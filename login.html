@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vistoria LOKAMIG | Scanner</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Vistoria LOKAMIG | Acesso</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -74,34 +73,21 @@
     </div>
 
     <script>
-        // Variáveis com nomes exclusivos para evitar erros de redeclaração
-        var SUPA_URL = 'https://guvapvlbqofnkbvibnci.supabase.co';
-        var SUPA_KEY = 'sb_publishable_ahwcIYfy3WkFZZ9x7TbzdA_anSph1I2';
-        var supabaseLOK;
-
-        // Inicializa o cliente apenas se a biblioteca carregar
-        try {
-            if (window.supabase) {
-                supabaseLOK = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-                console.log("Conexão Supabase preparada.");
-            }
-        } catch (e) {
-            console.error("Erro ao conectar ao banco:", e);
-        }
-
         function handleLogin() {
-            // Captura os dados dos inputs
+            // Captura os valores dos campos
             const u = document.getElementById('user_input').value.toLowerCase().trim();
             const p = document.getElementById('pass_input').value;
 
-            console.log("Tentativa de login para:", u);
+            console.log("Tentativa de acesso para:", u);
 
-            // Verificação de credenciais
+            // Lógica de login simples sem dependência de bibliotecas externas travando
             if (u === 'admin' && p === '1234') {
                 localStorage.setItem('user_role', 'ADMIN');
+                localStorage.setItem('session_username', 'Admin LOKAMIG');
                 window.location.href = 'index.html';
             } else if (u === 'lucas lima' && p === 'mudar@23') {
                 localStorage.setItem('user_role', 'SUPER_ADMIN');
+                localStorage.setItem('session_username', 'LUCAS LIMA');
                 window.location.href = 'admin.html';
             } else {
                 alert("Acesso Negado: Usuário ou senha incorretos.");
