@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub de Acesso | Grupo LOKAMIG</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(30, 41, 59, 0.5);
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .role-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .auth-container {
+            display: none;
+            text-align: left;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .auth-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animations -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2" style="background:var(--accent-blue);"></div>
+
+    <main class="app-container glass-panel" style="max-width: 420px; text-align: center; padding: 40px;">
+        <!-- Logo LOKAMIG (Texto/Imagem) -->
+        <h1 class="brand-title" style="font-size: 28px; margin-bottom: 5px; justify-content: center;">
+            <img src="https://img.icons8.com/color/64/000000/car-rental.png"
+                style="height:32px; margin-right:10px; filter: grayscale(100%) sepia(100%) hue-rotate(340deg) saturate(500%);" />
+            LOKAMIG
+        </h1>
+        <p class="subtitle" style="margin-bottom: 30px;">Identifique seu Nível de Operação</p>
+
+        <!-- Role Selection Tabs -->
+        <div class="role-selector">
+            <button class="role-btn active" onclick="selectRole('collaborator', this)">👷🏽 CHECKLIST</button>
+            <button class="role-btn" onclick="selectRole('vendor', this)">🏢 Fornecedor</button>
+            <button class="role-btn" onclick="selectRole('admin', this)">🛡️ ADM</button>
+        </div>
+
+        <!-- Forms -->
+
+        <!-- 1. Colaborador (Zero-Touch NFC) -->
+        <div id="form-collaborator" class="auth-container active">
+            <input type="text" id="collab-login" class="premium-input" placeholder="Login" style="margin-bottom: 15px;">
+            <input type="password" id="collab-pass" class="premium-input" placeholder="Senha"
+                style="margin-bottom: 20px;">
+            <button class="btn-primary" style="width: 100%; margin-bottom:15px;"
+                onclick="mockLogin('COLLABORATOR')">Acessar Pátio</button>
+
+            <div
+                style="background: rgba(209, 18, 42, 0.1); border: 1px dashed var(--primary-color); padding: 15px; border-radius: 8px;">
+                <button class="btn-primary" id="btn-login-nfc" onclick="listenNfcLogin()"
+                    style="width: 100%; background:transparent; border:1px solid var(--primary-color); color:var(--primary-color);">💳
+                    OU Usar Crachá (NFC Zero-Touch)</button>
+            </div>
+        </div>
+
+        <!-- 2. Vendor (E-mail/Pass) -->
+        <div id="form-vendor" class="auth-container">
+            <input type="text" id="vendor-email" class="premium-input" placeholder="Login" style="margin-bottom: 15px;">
+            <input type="password" id="vendor-pass" class="premium-input" placeholder="Senha"
+                style="margin-bottom: 20px;">
+            <button class="btn-primary" style="width: 100%;" onclick="mockLogin('VENDOR')">Acessar Painel
+                Oficina</button>
+        </div>
+
+        <!-- 3. Admin (E-mail/Pass) -->
+        <div id="form-admin" class="auth-container">
+            <input type="text" id="admin-email" class="premium-input" placeholder="Login" style="margin-bottom: 15px;">
+            <input type="password" id="admin-pass" class="premium-input" placeholder="Senha"
+                style="margin-bottom: 20px;">
+            <button class="btn-primary" style="width: 100%; background: #0f172a;"
+                onclick="mockLogin('ADMIN')">Autenticação Administrativa</button>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'https://guvapvlbqofnkbvibnci.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_ahwcIYfy3WkFZZ9x7TbzdA_anSph1I2';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function selectRole(roleId, btn) {
+            // Tabs UI
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Form UI
+            document.querySelectorAll('.auth-container').forEach(f => f.classList.remove('active'));
+            document.getElementById('form-' + roleId).classList.add('active');
+        }
+
+        function mockLogin(role) {
+            let loginName = '';
+            let pass = '';
+
+            if (role === 'ADMIN') {
+                loginName = document.getElementById('admin-email').value.toLowerCase().trim();
+                pass = document.getElementById('admin-pass').value;
+
+                // MODO DEUS (Hardcoded Backdoor intocável)
+                if (loginName === 'lucas lima' && pass === 'mudar@23') {
+                    localStorage.clear();
+                    localStorage.setItem('user_role', 'SUPER_ADMIN');
+                    localStorage.setItem('session_username', 'LUCAS LIMA (Modo Deus)');
+                    return window.location.href = 'admin.html';
+                }
+            } else if (role === 'VENDOR') {
+                loginName = document.getElementById('vendor-email').value.toLowerCase().trim();
+                pass = document.getElementById('vendor-pass').value;
+            } else if (role === 'COLLABORATOR') {
+                loginName = document.getElementById('collab-login').value.toLowerCase().trim();
+                pass = document.getElementById('collab-pass').value;
+            }
+
+            // Validação Relacional RBAC Falsa (Le o array que o ADM criar na tela)
+            const dbUsers = JSON.parse(localStorage.getItem('lokamig_users_db')) || [];
+            const found = dbUsers.find(u => u.login === loginName && u.senha === pass && u.roleGroup === role);
+
+            if (found) {
+                localStorage.setItem('user_role', found.roleSpecific); // Ex: MANAGER, SUPERVISOR...
+                localStorage.setItem('session_username', found.nome);
+
+                if (role === 'ADMIN') window.location.href = 'admin.html';
+                else if (role === 'COLLABORATOR') window.location.href = 'index.html';
+                else if (role === 'VENDOR') window.location.href = 'index.html';
+            } else {
+                alert("Acesso Negado: Credenciais não localizadas no Banco de Dados ADM.");
+            }
+        }
+
+        async function listenNfcLogin() {
+            if (!('NDEFReader' in window)) {
+                return alert('Ocorreu um erro: Dispositivo incompatível com Web NFC API (Certifique-se que usa HTTPS no Android).');
+            }
+            try {
+                const ndef = new NDEFReader();
+                document.getElementById('btn-login-nfc').innerText = "Lendo... Encoste o cartão.";
+                await ndef.scan();
+                ndef.addEventListener("reading", ({ serialNumber }) => {
+                    console.log("LOGIN REQUEST, NFC UID: " + serialNumber);
+
+                    const operators = JSON.parse(localStorage.getItem('auditor_operators')) || [];
+                    const user = operators.find(o => o.nfcUid === serialNumber);
+
+                    if (user) {
+                        document.getElementById('btn-login-nfc').style.background = '#3b82f6';
+                        document.getElementById('btn-login-nfc').innerText = "✅ Aprovado: " + user.name;
+
+                        localStorage.setItem('user_role', 'COLLABORATOR');
+                        localStorage.setItem('session_user_id', user.registration);
+                        localStorage.setItem('session_username', user.name);
+
+                        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                    } else {
+                        document.getElementById('btn-login-nfc').style.background = '#dc2626';
+                        document.getElementById('btn-login-nfc').innerText = "🚫 Cartão Desconhecido";
+                        setTimeout(() => {
+                            document.getElementById('btn-login-nfc').innerText = "📡 Ativar Leitor Novamente";
+                            document.getElementById('btn-login-nfc').style.background = "var(--primary-color)";
+                        }, 2500);
+                    }
+                });
+            } catch (err) {
+                alert("Permissão NFC Negada ou Hardware Inválido.");
+            }
+        }
+    </script>
+</body>
+
+</html>
