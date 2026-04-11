@@ -61,9 +61,9 @@
         }
 
         .step-circle.active {
-            border-color: var(--primary-color);
+            border-color: #000;
             color: white;
-            background: var(--primary-color);
+            background: #000;
         }
 
         .step-circle.done {
@@ -95,29 +95,63 @@
             pointer-events: none;
             z-index: 10;
         }
+
+        /* Estilos da Tela de Login */
+        #login-screen {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .premium-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        .btn-primary {
+            background: #000;
+            color: #fff;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 
-<body style="background:var(--bg-dark);">
+<body style="background:#f4f7f6; font-family: 'Montserrat', sans-serif;">
 
-    <div class="app-layout">
-        <div class="header-swap">
-            <div style="display:flex; align-items:center;">
-                <img src="https://img.icons8.com/color/64/000000/car-rental.png"
-                    style="height:32px; margin-right:10px;" />
-                <div>
-                    <h1 style="margin:0; font-size:18px; color:var(--primary-color);">LOKAMIG</h1>
-                    <p style="margin:0; font-size:12px; color:var(--text-muted);" id="user-badge">Carregando...</p>
+    <div id="login-screen">
+        <img src="https://img.icons8.com/color/96/000000/car-rental.png" style="margin-bottom:20px;">
+        <h1 style="margin:0; font-size:24px; color:#000;">LOKAMIG</h1>
+        <p style="color:#666; margin-bottom:30px;">Acesso ao Pátio de Vistoria</p>
+
+        <input type="text" id="user-input" class="premium-input" placeholder="Usuário">
+        <input type="password" id="pass-input" class="premium-input" placeholder="Senha">
+        <button class="btn-primary" onclick="handleLogin()">Acessar Pátio</button>
+    </div>
+
+    <div id="app-screen" style="display:none;">
+        <div class="app-layout">
+            <div class="header-swap">
+                <div style="display:flex; align-items:center;">
+                    <img src="https://img.icons8.com/color/64/000000/car-rental.png"
+                        style="height:32px; margin-right:10px;" />
+                    <div>
+                        <h1 style="margin:0; font-size:18px; color:#000;">LOKAMIG</h1>
+                        <p style="margin:0; font-size:12px; color:#666;" id="user-badge">Vistoriador</p>
+                    </div>
                 </div>
+                <button onclick="logout()"
+                    style="background:#ddd; border:none; padding:5px 10px; border-radius:5px;">Sair</button>
             </div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="window.location.href='admin.html'" class="btn-alt" id="admin-btn"
-                    style="display:none;">⚙️ ADM</button>
-                <button onclick="logout()" class="btn-secondary" style="padding:8px 12px; font-size:12px;">Sair</button>
-            </div>
-        </div>
 
-        <div class="glass-panel" style="flex:1; display:flex; flex-direction:column; padding: 25px;">
             <div class="stepper-header">
                 <div class="step-circle active" id="st-1">1</div>
                 <div class="step-circle" id="st-2">2</div>
@@ -128,22 +162,21 @@
             </div>
 
             <h2 id="step-title" style="margin:0; text-align:center;">Foto Frontal / Placa</h2>
-            <p id="step-desc" style="font-size:13px; color:var(--text-muted); text-align:center;">Toque no quadro abaixo
-                para iniciar.</p>
+            <p id="step-desc" style="font-size:13px; color:#666; text-align:center;">Toque no quadro abaixo para
+                iniciar.</p>
 
             <div class="camera-viewport" id="cam-view" onclick="startCamera()">
                 <span id="cam-text" style="font-size:40px;">📸</span>
             </div>
 
-            <div id="ocr-results"
-                style="display:none; background:#fff; padding:15px; border-radius:8px; border-left: 4px solid var(--primary-color);">
+            <div id="ocr-results" style="display:none; background:#fff; padding:15px; border-radius:8px;">
                 <input type="text" id="final-plate" class="premium-input" placeholder="Placa">
                 <input type="number" id="final-km" class="premium-input" placeholder="KM">
-                <button class="btn-primary" onclick="submitFinalVistoria()"
-                    style="width:100%; margin-top:10px;">Transmitir Laudo</button>
+                <button class="btn-primary" onclick="submitFinalVistoria()">Transmitir Laudo</button>
             </div>
 
-            <button id="btn-fallback" class="btn-secondary" style="width:100%; margin-top:10px;"
+            <button id="btn-fallback"
+                style="width:100%; margin-top:10px; background:none; border:1px solid #ccc; padding:10px; border-radius:8px;"
                 onclick="triggerManualFallback()">Usar Galeria</button>
             <input type="file" id="fake-gallery" accept="image/*" style="display:none;" onchange="galleryUploaded()">
         </div>
@@ -151,21 +184,17 @@
 
     <script src="app.js"></script>
     <script>
-        if (!localStorage.getItem('session_username')) {
-            window.location.href = 'login.html';
-        } else {
-            document.getElementById('user-badge').innerText = localStorage.getItem('session_username');
-            if (localStorage.getItem('user_role') === 'ADMIN') {
-                document.getElementById('admin-btn').style.display = 'block';
-            }
+        // Função para sair
+        function logout() {
+            localStorage.clear();
+            window.location.reload();
         }
 
-        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js');
-            });
+        // Verifica se já está logado ao abrir
+        if (localStorage.getItem('session_username')) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+            document.getElementById('user-badge').innerText = localStorage.getItem('session_username');
         }
     </script>
 </body>

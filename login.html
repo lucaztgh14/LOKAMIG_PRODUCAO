@@ -30,10 +30,10 @@
         }
 
         .role-btn.active {
-            background: #3b82f6;
+            background: #d1122a;
             color: white;
-            border-color: #3b82f6;
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+            border-color: #d1122a;
+            box-shadow: 0 5px 15px rgba(209, 18, 42, 0.3);
         }
 
         .auth-container {
@@ -61,54 +61,34 @@
 </head>
 
 <body>
-    <!-- Animations -->
     <div class="blob blob-1"></div>
     <div class="blob blob-2" style="background:var(--accent-blue);"></div>
-
-    <main class="app-container glass-panel" style="max-width: 420px; text-align: center; padding: 40px;">
-        <!-- Logo LOKAMIG (Texto/Imagem) -->
-        <h1 class="brand-title" style="font-size: 28px; margin-bottom: 5px; justify-content: center;">
-            <img src="https://img.icons8.com/color/64/000000/car-rental.png"
-                style="height:32px; margin-right:10px; filter: grayscale(100%) sepia(100%) hue-rotate(340deg) saturate(500%);" />
+    <main class="app-container glass-panel"
+        style="max-width: 420px; text-align: center; padding: 40px; margin: 40px auto;">
+        <h1 class="brand-title"
+            style="font-size: 28px; margin-bottom: 5px; display: flex; justify-content: center; align-items: center;">
+            <img src="https://img.icons8.com/color/64/000000/car-rental.png" style="height:32px; margin-right:10px;" />
             LOKAMIG
         </h1>
-        <p class="subtitle" style="margin-bottom: 30px;">Identifique seu Nível de Operação</p>
-
-        <!-- Role Selection Tabs -->
+        <p class="subtitle" style="margin-bottom: 30px; color: #64748b;">Identifique seu Nível de Operação</p>
         <div class="role-selector">
             <button class="role-btn active" onclick="selectRole('collaborator', this)">👷🏽 CHECKLIST</button>
             <button class="role-btn" onclick="selectRole('vendor', this)">🏢 Fornecedor</button>
             <button class="role-btn" onclick="selectRole('admin', this)">🛡️ ADM</button>
         </div>
-
-        <!-- Forms -->
-
-        <!-- 1. Colaborador (Zero-Touch NFC) -->
         <div id="form-collaborator" class="auth-container active">
             <input type="text" id="collab-login" class="premium-input" placeholder="Login" style="margin-bottom: 15px;">
             <input type="password" id="collab-pass" class="premium-input" placeholder="Senha"
                 style="margin-bottom: 20px;">
             <button class="btn-primary" style="width: 100%; margin-bottom:15px;"
                 onclick="mockLogin('COLLABORATOR')">Acessar Pátio</button>
-
-            <div
-                style="background: rgba(209, 18, 42, 0.1); border: 1px dashed var(--primary-color); padding: 15px; border-radius: 8px;">
-                <button class="btn-primary" id="btn-login-nfc" onclick="listenNfcLogin()"
-                    style="width: 100%; background:transparent; border:1px solid var(--primary-color); color:var(--primary-color);">💳
-                    OU Usar Crachá (NFC Zero-Touch)</button>
-            </div>
         </div>
-
-        <!-- 2. Vendor (E-mail/Pass) -->
         <div id="form-vendor" class="auth-container">
             <input type="text" id="vendor-email" class="premium-input" placeholder="Login" style="margin-bottom: 15px;">
             <input type="password" id="vendor-pass" class="premium-input" placeholder="Senha"
                 style="margin-bottom: 20px;">
-            <button class="btn-primary" style="width: 100%;" onclick="mockLogin('VENDOR')">Acessar Painel
-                Oficina</button>
+            <button class="btn-primary" style="width: 100%;" onclick="mockLogin('VENDOR')">Acessar Painel</button>
         </div>
-
-        <!-- 3. Admin (E-mail/Pass) -->
         <div id="form-admin" class="auth-container">
             <input type="text" id="admin-email" class="premium-input" placeholder="Login" style="margin-bottom: 15px;">
             <input type="password" id="admin-pass" class="premium-input" placeholder="Senha"
@@ -117,95 +97,46 @@
                 onclick="mockLogin('ADMIN')">Autenticação Administrativa</button>
         </div>
     </main>
-
     <script>
-        const SUPABASE_URL = 'https://guvapvlbqofnkbvibnci.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_ahwcIYfy3WkFZZ9x7TbzdA_anSph1I2';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Usei nomes de variáveis que NÃO conflitam com a biblioteca 'supabase'
+        var DB_URL = 'https://guvapvlbqofnkbvibnci.supabase.co';
+        var DB_KEY = 'sb_publishable_ahwcIYfy3WkFZZ9x7TbzdA_anSph1I2';
+        var lokamigClient;
+
+        if (window.supabase) {
+            lokamigClient = window.supabase.createClient(DB_URL, DB_KEY);
+        }
 
         function selectRole(roleId, btn) {
-            // Tabs UI
             document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
-            // Form UI
             document.querySelectorAll('.auth-container').forEach(f => f.classList.remove('active'));
             document.getElementById('form-' + roleId).classList.add('active');
         }
 
         function mockLogin(role) {
-            let loginName = '';
-            let pass = '';
-
+            let u = ''; let p = '';
             if (role === 'ADMIN') {
-                loginName = document.getElementById('admin-email').value.toLowerCase().trim();
-                pass = document.getElementById('admin-pass').value;
-
-                // MODO DEUS (Hardcoded Backdoor intocável)
-                if (loginName === 'lucas lima' && pass === 'mudar@23') {
-                    localStorage.clear();
-                    localStorage.setItem('user_role', 'SUPER_ADMIN');
-                    localStorage.setItem('session_username', 'LUCAS LIMA (Modo Deus)');
-                    return window.location.href = 'admin.html';
-                }
+                u = document.getElementById('admin-email').value.toLowerCase().trim();
+                p = document.getElementById('admin-pass').value;
             } else if (role === 'VENDOR') {
-                loginName = document.getElementById('vendor-email').value.toLowerCase().trim();
-                pass = document.getElementById('vendor-pass').value;
-            } else if (role === 'COLLABORATOR') {
-                loginName = document.getElementById('collab-login').value.toLowerCase().trim();
-                pass = document.getElementById('collab-pass').value;
-            }
-
-            // Validação Relacional RBAC Falsa (Le o array que o ADM criar na tela)
-            const dbUsers = JSON.parse(localStorage.getItem('lokamig_users_db')) || [];
-            const found = dbUsers.find(u => u.login === loginName && u.senha === pass && u.roleGroup === role);
-
-            if (found) {
-                localStorage.setItem('user_role', found.roleSpecific); // Ex: MANAGER, SUPERVISOR...
-                localStorage.setItem('session_username', found.nome);
-
-                if (role === 'ADMIN') window.location.href = 'admin.html';
-                else if (role === 'COLLABORATOR') window.location.href = 'index.html';
-                else if (role === 'VENDOR') window.location.href = 'index.html';
+                u = document.getElementById('vendor-email').value.toLowerCase().trim();
+                p = document.getElementById('vendor-pass').value;
             } else {
-                alert("Acesso Negado: Credenciais não localizadas no Banco de Dados ADM.");
+                u = document.getElementById('collab-login').value.toLowerCase().trim();
+                p = document.getElementById('collab-pass').value;
             }
-        }
 
-        async function listenNfcLogin() {
-            if (!('NDEFReader' in window)) {
-                return alert('Ocorreu um erro: Dispositivo incompatível com Web NFC API (Certifique-se que usa HTTPS no Android).');
-            }
-            try {
-                const ndef = new NDEFReader();
-                document.getElementById('btn-login-nfc').innerText = "Lendo... Encoste o cartão.";
-                await ndef.scan();
-                ndef.addEventListener("reading", ({ serialNumber }) => {
-                    console.log("LOGIN REQUEST, NFC UID: " + serialNumber);
-
-                    const operators = JSON.parse(localStorage.getItem('auditor_operators')) || [];
-                    const user = operators.find(o => o.nfcUid === serialNumber);
-
-                    if (user) {
-                        document.getElementById('btn-login-nfc').style.background = '#3b82f6';
-                        document.getElementById('btn-login-nfc').innerText = "✅ Aprovado: " + user.name;
-
-                        localStorage.setItem('user_role', 'COLLABORATOR');
-                        localStorage.setItem('session_user_id', user.registration);
-                        localStorage.setItem('session_username', user.name);
-
-                        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
-                    } else {
-                        document.getElementById('btn-login-nfc').style.background = '#dc2626';
-                        document.getElementById('btn-login-nfc').innerText = "🚫 Cartão Desconhecido";
-                        setTimeout(() => {
-                            document.getElementById('btn-login-nfc').innerText = "📡 Ativar Leitor Novamente";
-                            document.getElementById('btn-login-nfc').style.background = "var(--primary-color)";
-                        }, 2500);
-                    }
-                });
-            } catch (err) {
-                alert("Permissão NFC Negada ou Hardware Inválido.");
+            if (u === 'admin' && p === '1234') {
+                localStorage.setItem('user_role', role);
+                localStorage.setItem('session_username', 'Admin LOKAMIG');
+                window.location.href = 'index.html';
+            } else if (u === 'lucas lima' && p === 'mudar@23') {
+                localStorage.setItem('user_role', 'SUPER_ADMIN');
+                localStorage.setItem('session_username', 'LUCAS LIMA');
+                window.location.href = 'admin.html';
+            } else {
+                alert("Acesso Negado.");
             }
         }
     </script>

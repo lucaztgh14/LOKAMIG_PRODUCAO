@@ -16,10 +16,11 @@ let collectedImages = [];
 let bypassFlag = false;
 let videoStream = null;
 
+// --- FUNÇÕES DE CÂMERA ---
+
 async function startCamera() {
     const container = document.getElementById('cam-view');
 
-    // Se o vídeo já existir, significa que o usuário quer tirar a foto
     if (document.getElementById('webcam-video')) {
         takePhoto();
         return;
@@ -116,6 +117,8 @@ function runOcrSimulation() {
     document.getElementById('final-km').value = "45000";
 }
 
+// --- ENVIO DE DADOS ---
+
 async function submitFinalVistoria() {
     const plat = document.getElementById('final-plate').value;
     const km = document.getElementById('final-km').value;
@@ -134,5 +137,26 @@ async function submitFinalVistoria() {
 
     const { error } = await supabase.from('vistorias').insert([obj]);
     if (error) alert("Erro: " + error.message);
-    else { alert("Laudo Enviado!"); window.location.reload(); }
+    else {
+        alert("Laudo Enviado!");
+        window.location.reload();
+    }
+}
+
+// --- SISTEMA DE LOGIN (ADICIONADO) ---
+
+function handleLogin() {
+    const user = document.getElementById('user-input').value;
+    const pass = document.getElementById('pass-input').value;
+
+    // Usuário 'admin' e senha '1234'
+    if (user === 'admin' && pass === '1234') {
+        localStorage.setItem('session_username', user);
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'block';
+        // Inicia a câmera automaticamente após o login se desejar
+        // startCamera(); 
+    } else {
+        alert('Usuário ou senha incorretos!');
+    }
 }

@@ -19,20 +19,25 @@ self.addEventListener('install', event => {
       return cache.addAll(assets);
     })
   );
+  self.skipWaiting();
 });
 
-// Estratégia: Tenta buscar na rede, se falhar (offline), busca no cache
+// Estratégia: Tenta o Cache primeiro para os arquivos listados, senão vai para a rede
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
+    caches.match(event.request).then(cachedResponse => {
+      // Se tiver no cache, entrega o do cache. Se não, busca na rede.
+      return cachedResponse || fetch(event.request).catch(() => {
+        // Se a rede falhar e não tiver no cache (ex: uma imagem nova)
+        console.log('Falha na rede e arquivo não está no cache.');
+      });
     })
   );
 });
 
-// Limpa caches antigos
+// Limpa caches antigos quando houver atualização de versão
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
@@ -41,4 +46,5 @@ self.addEventListener('activate', event => {
       );
     })
   );
+  self.clients.claim();
 });
