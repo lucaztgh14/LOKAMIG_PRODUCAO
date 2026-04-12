@@ -154,13 +154,38 @@
         .admin-box {
             max-width: 850px;
             width: 95%;
+            height: 90vh;
+            overflow-y: auto;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: #1e293b;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            color: #fff;
+            cursor: pointer;
+            flex: 1;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .tab-active {
+            background: var(--primary);
+            border-color: var(--primary);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 11px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         th {
@@ -173,7 +198,6 @@
         td {
             padding: 10px;
             border-bottom: 1px solid #334155;
-            cursor: pointer;
         }
 
         .modal-detalhes {
@@ -255,10 +279,10 @@
         <input type="number" id="v-km" placeholder="KM ATUAL (Manual)">
         <select id="v-comb">
             <option value="Vazio">Nível Combustível: Vazio</option>
-            <option value="1/4">Nível Combustível: 1/4</option>
-            <option value="1/2">Nível Combustível: 1/2</option>
-            <option value="3/4">Nível Combustível: 3/4</option>
-            <option value="Cheio">Nível Combustível: Cheio</option>
+            <option value="1/4">1/4</option>
+            <option value="1/2">1/2</option>
+            <option value="3/4">3/4</option>
+            <option value="Cheio">Cheio</option>
         </select>
         <textarea id="v-obs" placeholder="Observações de manutenção..."></textarea>
         <button onclick="iniciarFluxoFotos()">Acessar Câmera</button>
@@ -271,58 +295,142 @@
             <canvas id="canvas"></canvas>
         </div>
         <button class="btn-avaria" onclick="marcarAvaria()">⚠️ REGISTRAR AVARIA NESTE ÂNGULO</button>
-
         <div class="cam-nav">
             <button class="btn-sec" onclick="mudarFoto(-1)">Voltar</button>
             <button onclick="capturarEProxima()">Próximo / Tirar Foto</button>
         </div>
-        <div id="foto-info" style="font-size: 11px; margin-top: 10px; color: #94a3b8;">Foto 1 de 8</div>
+        <div id="foto-info" style="font-size: 11px; margin-top: 10px; color: #94a3b8;">Ângulo 1 de 8</div>
     </section>
 
     <section id="scr-admin" class="container admin-box hidden">
-        <h1 style="color: var(--primary);">MONITORAMENTO ESCRITÓRIO</h1>
-        <div class="sub">Clique em uma linha para ver o Dossiê</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>HORA</th>
-                    <th>PLACA</th>
-                    <th>MOTORISTA</th>
-                    <th>TIPO</th>
-                </tr>
-            </thead>
-            <tbody id="logs-body"></tbody>
-        </table>
+        <h1 style="color: var(--primary);">PAINEL DE CONTROLE</h1>
+        <div class="tabs">
+            <button id="btn-tab-mon" class="tab-btn tab-active" onclick="switchTab('mon')">Monitoramento</button>
+            <button id="btn-tab-cad" class="tab-btn" onclick="switchTab('cad')">Colaboradores</button>
+        </div>
+
+        <div id="area-monitor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>HORA</th>
+                        <th>PLACA</th>
+                        <th>MOTORISTA</th>
+                        <th>TIPO</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-body"></tbody>
+            </table>
+        </div>
+
+        <div id="area-cadastro" class="hidden">
+            <div
+                style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; text-align: left; margin-bottom: 20px;">
+                <label style="font-size: 11px;">NOME COMPLETO</label>
+                <input type="text" id="reg-nome" placeholder="ex: nome completo">
+                <label style="font-size: 11px;">MATRÍCULA</label>
+                <input type="text" id="reg-mat" placeholder="ex: T123456">
+                <label style="font-size: 11px;">ID DO CRACHÁ (NFC)</label>
+                <input type="text" id="reg-id" placeholder="123456789">
+                <button onclick="salvarColaborador()" style="background: var(--success);">Ativar e Cadastrar</button>
+            </div>
+            <h2 style="font-size: 14px; text-align: left; color: var(--primary);">EQUIPE CADASTRADA</h2>
+            <table id="tbl-colaboradores">
+                <thead>
+                    <tr>
+                        <th>NOME</th>
+                        <th>MATRÍCULA</th>
+                        <th>AÇÃO</th>
+                    </tr>
+                </thead>
+                <tbody id="colab-body"></tbody>
+            </table>
+        </div>
+
         <button onclick="location.reload()" class="btn-sec" style="margin-top:20px;">Sair</button>
     </section>
 
     <div id="scr-detalhes" class="modal-detalhes hidden">
-        <h1 id="det-placa" style="color: var(--primary);">PLACA ABC-1234</h1>
-        <div id="det-info" style="text-align: left; margin: 20px 0; line-height: 1.6;"></div>
+        <h1 id="det-placa" style="color: var(--primary);">Dossiê</h1>
+        <div id="det-info" style="text-align: left; margin: 20px 0;"></div>
         <div class="photo-grid" id="det-fotos"></div>
         <div class="cam-nav btn-print-hide">
             <button onclick="window.print()" style="background: var(--success);">Gerar Relatório PDF</button>
-            <button onclick="show('scr-admin')" class="btn-sec">Voltar ao Painel</button>
+            <button onclick="show('scr-admin')" class="btn-sec">Voltar</button>
         </div>
     </div>
 
     <script>
         const LOG_DB = 'lokamig_logs_v5';
+        const USER_DB = 'lokamig_users_v5';
         let fluxo = ["Frente", "Lateral Esquerda", "Traseira", "Lateral Direita", "Estepe", "Painel/KM", "Motor", "Rodas"];
         let indexFoto = 0;
         let fotosCapturadas = {};
         let avariasEncontradas = [];
+
+        // Carregar Lucas Lima por padrão
+        if (!localStorage.getItem(USER_DB)) {
+            localStorage.setItem(USER_DB, JSON.stringify([{ nome: "LUCAS LIMA", mat: "T531971", id: "295698351" }]));
+        }
 
         function show(id) {
             document.querySelectorAll('section, .modal-detalhes').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
+        function switchTab(tab) {
+            document.getElementById('area-monitor').classList.toggle('hidden', tab !== 'mon');
+            document.getElementById('area-cadastro').classList.toggle('hidden', tab !== 'cad');
+            document.getElementById('btn-tab-mon').classList.toggle('tab-active', tab === 'mon');
+            document.getElementById('btn-tab-cad').classList.toggle('tab-active', tab === 'cad');
+            if (tab === 'cad') carregarListaColaboradores();
+        }
+
         function handleLogin() {
             const u = document.getElementById('user').value.toLowerCase();
             const p = document.getElementById('pass').value;
             if (u === 'admin' && p === '1234') { carregarAdmin(); }
-            else { show('scr-form'); }
+            else {
+                const users = JSON.parse(localStorage.getItem(USER_DB));
+                const found = users.find(x => x.mat.toLowerCase() === u);
+                if (found) show('scr-form');
+                else alert("Usuário não cadastrado.");
+            }
+        }
+
+        function salvarColaborador() {
+            const nome = document.getElementById('reg-nome').value.toUpperCase();
+            const mat = document.getElementById('reg-mat').value.toUpperCase();
+            const id = document.getElementById('reg-id').value;
+            if (!nome || !mat || !id) return alert("Preencha todos os campos.");
+            const users = JSON.parse(localStorage.getItem(USER_DB));
+            users.push({ nome, mat, id });
+            localStorage.setItem(USER_DB, JSON.stringify(users));
+            alert("Colaborador cadastrado!");
+            document.getElementById('reg-nome').value = '';
+            document.getElementById('reg-mat').value = '';
+            document.getElementById('reg-id').value = '';
+            carregarListaColaboradores();
+        }
+
+        function carregarListaColaboradores() {
+            const users = JSON.parse(localStorage.getItem(USER_DB));
+            document.getElementById('colab-body').innerHTML = users.map((u, i) => `
+            <tr>
+                <td>${u.nome}</td>
+                <td>${u.mat}</td>
+                <td><button onclick="removerColaborador(${i})" style="padding:5px; background:var(--primary); font-size:9px;">Excluir</button></td>
+            </tr>
+        `).join('');
+        }
+
+        function removerColaborador(index) {
+            if (confirm("Deseja remover este colaborador?")) {
+                const users = JSON.parse(localStorage.getItem(USER_DB));
+                users.splice(index, 1);
+                localStorage.setItem(USER_DB, JSON.stringify(users));
+                carregarListaColaboradores();
+            }
         }
 
         async function iniciarFluxoFotos() {
@@ -347,40 +455,31 @@
 
         function marcarAvaria() {
             avariasEncontradas.push(fluxo[indexFoto]);
-            alert("Avaria registrada para: " + fluxo[indexFoto]);
+            alert("Avaria registrada!");
         }
 
         function capturarEProxima() {
             const video = document.getElementById('vid');
             const canvas = document.getElementById('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-
             fotosCapturadas[fluxo[indexFoto]] = canvas.toDataURL('image/jpeg', 0.5);
-
             if (indexFoto === fluxo.length - 1) finalizarVistoria();
             else mudarFoto(1);
         }
 
         function finalizarVistoria() {
             const log = {
-                id: Date.now(),
-                data: new Date().toLocaleDateString(),
-                hora: new Date().toLocaleTimeString(),
-                op: "LUCAS LIMA (T531971)",
-                placa: document.getElementById('v-placa').value || '---',
-                km: document.getElementById('v-km').value || '---',
-                comb: document.getElementById('v-comb').value,
-                tipo: document.getElementById('v-tipo').value,
-                obs: document.getElementById('v-obs').value || 'Nenhuma observação.',
-                fotos: fotosCapturadas,
-                avarias: avariasEncontradas
+                id: Date.now(), data: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString(),
+                op: "LUCAS LIMA (T531971)", placa: document.getElementById('v-placa').value || '---',
+                km: document.getElementById('v-km').value || '---', comb: document.getElementById('v-comb').value,
+                tipo: document.getElementById('v-tipo').value, obs: document.getElementById('v-obs').value || 'Nenhuma.',
+                fotos: fotosCapturadas, avarias: avariasEncontradas
             };
             const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
             logs.unshift(log);
             localStorage.setItem(LOG_DB, JSON.stringify(logs));
-            alert("Vistoria finalizada com sucesso!");
+            alert("Vistoria enviada!");
             location.reload();
         }
 
@@ -389,10 +488,7 @@
             const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
             document.getElementById('logs-body').innerHTML = logs.map(l => `
             <tr onclick='verDossie(${JSON.stringify(l)})'>
-                <td>${l.hora}</td>
-                <td>${l.placa}</td>
-                <td>${l.op}</td>
-                <td>${l.tipo}</td>
+                <td>${l.hora}</td><td>${l.placa}</td><td>${l.op}</td><td>${l.tipo}</td>
             </tr>
         `).join('');
         }
@@ -403,17 +499,13 @@
             document.getElementById('det-info').innerHTML = `
             <p><b>Data:</b> ${log.data} às ${log.hora}</p>
             <p><b>Motorista:</b> ${log.op}</p>
-            <p><b>KM Atual:</b> ${log.km} | <b>Combustível:</b> ${log.comb}</p>
-            <p><b>Tipo:</b> ${log.tipo}</p>
-            <p><b>Avarias Identificadas:</b> ${log.avarias.join(', ') || 'Nenhuma'}</p>
-            <p><b>Manutenção/Obs:</b> ${log.obs}</p>
+            <p><b>KM:</b> ${log.km} | <b>Combustível:</b> ${log.comb}</p>
+            <p><b>Avarias:</b> ${log.avarias.join(', ') || 'Nenhuma'}</p>
+            <p><b>Obs:</b> ${log.obs}</p>
         `;
-
-            let htmlFotos = "";
-            for (let key in log.fotos) {
-                htmlFotos += `<div class="photo-card"><img src="${log.fotos[key]}"><span>${key}</span></div>`;
-            }
-            document.getElementById('det-fotos').innerHTML = htmlFotos;
+            let h = "";
+            for (let k in log.fotos) h += `<div class="photo-card"><img src="${log.fotos[k]}"><span>${k}</span></div>`;
+            document.getElementById('det-fotos').innerHTML = h;
         }
     </script>
 </body>
