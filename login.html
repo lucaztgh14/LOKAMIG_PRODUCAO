@@ -162,6 +162,9 @@
             padding: 10px;
             font-size: 12px;
             border-radius: 8px;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
 
         .tab-active {
@@ -257,11 +260,11 @@
         <div id="tab-cadastro" class="hidden">
             <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; text-align: left;">
                 <label>Nome do Colaborador</label>
-                <input type="text" id="reg-nome" placeholder="Ex: Lucas Lima">
+                <input type="text" id="reg-nome" placeholder="ex: nome completo">
                 <label>Matrícula</label>
-                <input type="text" id="reg-mat" placeholder="Ex: T531971">
-                <label>ID do Crachá (Aproxime do NFC ou digite)</label>
-                <input type="text" id="reg-id" placeholder="Ex: 295698351">
+                <input type="text" id="reg-mat" placeholder="ex: T123456">
+                <label>ID do Crachá (NFC)</label>
+                <input type="text" id="reg-id" placeholder="123456789">
                 <button onclick="salvarColaborador()" style="background: #10b981;">Ativar e Cadastrar</button>
             </div>
         </div>
@@ -273,7 +276,6 @@
         const DB_KEY = 'lokamig_logs_v4';
         const USER_DB = 'lokamig_users_v4';
 
-        // Dados Iniciais (Seu Crachá)
         if (!localStorage.getItem(USER_DB)) {
             localStorage.setItem(USER_DB, JSON.stringify([{
                 nome: "LUCAS LIMA", mat: "T531971", id: "295698351"
@@ -290,7 +292,7 @@
             document.getElementById('tab-cadastro').classList.add('hidden');
             document.getElementById('tab-' + name).classList.remove('hidden');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-            event.target.classList.add('tab-active');
+            event.currentTarget.classList.add('tab-active');
         }
 
         function handleLogin() {
@@ -301,12 +303,10 @@
                 show('scr-admin');
                 carregarLogs();
             } else {
-                // Tenta login por matrícula
                 const users = JSON.parse(localStorage.getItem(USER_DB));
                 const found = users.find(user => user.mat.toLowerCase() === u);
-                if (found) {
-                    acessarApp(found);
-                } else { alert("Usuário não encontrado."); }
+                if (found) acessarApp(found);
+                else alert("Usuário não encontrado.");
             }
         }
 
@@ -314,7 +314,7 @@
             if ('NDEFReader' in window) {
                 try {
                     const ndef = new NDEFReader();
-                    alert("Aproxime o crachá do sensor NFC...");
+                    alert("Aproxime o crachá...");
                     await ndef.scan();
                     ndef.onreading = event => {
                         const serial = event.serialNumber.replace(/:/g, "").toUpperCase();
@@ -323,9 +323,9 @@
                         if (found) acessarApp(found);
                         else alert("Crachá não cadastrado ID: " + serial);
                     };
-                } catch (e) { alert("NFC não disponível ou bloqueado."); }
+                } catch (e) { alert("NFC indisponível."); }
             } else {
-                const idManual = prompt("NFC não detectado. Digite o ID do Crachá:");
+                const idManual = prompt("Digite o ID do Crachá:");
                 const users = JSON.parse(localStorage.getItem(USER_DB));
                 const found = users.find(u => u.id === idManual);
                 if (found) acessarApp(found);
@@ -345,12 +345,12 @@
             const mat = document.getElementById('reg-mat').value;
             const id = document.getElementById('reg-id').value;
 
-            if (!nome || !mat || !id) return alert("Preencha todos os campos.");
+            if (!nome || !mat || !id) return alert("Preencha tudo.");
 
             const users = JSON.parse(localStorage.getItem(USER_DB));
             users.push({ nome, mat, id });
             localStorage.setItem(USER_DB, JSON.stringify(users));
-            alert("Colaborador " + nome + " cadastrado com sucesso!");
+            alert("Colaborador cadastrado!");
             document.getElementById('reg-nome').value = '';
             document.getElementById('reg-mat').value = '';
             document.getElementById('reg-id').value = '';
@@ -375,7 +375,7 @@
             const logs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
             logs.unshift(log);
             localStorage.setItem(DB_KEY, JSON.stringify(logs));
-            alert("Enviado para o escritório!");
+            alert("Enviado!");
             location.reload();
         }
 
