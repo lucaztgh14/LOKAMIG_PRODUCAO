@@ -87,6 +87,12 @@
             text-transform: uppercase;
         }
 
+        .btn-nfc {
+            background: #1e293b;
+            margin-top: 10px;
+            border: 1px dashed var(--primary);
+        }
+
         .user-card {
             background: rgba(209, 18, 42, 0.15);
             border: 1px solid var(--primary);
@@ -119,6 +125,7 @@
             font-size: 10px;
             padding: 12px;
             border: 1px solid #334155;
+            color: white;
         }
 
         .done {
@@ -140,8 +147,25 @@
 
         /* Painel Escritório */
         .admin-box {
-            max-width: 800px;
+            max-width: 850px;
             width: 95%;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: #1e293b;
+            padding: 10px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        .tab-active {
+            background: var(--primary);
         }
 
         table {
@@ -173,6 +197,7 @@
         <input type="text" id="user" placeholder="Usuário">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
+        <button class="btn-nfc" onclick="lerCrachaNFC()">📲 ACESSAR VIA CRACHÁ</button>
     </section>
 
     <section id="scr-welcome" class="container hidden">
@@ -180,9 +205,9 @@
         <div class="user-card">
             <div class="user-photo"></div>
             <div>
-                <b style="font-size: 15px;">LUCAS LIMA</b><br>
-                <small>Matrícula: T531971</small><br>
-                <small>Crachá: 295698351</small>
+                <b id="user-name-display" style="font-size: 15px;">CARREGANDO...</b><br>
+                <small id="user-mat-display">Matrícula: ---</small><br>
+                <small id="user-id-display">Crachá: ---</small>
             </div>
         </div>
         <select id="tipo-servico">
@@ -208,29 +233,64 @@
     </section>
 
     <section id="scr-admin" class="container admin-box hidden">
-        <h1 style="color: var(--primary);">MONITORAMENTO ESCRITÓRIO</h1>
-        <div class="sub">Logs de Vistoria em Tempo Real</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>HORA</th>
-                    <th>OPERADOR</th>
-                    <th>PLACA</th>
-                    <th>TIPO</th>
-                    <th>STATUS</th>
-                </tr>
-            </thead>
-            <tbody id="logs"></tbody>
-        </table>
+        <h1 style="color: var(--primary);">PAINEL DE CONTROLE</h1>
+        <div class="tabs">
+            <button class="tab-btn tab-active" onclick="tab('monitor')">Monitoramento</button>
+            <button class="tab-btn" onclick="tab('cadastro')">Cadastro Colaboradores</button>
+        </div>
+
+        <div id="tab-monitor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>HORA</th>
+                        <th>OPERADOR</th>
+                        <th>PLACA</th>
+                        <th>TIPO</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="logs"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-cadastro" class="hidden">
+            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; text-align: left;">
+                <label>Nome do Colaborador</label>
+                <input type="text" id="reg-nome" placeholder="Ex: Lucas Lima">
+                <label>Matrícula</label>
+                <input type="text" id="reg-mat" placeholder="Ex: T531971">
+                <label>ID do Crachá (Aproxime do NFC ou digite)</label>
+                <input type="text" id="reg-id" placeholder="Ex: 295698351">
+                <button onclick="salvarColaborador()" style="background: #10b981;">Ativar e Cadastrar</button>
+            </div>
+        </div>
+
         <button onclick="location.reload()" style="background:none; margin-top:20px; color:#94a3b8;">Sair</button>
     </section>
 
     <script>
-        const DB_KEY = 'lokamig_final_v4';
+        const DB_KEY = 'lokamig_logs_v4';
+        const USER_DB = 'lokamig_users_v4';
+
+        // Dados Iniciais (Seu Crachá)
+        if (!localStorage.getItem(USER_DB)) {
+            localStorage.setItem(USER_DB, JSON.stringify([{
+                nome: "LUCAS LIMA", mat: "T531971", id: "295698351"
+            }]));
+        }
 
         function show(id) {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
+        }
+
+        function tab(name) {
+            document.getElementById('tab-monitor').classList.add('hidden');
+            document.getElementById('tab-cadastro').classList.add('hidden');
+            document.getElementById('tab-' + name).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+            event.target.classList.add('tab-active');
         }
 
         function handleLogin() {
@@ -240,9 +300,60 @@
             if (u === 'admin' && p === '1234') {
                 show('scr-admin');
                 carregarLogs();
-            } else if (u !== '') {
-                show('scr-welcome');
+            } else {
+                // Tenta login por matrícula
+                const users = JSON.parse(localStorage.getItem(USER_DB));
+                const found = users.find(user => user.mat.toLowerCase() === u);
+                if (found) {
+                    acessarApp(found);
+                } else { alert("Usuário não encontrado."); }
             }
+        }
+
+        async function lerCrachaNFC() {
+            if ('NDEFReader' in window) {
+                try {
+                    const ndef = new NDEFReader();
+                    alert("Aproxime o crachá do sensor NFC...");
+                    await ndef.scan();
+                    ndef.onreading = event => {
+                        const serial = event.serialNumber.replace(/:/g, "").toUpperCase();
+                        const users = JSON.parse(localStorage.getItem(USER_DB));
+                        const found = users.find(u => u.id === serial);
+                        if (found) acessarApp(found);
+                        else alert("Crachá não cadastrado ID: " + serial);
+                    };
+                } catch (e) { alert("NFC não disponível ou bloqueado."); }
+            } else {
+                const idManual = prompt("NFC não detectado. Digite o ID do Crachá:");
+                const users = JSON.parse(localStorage.getItem(USER_DB));
+                const found = users.find(u => u.id === idManual);
+                if (found) acessarApp(found);
+                else alert("ID não cadastrado.");
+            }
+        }
+
+        function acessarApp(user) {
+            document.getElementById('user-name-display').textContent = user.nome;
+            document.getElementById('user-mat-display').textContent = "Matrícula: " + user.mat;
+            document.getElementById('user-id-display').textContent = "Crachá: " + user.id;
+            show('scr-welcome');
+        }
+
+        function salvarColaborador() {
+            const nome = document.getElementById('reg-nome').value;
+            const mat = document.getElementById('reg-mat').value;
+            const id = document.getElementById('reg-id').value;
+
+            if (!nome || !mat || !id) return alert("Preencha todos os campos.");
+
+            const users = JSON.parse(localStorage.getItem(USER_DB));
+            users.push({ nome, mat, id });
+            localStorage.setItem(USER_DB, JSON.stringify(users));
+            alert("Colaborador " + nome + " cadastrado com sucesso!");
+            document.getElementById('reg-nome').value = '';
+            document.getElementById('reg-mat').value = '';
+            document.getElementById('reg-id').value = '';
         }
 
         async function irParaCamera() {
@@ -254,9 +365,10 @@
         function marcar(id) { document.getElementById(id).classList.add('done'); }
 
         function salvarVistoria() {
+            const user = document.getElementById('user-name-display').textContent;
             const log = {
                 h: new Date().toLocaleTimeString(),
-                op: "LUCAS LIMA",
+                op: user,
                 pl: document.getElementById('placa').value || '---',
                 tp: document.getElementById('tipo-servico').value,
             };
@@ -270,13 +382,7 @@
         function carregarLogs() {
             const logs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
             document.getElementById('logs').innerHTML = logs.map(l => `
-            <tr>
-                <td>${l.h}</td>
-                <td>${l.op}</td>
-                <td>${l.pl}</td>
-                <td>${l.tp}</td>
-                <td style="color:#10b981">● CONCLUÍDO</td>
-            </tr>
+            <tr><td>${l.h}</td><td>${l.op}</td><td>${l.pl}</td><td>${l.tp}</td><td style="color:#10b981">● ATIVO</td></tr>
         `).join('');
         }
     </script>
