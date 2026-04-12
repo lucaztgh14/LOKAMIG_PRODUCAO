@@ -3,95 +3,258 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vistoria LOKAMIG | Acesso</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LOKAMIG | Sistema Integrado</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #0b1b2b;
+            --card: #152036;
+            --primary: #d1122a;
+            --text: #e9f0f7;
+            --muted: #a2b3c9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: #f4f4f4;
+            background: var(--bg);
+            color: var(--text);
             font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
         }
 
-        .login-card {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        .panel {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1,
+        h2 {
             text-align: center;
-            width: 100%;
-            max-width: 350px;
-        }
-
-        .logo {
-            width: 60px;
-            margin-bottom: 10px;
-        }
-
-        .premium-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        .btn-red {
-            width: 100%;
-            padding: 12px;
-            background: #b91c1c;
+            margin-bottom: 20px;
             color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            font-family: inherit;
         }
 
-        .btn-red:hover {
-            background: #991b1b;
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #32415b;
+            background: #0f1a2b;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .badge {
+            background: #1e293b;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        video {
+            width: 100%;
+            border-radius: 12px;
+            background: #000;
+            margin-top: 15px;
+        }
+
+        .status {
+            font-size: 13px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 10px;
+            display: block;
         }
     </style>
 </head>
 
 <body>
-    <div class="login-card">
-        <img src="https://img.icons8.com/color/96/000000/car-key.png" class="logo" alt="LOKAMIG">
-        <h2 style="margin: 0 0 5px 0;">LOKAMIG</h2>
-        <p style="color: #666; margin-bottom: 30px; font-size: 14px;">Acesso ao Pátio de Vistoria</p>
 
-        <input type="text" id="user_input" class="premium-input" placeholder="Login">
-        <input type="password" id="pass_input" class="premium-input" placeholder="Senha">
-        <button class="btn-red" onclick="handleLogin()">Acessar Pátio</button>
+    <div id="app" style="width: 100%;">
+        <section id="screen-login" class="panel">
+            <h1>LOKAMIG</h1>
+            <p style="text-align: center; font-size: 14px; margin-bottom: 25px;">Acesso Nível Deus</p>
+            <div class="input-group">
+                <label>Usuário</label>
+                <input type="text" id="input-login" placeholder="Ex: admin">
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="input-password" placeholder="****">
+            </div>
+            <button id="btn-login">ACESSAR SISTEMA</button>
+            <span class="status" id="status-public">Aguardando login...</span>
+        </section>
+
+        <section id="screen-master" class="panel hidden">
+            <h2>Painel Master</h2>
+            <div class="input-group">
+                <label>Nova Senha Admin</label>
+                <input type="password" id="admin-password" placeholder="Mudar senha">
+                <button onclick="mudarSenha()" style="background:#1e3a8a; font-size: 12px; padding: 8px;">Atualizar
+                    Senha</button>
+            </div>
+            <hr style="border: 0.5px solid #32415b; margin: 20px 0;">
+            <button id="btn-nfc-master" style="background:#1e293b;">💳 CADASTRAR CRACHÁ (NFC)</button>
+            <div style="text-align: center; margin-top: 10px;">
+                <span class="badge" id="badge-count">Crachás: 0</span>
+            </div>
+            <button onclick="irParaVistoria()" style="background:#0b7a0b;">INICIAR VISTORIA</button>
+            <button onclick="logout()" style="background:transparent; color:#666; font-size: 12px;">Sair do
+                Sistema</button>
+        </section>
+
+        <section id="screen-activate" class="panel hidden">
+            <h2>Ativação de Vistoria</h2>
+            <div id="nfc-area">
+                <p style="text-align: center;">Aproxime o crachá no celular para liberar a câmera.</p>
+                <button id="btn-scan-nfc">LER CRACHÁ</button>
+            </div>
+            <div id="camera-section" class="hidden">
+                <video id="video" autoplay playsinline></video>
+                <span class="status" id="status-ai">IA: Detectando danos...</span>
+                <button onclick="location.reload()" style="background:#32415b;">CONCLUIR</button>
+            </div>
+        </section>
     </div>
 
     <script>
-        function handleLogin() {
-            // Captura os valores dos campos
-            const u = document.getElementById('user_input').value.toLowerCase().trim();
-            const p = document.getElementById('pass_input').value;
+        const ADMIN_KEY = 'lokamig_pw';
+        const NFC_KEY = 'lokamig_nfc';
 
-            console.log("Tentativa de acesso para:", u);
+        // Inicia senha padrão
+        if (!localStorage.getItem(ADMIN_KEY)) localStorage.setItem(ADMIN_KEY, '1234');
 
-            // Lógica de login simples sem dependência de bibliotecas externas travando
-            if (u === 'admin' && p === '1234') {
-                localStorage.setItem('user_role', 'ADMIN');
-                localStorage.setItem('session_username', 'Admin LOKAMIG');
-                window.location.href = 'index.html';
-            } else if (u === 'lucas lima' && p === 'mudar@23') {
-                localStorage.setItem('user_role', 'SUPER_ADMIN');
-                localStorage.setItem('session_username', 'LUCAS LIMA');
-                window.location.href = 'admin.html';
+        function show(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        // Ação Login
+        document.getElementById('btn-login').addEventListener('click', () => {
+            const u = document.getElementById('input-login').value.toLowerCase().trim();
+            const p = document.getElementById('input-password').value;
+            const masterP = localStorage.getItem(ADMIN_KEY);
+
+            if (u === 'admin' && p === masterP) {
+                show('screen-master');
+                atualizarContador();
+            } else if (u !== '') {
+                show('screen-activate');
             } else {
-                alert("Acesso Negado: Usuário ou senha incorretos.");
+                alert("Preencha os campos!");
             }
+        });
+
+        function mudarSenha() {
+            const nova = document.getElementById('admin-password').value;
+            if (nova.length >= 4) {
+                localStorage.setItem(ADMIN_KEY, nova);
+                alert("Senha alterada!");
+            }
+        }
+
+        function atualizarContador() {
+            const arr = JSON.parse(localStorage.getItem(NFC_KEY) || '[]');
+            document.getElementById('badge-count').textContent = 'Crachás: ' + arr.length;
+        }
+
+        function logout() { localStorage.removeItem('user_active'); location.reload(); }
+        function irParaVistoria() { show('screen-activate'); }
+
+        // NFC E CÂMERA
+        document.getElementById('btn-nfc-master').addEventListener('click', async () => {
+            if ('NDEFReader' in window) {
+                try {
+                    const ndef = new NDEFReader();
+                    await ndef.scan();
+                    alert("NFC pronto! Aproxime o cartão.");
+                    ndef.onreading = (event) => {
+                        const arr = JSON.parse(localStorage.getItem(NFC_KEY) || '[]');
+                        if (!arr.includes(event.serialNumber)) {
+                            arr.push(event.serialNumber);
+                            localStorage.setItem(NFC_KEY, JSON.stringify(arr));
+                            atualizarContador();
+                            alert("Sucesso! Crachá registrado.");
+                        }
+                    };
+                } catch (e) { alert("NFC Erro: " + e); }
+            } else { alert("NFC não suportado neste PC/Celular."); }
+        });
+
+        document.getElementById('btn-scan-nfc').addEventListener('click', async () => {
+            if ('NDEFReader' in window) {
+                try {
+                    const ndef = new NDEFReader();
+                    await ndef.scan();
+                    alert("Aproxime o crachá para validar...");
+                    ndef.onreading = () => iniciarCamera();
+                } catch (e) { alert("Erro: " + e); }
+            } else {
+                // Mock para testar no PC sem NFC
+                if (confirm("Simular leitura de crachá?")) iniciarCamera();
+            }
+        });
+
+        async function iniciarCamera() {
+            document.getElementById('nfc-area').classList.add('hidden');
+            document.getElementById('camera-section').classList.remove('hidden');
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            document.getElementById('video').srcObject = stream;
         }
     </script>
 </body>
