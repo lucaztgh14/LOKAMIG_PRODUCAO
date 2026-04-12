@@ -201,6 +201,7 @@
         td {
             padding: 10px;
             border-bottom: 1px solid #334155;
+            cursor: pointer;
         }
 
         .modal-detalhes {
@@ -255,6 +256,10 @@
                 position: static;
                 background: white;
                 padding: 0;
+            }
+
+            .photo-grid {
+                grid-template-columns: 1fr 1fr 1fr;
             }
         }
     </style>
@@ -351,11 +356,13 @@
     </section>
 
     <div id="scr-detalhes" class="modal-detalhes hidden">
-        <h1 id="det-placa">Dossiê</h1>
-        <div id="det-info"></div>
+        <h1 id="det-placa" style="color: var(--primary);">Dossiê</h1>
+        <div id="det-info" style="text-align: left; margin: 20px 0; line-height: 1.6;"></div>
         <div class="photo-grid" id="det-fotos"></div>
-        <button onclick="window.print()">Gerar PDF</button>
-        <button onclick="show('scr-admin')">Voltar</button>
+        <div class="cam-nav btn-print-hide">
+            <button onclick="window.print()" style="background: var(--success);">Gerar Relatório PDF</button>
+            <button onclick="show('scr-admin')" class="btn-sec">Voltar</button>
+        </div>
     </div>
 
     <script>
@@ -384,7 +391,7 @@
             if (u === 'admin' && p === '1234') carregarAdmin();
             else {
                 const user = JSON.parse(localStorage.getItem(USER_DB)).find(x => x.mat.toLowerCase() === u);
-                if (user) logar(user); else alert("Não encontrado.");
+                if (user) logar(user); else alert("Usuário não cadastrado.");
             }
         }
 
@@ -399,7 +406,7 @@
                         const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === id);
                         if (user) logar(user); else alert("Crachá ID: " + id + " não cadastrado.");
                     };
-                } catch (e) { alert("NFC erro."); }
+                } catch (e) { alert("NFC não suportado ou erro de permissão."); }
             } else {
                 const id = prompt("Digite o ID do Crachá:");
                 const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === id);
@@ -416,21 +423,24 @@
 
         function salvarColaborador() {
             const n = document.getElementById('reg-nome').value.toUpperCase(), m = document.getElementById('reg-mat').value.toUpperCase(), i = document.getElementById('reg-id').value;
-            if (!n || !m || !i) return alert("Erro");
+            if (!n || !m || !i) return alert("Preencha todos os campos.");
             const u = JSON.parse(localStorage.getItem(USER_DB));
             u.push({ nome: n, mat: m, id: i });
             localStorage.setItem(USER_DB, JSON.stringify(u));
             carregarListaColaboradores();
+            alert("Cadastrado!");
         }
 
         function carregarListaColaboradores() {
             const u = JSON.parse(localStorage.getItem(USER_DB));
-            document.getElementById('colab-body').innerHTML = u.map((x, i) => `<tr><td>${x.nome}</td><td>${x.mat}</td><td><button onclick="removerColaborador(${i})">X</button></td></tr>`).join('');
+            document.getElementById('colab-body').innerHTML = u.map((x, i) => `<tr><td>${x.nome}</td><td>${x.mat}</td><td><button onclick="removerColaborador(${i})" style="background:var(--primary); padding:5px; font-size:9px;">X</button></td></tr>`).join('');
         }
 
         function removerColaborador(i) {
-            const u = JSON.parse(localStorage.getItem(USER_DB)); u.splice(i, 1);
-            localStorage.setItem(USER_DB, JSON.stringify(u)); carregarListaColaboradores();
+            if (confirm("Remover?")) {
+                const u = JSON.parse(localStorage.getItem(USER_DB)); u.splice(i, 1);
+                localStorage.setItem(USER_DB, JSON.stringify(u)); carregarListaColaboradores();
+            }
         }
 
         async function iniciarFluxoFotos() {
@@ -440,7 +450,7 @@
         }
 
         function atualizarInterfaceCam() {
-            document.getElementById('cam-label').innerText = "FOTO: " + fluxo[indexFoto].toUpperCase();
+            document.getElementById('cam-label').innerText = "FOTO DA " + fluxo[indexFoto].toUpperCase();
             document.getElementById('foto-info').innerText = `Ângulo ${indexFoto + 1} de ${fluxo.length}`;
         }
 
@@ -451,7 +461,7 @@
             else atualizarInterfaceCam();
         }
 
-        function marcarAvaria() { avariasEncontradas.push(fluxo[indexFoto]); alert("Avaria!"); }
+        function marcarAvaria() { avariasEncontradas.push(fluxo[indexFoto]); alert("Avaria Registrada!"); }
 
         function capturarEProxima() {
             const v = document.getElementById('vid'), c = document.getElementById('canvas');
@@ -463,14 +473,15 @@
 
         function finalizarVistoria() {
             const l = {
-                id: Date.now(), hora: new Date().toLocaleTimeString(), op: currentUser.nome,
-                placa: document.getElementById('v-placa').value, km: document.getElementById('v-km').value,
-                comb: document.getElementById('v-comb').value, tipo: document.getElementById('v-tipo').value,
-                obs: document.getElementById('v-obs').value, fotos: fotosCapturadas, avarias: avariasEncontradas
+                id: Date.now(), data: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString(),
+                op: currentUser.nome, placa: document.getElementById('v-placa').value || '---',
+                km: document.getElementById('v-km').value || '---', comb: document.getElementById('v-comb').value,
+                tipo: document.getElementById('v-tipo').value, obs: document.getElementById('v-obs').value || 'Sem obs.',
+                fotos: fotosCapturadas, avarias: avariasEncontradas
             };
             const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
             logs.unshift(l); localStorage.setItem(LOG_DB, JSON.stringify(logs));
-            alert("Enviado!"); location.reload();
+            alert("Vistoria Enviada!"); location.reload();
         }
 
         function carregarAdmin() {
@@ -479,11 +490,18 @@
             document.getElementById('logs-body').innerHTML = l.map(x => `<tr onclick='verDossie(${JSON.stringify(x)})'><td>${x.hora}</td><td>${x.placa}</td><td>${x.op}</td><td>${x.tipo}</td></tr>`).join('');
         }
 
-        function verDossie(l) {
+        function verDossie(log) {
             show('scr-detalhes');
-            document.getElementById('det-placa').innerText = "PLACA: " + l.placa;
-            document.getElementById('det-info').innerHTML = `<p><b>Motorista:</b> ${l.op}</p><p><b>KM:</b> ${l.km} | <b>Comb:</b> ${l.comb}</p>`;
-            let h = ""; for (let k in l.fotos) h += `<div class="photo-card"><img src="${l.fotos[k]}"><span>${k}</span></div>`;
+            document.getElementById('det-placa').innerText = "VEÍCULO: " + log.placa;
+            document.getElementById('det-info').innerHTML = `
+            <p><b>Data:</b> ${log.data} às ${log.hora}</p>
+            <p><b>Motorista:</b> ${log.op}</p>
+            <p><b>KM:</b> ${log.km} | <b>Combustível:</b> ${log.comb}</p>
+            <p><b>Avarias:</b> ${log.avarias.join(', ') || 'Nenhuma'}</p>
+            <p><b>Observações:</b> ${log.obs}</p>
+        `;
+            let h = "";
+            for (let k in log.fotos) h += `<div class="photo-card"><img src="${log.fotos[k]}"><span>${k}</span></div>`;
             document.getElementById('det-fotos').innerHTML = h;
         }
     </script>
