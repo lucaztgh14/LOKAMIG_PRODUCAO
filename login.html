@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOKAMIG | Gestão de Frotas</title>
+    <title>LOKAMIG | Sistema Integrado de Frotas</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #d1122a;
             --bg: #0f172a;
             --text: #f8fafc;
+            --success: #10b981;
         }
 
         * {
@@ -20,8 +21,7 @@
         }
 
         body {
-            background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)),
-                url('Faça_uma_montagem_202604121721.png');
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('Faça_uma_montagem_202604121721.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -34,160 +34,139 @@
         }
 
         .container {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 25px;
-            width: 90%;
-            max-width: 400px;
+            padding: 20px;
+            width: 95%;
+            max-width: 450px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
 
-        h1 {
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 5px;
-            color: #fff;
+        .hidden {
+            display: none !important;
         }
 
-        .sub {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
         }
 
         input,
-        select {
+        select,
+        textarea {
             width: 100%;
-            padding: 14px;
-            margin-bottom: 15px;
-            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(15, 23, 42, 0.8);
             color: #fff;
-            font-size: 14px;
-            outline: none;
         }
 
         button {
             width: 100%;
-            padding: 16px;
+            padding: 15px;
             border-radius: 12px;
             border: none;
             background: var(--primary);
             color: #fff;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
             text-transform: uppercase;
         }
 
-        .btn-nfc {
-            background: #1e293b;
-            margin-top: 10px;
-            border: 1px dashed var(--primary);
-        }
-
-        .user-card {
-            background: rgba(209, 18, 42, 0.15);
-            border: 1px solid var(--primary);
-            padding: 15px;
+        /* Câmera e Fotos */
+        .cam-box {
+            position: relative;
+            width: 100%;
+            background: #000;
             border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .user-photo {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #334155;
+            overflow: hidden;
             border: 2px solid var(--primary);
-        }
-
-        .grid-check {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .btn-angle {
-            background: #1e293b;
-            font-size: 10px;
-            padding: 12px;
-            border: 1px solid #334155;
-            color: white;
-        }
-
-        .done {
-            background: #10b981 !important;
-            border-color: #10b981;
         }
 
         video {
             width: 100%;
-            border-radius: 15px;
-            margin: 10px 0;
-            border: 2px solid var(--primary);
-            background: #000;
+            display: block;
         }
 
-        .hidden {
+        canvas {
             display: none;
         }
 
-        /* Painel Escritório */
-        .admin-box {
-            max-width: 850px;
-            width: 95%;
-        }
-
-        .tabs {
+        .cam-nav {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-top: 10px;
         }
 
-        .tab-btn {
-            background: #1e293b;
-            padding: 10px;
+        .btn-sec {
+            background: #334155;
+        }
+
+        .btn-avaria {
+            background: #f59e0b;
+            margin-top: 5px;
             font-size: 12px;
-            border-radius: 8px;
-            color: white;
-            border: none;
-            cursor: pointer;
         }
 
-        .tab-active {
-            background: var(--primary);
+        /* Admin */
+        .admin-box {
+            max-width: 900px;
+            height: 90vh;
+            overflow-y: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
-            margin-top: 20px;
+            font-size: 12px;
+            cursor: pointer;
         }
 
         th {
             background: #0f172a;
-            padding: 10px;
-            text-align: left;
             color: var(--primary);
+            padding: 12px;
+            text-align: left;
         }
 
         td {
-            padding: 10px;
+            padding: 12px;
             border-bottom: 1px solid #334155;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Modal Detalhes */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            z-index: 100;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .photo-item {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid var(--primary);
         }
     </style>
 </head>
@@ -196,194 +175,190 @@
 
     <section id="scr-login" class="container">
         <h1>LOKAMIG</h1>
-        <div class="sub">Vistoria e Logística de Pátio</div>
-        <input type="text" id="user" placeholder="Usuário">
+        <div style="font-size: 10px; margin-bottom: 20px; color: #94a3b8;">SISTEMA INTEGRADO V5</div>
+        <input type="text" id="user" placeholder="Matrícula ou Usuário">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
-        <button class="btn-nfc" onclick="lerCrachaNFC()">📲 ACESSAR VIA CRACHÁ</button>
     </section>
 
-    <section id="scr-welcome" class="container hidden">
-        <h1>BEM-VINDO</h1>
-        <div class="user-card">
-            <div class="user-photo"></div>
-            <div>
-                <b id="user-name-display" style="font-size: 15px;">CARREGANDO...</b><br>
-                <small id="user-mat-display">Matrícula: ---</small><br>
-                <small id="user-id-display">Crachá: ---</small>
-            </div>
-        </div>
-        <select id="tipo-servico">
-            <option value="Saída">Checklist de Saída</option>
-            <option value="Retorno">Checklist de Retorno</option>
-            <option value="Manutenção">Manutenção</option>
-            <option value="Limpeza">Higienização</option>
+    <section id="scr-form" class="container hidden">
+        <h1>DADOS DO VEÍCULO</h1>
+        <select id="v-tipo">
+            <option value="Operacional">Operacional</option>
+            <option value="Reserva">Reserva</option>
+            <option value="Gerencial">Gerencial</option>
         </select>
-        <button onclick="irParaCamera()">Iniciar Vistoria</button>
+        <input type="text" id="v-placa" placeholder="PLACA (Ex: ABC1234)">
+        <input type="number" id="v-km" placeholder="KM ATUAL (Manual)">
+        <select id="v-comb">
+            <option value="Vazio">Vazio</option>
+            <option value="1/4">1/4</option>
+            <option value="1/2">1/2</option>
+            <option value="3/4">3/4</option>
+            <option value="Cheio">Cheio</option>
+        </select>
+        <textarea id="v-obs" placeholder="Observações de Manutenção..."></textarea>
+        <button onclick="iniciarFluxoFotos()">Ir para Fotos</button>
     </section>
 
     <section id="scr-camera" class="container hidden">
-        <h1>CHECKLIST</h1>
-        <video id="vid" autoplay playsinline></video>
-        <div class="grid-check">
-            <button class="btn-angle" id="f" onclick="marcar('f')">FRENTE</button>
-            <button class="btn-angle" id="l" onclick="marcar('l')">LATERAL</button>
-            <button class="btn-angle" id="t" onclick="marcar('t')">TRASEIRA</button>
-            <button class="btn-angle" id="i" onclick="marcar('i')">INTERIOR</button>
+        <h2 id="cam-label" style="color: var(--primary);">FOTO DA FRENTE</h2>
+        <div class="cam-box">
+            <video id="vid" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
         </div>
-        <input type="text" id="placa" placeholder="PLACA DO VEÍCULO">
-        <button onclick="salvarVistoria()" style="background: #10b981;">Finalizar</button>
+        <button class="btn-avaria" onclick="marcarAvaria()">⚠️ REGISTRAR AVARIA NESTE ÂNGULO</button>
+
+        <div class="cam-nav">
+            <button class="btn-sec" onclick="mudarFoto(-1)">Voltar</button>
+            <button onclick="capturarEFotoProxima()">Próximo / Tirar Foto</button>
+        </div>
+        <div id="foto-count" style="font-size: 11px; margin-top: 10px;">Foto 1 de 7</div>
     </section>
 
     <section id="scr-admin" class="container admin-box hidden">
-        <h1 style="color: var(--primary);">PAINEL DE CONTROLE</h1>
-        <div class="tabs">
-            <button class="tab-btn tab-active" onclick="tab('monitor')">Monitoramento</button>
-            <button class="tab-btn" onclick="tab('cadastro')">Cadastro Colaboradores</button>
+        <h1>CONTROLE OPERACIONAL</h1>
+        <div class="cam-nav" style="margin-bottom: 15px;">
+            <button class="tab-btn" onclick="showCadastro()">Novo Cadastro</button>
+            <button class="btn-sec" onclick="location.reload()">Sair</button>
         </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>HORA</th>
+                    <th>PLACA</th>
+                    <th>MOTORISTA</th>
+                    <th>TIPO</th>
+                </tr>
+            </thead>
+            <tbody id="logs-body"></tbody>
+        </table>
+    </section>
 
-        <div id="tab-monitor">
-            <table>
-                <thead>
-                    <tr>
-                        <th>HORA</th>
-                        <th>OPERADOR</th>
-                        <th>PLACA</th>
-                        <th>TIPO</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody id="logs"></tbody>
-            </table>
+    <section id="scr-detalhes" class="modal hidden">
+        <h1 id="det-titulo">DETALHES</h1>
+        <div id="det-info"
+            style="text-align: left; font-size: 13px; margin: 15px 0; border-left: 3px solid var(--primary); padding-left: 10px;">
         </div>
-
-        <div id="tab-cadastro" class="hidden">
-            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; text-align: left;">
-                <label>Nome do Colaborador</label>
-                <input type="text" id="reg-nome" placeholder="ex: nome completo">
-                <label>Matrícula</label>
-                <input type="text" id="reg-mat" placeholder="ex: T123456">
-                <label>ID do Crachá (NFC)</label>
-                <input type="text" id="reg-id" placeholder="123456789">
-                <button onclick="salvarColaborador()" style="background: #10b981;">Ativar e Cadastrar</button>
-            </div>
-        </div>
-
-        <button onclick="location.reload()" style="background:none; margin-top:20px; color:#94a3b8;">Sair</button>
+        <div class="photo-grid" id="det-fotos"></div>
+        <button onclick="gerarRelatorio()" style="background: var(--success);">Gerar Relatório PDF</button>
+        <button onclick="show('scr-admin')" class="btn-sec" style="margin-top: 10px;">Voltar</button>
     </section>
 
     <script>
-        const DB_KEY = 'lokamig_logs_v4';
-        const USER_DB = 'lokamig_users_v4';
+        let fluxo = ["Frente", "Lateral Esquerda", "Traseira", "Lateral Direita", "Estepe", "Painel/KM", "Motor", "Rodas"];
+        let indexFoto = 0;
+        let fotosCapturadas = {};
+        let currentLog = null;
+        let avarias = [];
 
-        if (!localStorage.getItem(USER_DB)) {
-            localStorage.setItem(USER_DB, JSON.stringify([{
-                nome: "LUCAS LIMA", mat: "T531971", id: "295698351"
-            }]));
-        }
+        const USER_DB = 'lokamig_users_v4';
+        const LOG_DB = 'lokamig_logs_v5';
 
         function show(id) {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
-        function tab(name) {
-            document.getElementById('tab-monitor').classList.add('hidden');
-            document.getElementById('tab-cadastro').classList.add('hidden');
-            document.getElementById('tab-' + name).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-            event.currentTarget.classList.add('tab-active');
-        }
-
         function handleLogin() {
             const u = document.getElementById('user').value.toLowerCase();
             const p = document.getElementById('pass').value;
-
-            if (u === 'admin' && p === '1234') {
-                show('scr-admin');
-                carregarLogs();
-            } else {
-                const users = JSON.parse(localStorage.getItem(USER_DB));
-                const found = users.find(user => user.mat.toLowerCase() === u);
-                if (found) acessarApp(found);
-                else alert("Usuário não encontrado.");
-            }
+            if (u === 'admin' && p === '1234') { carregarAdmin(); }
+            else { show('scr-form'); }
         }
 
-        async function lerCrachaNFC() {
-            if ('NDEFReader' in window) {
-                try {
-                    const ndef = new NDEFReader();
-                    alert("Aproxime o crachá...");
-                    await ndef.scan();
-                    ndef.onreading = event => {
-                        const serial = event.serialNumber.replace(/:/g, "").toUpperCase();
-                        const users = JSON.parse(localStorage.getItem(USER_DB));
-                        const found = users.find(u => u.id === serial);
-                        if (found) acessarApp(found);
-                        else alert("Crachá não cadastrado ID: " + serial);
-                    };
-                } catch (e) { alert("NFC indisponível."); }
-            } else {
-                const idManual = prompt("Digite o ID do Crachá:");
-                const users = JSON.parse(localStorage.getItem(USER_DB));
-                const found = users.find(u => u.id === idManual);
-                if (found) acessarApp(found);
-                else alert("ID não cadastrado.");
-            }
-        }
-
-        function acessarApp(user) {
-            document.getElementById('user-name-display').textContent = user.nome;
-            document.getElementById('user-mat-display').textContent = "Matrícula: " + user.mat;
-            document.getElementById('user-id-display').textContent = "Crachá: " + user.id;
-            show('scr-welcome');
-        }
-
-        function salvarColaborador() {
-            const nome = document.getElementById('reg-nome').value;
-            const mat = document.getElementById('reg-mat').value;
-            const id = document.getElementById('reg-id').value;
-
-            if (!nome || !mat || !id) return alert("Preencha tudo.");
-
-            const users = JSON.parse(localStorage.getItem(USER_DB));
-            users.push({ nome, mat, id });
-            localStorage.setItem(USER_DB, JSON.stringify(users));
-            alert("Colaborador cadastrado!");
-            document.getElementById('reg-nome').value = '';
-            document.getElementById('reg-mat').value = '';
-            document.getElementById('reg-id').value = '';
-        }
-
-        async function irParaCamera() {
+        async function iniciarFluxoFotos() {
             show('scr-camera');
+            indexFoto = 0;
+            atualizarCamInterface();
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
             document.getElementById('vid').srcObject = stream;
         }
 
-        function marcar(id) { document.getElementById(id).classList.add('done'); }
+        function atualizarCamInterface() {
+            document.getElementById('cam-label').innerText = "FOTO: " + fluxo[indexFoto].toUpperCase();
+            document.getElementById('foto-count').innerText = `Foto ${indexFoto + 1} de ${fluxo.length}`;
+        }
 
-        function salvarVistoria() {
-            const user = document.getElementById('user-name-display').textContent;
+        function mudarFoto(dir) {
+            indexFoto += dir;
+            if (indexFoto < 0) indexFoto = 0;
+            if (indexFoto >= fluxo.length) finalizarVistoria();
+            else atualizarCamInterface();
+        }
+
+        function marcarAvaria() {
+            avarias.push(fluxo[indexFoto]);
+            alert("Avaria marcada para: " + fluxo[indexFoto] + ". Tire a foto normalmente.");
+        }
+
+        function capturarEFotoProxima() {
+            const video = document.getElementById('vid');
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            fotosCapturadas[fluxo[indexFoto]] = canvas.toDataURL('image/jpeg', 0.5);
+
+            if (indexFoto === fluxo.length - 1) finalizarVistoria();
+            else mudarFoto(1);
+        }
+
+        function finalizarVistoria() {
             const log = {
-                h: new Date().toLocaleTimeString(),
-                op: user,
-                pl: document.getElementById('placa').value || '---',
-                tp: document.getElementById('tipo-servico').value,
+                id: Date.now(),
+                hora: new Date().toLocaleString(),
+                motorista: "LUCAS LIMA (T531971)",
+                placa: document.getElementById('v-placa').value,
+                km: document.getElementById('v-km').value,
+                comb: document.getElementById('v-comb').value,
+                tipo: document.getElementById('v-tipo').value,
+                obs: document.getElementById('v-obs').value,
+                fotos: fotosCapturadas,
+                avarias: avarias
             };
-            const logs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+            const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
             logs.unshift(log);
-            localStorage.setItem(DB_KEY, JSON.stringify(logs));
-            alert("Enviado!");
+            localStorage.setItem(LOG_DB, JSON.stringify(logs));
+            alert("Vistoria Concluída e enviada ao escritório!");
             location.reload();
         }
 
-        function carregarLogs() {
-            const logs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
-            document.getElementById('logs').innerHTML = logs.map(l => `
-            <tr><td>${l.h}</td><td>${l.op}</td><td>${l.pl}</td><td>${l.tp}</td><td style="color:#10b981">● ATIVO</td></tr>
+        function carregarAdmin() {
+            show('scr-admin');
+            const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
+            document.getElementById('logs-body').innerHTML = logs.map(l => `
+            <tr onclick='verDetalhes(${JSON.stringify(l)})'>
+                <td>${l.hora.split(',')[1]}</td>
+                <td>${l.placa}</td>
+                <td>${l.motorista}</td>
+                <td>${l.tipo}</td>
+            </tr>
         `).join('');
+        }
+
+        function verDetalhes(log) {
+            currentLog = log;
+            show('scr-detalhes');
+            document.getElementById('det-titulo').innerText = "VISTORIA: " + log.placa;
+            document.getElementById('det-info').innerHTML = `
+            <b>Motorista:</b> ${log.motorista}<br>
+            <b>KM:</b> ${log.km} | <b>Combustível:</b> ${log.comb}<br>
+            <b>Tipo:</b> ${log.tipo}<br>
+            <b>Avarias em:</b> ${log.avarias.join(', ') || 'Nenhuma'}<br>
+            <b>Obs:</b> ${log.obs}
+        `;
+
+            let htmlFotos = "";
+            for (let key in log.fotos) {
+                htmlFotos += `<div><small>${key}</small><img src="${log.fotos[key]}" class="photo-item"></div>`;
+            }
+            document.getElementById('det-fotos').innerHTML = htmlFotos;
+        }
+
+        function gerarRelatorio() {
+            window.print();
         }
     </script>
 </body>
