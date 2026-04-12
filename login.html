@@ -95,9 +95,9 @@
             border: 1px dashed var(--primary);
         }
 
-        .btn-valida {
+        .btn-vincular {
             background: #3b82f6;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             font-size: 12px;
             padding: 10px;
         }
@@ -106,61 +106,7 @@
             display: none !important;
         }
 
-        .user-card {
-            background: rgba(209, 18, 42, 0.15);
-            border: 1px solid var(--primary);
-            padding: 15px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .user-photo {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #334155;
-            border: 2px solid var(--primary);
-        }
-
-        .cam-box {
-            position: relative;
-            width: 100%;
-            border-radius: 15px;
-            overflow: hidden;
-            border: 2px solid var(--primary);
-            background: #000;
-            margin-bottom: 15px;
-        }
-
-        video {
-            width: 100%;
-            display: block;
-        }
-
-        canvas {
-            display: none;
-        }
-
-        .cam-nav {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-sec {
-            background: #334155;
-        }
-
-        .btn-avaria {
-            background: #f59e0b;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-
+        /* Estilo da Tabela e Abas */
         .admin-box {
             max-width: 850px;
             width: 95%;
@@ -209,61 +155,6 @@
             padding: 10px;
             border-bottom: 1px solid #334155;
         }
-
-        .modal-detalhes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg);
-            z-index: 1000;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .photo-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .photo-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 5px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-        }
-
-        .photo-card img {
-            width: 100%;
-            border-radius: 5px;
-        }
-
-        .photo-card span {
-            font-size: 9px;
-            display: block;
-            text-align: center;
-            margin-top: 4px;
-        }
-
-        @media print {
-            .btn-print-hide {
-                display: none;
-            }
-
-            body {
-                background: white;
-                color: black;
-            }
-
-            .modal-detalhes {
-                position: static;
-                background: white;
-                padding: 0;
-            }
-        }
     </style>
 </head>
 
@@ -278,55 +169,43 @@
         <button class="btn-nfc" onclick="lerCrachaNFC('login')">📲 ACESSAR VIA CRACHÁ</button>
     </section>
 
-    <section id="scr-form" class="container hidden">
-        <h1>CHECKLIST</h1>
-        <div class="user-card">
-            <div class="user-photo"></div>
-            <div>
-                <b id="display-nome">---</b><br>
-                <small id="display-mat">Matrícula: ---</small>
-            </div>
-        </div>
-        <select id="v-tipo">
-            <option value="Operacional">Operacional</option>
-            <option value="Reserva">Reserva</option>
-            <option value="Gerencial">Gerencial</option>
-        </select>
-        <input type="text" id="v-placa" placeholder="PLACA DO VEÍCULO">
-        <input type="number" id="v-km" placeholder="KM ATUAL (Manual)">
-        <select id="v-comb">
-            <option value="Vazio">Nível Combustível: Vazio</option>
-            <option value="1/4">1/4</option>
-            <option value="1/2">1/2</option>
-            <option value="3/4">3/4</option>
-            <option value="Cheio">Cheio</option>
-        </select>
-        <textarea id="v-obs" placeholder="Observações de manutenção..."></textarea>
-        <button onclick="iniciarFluxoFotos()">Acessar Câmera</button>
-    </section>
-
-    <section id="scr-camera" class="container hidden">
-        <h1 id="cam-label">FOTO</h1>
-        <div class="cam-box">
-            <video id="vid" autoplay playsinline></video>
-            <canvas id="canvas"></canvas>
-        </div>
-        <button class="btn-avaria" onclick="marcarAvaria()">⚠️ REGISTRAR AVARIA NESTE ÂNGULO</button>
-        <div class="cam-nav">
-            <button class="btn-sec" onclick="mudarFoto(-1)">Voltar</button>
-            <button onclick="capturarEProxima()">Próximo / Tirar Foto</button>
-        </div>
-        <div id="foto-info" style="font-size: 11px; margin-top: 10px;">Ângulo 1 de 8</div>
-    </section>
-
     <section id="scr-admin" class="container admin-box hidden">
-        <h1 style="color: var(--primary);">PAINEL DE CONTROLE</h1>
+        <h1>PAINEL DE CONTROLE</h1>
         <div class="tabs">
             <button id="btn-tab-mon" class="tab-btn tab-active" onclick="switchTab('mon')">Monitoramento</button>
             <button id="btn-tab-cad" class="tab-btn" onclick="switchTab('cad')">Colaboradores</button>
         </div>
-        <div id="area-monitor">
+
+        <div id="area-cadastro" class="hidden">
+            <div
+                style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
+                <label style="font-size: 10px; margin-left: 5px;">1. DIGITE A MATRÍCULA E NOME</label>
+                <input type="text" id="reg-mat" placeholder="MATRÍCULA (ex: T531971)">
+                <input type="text" id="reg-nome" placeholder="NOME COMPLETO">
+
+                <label style="font-size: 10px; margin-left: 5px;">2. VINCULE O CHIP DO CRACHÁ</label>
+                <button class="btn-vincular" onclick="lerCrachaNFC('vincular')">APROXIMAR CRACHÁ PARA VINCULAR</button>
+                <input type="text" id="reg-id" placeholder="Código do Chip (Lido automaticamente)" readonly
+                    style="color: var(--success);">
+
+                <button onclick="salvarColaborador()" style="background: var(--success); margin-top: 10px;">SALVAR
+                    CADASTRO</button>
+            </div>
             <table>
+                <thead>
+                    <tr>
+                        <th>NOME</th>
+                        <th>MATRÍCULA</th>
+                        <th>CHIP</th>
+                        <th>AÇÃO</th>
+                    </tr>
+                </thead>
+                <tbody id="colab-body"></tbody>
+            </table>
+        </div>
+
+        <div id="area-monitor">
+            <table id="tbl-logs">
                 <thead>
                     <tr>
                         <th>HORA</th>
@@ -338,47 +217,27 @@
                 <tbody id="logs-body"></tbody>
             </table>
         </div>
-        <div id="area-cadastro" class="hidden">
-            <button class="btn-valida" onclick="lerCrachaNFC('validar')">🔍 VALIDAR CRACHÁ (TESTE NFC)</button>
-
-            <input type="text" id="reg-nome" placeholder="ex: nome completo">
-            <input type="text" id="reg-mat" placeholder="ex: T123456">
-            <input type="text" id="reg-id" placeholder="123456789 (ID do Cartão)">
-            <button onclick="salvarColaborador()" style="background: var(--success);">Cadastrar</button>
-            <table style="margin-top:20px;">
-                <thead>
-                    <tr>
-                        <th>NOME</th>
-                        <th>MATRÍCULA</th>
-                        <th>AÇÃO</th>
-                    </tr>
-                </thead>
-                <tbody id="colab-body"></tbody>
-            </table>
-        </div>
         <button onclick="location.reload()" class="btn-sec" style="margin-top:20px;">Sair</button>
     </section>
 
-    <div id="scr-detalhes" class="modal-detalhes hidden">
-        <h1 id="det-placa" style="color: var(--primary);">Dossiê</h1>
-        <div id="det-info" style="text-align: left; margin: 20px 0; line-height: 1.6;"></div>
-        <div class="photo-grid" id="det-fotos"></div>
-        <div class="cam-nav btn-print-hide">
-            <button onclick="window.print()" style="background: var(--success);">Gerar Relatório PDF</button>
-            <button onclick="show('scr-admin')" class="btn-sec">Voltar</button>
-        </div>
-    </div>
+    <section id="scr-form" class="container hidden">
+        <h1 id="display-nome">---</h1>
+        <div class="sub" id="display-mat">Matrícula: ---</div>
+        <input type="text" id="v-placa" placeholder="PLACA DO VEÍCULO">
+        <button onclick="alert('Iniciando Fotos...')">Avançar para Fotos</button>
+        <button onclick="location.reload()" class="btn-sec" style="margin-top:10px;">Cancelar</button>
+    </section>
 
     <script>
-        const LOG_DB = 'lokamig_logs_v5';
         const USER_DB = 'lokamig_users_v5';
-        let fluxo = ["Frente", "Lateral Esquerda", "Traseira", "Lateral Direita", "Estepe", "Painel/KM", "Motor", "Rodas"];
-        let indexFoto = 0, fotosCapturadas = {}, avariasEncontradas = [], currentUser = null;
+        const LOG_DB = 'lokamig_logs_v5';
 
-        if (!localStorage.getItem(USER_DB)) localStorage.setItem(USER_DB, JSON.stringify([{ nome: "LUCAS LIMA", mat: "T531971", id: "295698351" }]));
+        if (!localStorage.getItem(USER_DB)) {
+            localStorage.setItem(USER_DB, JSON.stringify([{ nome: "LUCAS LIMA", mat: "T531971", id: "D3C776D2" }]));
+        }
 
         function show(id) {
-            document.querySelectorAll('section, .modal-detalhes').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
@@ -391,11 +250,12 @@
         }
 
         function handleLogin() {
-            const u = document.getElementById('user').value.toLowerCase(), p = document.getElementById('pass').value;
-            if (u === 'admin' && p === '1234') carregarAdmin();
+            const u = document.getElementById('user').value.toUpperCase();
+            const p = document.getElementById('pass').value;
+            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarAdmin(); }
             else {
-                const user = JSON.parse(localStorage.getItem(USER_DB)).find(x => x.mat.toLowerCase() === u);
-                if (user) logar(user); else alert("Usuário não cadastrado.");
+                const user = JSON.parse(localStorage.getItem(USER_DB)).find(x => x.mat.toUpperCase() === u);
+                if (user) logar(user); else alert("Matrícula não cadastrada.");
             }
         }
 
@@ -403,120 +263,78 @@
             if ('NDEFReader' in window) {
                 try {
                     const ndef = new NDEFReader();
-                    alert("Aproxime o crachá da antena NFC...");
                     await ndef.scan();
+                    alert("Aproxime o crachá...");
                     ndef.onreading = event => {
                         const idLido = event.serialNumber.replace(/:/g, "").toUpperCase();
-                        const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id.toUpperCase() === idLido);
 
-                        if (modo === 'login') {
-                            if (user) logar(user); else alert("ID: " + idLido + " não cadastrado.");
+                        if (modo === 'vincular') {
+                            document.getElementById('reg-id').value = idLido;
+                            alert("Chip detectado: " + idLido + "\nAgora clique em Salvar Cadastro.");
                         } else {
-                            if (user) alert("✅ CRACHÁ VÁLIDO!\nPertence a: " + user.nome + "\nMatrícula: " + user.mat);
-                            else alert("⚠️ NÃO CADASTRADO\nID Lido: " + idLido);
+                            const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === idLido);
+                            if (user) {
+                                document.getElementById('user').value = user.mat;
+                                logar(user);
+                            } else {
+                                alert("Crachá não reconhecido (ID: " + idLido + "). Cadastre-o no painel admin primeiro.");
+                            }
                         }
                     };
-                } catch (e) { alert("NFC Erro: Certifique-se de usar HTTPS e dar permissão."); }
+                } catch (e) { alert("Erro NFC. Verifique as permissões."); }
             } else {
-                const idManual = prompt("NFC não detectado. Digite o ID para testar:");
-                if (idManual) {
-                    const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === idManual);
-                    if (modo === 'login' && user) logar(user);
-                    else if (user) alert("Válido: " + user.nome);
-                    else alert("Não encontrado.");
+                const mock = prompt("NFC não disponível. Digite o ID do chip:");
+                if (mock) {
+                    if (modo === 'vincular') document.getElementById('reg-id').value = mock.toUpperCase();
+                    else handleLogin();
                 }
             }
         }
 
         function logar(user) {
-            currentUser = user;
             document.getElementById('display-nome').innerText = user.nome;
             document.getElementById('display-mat').innerText = "Matrícula: " + user.mat;
             show('scr-form');
         }
 
         function salvarColaborador() {
-            const n = document.getElementById('reg-nome').value.toUpperCase(), m = document.getElementById('reg-mat').value.toUpperCase(), i = document.getElementById('reg-id').value.toUpperCase();
-            if (!n || !m || !i) return alert("Preencha tudo.");
-            const u = JSON.parse(localStorage.getItem(USER_DB));
-            u.push({ nome: n, mat: m, id: i });
-            localStorage.setItem(USER_DB, JSON.stringify(u));
+            const mat = document.getElementById('reg-mat').value.toUpperCase();
+            const nome = document.getElementById('reg-nome').value.toUpperCase();
+            const chip = document.getElementById('reg-id').value.toUpperCase();
+
+            if (!mat || !nome || !chip) return alert("Preencha Matrícula, Nome e aproxime o Crachá!");
+
+            const users = JSON.parse(localStorage.getItem(USER_DB));
+            users.push({ nome: nome, mat: mat, id: chip });
+            localStorage.setItem(USER_DB, JSON.stringify(users));
+
+            alert("Sucesso! O crachá agora está vinculado à matrícula " + mat);
+            document.getElementById('reg-mat').value = '';
+            document.getElementById('reg-nome').value = '';
+            document.getElementById('reg-id').value = '';
             carregarListaColaboradores();
-            alert("Cadastrado com sucesso!");
         }
 
         function carregarListaColaboradores() {
             const u = JSON.parse(localStorage.getItem(USER_DB));
-            document.getElementById('colab-body').innerHTML = u.map((x, i) => `<tr><td>${x.nome}</td><td>${x.mat}</td><td><button onclick="removerColaborador(${i})" style="background:var(--primary); padding:5px; font-size:9px;">X</button></td></tr>`).join('');
+            document.getElementById('colab-body').innerHTML = u.map((x, i) => `
+            <tr>
+                <td>${x.nome}</td>
+                <td>${x.mat}</td>
+                <td>${x.id}</td>
+                <td><button onclick="removerColaborador(${i})" style="background:var(--primary); padding:5px; font-size:9px;">X</button></td>
+            </tr>
+        `).join('');
         }
 
         function removerColaborador(i) {
-            if (confirm("Remover colaborador?")) {
-                const u = JSON.parse(localStorage.getItem(USER_DB)); u.splice(i, 1);
-                localStorage.setItem(USER_DB, JSON.stringify(u)); carregarListaColaboradores();
-            }
-        }
-
-        async function iniciarFluxoFotos() {
-            show('scr-camera'); indexFoto = 0; atualizarInterfaceCam();
-            const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            document.getElementById('vid').srcObject = s;
-        }
-
-        function atualizarInterfaceCam() {
-            document.getElementById('cam-label').innerText = "FOTO DA " + fluxo[indexFoto].toUpperCase();
-            document.getElementById('foto-info').innerText = `Ângulo ${indexFoto + 1} de ${fluxo.length}`;
-        }
-
-        function mudarFoto(d) {
-            indexFoto += d;
-            if (indexFoto < 0) indexFoto = 0;
-            else if (indexFoto >= fluxo.length) finalizarVistoria();
-            else atualizarInterfaceCam();
-        }
-
-        function marcarAvaria() { avariasEncontradas.push(fluxo[indexFoto]); alert("Avaria Registrada!"); }
-
-        function capturarEProxima() {
-            const v = document.getElementById('vid'), c = document.getElementById('canvas');
-            c.width = v.videoWidth; c.height = v.videoHeight;
-            c.getContext('2d').drawImage(v, 0, 0);
-            fotosCapturadas[fluxo[indexFoto]] = c.toDataURL('image/jpeg', 0.5);
-            if (indexFoto === fluxo.length - 1) finalizarVistoria(); else mudarFoto(1);
-        }
-
-        function finalizarVistoria() {
-            const l = {
-                id: Date.now(), data: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString(),
-                op: currentUser.nome, placa: document.getElementById('v-placa').value || '---',
-                km: document.getElementById('v-km').value || '---', comb: document.getElementById('v-comb').value,
-                tipo: document.getElementById('v-tipo').value, obs: document.getElementById('v-obs').value || 'Sem obs.',
-                fotos: fotosCapturadas, avarias: avariasEncontradas
-            };
-            const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
-            logs.unshift(l); localStorage.setItem(LOG_DB, JSON.stringify(logs));
-            alert("Vistoria Finalizada!"); location.reload();
+            const u = JSON.parse(localStorage.getItem(USER_DB)); u.splice(i, 1);
+            localStorage.setItem(USER_DB, JSON.stringify(u)); carregarListaColaboradores();
         }
 
         function carregarAdmin() {
-            show('scr-admin');
-            const l = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
-            document.getElementById('logs-body').innerHTML = l.map(x => `<tr onclick='verDossie(${JSON.stringify(x)})'><td>${x.hora}</td><td>${x.placa}</td><td>${x.op}</td><td>${x.tipo}</td></tr>`).join('');
-        }
-
-        function verDossie(log) {
-            show('scr-detalhes');
-            document.getElementById('det-placa').innerText = "VEÍCULO: " + log.placa;
-            document.getElementById('det-info').innerHTML = `
-            <p><b>Data:</b> ${log.data} às ${log.hora}</p>
-            <p><b>Motorista:</b> ${log.op}</p>
-            <p><b>KM:</b> ${log.km} | <b>Combustível:</b> ${log.comb}</p>
-            <p><b>Avarias:</b> ${log.avarias.join(', ') || 'Nenhuma'}</p>
-            <p><b>Observações:</b> ${log.obs}</p>
-        `;
-            let h = "";
-            for (let k in log.fotos) h += `<div class="photo-card"><img src="${log.fotos[k]}"><span>${k}</span></div>`;
-            document.getElementById('det-fotos').innerHTML = h;
+            const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
+            document.getElementById('logs-body').innerHTML = logs.map(l => `<tr><td>${l.hora}</td><td>${l.placa}</td><td>${l.op}</td><td>${l.tipo}</td></tr>`).join('');
         }
     </script>
 </body>
