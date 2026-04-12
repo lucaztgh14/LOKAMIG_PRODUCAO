@@ -89,11 +89,16 @@
             text-transform: uppercase;
         }
 
+        .btn-nfc {
+            background: #1e293b;
+            margin-top: 10px;
+            border: 1px dashed var(--primary);
+        }
+
         .hidden {
             display: none !important;
         }
 
-        /* Estilo dos Cards de Usuário */
         .user-card {
             background: rgba(209, 18, 42, 0.15);
             border: 1px solid var(--primary);
@@ -114,7 +119,6 @@
             border: 2px solid var(--primary);
         }
 
-        /* Câmera e Navegação */
         .cam-box {
             position: relative;
             width: 100%;
@@ -150,7 +154,6 @@
             margin-top: 10px;
         }
 
-        /* Admin e Dossiê */
         .admin-box {
             max-width: 850px;
             width: 95%;
@@ -265,11 +268,18 @@
         <input type="text" id="user" placeholder="Usuário / Matrícula">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
+        <button class="btn-nfc" onclick="lerCrachaNFC()">📲 ACESSAR VIA CRACHÁ</button>
     </section>
 
     <section id="scr-form" class="container hidden">
         <h1>CHECKLIST</h1>
-        <div class="sub">Informações Iniciais</div>
+        <div class="user-card">
+            <div class="user-photo"></div>
+            <div>
+                <b id="display-nome">---</b><br>
+                <small id="display-mat">Matrícula: ---</small>
+            </div>
+        </div>
         <select id="v-tipo">
             <option value="Operacional">Operacional</option>
             <option value="Reserva">Reserva</option>
@@ -289,7 +299,7 @@
     </section>
 
     <section id="scr-camera" class="container hidden">
-        <h1 id="cam-label">FOTO DA FRENTE</h1>
+        <h1 id="cam-label">FOTO</h1>
         <div class="cam-box">
             <video id="vid" autoplay playsinline></video>
             <canvas id="canvas"></canvas>
@@ -299,7 +309,7 @@
             <button class="btn-sec" onclick="mudarFoto(-1)">Voltar</button>
             <button onclick="capturarEProxima()">Próximo / Tirar Foto</button>
         </div>
-        <div id="foto-info" style="font-size: 11px; margin-top: 10px; color: #94a3b8;">Ângulo 1 de 8</div>
+        <div id="foto-info" style="font-size: 11px; margin-top: 10px;">Ângulo 1 de 8</div>
     </section>
 
     <section id="scr-admin" class="container admin-box hidden">
@@ -308,7 +318,6 @@
             <button id="btn-tab-mon" class="tab-btn tab-active" onclick="switchTab('mon')">Monitoramento</button>
             <button id="btn-tab-cad" class="tab-btn" onclick="switchTab('cad')">Colaboradores</button>
         </div>
-
         <div id="area-monitor">
             <table>
                 <thead>
@@ -322,20 +331,12 @@
                 <tbody id="logs-body"></tbody>
             </table>
         </div>
-
         <div id="area-cadastro" class="hidden">
-            <div
-                style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; text-align: left; margin-bottom: 20px;">
-                <label style="font-size: 11px;">NOME COMPLETO</label>
-                <input type="text" id="reg-nome" placeholder="ex: nome completo">
-                <label style="font-size: 11px;">MATRÍCULA</label>
-                <input type="text" id="reg-mat" placeholder="ex: T123456">
-                <label style="font-size: 11px;">ID DO CRACHÁ (NFC)</label>
-                <input type="text" id="reg-id" placeholder="123456789">
-                <button onclick="salvarColaborador()" style="background: var(--success);">Ativar e Cadastrar</button>
-            </div>
-            <h2 style="font-size: 14px; text-align: left; color: var(--primary);">EQUIPE CADASTRADA</h2>
-            <table id="tbl-colaboradores">
+            <input type="text" id="reg-nome" placeholder="ex: nome completo">
+            <input type="text" id="reg-mat" placeholder="ex: T123456">
+            <input type="text" id="reg-id" placeholder="123456789">
+            <button onclick="salvarColaborador()" style="background: var(--success);">Cadastrar</button>
+            <table style="margin-top:20px;">
                 <thead>
                     <tr>
                         <th>NOME</th>
@@ -346,165 +347,143 @@
                 <tbody id="colab-body"></tbody>
             </table>
         </div>
-
         <button onclick="location.reload()" class="btn-sec" style="margin-top:20px;">Sair</button>
     </section>
 
     <div id="scr-detalhes" class="modal-detalhes hidden">
-        <h1 id="det-placa" style="color: var(--primary);">Dossiê</h1>
-        <div id="det-info" style="text-align: left; margin: 20px 0;"></div>
+        <h1 id="det-placa">Dossiê</h1>
+        <div id="det-info"></div>
         <div class="photo-grid" id="det-fotos"></div>
-        <div class="cam-nav btn-print-hide">
-            <button onclick="window.print()" style="background: var(--success);">Gerar Relatório PDF</button>
-            <button onclick="show('scr-admin')" class="btn-sec">Voltar</button>
-        </div>
+        <button onclick="window.print()">Gerar PDF</button>
+        <button onclick="show('scr-admin')">Voltar</button>
     </div>
 
     <script>
         const LOG_DB = 'lokamig_logs_v5';
         const USER_DB = 'lokamig_users_v5';
         let fluxo = ["Frente", "Lateral Esquerda", "Traseira", "Lateral Direita", "Estepe", "Painel/KM", "Motor", "Rodas"];
-        let indexFoto = 0;
-        let fotosCapturadas = {};
-        let avariasEncontradas = [];
+        let indexFoto = 0, fotosCapturadas = {}, avariasEncontradas = [], currentUser = null;
 
-        // Carregar Lucas Lima por padrão
-        if (!localStorage.getItem(USER_DB)) {
-            localStorage.setItem(USER_DB, JSON.stringify([{ nome: "LUCAS LIMA", mat: "T531971", id: "295698351" }]));
-        }
+        if (!localStorage.getItem(USER_DB)) localStorage.setItem(USER_DB, JSON.stringify([{ nome: "LUCAS LIMA", mat: "T531971", id: "295698351" }]));
 
         function show(id) {
             document.querySelectorAll('section, .modal-detalhes').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
-        function switchTab(tab) {
-            document.getElementById('area-monitor').classList.toggle('hidden', tab !== 'mon');
-            document.getElementById('area-cadastro').classList.toggle('hidden', tab !== 'cad');
-            document.getElementById('btn-tab-mon').classList.toggle('tab-active', tab === 'mon');
-            document.getElementById('btn-tab-cad').classList.toggle('tab-active', tab === 'cad');
-            if (tab === 'cad') carregarListaColaboradores();
+        function switchTab(t) {
+            document.getElementById('area-monitor').classList.toggle('hidden', t !== 'mon');
+            document.getElementById('area-cadastro').classList.toggle('hidden', t !== 'cad');
+            document.getElementById('btn-tab-mon').classList.toggle('tab-active', t === 'mon');
+            document.getElementById('btn-tab-cad').classList.toggle('tab-active', t === 'cad');
+            if (t === 'cad') carregarListaColaboradores();
         }
 
         function handleLogin() {
-            const u = document.getElementById('user').value.toLowerCase();
-            const p = document.getElementById('pass').value;
-            if (u === 'admin' && p === '1234') { carregarAdmin(); }
+            const u = document.getElementById('user').value.toLowerCase(), p = document.getElementById('pass').value;
+            if (u === 'admin' && p === '1234') carregarAdmin();
             else {
-                const users = JSON.parse(localStorage.getItem(USER_DB));
-                const found = users.find(x => x.mat.toLowerCase() === u);
-                if (found) show('scr-form');
-                else alert("Usuário não cadastrado.");
+                const user = JSON.parse(localStorage.getItem(USER_DB)).find(x => x.mat.toLowerCase() === u);
+                if (user) logar(user); else alert("Não encontrado.");
             }
         }
 
+        async function lerCrachaNFC() {
+            if ('NDEFReader' in window) {
+                try {
+                    const ndef = new NDEFReader();
+                    alert("Aproxime o crachá...");
+                    await ndef.scan();
+                    ndef.onreading = event => {
+                        const id = event.serialNumber.replace(/:/g, "").toUpperCase();
+                        const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === id);
+                        if (user) logar(user); else alert("Crachá ID: " + id + " não cadastrado.");
+                    };
+                } catch (e) { alert("NFC erro."); }
+            } else {
+                const id = prompt("Digite o ID do Crachá:");
+                const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === id);
+                if (user) logar(user); else alert("ID não cadastrado.");
+            }
+        }
+
+        function logar(user) {
+            currentUser = user;
+            document.getElementById('display-nome').innerText = user.nome;
+            document.getElementById('display-mat').innerText = "Matrícula: " + user.mat;
+            show('scr-form');
+        }
+
         function salvarColaborador() {
-            const nome = document.getElementById('reg-nome').value.toUpperCase();
-            const mat = document.getElementById('reg-mat').value.toUpperCase();
-            const id = document.getElementById('reg-id').value;
-            if (!nome || !mat || !id) return alert("Preencha todos os campos.");
-            const users = JSON.parse(localStorage.getItem(USER_DB));
-            users.push({ nome, mat, id });
-            localStorage.setItem(USER_DB, JSON.stringify(users));
-            alert("Colaborador cadastrado!");
-            document.getElementById('reg-nome').value = '';
-            document.getElementById('reg-mat').value = '';
-            document.getElementById('reg-id').value = '';
+            const n = document.getElementById('reg-nome').value.toUpperCase(), m = document.getElementById('reg-mat').value.toUpperCase(), i = document.getElementById('reg-id').value;
+            if (!n || !m || !i) return alert("Erro");
+            const u = JSON.parse(localStorage.getItem(USER_DB));
+            u.push({ nome: n, mat: m, id: i });
+            localStorage.setItem(USER_DB, JSON.stringify(u));
             carregarListaColaboradores();
         }
 
         function carregarListaColaboradores() {
-            const users = JSON.parse(localStorage.getItem(USER_DB));
-            document.getElementById('colab-body').innerHTML = users.map((u, i) => `
-            <tr>
-                <td>${u.nome}</td>
-                <td>${u.mat}</td>
-                <td><button onclick="removerColaborador(${i})" style="padding:5px; background:var(--primary); font-size:9px;">Excluir</button></td>
-            </tr>
-        `).join('');
+            const u = JSON.parse(localStorage.getItem(USER_DB));
+            document.getElementById('colab-body').innerHTML = u.map((x, i) => `<tr><td>${x.nome}</td><td>${x.mat}</td><td><button onclick="removerColaborador(${i})">X</button></td></tr>`).join('');
         }
 
-        function removerColaborador(index) {
-            if (confirm("Deseja remover este colaborador?")) {
-                const users = JSON.parse(localStorage.getItem(USER_DB));
-                users.splice(index, 1);
-                localStorage.setItem(USER_DB, JSON.stringify(users));
-                carregarListaColaboradores();
-            }
+        function removerColaborador(i) {
+            const u = JSON.parse(localStorage.getItem(USER_DB)); u.splice(i, 1);
+            localStorage.setItem(USER_DB, JSON.stringify(u)); carregarListaColaboradores();
         }
 
         async function iniciarFluxoFotos() {
-            show('scr-camera');
-            indexFoto = 0;
-            atualizarInterfaceCam();
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            document.getElementById('vid').srcObject = stream;
+            show('scr-camera'); indexFoto = 0; atualizarInterfaceCam();
+            const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            document.getElementById('vid').srcObject = s;
         }
 
         function atualizarInterfaceCam() {
-            document.getElementById('cam-label').innerText = "FOTO DA " + fluxo[indexFoto].toUpperCase();
+            document.getElementById('cam-label').innerText = "FOTO: " + fluxo[indexFoto].toUpperCase();
             document.getElementById('foto-info').innerText = `Ângulo ${indexFoto + 1} de ${fluxo.length}`;
         }
 
-        function mudarFoto(dir) {
-            indexFoto += dir;
+        function mudarFoto(d) {
+            indexFoto += d;
             if (indexFoto < 0) indexFoto = 0;
-            if (indexFoto >= fluxo.length) finalizarVistoria();
+            else if (indexFoto >= fluxo.length) finalizarVistoria();
             else atualizarInterfaceCam();
         }
 
-        function marcarAvaria() {
-            avariasEncontradas.push(fluxo[indexFoto]);
-            alert("Avaria registrada!");
-        }
+        function marcarAvaria() { avariasEncontradas.push(fluxo[indexFoto]); alert("Avaria!"); }
 
         function capturarEProxima() {
-            const video = document.getElementById('vid');
-            const canvas = document.getElementById('canvas');
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            fotosCapturadas[fluxo[indexFoto]] = canvas.toDataURL('image/jpeg', 0.5);
-            if (indexFoto === fluxo.length - 1) finalizarVistoria();
-            else mudarFoto(1);
+            const v = document.getElementById('vid'), c = document.getElementById('canvas');
+            c.width = v.videoWidth; c.height = v.videoHeight;
+            c.getContext('2d').drawImage(v, 0, 0);
+            fotosCapturadas[fluxo[indexFoto]] = c.toDataURL('image/jpeg', 0.5);
+            if (indexFoto === fluxo.length - 1) finalizarVistoria(); else mudarFoto(1);
         }
 
         function finalizarVistoria() {
-            const log = {
-                id: Date.now(), data: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString(),
-                op: "LUCAS LIMA (T531971)", placa: document.getElementById('v-placa').value || '---',
-                km: document.getElementById('v-km').value || '---', comb: document.getElementById('v-comb').value,
-                tipo: document.getElementById('v-tipo').value, obs: document.getElementById('v-obs').value || 'Nenhuma.',
-                fotos: fotosCapturadas, avarias: avariasEncontradas
+            const l = {
+                id: Date.now(), hora: new Date().toLocaleTimeString(), op: currentUser.nome,
+                placa: document.getElementById('v-placa').value, km: document.getElementById('v-km').value,
+                comb: document.getElementById('v-comb').value, tipo: document.getElementById('v-tipo').value,
+                obs: document.getElementById('v-obs').value, fotos: fotosCapturadas, avarias: avariasEncontradas
             };
             const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
-            logs.unshift(log);
-            localStorage.setItem(LOG_DB, JSON.stringify(logs));
-            alert("Vistoria enviada!");
-            location.reload();
+            logs.unshift(l); localStorage.setItem(LOG_DB, JSON.stringify(logs));
+            alert("Enviado!"); location.reload();
         }
 
         function carregarAdmin() {
             show('scr-admin');
-            const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
-            document.getElementById('logs-body').innerHTML = logs.map(l => `
-            <tr onclick='verDossie(${JSON.stringify(l)})'>
-                <td>${l.hora}</td><td>${l.placa}</td><td>${l.op}</td><td>${l.tipo}</td>
-            </tr>
-        `).join('');
+            const l = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
+            document.getElementById('logs-body').innerHTML = l.map(x => `<tr onclick='verDossie(${JSON.stringify(x)})'><td>${x.hora}</td><td>${x.placa}</td><td>${x.op}</td><td>${x.tipo}</td></tr>`).join('');
         }
 
-        function verDossie(log) {
+        function verDossie(l) {
             show('scr-detalhes');
-            document.getElementById('det-placa').innerText = "VEÍCULO: " + log.placa;
-            document.getElementById('det-info').innerHTML = `
-            <p><b>Data:</b> ${log.data} às ${log.hora}</p>
-            <p><b>Motorista:</b> ${log.op}</p>
-            <p><b>KM:</b> ${log.km} | <b>Combustível:</b> ${log.comb}</p>
-            <p><b>Avarias:</b> ${log.avarias.join(', ') || 'Nenhuma'}</p>
-            <p><b>Obs:</b> ${log.obs}</p>
-        `;
-            let h = "";
-            for (let k in log.fotos) h += `<div class="photo-card"><img src="${log.fotos[k]}"><span>${k}</span></div>`;
+            document.getElementById('det-placa').innerText = "PLACA: " + l.placa;
+            document.getElementById('det-info').innerHTML = `<p><b>Motorista:</b> ${l.op}</p><p><b>KM:</b> ${l.km} | <b>Comb:</b> ${l.comb}</p>`;
+            let h = ""; for (let k in l.fotos) h += `<div class="photo-card"><img src="${l.fotos[k]}"><span>${k}</span></div>`;
             document.getElementById('det-fotos').innerHTML = h;
         }
     </script>
