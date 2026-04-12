@@ -1,1 +1,2 @@
-// Arquivo desativado para evitar conflitos de variáveis.
+// Sistema LOKAMIG V4 - Módulo Ativo
+console.log("Monitoramento de Pátio Iniciado.");
