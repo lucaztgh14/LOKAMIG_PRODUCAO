@@ -95,6 +95,13 @@
             border: 1px dashed var(--primary);
         }
 
+        .btn-valida {
+            background: #3b82f6;
+            margin-bottom: 15px;
+            font-size: 12px;
+            padding: 10px;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -201,7 +208,6 @@
         td {
             padding: 10px;
             border-bottom: 1px solid #334155;
-            cursor: pointer;
         }
 
         .modal-detalhes {
@@ -257,10 +263,6 @@
                 background: white;
                 padding: 0;
             }
-
-            .photo-grid {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
         }
     </style>
 </head>
@@ -273,7 +275,7 @@
         <input type="text" id="user" placeholder="Usuário / Matrícula">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
-        <button class="btn-nfc" onclick="lerCrachaNFC()">📲 ACESSAR VIA CRACHÁ</button>
+        <button class="btn-nfc" onclick="lerCrachaNFC('login')">📲 ACESSAR VIA CRACHÁ</button>
     </section>
 
     <section id="scr-form" class="container hidden">
@@ -337,9 +339,11 @@
             </table>
         </div>
         <div id="area-cadastro" class="hidden">
+            <button class="btn-valida" onclick="lerCrachaNFC('validar')">🔍 VALIDAR CRACHÁ (TESTE NFC)</button>
+
             <input type="text" id="reg-nome" placeholder="ex: nome completo">
             <input type="text" id="reg-mat" placeholder="ex: T123456">
-            <input type="text" id="reg-id" placeholder="123456789">
+            <input type="text" id="reg-id" placeholder="123456789 (ID do Cartão)">
             <button onclick="salvarColaborador()" style="background: var(--success);">Cadastrar</button>
             <table style="margin-top:20px;">
                 <thead>
@@ -395,22 +399,32 @@
             }
         }
 
-        async function lerCrachaNFC() {
+        async function lerCrachaNFC(modo) {
             if ('NDEFReader' in window) {
                 try {
                     const ndef = new NDEFReader();
-                    alert("Aproxime o crachá...");
+                    alert("Aproxime o crachá da antena NFC...");
                     await ndef.scan();
                     ndef.onreading = event => {
-                        const id = event.serialNumber.replace(/:/g, "").toUpperCase();
-                        const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === id);
-                        if (user) logar(user); else alert("Crachá ID: " + id + " não cadastrado.");
+                        const idLido = event.serialNumber.replace(/:/g, "").toUpperCase();
+                        const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id.toUpperCase() === idLido);
+
+                        if (modo === 'login') {
+                            if (user) logar(user); else alert("ID: " + idLido + " não cadastrado.");
+                        } else {
+                            if (user) alert("✅ CRACHÁ VÁLIDO!\nPertence a: " + user.nome + "\nMatrícula: " + user.mat);
+                            else alert("⚠️ NÃO CADASTRADO\nID Lido: " + idLido);
+                        }
                     };
-                } catch (e) { alert("NFC não suportado ou erro de permissão."); }
+                } catch (e) { alert("NFC Erro: Certifique-se de usar HTTPS e dar permissão."); }
             } else {
-                const id = prompt("Digite o ID do Crachá:");
-                const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === id);
-                if (user) logar(user); else alert("ID não cadastrado.");
+                const idManual = prompt("NFC não detectado. Digite o ID para testar:");
+                if (idManual) {
+                    const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === idManual);
+                    if (modo === 'login' && user) logar(user);
+                    else if (user) alert("Válido: " + user.nome);
+                    else alert("Não encontrado.");
+                }
             }
         }
 
@@ -422,13 +436,13 @@
         }
 
         function salvarColaborador() {
-            const n = document.getElementById('reg-nome').value.toUpperCase(), m = document.getElementById('reg-mat').value.toUpperCase(), i = document.getElementById('reg-id').value;
-            if (!n || !m || !i) return alert("Preencha todos os campos.");
+            const n = document.getElementById('reg-nome').value.toUpperCase(), m = document.getElementById('reg-mat').value.toUpperCase(), i = document.getElementById('reg-id').value.toUpperCase();
+            if (!n || !m || !i) return alert("Preencha tudo.");
             const u = JSON.parse(localStorage.getItem(USER_DB));
             u.push({ nome: n, mat: m, id: i });
             localStorage.setItem(USER_DB, JSON.stringify(u));
             carregarListaColaboradores();
-            alert("Cadastrado!");
+            alert("Cadastrado com sucesso!");
         }
 
         function carregarListaColaboradores() {
@@ -437,7 +451,7 @@
         }
 
         function removerColaborador(i) {
-            if (confirm("Remover?")) {
+            if (confirm("Remover colaborador?")) {
                 const u = JSON.parse(localStorage.getItem(USER_DB)); u.splice(i, 1);
                 localStorage.setItem(USER_DB, JSON.stringify(u)); carregarListaColaboradores();
             }
@@ -481,7 +495,7 @@
             };
             const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
             logs.unshift(l); localStorage.setItem(LOG_DB, JSON.stringify(logs));
-            alert("Vistoria Enviada!"); location.reload();
+            alert("Vistoria Finalizada!"); location.reload();
         }
 
         function carregarAdmin() {
