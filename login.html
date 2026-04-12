@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOKAMIG | Sistema Integrado de Frotas</title>
+    <title>LOKAMIG | Gestão de Frotas</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -21,7 +21,8 @@
         }
 
         body {
-            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('Faça_uma_montagem_202604121721.png');
+            background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)),
+                url('Faça_uma_montagem_202604121721.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -34,58 +35,94 @@
         }
 
         .container {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(30, 41, 59, 0.6);
             backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 20px;
-            width: 95%;
+            padding: 25px;
+            width: 90%;
             max-width: 450px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
 
-        .hidden {
-            display: none !important;
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #fff;
         }
 
-        h1 {
-            font-size: 22px;
-            margin-bottom: 5px;
+        .sub {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         input,
         select,
         textarea {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 15px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(15, 23, 42, 0.8);
             color: #fff;
+            font-size: 14px;
+            outline: none;
         }
 
         button {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             border-radius: 12px;
             border: none;
             background: var(--primary);
             color: #fff;
             font-weight: 700;
             cursor: pointer;
+            transition: 0.3s;
             text-transform: uppercase;
         }
 
-        /* Câmera e Fotos */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Estilo dos Cards de Usuário */
+        .user-card {
+            background: rgba(209, 18, 42, 0.15);
+            border: 1px solid var(--primary);
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .user-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #334155;
+            border: 2px solid var(--primary);
+        }
+
+        /* Câmera e Navegação */
         .cam-box {
             position: relative;
             width: 100%;
-            background: #000;
             border-radius: 15px;
             overflow: hidden;
             border: 2px solid var(--primary);
+            background: #000;
+            margin-bottom: 15px;
         }
 
         video {
@@ -100,7 +137,7 @@
         .cam-nav {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .btn-sec {
@@ -109,49 +146,44 @@
 
         .btn-avaria {
             background: #f59e0b;
-            margin-top: 5px;
             font-size: 12px;
+            margin-top: 10px;
         }
 
-        /* Admin */
+        /* Admin e Dossiê */
         .admin-box {
-            max-width: 900px;
-            height: 90vh;
-            overflow-y: auto;
+            max-width: 850px;
+            width: 95%;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
-            cursor: pointer;
+            font-size: 11px;
+            margin-top: 20px;
         }
 
         th {
             background: #0f172a;
-            color: var(--primary);
-            padding: 12px;
+            padding: 10px;
             text-align: left;
+            color: var(--primary);
         }
 
         td {
-            padding: 12px;
+            padding: 10px;
             border-bottom: 1px solid #334155;
+            cursor: pointer;
         }
 
-        tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        /* Modal Detalhes */
-        .modal {
+        .modal-detalhes {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #0f172a;
-            z-index: 100;
+            background: var(--bg);
+            z-index: 1000;
             padding: 20px;
             overflow-y: auto;
         }
@@ -163,10 +195,40 @@
             margin: 20px 0;
         }
 
-        .photo-item {
+        .photo-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .photo-card img {
             width: 100%;
-            border-radius: 10px;
-            border: 1px solid var(--primary);
+            border-radius: 5px;
+        }
+
+        .photo-card span {
+            font-size: 9px;
+            display: block;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        @media print {
+            .btn-print-hide {
+                display: none;
+            }
+
+            body {
+                background: white;
+                color: black;
+            }
+
+            .modal-detalhes {
+                position: static;
+                background: white;
+                padding: 0;
+            }
         }
     </style>
 </head>
@@ -175,34 +237,35 @@
 
     <section id="scr-login" class="container">
         <h1>LOKAMIG</h1>
-        <div style="font-size: 10px; margin-bottom: 20px; color: #94a3b8;">SISTEMA INTEGRADO V5</div>
-        <input type="text" id="user" placeholder="Matrícula ou Usuário">
+        <div class="sub">Vistoria e Logística de Pátio</div>
+        <input type="text" id="user" placeholder="Usuário / Matrícula">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
     </section>
 
     <section id="scr-form" class="container hidden">
-        <h1>DADOS DO VEÍCULO</h1>
+        <h1>CHECKLIST</h1>
+        <div class="sub">Informações Iniciais</div>
         <select id="v-tipo">
             <option value="Operacional">Operacional</option>
             <option value="Reserva">Reserva</option>
             <option value="Gerencial">Gerencial</option>
         </select>
-        <input type="text" id="v-placa" placeholder="PLACA (Ex: ABC1234)">
+        <input type="text" id="v-placa" placeholder="PLACA DO VEÍCULO">
         <input type="number" id="v-km" placeholder="KM ATUAL (Manual)">
         <select id="v-comb">
-            <option value="Vazio">Vazio</option>
-            <option value="1/4">1/4</option>
-            <option value="1/2">1/2</option>
-            <option value="3/4">3/4</option>
-            <option value="Cheio">Cheio</option>
+            <option value="Vazio">Nível Combustível: Vazio</option>
+            <option value="1/4">Nível Combustível: 1/4</option>
+            <option value="1/2">Nível Combustível: 1/2</option>
+            <option value="3/4">Nível Combustível: 3/4</option>
+            <option value="Cheio">Nível Combustível: Cheio</option>
         </select>
-        <textarea id="v-obs" placeholder="Observações de Manutenção..."></textarea>
-        <button onclick="iniciarFluxoFotos()">Ir para Fotos</button>
+        <textarea id="v-obs" placeholder="Observações de manutenção..."></textarea>
+        <button onclick="iniciarFluxoFotos()">Acessar Câmera</button>
     </section>
 
     <section id="scr-camera" class="container hidden">
-        <h2 id="cam-label" style="color: var(--primary);">FOTO DA FRENTE</h2>
+        <h1 id="cam-label">FOTO DA FRENTE</h1>
         <div class="cam-box">
             <video id="vid" autoplay playsinline></video>
             <canvas id="canvas"></canvas>
@@ -211,17 +274,14 @@
 
         <div class="cam-nav">
             <button class="btn-sec" onclick="mudarFoto(-1)">Voltar</button>
-            <button onclick="capturarEFotoProxima()">Próximo / Tirar Foto</button>
+            <button onclick="capturarEProxima()">Próximo / Tirar Foto</button>
         </div>
-        <div id="foto-count" style="font-size: 11px; margin-top: 10px;">Foto 1 de 7</div>
+        <div id="foto-info" style="font-size: 11px; margin-top: 10px; color: #94a3b8;">Foto 1 de 8</div>
     </section>
 
     <section id="scr-admin" class="container admin-box hidden">
-        <h1>CONTROLE OPERACIONAL</h1>
-        <div class="cam-nav" style="margin-bottom: 15px;">
-            <button class="tab-btn" onclick="showCadastro()">Novo Cadastro</button>
-            <button class="btn-sec" onclick="location.reload()">Sair</button>
-        </div>
+        <h1 style="color: var(--primary);">MONITORAMENTO ESCRITÓRIO</h1>
+        <div class="sub">Clique em uma linha para ver o Dossiê</div>
         <table>
             <thead>
                 <tr>
@@ -233,30 +293,28 @@
             </thead>
             <tbody id="logs-body"></tbody>
         </table>
+        <button onclick="location.reload()" class="btn-sec" style="margin-top:20px;">Sair</button>
     </section>
 
-    <section id="scr-detalhes" class="modal hidden">
-        <h1 id="det-titulo">DETALHES</h1>
-        <div id="det-info"
-            style="text-align: left; font-size: 13px; margin: 15px 0; border-left: 3px solid var(--primary); padding-left: 10px;">
-        </div>
+    <div id="scr-detalhes" class="modal-detalhes hidden">
+        <h1 id="det-placa" style="color: var(--primary);">PLACA ABC-1234</h1>
+        <div id="det-info" style="text-align: left; margin: 20px 0; line-height: 1.6;"></div>
         <div class="photo-grid" id="det-fotos"></div>
-        <button onclick="gerarRelatorio()" style="background: var(--success);">Gerar Relatório PDF</button>
-        <button onclick="show('scr-admin')" class="btn-sec" style="margin-top: 10px;">Voltar</button>
-    </section>
+        <div class="cam-nav btn-print-hide">
+            <button onclick="window.print()" style="background: var(--success);">Gerar Relatório PDF</button>
+            <button onclick="show('scr-admin')" class="btn-sec">Voltar ao Painel</button>
+        </div>
+    </div>
 
     <script>
+        const LOG_DB = 'lokamig_logs_v5';
         let fluxo = ["Frente", "Lateral Esquerda", "Traseira", "Lateral Direita", "Estepe", "Painel/KM", "Motor", "Rodas"];
         let indexFoto = 0;
         let fotosCapturadas = {};
-        let currentLog = null;
-        let avarias = [];
-
-        const USER_DB = 'lokamig_users_v4';
-        const LOG_DB = 'lokamig_logs_v5';
+        let avariasEncontradas = [];
 
         function show(id) {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('section, .modal-detalhes').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
@@ -270,29 +328,29 @@
         async function iniciarFluxoFotos() {
             show('scr-camera');
             indexFoto = 0;
-            atualizarCamInterface();
+            atualizarInterfaceCam();
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
             document.getElementById('vid').srcObject = stream;
         }
 
-        function atualizarCamInterface() {
-            document.getElementById('cam-label').innerText = "FOTO: " + fluxo[indexFoto].toUpperCase();
-            document.getElementById('foto-count').innerText = `Foto ${indexFoto + 1} de ${fluxo.length}`;
+        function atualizarInterfaceCam() {
+            document.getElementById('cam-label').innerText = "FOTO DA " + fluxo[indexFoto].toUpperCase();
+            document.getElementById('foto-info').innerText = `Ângulo ${indexFoto + 1} de ${fluxo.length}`;
         }
 
         function mudarFoto(dir) {
             indexFoto += dir;
             if (indexFoto < 0) indexFoto = 0;
             if (indexFoto >= fluxo.length) finalizarVistoria();
-            else atualizarCamInterface();
+            else atualizarInterfaceCam();
         }
 
         function marcarAvaria() {
-            avarias.push(fluxo[indexFoto]);
-            alert("Avaria marcada para: " + fluxo[indexFoto] + ". Tire a foto normalmente.");
+            avariasEncontradas.push(fluxo[indexFoto]);
+            alert("Avaria registrada para: " + fluxo[indexFoto]);
         }
 
-        function capturarEFotoProxima() {
+        function capturarEProxima() {
             const video = document.getElementById('vid');
             const canvas = document.getElementById('canvas');
             canvas.width = video.videoWidth;
@@ -308,20 +366,21 @@
         function finalizarVistoria() {
             const log = {
                 id: Date.now(),
-                hora: new Date().toLocaleString(),
-                motorista: "LUCAS LIMA (T531971)",
-                placa: document.getElementById('v-placa').value,
-                km: document.getElementById('v-km').value,
+                data: new Date().toLocaleDateString(),
+                hora: new Date().toLocaleTimeString(),
+                op: "LUCAS LIMA (T531971)",
+                placa: document.getElementById('v-placa').value || '---',
+                km: document.getElementById('v-km').value || '---',
                 comb: document.getElementById('v-comb').value,
                 tipo: document.getElementById('v-tipo').value,
-                obs: document.getElementById('v-obs').value,
+                obs: document.getElementById('v-obs').value || 'Nenhuma observação.',
                 fotos: fotosCapturadas,
-                avarias: avarias
+                avarias: avariasEncontradas
             };
             const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
             logs.unshift(log);
             localStorage.setItem(LOG_DB, JSON.stringify(logs));
-            alert("Vistoria Concluída e enviada ao escritório!");
+            alert("Vistoria finalizada com sucesso!");
             location.reload();
         }
 
@@ -329,36 +388,32 @@
             show('scr-admin');
             const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
             document.getElementById('logs-body').innerHTML = logs.map(l => `
-            <tr onclick='verDetalhes(${JSON.stringify(l)})'>
-                <td>${l.hora.split(',')[1]}</td>
+            <tr onclick='verDossie(${JSON.stringify(l)})'>
+                <td>${l.hora}</td>
                 <td>${l.placa}</td>
-                <td>${l.motorista}</td>
+                <td>${l.op}</td>
                 <td>${l.tipo}</td>
             </tr>
         `).join('');
         }
 
-        function verDetalhes(log) {
-            currentLog = log;
+        function verDossie(log) {
             show('scr-detalhes');
-            document.getElementById('det-titulo').innerText = "VISTORIA: " + log.placa;
+            document.getElementById('det-placa').innerText = "VEÍCULO: " + log.placa;
             document.getElementById('det-info').innerHTML = `
-            <b>Motorista:</b> ${log.motorista}<br>
-            <b>KM:</b> ${log.km} | <b>Combustível:</b> ${log.comb}<br>
-            <b>Tipo:</b> ${log.tipo}<br>
-            <b>Avarias em:</b> ${log.avarias.join(', ') || 'Nenhuma'}<br>
-            <b>Obs:</b> ${log.obs}
+            <p><b>Data:</b> ${log.data} às ${log.hora}</p>
+            <p><b>Motorista:</b> ${log.op}</p>
+            <p><b>KM Atual:</b> ${log.km} | <b>Combustível:</b> ${log.comb}</p>
+            <p><b>Tipo:</b> ${log.tipo}</p>
+            <p><b>Avarias Identificadas:</b> ${log.avarias.join(', ') || 'Nenhuma'}</p>
+            <p><b>Manutenção/Obs:</b> ${log.obs}</p>
         `;
 
             let htmlFotos = "";
             for (let key in log.fotos) {
-                htmlFotos += `<div><small>${key}</small><img src="${log.fotos[key]}" class="photo-item"></div>`;
+                htmlFotos += `<div class="photo-card"><img src="${log.fotos[key]}"><span>${key}</span></div>`;
             }
             document.getElementById('det-fotos').innerHTML = htmlFotos;
-        }
-
-        function gerarRelatorio() {
-            window.print();
         }
     </script>
 </body>
