@@ -8,9 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0b1b2b;
-            --card: #152036;
             --primary: #d1122a;
+            --card-bg: rgba(15, 23, 42, 0.7);
             --text: #e9f0f7;
             --muted: #a2b3c9;
         }
@@ -20,7 +19,12 @@
         }
 
         body {
-            background: var(--bg);
+            /* Usando a imagem que você gerou como fundo */
+            background-image: url('Faça_uma_montagem_202604121721.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             color: var(--text);
             font-family: 'Montserrat', sans-serif;
             margin: 0;
@@ -32,64 +36,81 @@
         }
 
         .panel {
-            background: var(--card);
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 25px;
+            border-radius: 24px;
+            padding: 35px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
 
-        h1,
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
+        h1 {
+            margin: 0;
             color: #fff;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        p {
+            font-size: 14px;
+            margin-bottom: 30px;
+            color: var(--muted);
         }
 
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            text-align: left;
         }
 
         label {
             display: block;
             font-size: 12px;
             color: var(--muted);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #32415b;
-            background: #0f1a2b;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
             color: #fff;
             font-size: 16px;
             outline: none;
+            transition: 0.3s;
         }
 
         input:focus {
             border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 0 4px rgba(209, 18, 42, 0.2);
         }
 
         button {
             width: 100%;
-            padding: 14px;
-            border-radius: 8px;
+            padding: 16px;
+            border-radius: 12px;
             border: none;
             cursor: pointer;
             background: var(--primary);
             color: white;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 16px;
+            text-transform: uppercase;
             transition: 0.3s;
             margin-top: 10px;
         }
 
         button:active {
-            transform: scale(0.98);
+            transform: scale(0.96);
         }
 
         .hidden {
@@ -97,26 +118,28 @@
         }
 
         .badge {
-            background: #1e293b;
-            padding: 5px 10px;
-            border-radius: 5px;
+            background: rgba(209, 18, 42, 0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
             font-size: 12px;
             color: var(--primary);
             border: 1px solid var(--primary);
+            font-weight: bold;
         }
 
         video {
             width: 100%;
-            border-radius: 12px;
+            border-radius: 15px;
             background: #000;
-            margin-top: 15px;
+            margin-top: 20px;
+            border: 2px solid var(--primary);
         }
 
         .status {
             font-size: 13px;
             color: var(--muted);
             text-align: center;
-            margin-top: 10px;
+            margin-top: 20px;
             display: block;
         }
     </style>
@@ -124,59 +147,60 @@
 
 <body>
 
-    <div id="app" style="width: 100%;">
+    <div id="app" style="width: 100%; display: flex; justify-content: center;">
         <section id="screen-login" class="panel">
             <h1>LOKAMIG</h1>
-            <p style="text-align: center; font-size: 14px; margin-bottom: 25px;">Acesso Nível Deus</p>
+            <p>Acesso Nível Deus</p>
             <div class="input-group">
                 <label>Usuário</label>
-                <input type="text" id="input-login" placeholder="Ex: admin">
+                <input type="text" id="input-login" placeholder="Digite seu usuário">
             </div>
             <div class="input-group">
                 <label>Senha</label>
-                <input type="password" id="input-password" placeholder="****">
+                <input type="password" id="input-password" placeholder="••••••••">
             </div>
-            <button id="btn-login">ACESSAR SISTEMA</button>
-            <span class="status" id="status-public">Aguardando login...</span>
+            <button id="btn-login">ENTRAR NO SISTEMA</button>
+            <span class="status" id="status-public">Aguardando credenciais...</span>
         </section>
 
         <section id="screen-master" class="panel hidden">
             <h2>Painel Master</h2>
             <div class="input-group">
-                <label>Nova Senha Admin</label>
-                <input type="password" id="admin-password" placeholder="Mudar senha">
-                <button onclick="mudarSenha()" style="background:#1e3a8a; font-size: 12px; padding: 8px;">Atualizar
-                    Senha</button>
+                <label>Nova Senha Master</label>
+                <input type="password" id="admin-password" placeholder="Nova senha">
+                <button onclick="mudarSenha()"
+                    style="background:#1e293b; font-size: 12px; padding: 10px; margin-top: 10px;">ATUALIZAR
+                    SENHA</button>
             </div>
-            <hr style="border: 0.5px solid #32415b; margin: 20px 0;">
-            <button id="btn-nfc-master" style="background:#1e293b;">💳 CADASTRAR CRACHÁ (NFC)</button>
-            <div style="text-align: center; margin-top: 10px;">
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 25px 0;">
+            <button id="btn-nfc-master" style="background:#0f172a; border: 1px solid var(--primary);">💳 CADASTRAR
+                CRACHÁ (NFC)</button>
+            <div style="margin: 15px 0;">
                 <span class="badge" id="badge-count">Crachás: 0</span>
             </div>
-            <button onclick="irParaVistoria()" style="background:#0b7a0b;">INICIAR VISTORIA</button>
-            <button onclick="logout()" style="background:transparent; color:#666; font-size: 12px;">Sair do
-                Sistema</button>
+            <button onclick="irParaVistoria()" style="background:#059669;">IR PARA VISTORIA</button>
+            <button onclick="location.reload()"
+                style="background:transparent; color:#94a3b8; font-size: 12px;">Desconectar</button>
         </section>
 
         <section id="screen-activate" class="panel hidden">
-            <h2>Ativação de Vistoria</h2>
+            <h2>Ativação</h2>
             <div id="nfc-area">
-                <p style="text-align: center;">Aproxime o crachá no celular para liberar a câmera.</p>
-                <button id="btn-scan-nfc">LER CRACHÁ</button>
+                <p>Aproxime o crachá no celular para liberar a câmera.</p>
+                <button id="btn-scan-nfc">ESCANEAR CRACHÁ</button>
             </div>
             <div id="camera-section" class="hidden">
                 <video id="video" autoplay playsinline></video>
-                <span class="status" id="status-ai">IA: Detectando danos...</span>
-                <button onclick="location.reload()" style="background:#32415b;">CONCLUIR</button>
+                <span class="status" id="status-ai">IA: Analisando frames em tempo real...</span>
+                <button onclick="location.reload()" style="background:#1e293b;">FINALIZAR</button>
             </div>
         </section>
     </div>
 
     <script>
-        const ADMIN_KEY = 'lokamig_pw';
-        const NFC_KEY = 'lokamig_nfc';
+        const ADMIN_KEY = 'lokamig_pw_master';
+        const NFC_KEY = 'lokamig_nfc_db';
 
-        // Inicia senha padrão
         if (!localStorage.getItem(ADMIN_KEY)) localStorage.setItem(ADMIN_KEY, '1234');
 
         function show(id) {
@@ -184,7 +208,6 @@
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // Ação Login
         document.getElementById('btn-login').addEventListener('click', () => {
             const u = document.getElementById('input-login').value.toLowerCase().trim();
             const p = document.getElementById('input-password').value;
@@ -196,7 +219,7 @@
             } else if (u !== '') {
                 show('screen-activate');
             } else {
-                alert("Preencha os campos!");
+                alert("Por favor, preencha os campos.");
             }
         });
 
@@ -204,36 +227,34 @@
             const nova = document.getElementById('admin-password').value;
             if (nova.length >= 4) {
                 localStorage.setItem(ADMIN_KEY, nova);
-                alert("Senha alterada!");
+                alert("Senha Master atualizada!");
             }
         }
 
         function atualizarContador() {
             const arr = JSON.parse(localStorage.getItem(NFC_KEY) || '[]');
-            document.getElementById('badge-count').textContent = 'Crachás: ' + arr.length;
+            document.getElementById('badge-count').textContent = 'Crachás Cadastrados: ' + arr.length;
         }
 
-        function logout() { localStorage.removeItem('user_active'); location.reload(); }
         function irParaVistoria() { show('screen-activate'); }
 
-        // NFC E CÂMERA
         document.getElementById('btn-nfc-master').addEventListener('click', async () => {
             if ('NDEFReader' in window) {
                 try {
                     const ndef = new NDEFReader();
                     await ndef.scan();
-                    alert("NFC pronto! Aproxime o cartão.");
+                    alert("NFC Ativo! Aproxime o crachá do Admin.");
                     ndef.onreading = (event) => {
                         const arr = JSON.parse(localStorage.getItem(NFC_KEY) || '[]');
                         if (!arr.includes(event.serialNumber)) {
                             arr.push(event.serialNumber);
                             localStorage.setItem(NFC_KEY, JSON.stringify(arr));
                             atualizarContador();
-                            alert("Sucesso! Crachá registrado.");
+                            alert("Crachá vinculado com sucesso!");
                         }
                     };
-                } catch (e) { alert("NFC Erro: " + e); }
-            } else { alert("NFC não suportado neste PC/Celular."); }
+                } catch (e) { alert("Erro NFC: " + e); }
+            } else { alert("NFC não suportado neste dispositivo."); }
         });
 
         document.getElementById('btn-scan-nfc').addEventListener('click', async () => {
@@ -241,20 +262,25 @@
                 try {
                     const ndef = new NDEFReader();
                     await ndef.scan();
-                    alert("Aproxime o crachá para validar...");
+                    alert("Aguardando crachá para liberar câmera...");
                     ndef.onreading = () => iniciarCamera();
                 } catch (e) { alert("Erro: " + e); }
             } else {
-                // Mock para testar no PC sem NFC
-                if (confirm("Simular leitura de crachá?")) iniciarCamera();
+                if (confirm("Simular leitura de crachá para teste?")) iniciarCamera();
             }
         });
 
         async function iniciarCamera() {
             document.getElementById('nfc-area').classList.add('hidden');
             document.getElementById('camera-section').classList.remove('hidden');
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            document.getElementById('video').srcObject = stream;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+                });
+                document.getElementById('video').srcObject = stream;
+            } catch (err) {
+                alert("Erro ao abrir câmera: " + err);
+            }
         }
     </script>
 </body>
