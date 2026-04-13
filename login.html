@@ -109,6 +109,9 @@
             border-left: 4px solid var(--primary);
             font-size: 12px;
             position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .badge {
@@ -145,10 +148,14 @@
             border-color: var(--primary);
         }
 
-        .btn-prog {
-            background: var(--warning);
-            color: #000;
-            margin-bottom: 15px;
+        .btn-del {
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 5px;
         }
 
         table {
@@ -325,7 +332,7 @@
             }
         }
 
-        // LEITURA NFC NO LOGIN
+        // NFC LOGIC
         async function ativarLeituraNFCLogin() {
             if (!('NDEFReader' in window)) return;
             try {
@@ -335,12 +342,11 @@
                 document.getElementById('status-nfc-login').classList.remove('hidden');
                 ndef.onreading = event => {
                     document.getElementById('user').value = event.serialNumber.toUpperCase();
-                    handleLogin(); // Tenta o login automático
+                    handleLogin();
                 };
             } catch (e) { console.error(e); }
         }
 
-        // LEITURA NFC NO CADASTRO
         async function ativarLeituraNFCCadastro() {
             const campo = document.getElementById('c-nfc');
             if (!('NDEFReader' in window)) { alert("NFC não suportado."); return; }
@@ -356,32 +362,57 @@
             } catch (e) { alert(e); }
         }
 
-        // ADMIN LOGICA
+        // ADMIN - EXCLUIR GERAL
+        function excluirItem(tipoDB, idProp, idValor) {
+            if (!confirm("Deseja realmente excluir este item?")) return;
+            let d = JSON.parse(localStorage.getItem(tipoDB) || '[]');
+            d = d.filter(item => item[idProp] !== idValor);
+            localStorage.setItem(tipoDB, JSON.stringify(d));
+            // Recarregar a lista correta
+            if (tipoDB === DB.colab) carregarListaColab();
+            if (tipoDB === DB.forn) carregarListaForn();
+            if (tipoDB === DB.veic) carregarListaVeic();
+        }
+
+        // LOGICA CADASTROS
         function salvarColab() {
             const d = JSON.parse(localStorage.getItem(DB.colab) || '[]');
             d.push({ mat: document.getElementById('c-mat').value.toUpperCase(), nome: document.getElementById('c-nome').value, nfc: document.getElementById('c-nfc').value.toUpperCase() });
-            localStorage.setItem(DB.colab, JSON.stringify(d)); carregarListaColab();
+            localStorage.setItem(DB.colab, JSON.stringify(d));
+            carregarListaColab();
             document.getElementById('c-mat').value = ''; document.getElementById('c-nome').value = ''; document.getElementById('c-nfc').value = '';
         }
         function carregarListaColab() {
             const d = JSON.parse(localStorage.getItem(DB.colab) || '[]');
-            document.getElementById('list-colab').innerHTML = d.map(x => `<div class="prog-item">${x.nome} (ID: ${x.nfc || x.mat})</div>`).join('');
+            document.getElementById('list-colab').innerHTML = d.map(x => `<div class="prog-item"><span>${x.nome} (ID: ${x.nfc || x.mat})</span><button class="btn-del" onclick="excluirItem(DB.colab, 'mat', '${x.mat}')">×</button></div>`).join('');
+        }
+        function salvarForn() {
+            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+            f.push({ nome: document.getElementById('f-nome').value, user: document.getElementById('f-user').value, pass: document.getElementById('f-pass').value, tipo: document.getElementById('f-tipo').value });
+            localStorage.setItem(DB.forn, JSON.stringify(f)); carregarListaForn();
+            document.getElementById('f-nome').value = ''; document.getElementById('f-user').value = ''; document.getElementById('f-pass').value = '';
+        }
+        function carregarListaForn() {
+            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+            document.getElementById('list-forn').innerHTML = f.map(x => `<div class="prog-item"><span>${x.nome} (${x.tipo})</span><button class="btn-del" onclick="excluirItem(DB.forn, 'user', '${x.user}')">×</button></div>`).join('');
         }
         function salvarVeiculo() {
             const d = JSON.parse(localStorage.getItem(DB.veic) || '[]');
-            d.push({ placa: document.getElementById('v-reg-placa').value.toUpperCase(), tipo: document.getElementById('v-reg-tipo').value });
+            const placa = document.getElementById('v-reg-placa').value.toUpperCase();
+            d.push({ placa: placa, tipo: document.getElementById('v-reg-tipo').value });
             localStorage.setItem(DB.veic, JSON.stringify(d)); carregarListaVeic();
+            document.getElementById('v-reg-placa').value = '';
         }
         function carregarListaVeic() {
             const d = JSON.parse(localStorage.getItem(DB.veic) || '[]');
-            document.getElementById('list-veic').innerHTML = d.map(x => `<div class="prog-item">${x.placa} - ${x.tipo}</div>`).join('');
+            document.getElementById('list-veic').innerHTML = d.map(x => `<div class="prog-item"><span>${x.placa} - ${x.tipo}</span><button class="btn-del" onclick="excluirItem(DB.veic, 'placa', '${x.placa}')">×</button></div>`).join('');
         }
         function carregarLogs() {
             const d = JSON.parse(localStorage.getItem(DB.logs) || '[]');
             document.getElementById('list-mon').innerHTML = d.map(x => `<tr><td>${x.data}</td><td>${x.placa}</td><td>${x.user}</td><td>${x.tipo}</td></tr>`).join('');
         }
 
-        // CLIENTE E PROGRAMAÇÃO
+        // CLIENTE
         function lancarProgramacao() {
             const p = document.getElementById('p-placa').value.toUpperCase();
             if (!p) return;
@@ -392,9 +423,10 @@
         }
         function carregarProgCliente() {
             const d = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            document.getElementById('lista-programacao-cliente').innerHTML = d.map(i => `<div class="prog-item"><div class="badge">${i.destino}</div><b>${i.placa}</b><button onclick="cancelarProg(${i.id})" style="float:right; color:red; background:none; border:none;">X</button></div>`).join('');
+            document.getElementById('lista-programacao-cliente').innerHTML = d.map(i => `<div class="prog-item"><div><div class="badge">${i.destino}</div> <b>${i.placa}</b></div><button class="btn-del" onclick="cancelarProg(${i.id})">×</button></div>`).join('');
         }
         function cancelarProg(id) {
+            if (!confirm("Remover da programação?")) return;
             let d = JSON.parse(localStorage.getItem(DB.prog));
             localStorage.setItem(DB.prog, JSON.stringify(d.filter(i => i.id !== id))); carregarProgCliente();
         }
@@ -416,21 +448,13 @@
             document.getElementById('area-forn').classList.toggle('hidden', t !== 'forn');
             document.getElementById('area-veic').classList.toggle('hidden', t !== 'veic');
             if (t === 'colab') carregarListaColab();
+            if (t === 'forn') carregarListaForn();
             if (t === 'veic') carregarListaVeic();
-        }
-        function salvarForn() {
-            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]');
-            f.push({ nome: document.getElementById('f-nome').value, user: document.getElementById('f-user').value, pass: document.getElementById('f-pass').value, tipo: document.getElementById('f-tipo').value });
-            localStorage.setItem(DB.forn, JSON.stringify(f)); carregarListaForn();
-        }
-        function carregarListaForn() {
-            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]');
-            document.getElementById('list-forn').innerHTML = f.map(x => `<div class="prog-item">${x.nome} (${x.tipo})</div>`).join('');
         }
         function toggleProgView() {
             const box = document.getElementById('prog-view'); box.classList.toggle('hidden');
             const lista = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(i => i.destino === window.sessao.user.tipo);
-            document.getElementById('prog-list-content').innerHTML = lista.map(i => `<div><b>${i.placa}</b><br><small>${i.obs}</small></div>`).join('');
+            document.getElementById('prog-list-content').innerHTML = lista.map(i => `<div style="margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;"><b>${i.placa}</b><br><small>${i.obs}</small></div>`).join('');
         }
     </script>
 </body>
