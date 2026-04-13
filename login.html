@@ -22,8 +22,7 @@
         }
 
         body {
-            background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)),
-                url('Faça_uma_montagem_202604121721.png');
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('Faça_uma_montagem_202604121721.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -42,15 +41,14 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 25px;
-            width: 90%;
-            max-width: 480px;
+            width: 95%;
+            max-width: 500px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
 
         h1 {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 22px;
             margin-bottom: 5px;
             color: #fff;
         }
@@ -88,27 +86,45 @@
             cursor: pointer;
             transition: 0.3s;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .hidden {
             display: none !important;
         }
 
-        /* Admin Layout */
-        .admin-box {
-            max-width: 900px;
-            width: 95%;
-            height: 90vh;
-            overflow-y: auto;
+        .form-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .prog-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary);
+            font-size: 12px;
+            position: relative;
+        }
+
+        .badge {
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            background: var(--primary);
+            margin-bottom: 5px;
+            display: inline-block;
         }
 
         .tabs {
             display: flex;
             gap: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             overflow-x: auto;
-            padding-bottom: 10px;
         }
 
         .tab-btn {
@@ -119,8 +135,8 @@
             color: #fff;
             cursor: pointer;
             white-space: nowrap;
+            flex: 1;
             font-size: 10px;
-            font-weight: 700;
         }
 
         .tab-active {
@@ -128,98 +144,10 @@
             border-color: var(--primary);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-        }
-
-        th {
-            background: #0f172a;
-            padding: 10px;
-            text-align: left;
-            color: var(--primary);
-            position: sticky;
-            top: 0;
-        }
-
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #334155;
-            cursor: pointer;
-            text-align: left;
-        }
-
-        .form-section {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 12px;
+        .btn-prog {
+            background: var(--warning);
+            color: #000;
             margin-bottom: 15px;
-            text-align: left;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .form-label {
-            font-size: 11px;
-            color: var(--primary);
-            font-weight: bold;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .search-box {
-            position: relative;
-        }
-
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: #1e293b;
-            border-radius: 0 0 10px 10px;
-            z-index: 100;
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid var(--primary);
-            display: none;
-        }
-
-        .search-item {
-            padding: 10px;
-            border-bottom: 1px solid #334155;
-            cursor: pointer;
-        }
-
-        .modal-detalhes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg);
-            z-index: 1000;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .photo-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .photo-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 5px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-        }
-
-        .photo-card img {
-            width: 100%;
-            border-radius: 5px;
         }
     </style>
 </head>
@@ -228,273 +156,167 @@
 
     <section id="scr-login" class="container">
         <h1>LOKAMIG</h1>
-        <div class="sub">Logística e Gestão de Pátio</div>
-        <input type="text" id="user" placeholder="Matrícula ou Usuário">
+        <div class="sub">Logística & Programação</div>
+        <input type="text" id="user" placeholder="Matrícula / Usuário">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
-        <div style="margin: 15px 0; font-size: 10px; color: #64748b;">OU</div>
-        <button style="background:#1e293b; border:1px dashed var(--primary);" onclick="lerCrachaNFC('login')">📲 ACESSAR
-            VIA CRACHÁ</button>
+        <div style="margin: 10px; font-size: 9px; color: #64748b;">ACESSO PARA COLABORADORES, CLIENTES E FORNECEDORES
+        </div>
     </section>
 
-    <section id="scr-admin" class="container admin-box hidden">
-        <h1>PAINEL ADMIN</h1>
+    <section id="scr-admin" class="container hidden" style="max-width: 800px;">
+        <h1>ADMINISTRAÇÃO</h1>
         <div class="tabs">
-            <button class="tab-btn tab-active" onclick="switchTab('mon', event)">Monitoramento</button>
-            <button class="tab-btn" onclick="switchTab('cad', event)">Colaboradores</button>
-            <button class="tab-btn" onclick="switchTab('veic', event)">Veículos</button>
+            <button class="tab-btn tab-active" onclick="switchTab('mon', event)">Logs</button>
             <button class="tab-btn" onclick="switchTab('forn', event)">Fornecedores</button>
+            <button class="tab-btn" onclick="switchTab('veic', event)">Veículos</button>
         </div>
-
-        <div id="area-monitor">
-            <table>
-                <thead>
-                    <tr>
-                        <th>HORA</th>
-                        <th>PLACA</th>
-                        <th>SERVIÇO</th>
-                        <th>MOTORISTA</th>
-                    </tr>
-                </thead>
-                <tbody id="logs-body"></tbody>
-            </table>
-        </div>
-
-        <div id="area-veiculos" class="hidden">
-            <div class="form-section">
-                <input type="text" id="v-reg-placa" placeholder="PLACA">
-                <select id="v-reg-tipo">
-                    <option value="Operacional">Operacional</option>
-                    <option value="Gerencial">Gerencial</option>
-                    <option value="Reserva">Reserva</option>
-                </select>
-                <button onclick="salvarVeiculo()" style="background:var(--success);">Cadastrar Carro</button>
-            </div>
-            <table id="tbl-veic">
-                <tbody></tbody>
-            </table>
-        </div>
-
         <div id="area-forn" class="hidden">
             <div class="form-section">
-                <input type="text" id="f-reg-nome" placeholder="NOME DA EMPRESA">
-                <input type="text" id="f-reg-user" placeholder="USUÁRIO DE ACESSO">
-                <input type="password" id="f-reg-pass" placeholder="SENHA">
-                <select id="f-reg-tipo">
-                    <option value="Limpeza">Limpeza / Estética</option>
-                    <option value="Oficina">Oficina / Manutenção</option>
+                <input type="text" id="f-nome" placeholder="NOME DA EMPRESA">
+                <input type="text" id="f-user" placeholder="LOGIN">
+                <input type="text" id="f-pass" placeholder="SENHA">
+                <select id="f-tipo">
+                    <option value="Limpeza">Limpeza</option>
+                    <option value="Oficina">Oficina</option>
                 </select>
-                <button onclick="salvarForn()" style="background:var(--success);">Criar Acesso Fornecedor</button>
+                <button onclick="salvarForn()" style="background:var(--success)">Cadastrar Fornecedor</button>
             </div>
-            <table id="tbl-forn">
-                <tbody></tbody>
-            </table>
+            <div id="list-forn"></div>
         </div>
+        <button onclick="location.reload()" style="background:#334155; margin-top:10px;">Sair</button>
+    </section>
 
-        <div id="area-cadastro" class="hidden">
-            <div class="form-section">
-                <input type="text" id="reg-mat" placeholder="Matrícula">
-                <input type="text" id="reg-nome" placeholder="Nome">
-                <input type="text" id="reg-id" placeholder="ID NFC" readonly>
-                <button onclick="lerCrachaNFC('vincular')" style="background:#3b82f6; margin-bottom:5px;">Ler
-                    Crachá</button>
-                <button onclick="salvarColab()" style="background:var(--success);">Salvar Colaborador</button>
-            </div>
-            <table id="tbl-colab">
-                <tbody></tbody>
-            </table>
+    <section id="scr-cliente" class="container hidden">
+        <h1>PROGRAMAÇÃO DIÁRIA</h1>
+        <div class="sub">Área do Cliente</div>
+        <div class="form-section">
+            <input type="text" id="p-placa" placeholder="PLACA">
+            <select id="p-destino">
+                <option value="Limpeza">Para Limpeza</option>
+                <option value="Oficina">Para Oficina</option>
+            </select>
+            <textarea id="p-obs" placeholder="OBSERVAÇÕES DE MANUTENÇÃO..."></textarea>
+            <button onclick="lancarProgramacao()" style="background:var(--success)">Adicionar à Lista</button>
         </div>
-
+        <div id="lista-programacao-cliente" style="max-height: 250px; overflow-y: auto;"></div>
         <button onclick="location.reload()" style="background:#334155; margin-top:20px;">Sair</button>
     </section>
 
     <section id="scr-form" class="container hidden">
         <h1 id="display-nome">---</h1>
-        <div class="sub" id="display-mat">Perfil: ---</div>
+        <button id="btn-ver-prog" class="btn-prog hidden" onclick="toggleProgView()">Ver Programação do Dia 📅</button>
 
-        <div class="form-section" id="box-tipo-servico">
-            <span class="form-label">TIPO DE SERVIÇO</span>
-            <select id="f-servico-tipo" onchange="ajustarFormulario()">
-                <option value="Vistoria">Vistoria de Pátio (Comum)</option>
-                <option value="Limpeza">Entrada/Saída de Limpeza</option>
-                <option value="Manutenção">Manutenção / Oficina</option>
-            </select>
+        <div id="prog-view" class="form-section hidden"
+            style="background: rgba(245, 158, 11, 0.15); border: 1px solid var(--warning);">
+            <div id="prog-list-content"></div>
         </div>
 
         <div class="form-section">
-            <span class="form-label">VEÍCULO</span>
-            <div class="search-box">
-                <input type="text" id="v-search-placa" placeholder="BUSCAR PLACA..." onkeyup="filtrarVeiculos()"
-                    autocomplete="off">
-                <div id="search-results" class="search-results"></div>
-            </div>
-            <div id="box-reserva" class="hidden" style="margin-top:10px;">
-                <input type="text" id="v-placa-sub" placeholder="PLACA DO CARRO SUBSTITUÍDO">
-            </div>
-        </div>
-
-        <div id="sec-limpeza" class="form-section hidden">
-            <span class="form-label">CHECKLIST DE LIMPEZA</span>
-            <div style="font-size:12px; display:flex; flex-direction:column; gap:8px;">
-                <label><input type="checkbox" id="l-aspirado"> Aspirado e Higienizado</label>
-                <label><input type="checkbox" id="l-vidros"> Vidros sem Manchas</label>
-                <label><input type="checkbox" id="l-cheiro"> Odorizador aplicado</label>
-            </div>
-        </div>
-
-        <div id="sec-manutencao" class="form-section hidden">
-            <span class="form-label">DADOS DA OFICINA</span>
-            <input type="text" id="m-os" placeholder="Nº DA ORDEM DE SERVIÇO (O.S)">
-            <textarea id="m-pecas" placeholder="PEÇAS SUBSTITUÍDAS..."></textarea>
-        </div>
-
-        <div class="form-section">
-            <span class="form-label">DADOS GERAIS</span>
-            <input type="number" id="v-km" placeholder="KM ATUAL">
-            <select id="v-comb">
-                <option value="Vazio">Tanque: Vazio</option>
-                <option value="1/2">1/2</option>
-                <option value="Cheio">Cheio</option>
+            <input type="text" id="v-placa" placeholder="CONFIRMAR PLACA">
+            <select id="v-servico">
+                <option value="Limpeza">Limpeza</option>
+                <option value="Manutenção">Manutenção</option>
+                <option value="Vistoria">Vistoria</option>
             </select>
-            <textarea id="v-obs" placeholder="Observações..."></textarea>
+            <textarea id="v-obs" placeholder="Relatório do serviço realizado..."></textarea>
+            <button onclick="alert('Vistoria Salva com Sucesso!')">Finalizar Checklist</button>
         </div>
-
-        <button onclick="alert('Salvando Fotos...')">Finalizar e Salvar</button>
+        <button onclick="location.reload()" style="background:#334155;">Sair</button>
     </section>
 
     <script>
-        const LOG_DB = 'lokamig_logs_v5';
-        const USER_DB = 'lokamig_users_v5';
-        const VEIC_DB = 'lokamig_veiculos_v1';
-        const FORN_DB = 'lokamig_fornecedores_v1';
-
-        let currentUser = null;
-
-        function show(id) {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function switchTab(t, e) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-            e.target.classList.add('tab-active');
-            document.getElementById('area-monitor').classList.toggle('hidden', t !== 'mon');
-            document.getElementById('area-cadastro').classList.toggle('hidden', t !== 'cad');
-            document.getElementById('area-veiculos').classList.toggle('hidden', t !== 'veic');
-            document.getElementById('area-forn').classList.toggle('hidden', t !== 'forn');
-            if (t === 'veic') carregarListaVeiculos();
-            if (t === 'forn') carregarListaForn();
-            if (t === 'cad') carregarListaColab();
-        }
+        const FORN_DB = 'lokamig_forn_v6';
+        const PROG_DB = 'lokamig_prog_v6';
+        const CLIENTE_USER = { user: "CLIENTE", pass: "LOKAMIG2026", nome: "CLIENTE MASTER" };
 
         function handleLogin() {
             const u = document.getElementById('user').value.toUpperCase();
             const p = document.getElementById('pass').value;
 
-            // Admin
-            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarAdmin(); return; }
+            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); return; }
+            if (u === CLIENTE_USER.user && p === CLIENTE_USER.pass) { show('scr-cliente'); carregarProgCliente(); return; }
 
-            // Colaboradores
-            const colab = JSON.parse(localStorage.getItem(USER_DB) || '[]').find(x => x.mat.toUpperCase() === u);
-            if (colab) { logar(colab, 'colab'); return; }
-
-            // Fornecedores
-            const forn = JSON.parse(localStorage.getItem(FORN_DB) || '[]').find(x => x.user.toUpperCase() === u && x.pass === p);
+            const forn = JSON.parse(localStorage.getItem(FORN_DB) || '[]').find(f => f.user.toUpperCase() === u && f.pass === p);
             if (forn) { logar(forn, 'forn'); return; }
 
-            alert("Acesso Negado. Verifique usuário e senha.");
+            alert("Usuário não encontrado.");
         }
 
         function logar(user, tipo) {
-            currentUser = user;
             document.getElementById('display-nome').innerText = user.nome;
-            document.getElementById('display-mat').innerText = tipo === 'colab' ? "Matrícula: " + user.mat : "Fornecedor: " + user.tipo;
-
             show('scr-form');
-
-            // Se for fornecedor, trava o tipo de serviço dele
             if (tipo === 'forn') {
-                document.getElementById('box-tipo-servico').classList.add('hidden');
-                document.getElementById('f-servico-tipo').value = user.tipo;
-                ajustarFormulario();
-            } else {
-                document.getElementById('box-tipo-servico').classList.remove('hidden');
+                document.getElementById('btn-ver-prog').classList.remove('hidden');
+                window.userFornTipo = user.tipo;
             }
         }
 
-        function ajustarFormulario() {
-            const tipo = document.getElementById('f-servico-tipo').value;
-            document.getElementById('sec-limpeza').classList.toggle('hidden', tipo !== 'Limpeza');
-            document.getElementById('sec-manutencao').classList.toggle('hidden', tipo !== 'Manutenção');
+        // Lógica do Cliente
+        function lancarProgramacao() {
+            const p = document.getElementById('p-placa').value.toUpperCase();
+            const d = document.getElementById('p-destino').value;
+            const o = document.getElementById('p-obs').value;
+            if (!p) return;
+            const lista = JSON.parse(localStorage.getItem(PROG_DB) || '[]');
+            lista.push({ id: Date.now(), placa: p, destino: d, obs: o, data: new Date().toLocaleDateString() });
+            localStorage.setItem(PROG_DB, JSON.stringify(lista));
+            carregarProgCliente();
+            document.getElementById('p-placa').value = ''; document.getElementById('p-obs').value = '';
         }
 
-        function filtrarVeiculos() {
-            const input = document.getElementById('v-search-placa').value.toUpperCase();
-            const resBox = document.getElementById('search-results');
-            const veics = JSON.parse(localStorage.getItem(VEIC_DB) || '[]').filter(v => v.placa.includes(input));
-            if (veics.length > 0 && input !== "") {
-                resBox.style.display = 'block';
-                resBox.innerHTML = veics.map(v => `<div class="search-item" onclick="selecionarVeic('${v.placa}', '${v.tipo}')">${v.placa}</div>`).join('');
-            } else { resBox.style.display = 'none'; }
+        function carregarProgCliente() {
+            const lista = JSON.parse(localStorage.getItem(PROG_DB) || '[]');
+            document.getElementById('lista-programacao-cliente').innerHTML = lista.map(i => `
+            <div class="prog-item">
+                <div class="badge">${i.destino}</div>
+                <div style="font-weight:bold">${i.placa}</div>
+                <div style="font-size:10px; color:#94a3b8">${i.obs}</div>
+                <button onclick="cancelarProg(${i.id})" style="width:30px; padding:5px; position:absolute; top:5px; right:5px; background:none; color:red;">X</button>
+            </div>
+        `).join('');
         }
 
-        function selecionarVeic(p, t) {
-            document.getElementById('v-search-placa').value = p;
-            document.getElementById('search-results').style.display = 'none';
-            document.getElementById('box-reserva').classList.toggle('hidden', t !== 'Reserva');
+        function cancelarProg(id) {
+            let lista = JSON.parse(localStorage.getItem(PROG_DB));
+            lista = lista.filter(i => i.id !== id);
+            localStorage.setItem(PROG_DB, JSON.stringify(lista));
+            carregarProgCliente();
         }
 
-        // Admin Fornecedores
+        // Lógica do Fornecedor Ver a Lista
+        function toggleProgView() {
+            const box = document.getElementById('prog-view');
+            box.classList.toggle('hidden');
+            if (!box.classList.contains('hidden')) {
+                const lista = JSON.parse(localStorage.getItem(PROG_DB) || '[]');
+                const filtrada = lista.filter(i => i.destino === window.userFornTipo);
+                document.getElementById('prog-list-content').innerHTML = filtrada.length ? filtrada.map(i => `
+                <div style="border-bottom:1px solid rgba(255,255,255,0.1); padding:8px 0;">
+                    <b>${i.placa}</b><br><small>${i.obs || 'Sem obs.'}</small>
+                </div>
+            `).join('') : '<div style="font-size:11px;">Nenhuma programação para hoje.</div>';
+            }
+        }
+
+        function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+
         function salvarForn() {
-            const n = document.getElementById('f-reg-nome').value.toUpperCase();
-            const u = document.getElementById('f-reg-user').value.toUpperCase();
-            const p = document.getElementById('f-reg-pass').value;
-            const t = document.getElementById('f-reg-tipo').value;
-            if (!u || !p) return alert("Preencha Usuário e Senha!");
             const f = JSON.parse(localStorage.getItem(FORN_DB) || '[]');
-            f.push({ nome: n, user: u, pass: p, tipo: t });
-            localStorage.setItem(FORN_DB, JSON.stringify(f));
-            carregarListaForn();
+            f.push({ nome: document.getElementById('f-nome').value, user: document.getElementById('f-user').value, pass: document.getElementById('f-pass').value, tipo: document.getElementById('f-tipo').value });
+            localStorage.setItem(FORN_DB, JSON.stringify(f)); carregarListaForn();
         }
 
         function carregarListaForn() {
             const f = JSON.parse(localStorage.getItem(FORN_DB) || '[]');
-            document.getElementById('tbl-forn').innerHTML = f.map((x, i) => `<tr><td>${x.nome}</td><td>${x.user}</td><td>${x.tipo}</td><td onclick="removerItem('${FORN_DB}', ${i}, carregarListaForn)">❌</td></tr>`).join('');
+            document.getElementById('list-forn').innerHTML = f.map(x => `<div class="prog-item">${x.nome} (${x.tipo})</div>`).join('');
         }
 
-        // Outras funções de Admin (Veículos e Colaboradores) seguem a mesma lógica unificada...
-        function salvarVeiculo() {
-            const p = document.getElementById('v-reg-placa').value.toUpperCase();
-            const t = document.getElementById('v-reg-tipo').value;
-            const v = JSON.parse(localStorage.getItem(VEIC_DB) || '[]');
-            v.push({ placa: p, tipo: t });
-            localStorage.setItem(VEIC_DB, JSON.stringify(v)); carregarListaVeiculos();
-        }
-
-        function carregarListaVeiculos() {
-            const v = JSON.parse(localStorage.getItem(VEIC_DB) || '[]');
-            document.getElementById('tbl-veic').innerHTML = v.map((x, i) => `<tr><td>${x.placa}</td><td>${x.tipo}</td><td onclick="removerItem('${VEIC_DB}', ${i}, carregarListaVeiculos)">❌</td></tr>`).join('');
-        }
-
-        function removerItem(db, i, callback) {
-            const d = JSON.parse(localStorage.getItem(db)); d.splice(i, 1);
-            localStorage.setItem(db, JSON.stringify(d)); callback();
-        }
-
-        async function lerCrachaNFC(modo) {
-            if ('NDEFReader' in window) {
-                try {
-                    const ndef = new NDEFReader(); await ndef.scan();
-                    ndef.onreading = event => {
-                        const id = event.serialNumber.replace(/:/g, "").toUpperCase();
-                        if (modo === 'vincular') document.getElementById('reg-id').value = id;
-                        else {
-                            const user = JSON.parse(localStorage.getItem(USER_DB) || '[]').find(u => u.id === id);
-                            if (user) logar(user, 'colab');
-                        }
-                    };
-                } catch (e) { alert("NFC Erro."); }
-            }
+        function switchTab(t, e) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+            e.target.classList.add('tab-active');
+            document.getElementById('area-forn').classList.toggle('hidden', t !== 'forn');
+            if (t === 'forn') carregarListaForn();
         }
     </script>
 </body>
