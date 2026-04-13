@@ -106,7 +106,7 @@
             display: none !important;
         }
 
-        /* Estilo da Tabela e Abas */
+        /* Estilo Admin */
         .admin-box {
             max-width: 850px;
             width: 95%;
@@ -154,6 +154,63 @@
         td {
             padding: 10px;
             border-bottom: 1px solid #334155;
+            cursor: pointer;
+        }
+
+        /* Dossiê */
+        .modal-detalhes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .photo-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .photo-card img {
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        .photo-card span {
+            font-size: 9px;
+            display: block;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        @media print {
+            .btn-print-hide {
+                display: none;
+            }
+
+            body {
+                background: white;
+                color: black;
+            }
+
+            .modal-detalhes {
+                position: static;
+                background: white;
+                padding: 0;
+            }
         }
     </style>
 </head>
@@ -179,17 +236,11 @@
         <div id="area-cadastro" class="hidden">
             <div
                 style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
-                <label style="font-size: 10px; margin-left: 5px;">1. DIGITE A MATRÍCULA E NOME</label>
-                <input type="text" id="reg-mat" placeholder="MATRÍCULA (ex: T531971)">
+                <input type="text" id="reg-mat" placeholder="MATRÍCULA">
                 <input type="text" id="reg-nome" placeholder="NOME COMPLETO">
-
-                <label style="font-size: 10px; margin-left: 5px;">2. VINCULE O CHIP DO CRACHÁ</label>
                 <button class="btn-vincular" onclick="lerCrachaNFC('vincular')">APROXIMAR CRACHÁ PARA VINCULAR</button>
-                <input type="text" id="reg-id" placeholder="Código do Chip (Lido automaticamente)" readonly
-                    style="color: var(--success);">
-
-                <button onclick="salvarColaborador()" style="background: var(--success); margin-top: 10px;">SALVAR
-                    CADASTRO</button>
+                <input type="text" id="reg-id" placeholder="Código do Chip" readonly style="color: var(--success);">
+                <button onclick="salvarColaborador()" style="background: var(--success);">SALVAR CADASTRO</button>
             </div>
             <table>
                 <thead>
@@ -205,7 +256,7 @@
         </div>
 
         <div id="area-monitor">
-            <table id="tbl-logs">
+            <table>
                 <thead>
                     <tr>
                         <th>HORA</th>
@@ -217,27 +268,41 @@
                 <tbody id="logs-body"></tbody>
             </table>
         </div>
-        <button onclick="location.reload()" class="btn-sec" style="margin-top:20px;">Sair</button>
+        <button onclick="location.reload()" style="background:#334155; margin-top:20px;">Sair</button>
     </section>
 
     <section id="scr-form" class="container hidden">
         <h1 id="display-nome">---</h1>
         <div class="sub" id="display-mat">Matrícula: ---</div>
         <input type="text" id="v-placa" placeholder="PLACA DO VEÍCULO">
-        <button onclick="alert('Iniciando Fotos...')">Avançar para Fotos</button>
-        <button onclick="location.reload()" class="btn-sec" style="margin-top:10px;">Cancelar</button>
+        <input type="number" id="v-km" placeholder="KM ATUAL">
+        <select id="v-comb">
+            <option value="Vazio">Vazio</option>
+            <option value="1/4">1/4</option>
+            <option value="1/2">1/2</option>
+            <option value="3/4">3/4</option>
+            <option value="Cheio">Cheio</option>
+        </select>
+        <textarea id="v-obs" placeholder="Observações..."></textarea>
+        <button onclick="alert('Iniciando Câmera...')">Tirar Fotos</button>
     </section>
+
+    <div id="scr-detalhes" class="modal-detalhes hidden">
+        <h1 id="det-placa">Dossiê</h1>
+        <div id="det-info" style="text-align: left; margin: 20px 0;"></div>
+        <div class="photo-grid" id="det-fotos"></div>
+        <button onclick="window.print()" style="background:var(--success);">Gerar PDF</button>
+        <button onclick="show('scr-admin')">Voltar</button>
+    </div>
 
     <script>
         const USER_DB = 'lokamig_users_v5';
         const LOG_DB = 'lokamig_logs_v5';
 
-        if (!localStorage.getItem(USER_DB)) {
-            localStorage.setItem(USER_DB, JSON.stringify([{ nome: "LUCAS LIMA", mat: "T531971", id: "D3C776D2" }]));
-        }
+        if (!localStorage.getItem(USER_DB)) localStorage.setItem(USER_DB, JSON.stringify([{ nome: "LUCAS LIMA", mat: "T531971", id: "D3C776D2" }]));
 
         function show(id) {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('section, .modal-detalhes').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
@@ -255,7 +320,7 @@
             if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarAdmin(); }
             else {
                 const user = JSON.parse(localStorage.getItem(USER_DB)).find(x => x.mat.toUpperCase() === u);
-                if (user) logar(user); else alert("Matrícula não cadastrada.");
+                if (user) logar(user); else alert("Não cadastrado.");
             }
         }
 
@@ -267,27 +332,14 @@
                     alert("Aproxime o crachá...");
                     ndef.onreading = event => {
                         const idLido = event.serialNumber.replace(/:/g, "").toUpperCase();
-
                         if (modo === 'vincular') {
                             document.getElementById('reg-id').value = idLido;
-                            alert("Chip detectado: " + idLido + "\nAgora clique em Salvar Cadastro.");
                         } else {
                             const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === idLido);
-                            if (user) {
-                                document.getElementById('user').value = user.mat;
-                                logar(user);
-                            } else {
-                                alert("Crachá não reconhecido (ID: " + idLido + "). Cadastre-o no painel admin primeiro.");
-                            }
+                            if (user) logar(user); else alert("ID: " + idLido + " não vinculado.");
                         }
                     };
-                } catch (e) { alert("Erro NFC. Verifique as permissões."); }
-            } else {
-                const mock = prompt("NFC não disponível. Digite o ID do chip:");
-                if (mock) {
-                    if (modo === 'vincular') document.getElementById('reg-id').value = mock.toUpperCase();
-                    else handleLogin();
-                }
+                } catch (e) { alert("NFC Erro."); }
             }
         }
 
@@ -297,44 +349,39 @@
             show('scr-form');
         }
 
+        function carregarAdmin() {
+            const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
+            document.getElementById('logs-body').innerHTML = logs.map(l => `
+            <tr onclick='verDossie(${JSON.stringify(l)})'>
+                <td>${l.hora}</td><td>${l.placa}</td><td>${l.op}</td><td>${l.tipo || 'Vistoria'}</td>
+            </tr>
+        `).join('');
+        }
+
+        function verDossie(log) {
+            show('scr-detalhes');
+            document.getElementById('det-placa').innerText = "PLACA: " + log.placa;
+            document.getElementById('det-info').innerHTML = `<p><b>Motorista:</b> ${log.op}</p><p><b>KM:</b> ${log.km}</p><p><b>Obs:</b> ${log.obs}</p>`;
+            // Lógica de fotos aqui...
+        }
+
         function salvarColaborador() {
-            const mat = document.getElementById('reg-mat').value.toUpperCase();
-            const nome = document.getElementById('reg-nome').value.toUpperCase();
-            const chip = document.getElementById('reg-id').value.toUpperCase();
-
-            if (!mat || !nome || !chip) return alert("Preencha Matrícula, Nome e aproxime o Crachá!");
-
-            const users = JSON.parse(localStorage.getItem(USER_DB));
-            users.push({ nome: nome, mat: mat, id: chip });
-            localStorage.setItem(USER_DB, JSON.stringify(users));
-
-            alert("Sucesso! O crachá agora está vinculado à matrícula " + mat);
-            document.getElementById('reg-mat').value = '';
-            document.getElementById('reg-nome').value = '';
-            document.getElementById('reg-id').value = '';
+            const m = document.getElementById('reg-mat').value.toUpperCase(), n = document.getElementById('reg-nome').value.toUpperCase(), c = document.getElementById('reg-id').value.toUpperCase();
+            if (!m || !n || !c) return alert("Preencha tudo!");
+            const u = JSON.parse(localStorage.getItem(USER_DB));
+            u.push({ nome: n, mat: m, id: c });
+            localStorage.setItem(USER_DB, JSON.stringify(u));
             carregarListaColaboradores();
         }
 
         function carregarListaColaboradores() {
             const u = JSON.parse(localStorage.getItem(USER_DB));
-            document.getElementById('colab-body').innerHTML = u.map((x, i) => `
-            <tr>
-                <td>${x.nome}</td>
-                <td>${x.mat}</td>
-                <td>${x.id}</td>
-                <td><button onclick="removerColaborador(${i})" style="background:var(--primary); padding:5px; font-size:9px;">X</button></td>
-            </tr>
-        `).join('');
+            document.getElementById('colab-body').innerHTML = u.map((x, i) => `<tr><td>${x.nome}</td><td>${x.mat}</td><td>${x.id}</td><td><button onclick="removerColaborador(${i})">X</button></td></tr>`).join('');
         }
 
         function removerColaborador(i) {
             const u = JSON.parse(localStorage.getItem(USER_DB)); u.splice(i, 1);
             localStorage.setItem(USER_DB, JSON.stringify(u)); carregarListaColaboradores();
-        }
-
-        function carregarAdmin() {
-            const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
-            document.getElementById('logs-body').innerHTML = logs.map(l => `<tr><td>${l.hora}</td><td>${l.placa}</td><td>${l.op}</td><td>${l.tipo}</td></tr>`).join('');
         }
     </script>
 </body>
