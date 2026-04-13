@@ -12,6 +12,7 @@
             --bg: #0f172a;
             --text: #f8fafc;
             --success: #10b981;
+            --warning: #f59e0b;
         }
 
         * {
@@ -42,22 +43,22 @@
             border-radius: 20px;
             padding: 25px;
             width: 90%;
-            max-width: 450px;
+            max-width: 480px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
 
         h1 {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
             margin-bottom: 5px;
             color: #fff;
         }
 
         .sub {
-            font-size: 11px;
+            font-size: 10px;
             color: #94a3b8;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -66,20 +67,20 @@
         select,
         textarea {
             width: 100%;
-            padding: 14px;
-            margin-bottom: 15px;
-            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(15, 23, 42, 0.8);
             color: #fff;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
         }
 
         button {
             width: 100%;
-            padding: 16px;
-            border-radius: 12px;
+            padding: 14px;
+            border-radius: 10px;
             border: none;
             background: var(--primary);
             color: #fff;
@@ -87,6 +88,7 @@
             cursor: pointer;
             transition: 0.3s;
             text-transform: uppercase;
+            font-size: 12px;
         }
 
         .hidden {
@@ -95,7 +97,7 @@
 
         /* Admin Layout */
         .admin-box {
-            max-width: 850px;
+            max-width: 900px;
             width: 95%;
             height: 90vh;
             overflow-y: auto;
@@ -106,19 +108,19 @@
             gap: 5px;
             margin-bottom: 20px;
             overflow-x: auto;
+            padding-bottom: 10px;
         }
 
         .tab-btn {
             background: #1e293b;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 10px;
+            border-radius: 8px;
             border: 1px solid #334155;
             color: #fff;
             cursor: pointer;
-            flex: 1;
+            white-space: nowrap;
             font-size: 10px;
             font-weight: 700;
-            min-width: 100px;
         }
 
         .tab-active {
@@ -137,18 +139,38 @@
             padding: 10px;
             text-align: left;
             color: var(--primary);
+            position: sticky;
+            top: 0;
         }
 
         td {
             padding: 10px;
             border-bottom: 1px solid #334155;
             cursor: pointer;
+            text-align: left;
         }
 
-        /* Busca de Placas */
+        /* Seções de Formulário */
+        .form-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .form-label {
+            font-size: 11px;
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Resultados de Busca */
         .search-box {
             position: relative;
-            width: 100%;
         }
 
         .search-results {
@@ -157,7 +179,7 @@
             left: 0;
             width: 100%;
             background: #1e293b;
-            border-radius: 0 0 12px 12px;
+            border-radius: 0 0 10px 10px;
             z-index: 100;
             max-height: 150px;
             overflow-y: auto;
@@ -166,14 +188,9 @@
         }
 
         .search-item {
-            padding: 12px;
+            padding: 10px;
             border-bottom: 1px solid #334155;
             cursor: pointer;
-            text-align: left;
-        }
-
-        .search-item:hover {
-            background: var(--primary);
         }
 
         /* Dossiê */
@@ -207,16 +224,6 @@
             width: 100%;
             border-radius: 5px;
         }
-
-        .highlight-sub {
-            background: rgba(245, 158, 11, 0.2);
-            border: 1px solid #f59e0b;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-size: 12px;
-            color: #f59e0b;
-        }
     </style>
 </head>
 
@@ -224,7 +231,7 @@
 
     <section id="scr-login" class="container">
         <h1>LOKAMIG</h1>
-        <div class="sub">Vistoria e Logística de Pátio</div>
+        <div class="sub">Logística e Gestão de Pátio</div>
         <input type="text" id="user" placeholder="Matrícula">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
@@ -233,11 +240,12 @@
     </section>
 
     <section id="scr-admin" class="container admin-box hidden">
-        <h1>PAINEL DE CONTROLE</h1>
+        <h1>PAINEL ADMIN</h1>
         <div class="tabs">
             <button class="tab-btn tab-active" onclick="switchTab('mon', event)">Monitoramento</button>
             <button class="tab-btn" onclick="switchTab('cad', event)">Colaboradores</button>
             <button class="tab-btn" onclick="switchTab('veic', event)">Veículos</button>
+            <button class="tab-btn" onclick="switchTab('forn', event)">Fornecedores</button>
         </div>
 
         <div id="area-monitor">
@@ -246,7 +254,7 @@
                     <tr>
                         <th>HORA</th>
                         <th>PLACA</th>
-                        <th>TIPO</th>
+                        <th>SERVIÇO</th>
                         <th>MOTORISTA</th>
                     </tr>
                 </thead>
@@ -254,28 +262,46 @@
             </table>
         </div>
 
-        <div id="area-cadastro" class="hidden">
-            <input type="text" id="reg-mat" placeholder="MATRÍCULA">
-            <input type="text" id="reg-nome" placeholder="NOME COMPLETO">
-            <button onclick="lerCrachaNFC('vincular')"
-                style="background:#3b82f6; font-size:12px; margin-bottom:10px;">VINCULAR CHIP NFC</button>
-            <input type="text" id="reg-id" placeholder="ID do Chip" readonly>
-            <button onclick="salvarColaborador()" style="background:var(--success);">SALVAR</button>
-            <table style="margin-top:20px;">
-                <tbody id="colab-body"></tbody>
+        <div id="area-veiculos" class="hidden">
+            <div class="form-section">
+                <input type="text" id="v-reg-placa" placeholder="PLACA">
+                <select id="v-reg-tipo">
+                    <option value="Operacional">Operacional</option>
+                    <option value="Gerencial">Gerencial</option>
+                    <option value="Reserva">Reserva</option>
+                </select>
+                <button onclick="salvarVeiculo()" style="background:var(--success);">Cadastrar Carro</button>
+            </div>
+            <table id="tbl-veic">
+                <tbody></tbody>
             </table>
         </div>
 
-        <div id="area-veiculos" class="hidden">
-            <input type="text" id="v-reg-placa" placeholder="NOVA PLACA">
-            <select id="v-reg-tipo">
-                <option value="Operacional">Operacional</option>
-                <option value="Gerencial">Gerencial</option>
-                <option value="Reserva">Reserva</option>
-            </select>
-            <button onclick="salvarVeiculo()" style="background:var(--success);">CADASTRAR</button>
-            <table style="margin-top:20px;">
-                <tbody id="veic-body"></tbody>
+        <div id="area-forn" class="hidden">
+            <div class="form-section">
+                <input type="text" id="f-reg-nome" placeholder="NOME DO FORNECEDOR">
+                <select id="f-reg-tipo">
+                    <option value="Limpeza">Limpeza / Estética</option>
+                    <option value="Oficina">Oficina / Manutenção</option>
+                </select>
+                <button onclick="salvarForn()" style="background:var(--success);">Cadastrar Fornecedor</button>
+            </div>
+            <table id="tbl-forn">
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="area-cadastro" class="hidden">
+            <div class="form-section">
+                <input type="text" id="reg-mat" placeholder="Matrícula">
+                <input type="text" id="reg-nome" placeholder="Nome">
+                <input type="text" id="reg-id" placeholder="ID NFC" readonly>
+                <button onclick="lerCrachaNFC('vincular')" style="background:#3b82f6; margin-bottom:5px;">Ler
+                    Crachá</button>
+                <button onclick="salvarColab()" style="background:var(--success);">Salvar Colaborador</button>
+            </div>
+            <table id="tbl-colab">
+                <tbody></tbody>
             </table>
         </div>
 
@@ -286,40 +312,67 @@
         <h1 id="display-nome">---</h1>
         <div class="sub" id="display-mat">Matrícula: ---</div>
 
-        <select id="v-tipo-select" onchange="toggleSubstituicao()">
-            <option value="Operacional">Frota Operacional</option>
-            <option value="Gerencial">Frota Gerencial</option>
-            <option value="Reserva">Veículo Reserva (Substituição)</option>
-        </select>
-
-        <div id="box-substituicao" class="hidden">
-            <div class="highlight-sub">⚠️ IDENTIFIQUE O CARRO QUE ESTÁ NA OFICINA</div>
-            <input type="text" id="v-placa-substituida" placeholder="PLACA DO CARRO QUEBRADO">
+        <div class="form-section">
+            <span class="form-label">TIPO DE SERVIÇO</span>
+            <select id="f-servico-tipo" onchange="ajustarFormulario()">
+                <option value="Vistoria">Vistoria de Pátio (Comum)</option>
+                <option value="Limpeza">Entrada/Saída de Limpeza</option>
+                <option value="Manutenção">Manutenção / Oficina</option>
+            </select>
         </div>
 
-        <div class="search-box">
-            <input type="text" id="v-search-placa" placeholder="BUSCAR PLACA DO VEÍCULO ATUAL..."
-                onkeyup="filtrarVeiculos()" autocomplete="off">
-            <div id="search-results" class="search-results"></div>
+        <div class="form-section">
+            <span class="form-label">IDENTIFICAÇÃO DO VEÍCULO</span>
+            <div class="search-box">
+                <input type="text" id="v-search-placa" placeholder="BUSCAR PLACA..." onkeyup="filtrarVeiculos()"
+                    autocomplete="off">
+                <div id="search-results" class="search-results"></div>
+            </div>
+            <div id="box-reserva" class="hidden" style="margin-top:10px;">
+                <input type="text" id="v-placa-sub" placeholder="PLACA DO CARRO SUBSTITUÍDO">
+            </div>
         </div>
 
-        <input type="number" id="v-km" placeholder="KM ATUAL">
-        <select id="v-comb">
-            <option value="Vazio">Nível Combustível: Vazio</option>
-            <option value="1/4">1/4</option>
-            <option value="1/2">1/2</option>
-            <option value="3/4">3/4</option>
-            <option value="Cheio">Cheio</option>
-        </select>
-        <textarea id="v-obs" placeholder="Observações de Manutenção/Retorno..."></textarea>
-        <button onclick="alert('Iniciando Câmera...')">Tirar Fotos</button>
+        <div id="sec-limpeza" class="form-section hidden">
+            <span class="form-label">CHECKLIST DE LIMPEZA</span>
+            <select id="l-fornecedor">
+                <option>Selecione o Fornecedor...</option>
+            </select>
+            <div style="font-size:12px; display:flex; flex-direction:column; gap:8px;">
+                <label><input type="checkbox" id="l-aspirado"> Aspirado e Higienizado</label>
+                <label><input type="checkbox" id="l-vidros"> Vidros sem Manchas</label>
+                <label><input type="checkbox" id="l-cheiro"> Odorizador aplicado</label>
+            </div>
+        </div>
+
+        <div id="sec-manutencao" class="form-section hidden">
+            <span class="form-label">DADOS DA OFICINA</span>
+            <select id="m-fornecedor">
+                <option>Selecione a Oficina...</option>
+            </select>
+            <input type="text" id="m-os" placeholder="Nº DA ORDEM DE SERVIÇO (O.S)">
+            <textarea id="m-pecas" placeholder="LISTA DE PEÇAS SUBSTITUÍDAS..."></textarea>
+        </div>
+
+        <div class="form-section">
+            <span class="form-label">DADOS GERAIS</span>
+            <input type="number" id="v-km" placeholder="KM ATUAL">
+            <select id="v-comb">
+                <option value="Vazio">Tanque: Vazio</option>
+                <option value="1/2">1/2</option>
+                <option value="Cheio">Cheio</option>
+            </select>
+            <textarea id="v-obs" placeholder="Observações extras..."></textarea>
+        </div>
+
+        <button onclick="alert('Iniciando Câmera e Captura de Peças...')">Avançar para Fotos</button>
     </section>
 
     <div id="scr-detalhes" class="modal-detalhes hidden">
-        <h1 id="det-placa">Dossiê</h1>
-        <div id="det-info"></div>
+        <h1 id="det-titulo">Dossiê de Serviço</h1>
+        <div id="det-content" style="text-align:left; margin-top:20px;"></div>
         <div class="photo-grid" id="det-fotos"></div>
-        <button onclick="window.print()" style="background:var(--success);">Gerar PDF</button>
+        <button onclick="window.print()" style="background:var(--success);">Imprimir / PDF</button>
         <button onclick="show('scr-admin'); carregarAdmin();">Voltar</button>
     </div>
 
@@ -327,6 +380,7 @@
         const LOG_DB = 'lokamig_logs_v5';
         const USER_DB = 'lokamig_users_v5';
         const VEIC_DB = 'lokamig_veiculos_v1';
+        const FORN_DB = 'lokamig_fornecedores_v1';
 
         function show(id) {
             document.querySelectorAll('section, .modal-detalhes').forEach(s => s.classList.add('hidden'));
@@ -334,65 +388,85 @@
         }
 
         function switchTab(t, e) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+            e.target.classList.add('tab-active');
             document.getElementById('area-monitor').classList.toggle('hidden', t !== 'mon');
             document.getElementById('area-cadastro').classList.toggle('hidden', t !== 'cad');
             document.getElementById('area-veiculos').classList.toggle('hidden', t !== 'veic');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-            e.target.classList.add('tab-active');
-            if (t === 'cad') carregarListaColaboradores();
+            document.getElementById('area-forn').classList.toggle('hidden', t !== 'forn');
             if (t === 'veic') carregarListaVeiculos();
+            if (t === 'forn') carregarListaForn();
+            if (t === 'cad') carregarListaColab();
         }
 
-        // Lógica Reserva / Substituição
-        function toggleSubstituicao() {
-            const tipo = document.getElementById('v-tipo-select').value;
-            document.getElementById('box-substituicao').classList.toggle('hidden', tipo !== 'Reserva');
-            document.getElementById('v-search-placa').value = '';
-            document.getElementById('search-results').style.display = 'none';
+        // Lógica do Formulário Dinâmico
+        function ajustarFormulario() {
+            const tipo = document.getElementById('f-servico-tipo').value;
+            document.getElementById('sec-limpeza').classList.toggle('hidden', tipo !== 'Limpeza');
+            document.getElementById('sec-manutencao').classList.toggle('hidden', tipo !== 'Manutenção');
+
+            // Carrega fornecedores nos selects
+            const forns = JSON.parse(localStorage.getItem(FORN_DB) || '[]');
+            if (tipo === 'Limpeza') {
+                document.getElementById('l-fornecedor').innerHTML = forns.filter(f => f.tipo === 'Limpeza').map(f => `<option>${f.nome}</option>`).join('');
+            } else if (tipo === 'Manutenção') {
+                document.getElementById('m-fornecedor').innerHTML = forns.filter(f => f.tipo === 'Oficina').map(f => `<option>${f.nome}</option>`).join('');
+            }
         }
 
+        // Busca de Veículos
         function filtrarVeiculos() {
             const input = document.getElementById('v-search-placa').value.toUpperCase();
-            const tipo = document.getElementById('v-tipo-select').value;
             const resBox = document.getElementById('search-results');
-            const lista = JSON.parse(localStorage.getItem(VEIC_DB) || '[]').filter(v => v.tipo === tipo && v.placa.includes(input));
+            const veics = JSON.parse(localStorage.getItem(VEIC_DB) || '[]').filter(v => v.placa.includes(input));
 
-            if (lista.length > 0 && input !== "") {
+            if (veics.length > 0 && input !== "") {
                 resBox.style.display = 'block';
-                resBox.innerHTML = lista.map(v => `<div class="search-item" onclick="selecionarVeiculo('${v.placa}')">${v.placa}</div>`).join('');
+                resBox.innerHTML = veics.map(v => `<div class="search-item" onclick="selecionarVeic('${v.placa}', '${v.tipo}')">${v.placa} (${v.tipo})</div>`).join('');
             } else { resBox.style.display = 'none'; }
         }
 
-        function selecionarVeiculo(p) {
+        function selecionarVeic(p, t) {
             document.getElementById('v-search-placa').value = p;
             document.getElementById('search-results').style.display = 'none';
+            document.getElementById('box-reserva').classList.toggle('hidden', t !== 'Reserva');
         }
 
-        // Admin Veículos
+        // Funções Admin
         function salvarVeiculo() {
             const p = document.getElementById('v-reg-placa').value.toUpperCase();
             const t = document.getElementById('v-reg-tipo').value;
-            if (!p) return;
             const v = JSON.parse(localStorage.getItem(VEIC_DB) || '[]');
             v.push({ placa: p, tipo: t });
-            localStorage.setItem(VEIC_DB, JSON.stringify(v));
-            carregarListaVeiculos();
+            localStorage.setItem(VEIC_DB, JSON.stringify(v)); carregarListaVeiculos();
         }
 
         function carregarListaVeiculos() {
             const v = JSON.parse(localStorage.getItem(VEIC_DB) || '[]');
-            document.getElementById('veic-body').innerHTML = v.map((x, i) => `<tr><td>${x.placa}</td><td>${x.tipo}</td><td onclick="removerVeic(${i})">❌</td></tr>`).join('');
+            document.getElementById('tbl-veic').innerHTML = v.map((x, i) => `<tr><td>${x.placa}</td><td>${x.tipo}</td><td onclick="removerItem('${VEIC_DB}', ${i}, carregarListaVeiculos)">❌</td></tr>`).join('');
         }
 
-        function removerVeic(i) {
-            const v = JSON.parse(localStorage.getItem(VEIC_DB)); v.splice(i, 1);
-            localStorage.setItem(VEIC_DB, JSON.stringify(v)); carregarListaVeiculos();
+        function salvarForn() {
+            const n = document.getElementById('f-reg-nome').value.toUpperCase();
+            const t = document.getElementById('f-reg-tipo').value;
+            const f = JSON.parse(localStorage.getItem(FORN_DB) || '[]');
+            f.push({ nome: n, tipo: t });
+            localStorage.setItem(FORN_DB, JSON.stringify(f)); carregarListaForn();
         }
 
-        // Login e Monitoramento
+        function carregarListaForn() {
+            const f = JSON.parse(localStorage.getItem(FORN_DB) || '[]');
+            document.getElementById('tbl-forn').innerHTML = f.map((x, i) => `<tr><td>${x.nome}</td><td>${x.tipo}</td><td onclick="removerItem('${FORN_DB}', ${i}, carregarListaForn)">❌</td></tr>`).join('');
+        }
+
+        function removerItem(db, i, callback) {
+            const d = JSON.parse(localStorage.getItem(db)); d.splice(i, 1);
+            localStorage.setItem(db, JSON.stringify(d)); callback();
+        }
+
+        // Login e NFC (Congelados)
         function handleLogin() {
-            const u = document.getElementById('user').value.toUpperCase();
-            const p = document.getElementById('pass').value;
+            const u = document.getElementById('user').value.toUpperCase(), p = document.getElementById('pass').value;
             if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarAdmin(); }
             else {
                 const user = JSON.parse(localStorage.getItem(USER_DB) || '[]').find(x => x.mat.toUpperCase() === u);
@@ -411,55 +485,25 @@
             const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
             document.getElementById('logs-body').innerHTML = logs.map(l => `
             <tr onclick='verDossie(${JSON.stringify(l)})'>
-                <td>${l.hora}</td>
-                <td>${l.placa} ${l.subst ? '<br><small>Subst: ' + l.subst + '</small>' : ''}</td>
-                <td>${l.tipo}</td>
-                <td>${l.op}</td>
+                <td>${l.hora}</td><td>${l.placa}</td><td>${l.servico}</td><td>${l.op}</td>
             </tr>
         `).join('');
         }
 
         function verDossie(log) {
             show('scr-detalhes');
-            document.getElementById('det-placa').innerText = log.placa;
-            document.getElementById('det-info').innerHTML = `
-            <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
-                <p><b>Data:</b> ${log.data} às ${log.hora}</p>
-                <p><b>Motorista:</b> ${log.op}</p>
-                <p><b>KM:</b> ${log.km}</p>
-                ${log.subst ? `<p style="color:#f59e0b"><b>⚠️ EM SUBSTITUIÇÃO AO VEÍCULO: ${log.subst}</b></p>` : ''}
-                <p><b>Observações:</b> ${log.obs}</p>
+            document.getElementById('det-titulo').innerText = "VISTORIA: " + log.placa;
+            let infoHtml = `
+            <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; border-left:5px solid var(--primary);">
+                <p><b>Motorista:</b> ${log.op} | <b>KM:</b> ${log.km}</p>
+                <p><b>Tipo de Serviço:</b> ${log.servico}</p>
+                ${log.fornecedor ? `<p><b>Fornecedor:</b> ${log.fornecedor}</p>` : ''}
+                ${log.os ? `<p><b>Ordem de Serviço:</b> ${log.os}</p>` : ''}
+                ${log.pecas ? `<p><b>Peças:</b> ${log.pecas}</p>` : ''}
+                <p><b>Obs:</b> ${log.obs}</p>
             </div>
         `;
-        }
-
-        // Funções de Colaborador (Congeladas)
-        function carregarListaColaboradores() {
-            const u = JSON.parse(localStorage.getItem(USER_DB) || '[]');
-            document.getElementById('colab-body').innerHTML = u.map(x => `<tr><td>${x.nome}</td><td>${x.mat}</td></tr>`).join('');
-        }
-
-        function salvarColaborador() {
-            const m = document.getElementById('reg-mat').value, n = document.getElementById('reg-nome').value, c = document.getElementById('reg-id').value;
-            const u = JSON.parse(localStorage.getItem(USER_DB) || '[]');
-            u.push({ nome: n, mat: m, id: c });
-            localStorage.setItem(USER_DB, JSON.stringify(u)); carregarListaColaboradores();
-        }
-
-        async function lerCrachaNFC(modo) {
-            if ('NDEFReader' in window) {
-                try {
-                    const ndef = new NDEFReader(); await ndef.scan();
-                    ndef.onreading = event => {
-                        const id = event.serialNumber.replace(/:/g, "").toUpperCase();
-                        if (modo === 'vincular') document.getElementById('reg-id').value = id;
-                        else {
-                            const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === id);
-                            if (user) logar(user);
-                        }
-                    };
-                } catch (e) { alert("NFC Erro."); }
-            }
+            document.getElementById('det-content').innerHTML = infoHtml;
         }
     </script>
 </body>
