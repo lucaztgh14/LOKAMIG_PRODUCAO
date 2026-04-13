@@ -173,6 +173,7 @@
         .nfc-reading {
             animation: blink 1s infinite;
             border-color: var(--warning) !important;
+            color: var(--warning) !important;
         }
 
         @keyframes blink {
@@ -188,10 +189,13 @@
     <section id="scr-login" class="container">
         <h1>LOKAMIG</h1>
         <div class="sub">Logística & Programação</div>
-        <input type="text" id="user" placeholder="Matrícula / Usuário / Aproximar Crachá">
+        <input type="text" id="user" placeholder="Matrícula / Usuário / Clique para Crachá"
+            onclick="ativarLeituraNFCLogin()">
         <input type="password" id="pass" placeholder="Senha (Se houver)">
         <button onclick="handleLogin()">Entrar</button>
-        <div style="margin: 10px; font-size: 9px; color: #64748b;">ACESSO PARA COLABORADORES, CLIENTES E FORNECEDORES
+        <div id="status-nfc-login" style="margin-top: 10px; font-size: 9px; color: var(--warning);" class="hidden">
+            AGUARDANDO APROXIMAÇÃO DO CRACHÁ...</div>
+        <div style="margin: 15px; font-size: 9px; color: #64748b;">ACESSO PARA COLABORADORES, CLIENTES E FORNECEDORES
         </div>
     </section>
 
@@ -223,7 +227,7 @@
                 <input type="text" id="c-mat" placeholder="MATRÍCULA">
                 <input type="text" id="c-nome" placeholder="NOME COMPLETO">
                 <input type="text" id="c-nfc" placeholder="CLIQUE AQUI E APROXIME O CRACHÁ" readonly
-                    onclick="ativarLeituraNFC()">
+                    onclick="ativarLeituraNFCCadastro()">
                 <button onclick="salvarColab()" style="background:var(--success)">Cadastrar Colaborador</button>
             </div>
             <div id="list-colab"></div>
@@ -284,9 +288,6 @@
 
         <div class="form-section">
             <input type="text" id="v-placa-check" placeholder="PLACA DO VEÍCULO">
-            <div id="box-substituicao" class="hidden">
-                <input type="text" id="v-placa-sub" placeholder="PLACA DO CARRO SUBSTITUÍDO">
-            </div>
             <input type="number" id="v-km" placeholder="KM ATUAL">
             <textarea id="v-obs-check" placeholder="Relatório do serviço..."></textarea>
             <button onclick="finalizarChecklist()">Finalizar e Salvar</button>
@@ -324,38 +325,42 @@
             }
         }
 
-        // FUNÇÃO ACRESCENTADA: LEITURA DE CRACHÁ (NFC)
-        async function ativarLeituraNFC() {
-            const campo = document.getElementById('c-nfc');
-            if (!('NDEFReader' in window)) {
-                alert("NFC não suportado neste navegador/dispositivo. Insira manualmente.");
-                campo.readOnly = false;
-                campo.focus();
-                return;
-            }
+        // LEITURA NFC NO LOGIN
+        async function ativarLeituraNFCLogin() {
+            if (!('NDEFReader' in window)) return;
+            try {
+                const ndef = new NDEFReader();
+                await ndef.scan();
+                document.getElementById('user').classList.add('nfc-reading');
+                document.getElementById('status-nfc-login').classList.remove('hidden');
+                ndef.onreading = event => {
+                    document.getElementById('user').value = event.serialNumber.toUpperCase();
+                    handleLogin(); // Tenta o login automático
+                };
+            } catch (e) { console.error(e); }
+        }
 
+        // LEITURA NFC NO CADASTRO
+        async function ativarLeituraNFCCadastro() {
+            const campo = document.getElementById('c-nfc');
+            if (!('NDEFReader' in window)) { alert("NFC não suportado."); return; }
             try {
                 const ndef = new NDEFReader();
                 await ndef.scan();
                 campo.classList.add('nfc-reading');
-                campo.value = "AGUARDANDO APROXIMAÇÃO...";
-
+                campo.value = "AGUARDANDO...";
                 ndef.onreading = event => {
                     campo.value = event.serialNumber.toUpperCase();
                     campo.classList.remove('nfc-reading');
-                    alert("Crachá Identificado!");
                 };
-            } catch (error) {
-                alert("Erro ao acessar NFC: " + error);
-            }
+            } catch (e) { alert(e); }
         }
 
-        // LOGICA ADMIN
+        // ADMIN LOGICA
         function salvarColab() {
             const d = JSON.parse(localStorage.getItem(DB.colab) || '[]');
             d.push({ mat: document.getElementById('c-mat').value.toUpperCase(), nome: document.getElementById('c-nome').value, nfc: document.getElementById('c-nfc').value.toUpperCase() });
-            localStorage.setItem(DB.colab, JSON.stringify(d));
-            carregarListaColab();
+            localStorage.setItem(DB.colab, JSON.stringify(d)); carregarListaColab();
             document.getElementById('c-mat').value = ''; document.getElementById('c-nome').value = ''; document.getElementById('c-nfc').value = '';
         }
         function carregarListaColab() {
@@ -394,16 +399,14 @@
             localStorage.setItem(DB.prog, JSON.stringify(d.filter(i => i.id !== id))); carregarProgCliente();
         }
 
-        // FINALIZAR
         function finalizarChecklist() {
             const p = document.getElementById('v-placa-check').value.toUpperCase();
             const logs = JSON.parse(localStorage.getItem(DB.logs) || '[]');
             logs.push({ data: new Date().toLocaleString(), placa: p, user: window.sessao.user.nome, tipo: window.sessao.tipo });
             localStorage.setItem(DB.logs, JSON.stringify(logs));
-            alert("Salvo com sucesso!"); location.reload();
+            alert("Checklist Salvo!"); location.reload();
         }
 
-        // INTERFACE
         function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
         function switchTab(t, e) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
@@ -416,9 +419,9 @@
             if (t === 'veic') carregarListaVeic();
         }
         function salvarForn() {
-            const f = JSON.parse(localStorage.getItem(FORN_DB) || '[]');
+            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]');
             f.push({ nome: document.getElementById('f-nome').value, user: document.getElementById('f-user').value, pass: document.getElementById('f-pass').value, tipo: document.getElementById('f-tipo').value });
-            localStorage.setItem(FORN_DB, JSON.stringify(f)); carregarListaForn();
+            localStorage.setItem(DB.forn, JSON.stringify(f)); carregarListaForn();
         }
         function carregarListaForn() {
             const f = JSON.parse(localStorage.getItem(DB.forn) || '[]');
