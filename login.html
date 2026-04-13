@@ -89,24 +89,11 @@
             text-transform: uppercase;
         }
 
-        .btn-nfc {
-            background: #1e293b;
-            margin-top: 10px;
-            border: 1px dashed var(--primary);
-        }
-
-        .btn-vincular {
-            background: #3b82f6;
-            margin-bottom: 10px;
-            font-size: 12px;
-            padding: 10px;
-        }
-
         .hidden {
             display: none !important;
         }
 
-        /* Estilo Admin */
+        /* Admin Layout */
         .admin-box {
             max-width: 850px;
             width: 95%;
@@ -119,7 +106,6 @@
             gap: 5px;
             margin-bottom: 20px;
             overflow-x: auto;
-            padding-bottom: 5px;
         }
 
         .tab-btn {
@@ -144,7 +130,6 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 11px;
-            margin-top: 10px;
         }
 
         th {
@@ -158,6 +143,37 @@
             padding: 10px;
             border-bottom: 1px solid #334155;
             cursor: pointer;
+        }
+
+        /* Busca de Placas */
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #1e293b;
+            border-radius: 0 0 12px 12px;
+            z-index: 100;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid var(--primary);
+            display: none;
+        }
+
+        .search-item {
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .search-item:hover {
+            background: var(--primary);
         }
 
         /* Dossiê */
@@ -192,36 +208,14 @@
             border-radius: 5px;
         }
 
-        .search-box {
-            position: relative;
-            width: 100%;
-        }
-
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: #1e293b;
-            border-radius: 0 0 12px 12px;
-            z-index: 100;
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid var(--primary);
-            border-top: none;
-            display: none;
-        }
-
-        .search-item {
-            padding: 12px;
-            border-bottom: 1px solid #334155;
-            cursor: pointer;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        .search-item:hover {
-            background: var(--primary);
+        .highlight-sub {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid #f59e0b;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #f59e0b;
         }
     </style>
 </head>
@@ -231,63 +225,19 @@
     <section id="scr-login" class="container">
         <h1>LOKAMIG</h1>
         <div class="sub">Vistoria e Logística de Pátio</div>
-        <input type="text" id="user" placeholder="Usuário / Matrícula">
+        <input type="text" id="user" placeholder="Matrícula">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
-        <button class="btn-nfc" onclick="lerCrachaNFC('login')">📲 ACESSAR VIA CRACHÁ</button>
+        <button style="background:#1e293b; margin-top:10px; border:1px dashed var(--primary);"
+            onclick="lerCrachaNFC('login')">📲 ACESSAR VIA CRACHÁ</button>
     </section>
 
     <section id="scr-admin" class="container admin-box hidden">
         <h1>PAINEL DE CONTROLE</h1>
         <div class="tabs">
-            <button id="btn-tab-mon" class="tab-btn tab-active" onclick="switchTab('mon')">Monitoramento</button>
-            <button id="btn-tab-cad" class="tab-btn" onclick="switchTab('cad')">Colaboradores</button>
-            <button id="btn-tab-veic" class="tab-btn" onclick="switchTab('veic')">Veículos</button>
-        </div>
-
-        <div id="area-cadastro" class="hidden">
-            <div
-                style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
-                <input type="text" id="reg-mat" placeholder="MATRÍCULA">
-                <input type="text" id="reg-nome" placeholder="NOME COMPLETO">
-                <button class="btn-vincular" onclick="lerCrachaNFC('vincular')">APROXIMAR CRACHÁ PARA VINCULAR</button>
-                <input type="text" id="reg-id" placeholder="Código do Chip" readonly style="color: var(--success);">
-                <button onclick="salvarColaborador()" style="background: var(--success);">SALVAR CADASTRO</button>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>NOME</th>
-                        <th>MATRÍCULA</th>
-                        <th>CHIP</th>
-                        <th>AÇÃO</th>
-                    </tr>
-                </thead>
-                <tbody id="colab-body"></tbody>
-            </table>
-        </div>
-
-        <div id="area-veiculos" class="hidden">
-            <div
-                style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
-                <input type="text" id="v-reg-placa" placeholder="PLACA (ex: ABC1234)">
-                <select id="v-reg-tipo">
-                    <option value="Operacional">Operacional</option>
-                    <option value="Gerencial">Gerencial</option>
-                    <option value="Reserva">Reserva</option>
-                </select>
-                <button onclick="salvarVeiculo()" style="background: var(--success);">CADASTRAR VEÍCULO</button>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>PLACA</th>
-                        <th>TIPO</th>
-                        <th>AÇÃO</th>
-                    </tr>
-                </thead>
-                <tbody id="veic-body"></tbody>
-            </table>
+            <button class="tab-btn tab-active" onclick="switchTab('mon', event)">Monitoramento</button>
+            <button class="tab-btn" onclick="switchTab('cad', event)">Colaboradores</button>
+            <button class="tab-btn" onclick="switchTab('veic', event)">Veículos</button>
         </div>
 
         <div id="area-monitor">
@@ -296,13 +246,39 @@
                     <tr>
                         <th>HORA</th>
                         <th>PLACA</th>
-                        <th>MOTORISTA</th>
                         <th>TIPO</th>
+                        <th>MOTORISTA</th>
                     </tr>
                 </thead>
                 <tbody id="logs-body"></tbody>
             </table>
         </div>
+
+        <div id="area-cadastro" class="hidden">
+            <input type="text" id="reg-mat" placeholder="MATRÍCULA">
+            <input type="text" id="reg-nome" placeholder="NOME COMPLETO">
+            <button onclick="lerCrachaNFC('vincular')"
+                style="background:#3b82f6; font-size:12px; margin-bottom:10px;">VINCULAR CHIP NFC</button>
+            <input type="text" id="reg-id" placeholder="ID do Chip" readonly>
+            <button onclick="salvarColaborador()" style="background:var(--success);">SALVAR</button>
+            <table style="margin-top:20px;">
+                <tbody id="colab-body"></tbody>
+            </table>
+        </div>
+
+        <div id="area-veiculos" class="hidden">
+            <input type="text" id="v-reg-placa" placeholder="NOVA PLACA">
+            <select id="v-reg-tipo">
+                <option value="Operacional">Operacional</option>
+                <option value="Gerencial">Gerencial</option>
+                <option value="Reserva">Reserva</option>
+            </select>
+            <button onclick="salvarVeiculo()" style="background:var(--success);">CADASTRAR</button>
+            <table style="margin-top:20px;">
+                <tbody id="veic-body"></tbody>
+            </table>
+        </div>
+
         <button onclick="location.reload()" style="background:#334155; margin-top:20px;">Sair</button>
     </section>
 
@@ -310,15 +286,20 @@
         <h1 id="display-nome">---</h1>
         <div class="sub" id="display-mat">Matrícula: ---</div>
 
-        <select id="v-tipo-select" onchange="limparBuscaVeiculo()">
+        <select id="v-tipo-select" onchange="toggleSubstituicao()">
             <option value="Operacional">Frota Operacional</option>
             <option value="Gerencial">Frota Gerencial</option>
-            <option value="Reserva">Veículo Reserva</option>
+            <option value="Reserva">Veículo Reserva (Substituição)</option>
         </select>
 
+        <div id="box-substituicao" class="hidden">
+            <div class="highlight-sub">⚠️ IDENTIFIQUE O CARRO QUE ESTÁ NA OFICINA</div>
+            <input type="text" id="v-placa-substituida" placeholder="PLACA DO CARRO QUEBRADO">
+        </div>
+
         <div class="search-box">
-            <input type="text" id="v-search-placa" placeholder="DIGITE A PLACA..." onkeyup="filtrarVeiculos()"
-                autocomplete="off">
+            <input type="text" id="v-search-placa" placeholder="BUSCAR PLACA DO VEÍCULO ATUAL..."
+                onkeyup="filtrarVeiculos()" autocomplete="off">
             <div id="search-results" class="search-results"></div>
         </div>
 
@@ -330,131 +311,155 @@
             <option value="3/4">3/4</option>
             <option value="Cheio">Cheio</option>
         </select>
-        <textarea id="v-obs" placeholder="Observações..."></textarea>
-        <button onclick="alert('Iniciando Fotos...')">Avançar para Fotos</button>
+        <textarea id="v-obs" placeholder="Observações de Manutenção/Retorno..."></textarea>
+        <button onclick="alert('Iniciando Câmera...')">Tirar Fotos</button>
     </section>
 
+    <div id="scr-detalhes" class="modal-detalhes hidden">
+        <h1 id="det-placa">Dossiê</h1>
+        <div id="det-info"></div>
+        <div class="photo-grid" id="det-fotos"></div>
+        <button onclick="window.print()" style="background:var(--success);">Gerar PDF</button>
+        <button onclick="show('scr-admin'); carregarAdmin();">Voltar</button>
+    </div>
+
     <script>
-        const USER_DB = 'lokamig_users_v5';
         const LOG_DB = 'lokamig_logs_v5';
+        const USER_DB = 'lokamig_users_v5';
         const VEIC_DB = 'lokamig_veiculos_v1';
 
-        if (!localStorage.getItem(VEIC_DB)) localStorage.setItem(VEIC_DB, JSON.stringify([]));
-        if (!localStorage.getItem(USER_DB)) localStorage.setItem(USER_DB, JSON.stringify([{ nome: "LUCAS LIMA", mat: "T531971", id: "D3C776D2" }]));
-
         function show(id) {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('section, .modal-detalhes').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
-        function switchTab(t) {
+        function switchTab(t, e) {
             document.getElementById('area-monitor').classList.toggle('hidden', t !== 'mon');
             document.getElementById('area-cadastro').classList.toggle('hidden', t !== 'cad');
             document.getElementById('area-veiculos').classList.toggle('hidden', t !== 'veic');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-            event.target.classList.add('tab-active');
+            e.target.classList.add('tab-active');
             if (t === 'cad') carregarListaColaboradores();
             if (t === 'veic') carregarListaVeiculos();
         }
 
-        // Lógica de Veículos
-        function salvarVeiculo() {
-            const p = document.getElementById('v-reg-placa').value.toUpperCase();
-            const t = document.getElementById('v-reg-tipo').value;
-            if (!p) return alert("Digite a placa!");
-            const v = JSON.parse(localStorage.getItem(VEIC_DB));
-            v.push({ placa: p, tipo: t });
-            localStorage.setItem(VEIC_DB, JSON.stringify(v));
-            document.getElementById('v-reg-placa').value = '';
-            carregarListaVeiculos();
-        }
-
-        function carregarListaVeiculos() {
-            const v = JSON.parse(localStorage.getItem(VEIC_DB));
-            document.getElementById('veic-body').innerHTML = v.map((x, i) => `<tr><td>${x.placa}</td><td>${x.tipo}</td><td><button onclick="removerVeiculo(${i})" style="background:var(--primary); padding:5px;">X</button></td></tr>`).join('');
-        }
-
-        function removerVeiculo(i) {
-            const v = JSON.parse(localStorage.getItem(VEIC_DB)); v.splice(i, 1);
-            localStorage.setItem(VEIC_DB, JSON.stringify(v)); carregarListaVeiculos();
-        }
-
-        // Busca de Veículos no Checklist
-        function filtrarVeiculos() {
-            const input = document.getElementById('v-search-placa').value.toUpperCase();
+        // Lógica Reserva / Substituição
+        function toggleSubstituicao() {
             const tipo = document.getElementById('v-tipo-select').value;
-            const resBox = document.getElementById('search-results');
-            const veiculos = JSON.parse(localStorage.getItem(VEIC_DB)).filter(v => v.tipo === tipo && v.placa.includes(input));
-
-            if (veiculos.length > 0 && input !== "") {
-                resBox.style.display = 'block';
-                resBox.innerHTML = veiculos.map(v => `<div class="search-item" onclick="selecionarVeiculo('${v.placa}')">${v.placa}</div>`).join('');
-            } else {
-                resBox.style.display = 'none';
-            }
-        }
-
-        function selecionarVeiculo(placa) {
-            document.getElementById('v-search-placa').value = placa;
-            document.getElementById('search-results').style.display = 'none';
-        }
-
-        function limparBuscaVeiculo() {
+            document.getElementById('box-substituicao').classList.toggle('hidden', tipo !== 'Reserva');
             document.getElementById('v-search-placa').value = '';
             document.getElementById('search-results').style.display = 'none';
         }
 
-        // (Lógicas de Login, NFC e Admin mantidas conforme os pedidos anteriores)
+        function filtrarVeiculos() {
+            const input = document.getElementById('v-search-placa').value.toUpperCase();
+            const tipo = document.getElementById('v-tipo-select').value;
+            const resBox = document.getElementById('search-results');
+            const lista = JSON.parse(localStorage.getItem(VEIC_DB) || '[]').filter(v => v.tipo === tipo && v.placa.includes(input));
+
+            if (lista.length > 0 && input !== "") {
+                resBox.style.display = 'block';
+                resBox.innerHTML = lista.map(v => `<div class="search-item" onclick="selecionarVeiculo('${v.placa}')">${v.placa}</div>`).join('');
+            } else { resBox.style.display = 'none'; }
+        }
+
+        function selecionarVeiculo(p) {
+            document.getElementById('v-search-placa').value = p;
+            document.getElementById('search-results').style.display = 'none';
+        }
+
+        // Admin Veículos
+        function salvarVeiculo() {
+            const p = document.getElementById('v-reg-placa').value.toUpperCase();
+            const t = document.getElementById('v-reg-tipo').value;
+            if (!p) return;
+            const v = JSON.parse(localStorage.getItem(VEIC_DB) || '[]');
+            v.push({ placa: p, tipo: t });
+            localStorage.setItem(VEIC_DB, JSON.stringify(v));
+            carregarListaVeiculos();
+        }
+
+        function carregarListaVeiculos() {
+            const v = JSON.parse(localStorage.getItem(VEIC_DB) || '[]');
+            document.getElementById('veic-body').innerHTML = v.map((x, i) => `<tr><td>${x.placa}</td><td>${x.tipo}</td><td onclick="removerVeic(${i})">❌</td></tr>`).join('');
+        }
+
+        function removerVeic(i) {
+            const v = JSON.parse(localStorage.getItem(VEIC_DB)); v.splice(i, 1);
+            localStorage.setItem(VEIC_DB, JSON.stringify(v)); carregarListaVeiculos();
+        }
+
+        // Login e Monitoramento
         function handleLogin() {
             const u = document.getElementById('user').value.toUpperCase();
             const p = document.getElementById('pass').value;
             if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarAdmin(); }
             else {
-                const user = JSON.parse(localStorage.getItem(USER_DB)).find(x => x.mat.toUpperCase() === u);
+                const user = JSON.parse(localStorage.getItem(USER_DB) || '[]').find(x => x.mat.toUpperCase() === u);
                 if (user) logar(user); else alert("Matrícula não cadastrada.");
             }
+        }
+
+        function logar(user) {
+            window.currentUser = user;
+            document.getElementById('display-nome').innerText = user.nome;
+            document.getElementById('display-mat').innerText = "Matrícula: " + user.mat;
+            show('scr-form');
+        }
+
+        function carregarAdmin() {
+            const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
+            document.getElementById('logs-body').innerHTML = logs.map(l => `
+            <tr onclick='verDossie(${JSON.stringify(l)})'>
+                <td>${l.hora}</td>
+                <td>${l.placa} ${l.subst ? '<br><small>Subst: ' + l.subst + '</small>' : ''}</td>
+                <td>${l.tipo}</td>
+                <td>${l.op}</td>
+            </tr>
+        `).join('');
+        }
+
+        function verDossie(log) {
+            show('scr-detalhes');
+            document.getElementById('det-placa').innerText = log.placa;
+            document.getElementById('det-info').innerHTML = `
+            <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
+                <p><b>Data:</b> ${log.data} às ${log.hora}</p>
+                <p><b>Motorista:</b> ${log.op}</p>
+                <p><b>KM:</b> ${log.km}</p>
+                ${log.subst ? `<p style="color:#f59e0b"><b>⚠️ EM SUBSTITUIÇÃO AO VEÍCULO: ${log.subst}</b></p>` : ''}
+                <p><b>Observações:</b> ${log.obs}</p>
+            </div>
+        `;
+        }
+
+        // Funções de Colaborador (Congeladas)
+        function carregarListaColaboradores() {
+            const u = JSON.parse(localStorage.getItem(USER_DB) || '[]');
+            document.getElementById('colab-body').innerHTML = u.map(x => `<tr><td>${x.nome}</td><td>${x.mat}</td></tr>`).join('');
+        }
+
+        function salvarColaborador() {
+            const m = document.getElementById('reg-mat').value, n = document.getElementById('reg-nome').value, c = document.getElementById('reg-id').value;
+            const u = JSON.parse(localStorage.getItem(USER_DB) || '[]');
+            u.push({ nome: n, mat: m, id: c });
+            localStorage.setItem(USER_DB, JSON.stringify(u)); carregarListaColaboradores();
         }
 
         async function lerCrachaNFC(modo) {
             if ('NDEFReader' in window) {
                 try {
                     const ndef = new NDEFReader(); await ndef.scan();
-                    alert("Aproxime o crachá...");
                     ndef.onreading = event => {
-                        const idLido = event.serialNumber.replace(/:/g, "").toUpperCase();
-                        if (modo === 'vincular') document.getElementById('reg-id').value = idLido;
+                        const id = event.serialNumber.replace(/:/g, "").toUpperCase();
+                        if (modo === 'vincular') document.getElementById('reg-id').value = id;
                         else {
-                            const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === idLido);
-                            if (user) logar(user); else alert("ID não vinculado.");
+                            const user = JSON.parse(localStorage.getItem(USER_DB)).find(u => u.id === id);
+                            if (user) logar(user);
                         }
                     };
                 } catch (e) { alert("NFC Erro."); }
             }
-        }
-
-        function logar(user) {
-            document.getElementById('display-nome').innerText = user.nome;
-            document.getElementById('display-mat').innerText = "Matrícula: " + user.mat;
-            show('scr-form');
-        }
-
-        function salvarColaborador() {
-            const m = document.getElementById('reg-mat').value.toUpperCase(), n = document.getElementById('reg-nome').value.toUpperCase(), c = document.getElementById('reg-id').value.toUpperCase();
-            if (!m || !n || !c) return alert("Preencha tudo!");
-            const u = JSON.parse(localStorage.getItem(USER_DB));
-            u.push({ nome: n, mat: m, id: c });
-            localStorage.setItem(USER_DB, JSON.stringify(u));
-            carregarListaColaboradores();
-        }
-
-        function carregarListaColaboradores() {
-            const u = JSON.parse(localStorage.getItem(USER_DB));
-            document.getElementById('colab-body').innerHTML = u.map((x, i) => `<tr><td>${x.nome}</td><td>${x.mat}</td><td>${x.id}</td><td><button onclick="removerColaborador(${i})" style="background:var(--primary); padding:5px;">X</button></td></tr>`).join('');
-        }
-
-        function carregarAdmin() {
-            const logs = JSON.parse(localStorage.getItem(LOG_DB) || '[]');
-            document.getElementById('logs-body').innerHTML = logs.map(l => `<tr><td>${l.hora}</td><td>${l.placa}</td><td>${l.op}</td><td>${l.tipo || 'Vistoria'}</td></tr>`).join('');
         }
     </script>
 </body>
