@@ -13,6 +13,7 @@
             --text: #f8fafc;
             --success: #10b981;
             --warning: #f59e0b;
+            --danger: #ef4444;
         }
 
         * {
@@ -42,7 +43,7 @@
             border-radius: 20px;
             padding: 25px;
             width: 95%;
-            max-width: 500px;
+            max-width: 600px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
@@ -103,24 +104,39 @@
 
         .prog-item {
             background: rgba(255, 255, 255, 0.05);
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             margin-bottom: 10px;
-            border-left: 4px solid var(--primary);
-            font-size: 12px;
-            position: relative;
+            border-left: 6px solid var(--warning);
+            font-size: 11px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: 0.3s;
+        }
+
+        .status-pendente {
+            border-left-color: var(--warning);
+        }
+
+        .status-execucao {
+            border-left-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .status-concluido {
+            border-left-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
         }
 
         .badge {
-            font-size: 9px;
+            font-size: 8px;
             padding: 3px 6px;
             border-radius: 4px;
             background: var(--primary);
-            margin-bottom: 5px;
-            display: inline-block;
+            color: #fff;
+            text-transform: uppercase;
+            margin-right: 5px;
         }
 
         .tabs {
@@ -152,10 +168,9 @@
             background: none;
             border: none;
             color: #ff4444;
-            cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
-            padding: 5px;
+            font-size: 16px;
+            cursor: pointer;
         }
 
         table {
@@ -202,20 +217,27 @@
         <button onclick="handleLogin()">Entrar</button>
         <div id="status-nfc-login" style="margin-top: 10px; font-size: 9px; color: var(--warning);" class="hidden">
             AGUARDANDO APROXIMAÇÃO DO CRACHÁ...</div>
-        <div style="margin: 15px; font-size: 9px; color: #64748b;">ACESSO PARA COLABORADORES, CLIENTES E FORNECEDORES
-        </div>
     </section>
 
     <section id="scr-admin" class="container hidden" style="max-width: 800px;">
         <h1>ADMINISTRAÇÃO</h1>
         <div class="tabs">
-            <button class="tab-btn tab-active" onclick="switchTab('mon', event)">Monitoramento</button>
+            <button class="tab-btn tab-active" onclick="switchTab('prog-view-admin', event)">Programação</button>
+            <button class="tab-btn" onclick="switchTab('mon', event)">Monitoramento</button>
             <button class="tab-btn" onclick="switchTab('colab', event)">Equipe</button>
             <button class="tab-btn" onclick="switchTab('forn', event)">Fornecedores</button>
             <button class="tab-btn" onclick="switchTab('veic', event)">Veículos</button>
         </div>
 
-        <div id="area-mon">
+        <div id="area-prog-view-admin">
+            <div class="form-section" style="display: flex; gap: 10px; align-items: center;">
+                <span style="font-size: 11px;">Data:</span>
+                <input type="date" id="filtro-data-admin" onchange="carregarProgAdmin()" style="margin-bottom: 0;">
+            </div>
+            <div id="list-prog-admin"></div>
+        </div>
+
+        <div id="area-mon" class="hidden">
             <table>
                 <thead>
                     <tr>
@@ -260,6 +282,7 @@
                 <select id="v-reg-tipo">
                     <option value="Operacional">Operacional</option>
                     <option value="Reserva">Reserva</option>
+                    <option value="Gerencial">Gerencial</option>
                 </select>
                 <button onclick="salvarVeiculo()" style="background:var(--success)">Cadastrar Veículo</button>
             </div>
@@ -273,13 +296,14 @@
         <h1>PROGRAMAÇÃO DIÁRIA</h1>
         <div class="sub">Área do Cliente</div>
         <div class="form-section">
-            <input type="text" id="p-placa" placeholder="PLACA">
+            <input type="text" id="p-placa" placeholder="PLACA DO VEÍCULO" onblur="buscarInfoVeiculo(this.value)">
+            <div id="info-veiculo-status" style="font-size: 10px; margin-bottom: 10px; color: var(--warning);"></div>
             <select id="p-destino">
                 <option value="Limpeza">Para Limpeza</option>
                 <option value="Oficina">Para Oficina</option>
             </select>
             <textarea id="p-obs" placeholder="OBSERVAÇÕES DE MANUTENÇÃO..."></textarea>
-            <button onclick="lancarProgramacao()" style="background:var(--success)">Adicionar à Lista</button>
+            <button onclick="lancarProgramacao()" style="background:var(--success)">Lançar na Agenda</button>
         </div>
         <div id="lista-programacao-cliente" style="max-height: 250px; overflow-y: auto;"></div>
         <button onclick="location.reload()" style="background:#334155; margin-top:20px;">Sair</button>
@@ -287,17 +311,17 @@
 
     <section id="scr-form" class="container hidden">
         <h1 id="display-nome">---</h1>
-        <button id="btn-ver-prog" class="btn-prog hidden" onclick="toggleProgView()">Ver Programação do Dia 📅</button>
-        <div id="prog-view" class="form-section hidden"
-            style="background: rgba(245, 158, 11, 0.15); border: 1px solid var(--warning);">
-            <div id="prog-list-content"></div>
+        <div id="area-fornecedor-prog" class="hidden">
+            <div class="sub">Serviços Designados</div>
+            <div id="prog-list-forn"></div>
         </div>
 
         <div class="form-section">
-            <input type="text" id="v-placa-check" placeholder="PLACA DO VEÍCULO">
+            <div class="sub">Realizar Checklist</div>
+            <input type="text" id="v-placa-check" placeholder="PLACA">
             <input type="number" id="v-km" placeholder="KM ATUAL">
             <textarea id="v-obs-check" placeholder="Relatório do serviço..."></textarea>
-            <button onclick="finalizarChecklist()">Finalizar e Salvar</button>
+            <button onclick="finalizarChecklist()">Finalizar Serviço</button>
         </div>
         <button onclick="location.reload()" style="background:#334155;">Sair</button>
     </section>
@@ -306,20 +330,21 @@
         const DB = { colab: 'l_colab_v7', forn: 'l_forn_v7', veic: 'l_veic_v7', prog: 'l_prog_v7', logs: 'l_logs_v7' };
         const CLIENTE_USER = { user: "CLIENTE", pass: "LOKAMIG2026", nome: "CLIENTE MASTER" };
 
+        // Inicializa data de hoje nos filtros
+        window.onload = () => {
+            const hoje = new Date().toISOString().split('T')[0];
+            if (document.getElementById('filtro-data-admin')) document.getElementById('filtro-data-admin').value = hoje;
+        };
+
         function handleLogin() {
             const u = document.getElementById('user').value.toUpperCase();
             const p = document.getElementById('pass').value;
-
-            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarLogs(); return; }
+            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarProgAdmin(); return; }
             if (u === CLIENTE_USER.user && p === CLIENTE_USER.pass) { show('scr-cliente'); carregarProgCliente(); return; }
-
-            const colabs = JSON.parse(localStorage.getItem(DB.colab) || '[]');
-            const colab = colabs.find(c => c.mat === u || c.nfc === u);
+            const colab = JSON.parse(localStorage.getItem(DB.colab) || '[]').find(c => c.mat === u || c.nfc === u);
             if (colab) { logar(colab, 'COLABORADOR'); return; }
-
             const forn = JSON.parse(localStorage.getItem(DB.forn) || '[]').find(f => f.user.toUpperCase() === u && f.pass === p);
             if (forn) { logar(forn, 'FORNECEDOR'); return; }
-
             alert("Acesso Negado.");
         }
 
@@ -328,16 +353,103 @@
             document.getElementById('display-nome').innerText = user.nome;
             show('scr-form');
             if (tipo === 'FORNECEDOR') {
-                document.getElementById('btn-ver-prog').classList.remove('hidden');
+                document.getElementById('area-fornecedor-prog').classList.remove('hidden');
+                carregarProgFornecedor();
             }
         }
 
-        // NFC LOGIC
+        // LOGICA DE PROGRAMAÇÃO E CORES
+        function lancarProgramacao() {
+            const p = document.getElementById('p-placa').value.toUpperCase();
+            if (!p) return;
+            const veiculos = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+            const vInfo = veiculos.find(v => v.placa === p) || { tipo: 'N/I' };
+
+            const d = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            d.push({
+                id: Date.now(),
+                data: new Date().toISOString().split('T')[0],
+                placa: p,
+                tipoVeic: vInfo.tipo,
+                destino: document.getElementById('p-destino').value,
+                obs: document.getElementById('p-obs').value,
+                status: 'PENDENTE' // PENDENTE (Laranja), EXECUCAO (Vermelho), CONCLUIDO (Verde)
+            });
+            localStorage.setItem(DB.prog, JSON.stringify(d));
+            carregarProgCliente();
+            document.getElementById('p-placa').value = ''; document.getElementById('p-obs').value = '';
+        }
+
+        function carregarProgAdmin() {
+            const filtro = document.getElementById('filtro-data-admin').value;
+            const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === filtro);
+            const lista = document.getElementById('list-prog-admin');
+
+            if (dados.length === 0) {
+                lista.innerHTML = "<div class='sub'>Nenhuma programação para este dia.</div>";
+                return;
+            }
+
+            lista.innerHTML = dados.map(i => {
+                let corClass = i.status === 'PENDENTE' ? 'status-pendente' : (i.status === 'EXECUCAO' ? 'status-execucao' : 'status-concluido');
+                return `
+                <div class="prog-item ${corClass}">
+                    <div>
+                        <span class="badge">${i.tipoVeic}</span>
+                        <span class="badge" style="background:#334155">${i.destino}</span>
+                        <b>${i.placa}</b><br>
+                        <small>${i.status} - ${i.obs}</small>
+                    </div>
+                    <button class="btn-del" onclick="excluirProgAdmin(${i.id})">×</button>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function carregarProgFornecedor() {
+            const hoje = new Date().toISOString().split('T')[0];
+            const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === hoje && x.destino === window.sessao.user.tipo);
+            const lista = document.getElementById('prog-list-forn');
+
+            lista.innerHTML = dados.map(i => `
+            <div class="prog-item ${i.status === 'PENDENTE' ? 'status-pendente' : (i.status === 'EXECUCAO' ? 'status-execucao' : 'status-concluido')}">
+                <div><b>${i.placa}</b> (${i.tipoVeic})<br><small>${i.obs}</small></div>
+                <div style="display:flex; gap:5px;">
+                    ${i.status === 'PENDENTE' ? `<button onclick="alterarStatus(${i.id}, 'EXECUCAO')" style="padding:5px; background:var(--danger); font-size:8px;">INICIAR</button>` : ''}
+                    ${i.status === 'EXECUCAO' ? `<button onclick="alterarStatus(${i.id}, 'CONCLUIDO')" style="padding:5px; background:var(--success); font-size:8px;">FINALIZAR</button>` : ''}
+                </div>
+            </div>
+        `).join('');
+        }
+
+        function alterarStatus(id, novoStatus) {
+            let d = JSON.parse(localStorage.getItem(DB.prog));
+            const idx = d.findIndex(x => x.id === id);
+            if (idx !== -1) {
+                d[idx].status = novoStatus;
+                localStorage.setItem(DB.prog, JSON.stringify(d));
+                carregarProgFornecedor();
+            }
+        }
+
+        // UTILITÁRIOS
+        function buscarInfoVeiculo(placa) {
+            const v = JSON.parse(localStorage.getItem(DB.veic) || '[]').find(x => x.placa === placa.toUpperCase());
+            document.getElementById('info-veiculo-status').innerText = v ? `Veículo ${v.tipo} identificado.` : "Placa não cadastrada na frota.";
+        }
+
+        function excluirProgAdmin(id) {
+            if (!confirm("Remover esta programação?")) return;
+            let d = JSON.parse(localStorage.getItem(DB.prog));
+            localStorage.setItem(DB.prog, JSON.stringify(d.filter(x => x.id !== id)));
+            carregarProgAdmin();
+        }
+
+        // MANTENDO AS FUNÇÕES ANTERIORES (NFC, CADASTROS, ETC)
         async function ativarLeituraNFCLogin() {
             if (!('NDEFReader' in window)) return;
             try {
-                const ndef = new NDEFReader();
-                await ndef.scan();
+                const ndef = new NDEFReader(); await ndef.scan();
                 document.getElementById('user').classList.add('nfc-reading');
                 document.getElementById('status-nfc-login').classList.remove('hidden');
                 ndef.onreading = event => {
@@ -351,84 +463,46 @@
             const campo = document.getElementById('c-nfc');
             if (!('NDEFReader' in window)) { alert("NFC não suportado."); return; }
             try {
-                const ndef = new NDEFReader();
-                await ndef.scan();
-                campo.classList.add('nfc-reading');
-                campo.value = "AGUARDANDO...";
-                ndef.onreading = event => {
-                    campo.value = event.serialNumber.toUpperCase();
-                    campo.classList.remove('nfc-reading');
-                };
+                const ndef = new NDEFReader(); await ndef.scan();
+                campo.classList.add('nfc-reading'); campo.value = "AGUARDANDO...";
+                ndef.onreading = event => { campo.value = event.serialNumber.toUpperCase(); campo.classList.remove('nfc-reading'); };
             } catch (e) { alert(e); }
         }
 
-        // ADMIN - EXCLUIR GERAL
-        function excluirItem(tipoDB, idProp, idValor) {
-            if (!confirm("Deseja realmente excluir este item?")) return;
-            let d = JSON.parse(localStorage.getItem(tipoDB) || '[]');
-            d = d.filter(item => item[idProp] !== idValor);
-            localStorage.setItem(tipoDB, JSON.stringify(d));
-            // Recarregar a lista correta
-            if (tipoDB === DB.colab) carregarListaColab();
-            if (tipoDB === DB.forn) carregarListaForn();
-            if (tipoDB === DB.veic) carregarListaVeic();
-        }
-
-        // LOGICA CADASTROS
         function salvarColab() {
             const d = JSON.parse(localStorage.getItem(DB.colab) || '[]');
             d.push({ mat: document.getElementById('c-mat').value.toUpperCase(), nome: document.getElementById('c-nome').value, nfc: document.getElementById('c-nfc').value.toUpperCase() });
-            localStorage.setItem(DB.colab, JSON.stringify(d));
-            carregarListaColab();
-            document.getElementById('c-mat').value = ''; document.getElementById('c-nome').value = ''; document.getElementById('c-nfc').value = '';
+            localStorage.setItem(DB.colab, JSON.stringify(d)); carregarListaColab();
         }
         function carregarListaColab() {
             const d = JSON.parse(localStorage.getItem(DB.colab) || '[]');
-            document.getElementById('list-colab').innerHTML = d.map(x => `<div class="prog-item"><span>${x.nome} (ID: ${x.nfc || x.mat})</span><button class="btn-del" onclick="excluirItem(DB.colab, 'mat', '${x.mat}')">×</button></div>`).join('');
-        }
-        function salvarForn() {
-            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]');
-            f.push({ nome: document.getElementById('f-nome').value, user: document.getElementById('f-user').value, pass: document.getElementById('f-pass').value, tipo: document.getElementById('f-tipo').value });
-            localStorage.setItem(DB.forn, JSON.stringify(f)); carregarListaForn();
-            document.getElementById('f-nome').value = ''; document.getElementById('f-user').value = ''; document.getElementById('f-pass').value = '';
-        }
-        function carregarListaForn() {
-            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]');
-            document.getElementById('list-forn').innerHTML = f.map(x => `<div class="prog-item"><span>${x.nome} (${x.tipo})</span><button class="btn-del" onclick="excluirItem(DB.forn, 'user', '${x.user}')">×</button></div>`).join('');
+            document.getElementById('list-colab').innerHTML = d.map(x => `<div class="prog-item"><span>${x.nome} (ID: ${x.nfc || x.mat})</span><button class="btn-del" onclick="excluirItem('${DB.colab}', 'mat', '${x.mat}')">×</button></div>`).join('');
         }
         function salvarVeiculo() {
             const d = JSON.parse(localStorage.getItem(DB.veic) || '[]');
-            const placa = document.getElementById('v-reg-placa').value.toUpperCase();
-            d.push({ placa: placa, tipo: document.getElementById('v-reg-tipo').value });
+            d.push({ placa: document.getElementById('v-reg-placa').value.toUpperCase(), tipo: document.getElementById('v-reg-tipo').value });
             localStorage.setItem(DB.veic, JSON.stringify(d)); carregarListaVeic();
-            document.getElementById('v-reg-placa').value = '';
         }
         function carregarListaVeic() {
             const d = JSON.parse(localStorage.getItem(DB.veic) || '[]');
-            document.getElementById('list-veic').innerHTML = d.map(x => `<div class="prog-item"><span>${x.placa} - ${x.tipo}</span><button class="btn-del" onclick="excluirItem(DB.veic, 'placa', '${x.placa}')">×</button></div>`).join('');
+            document.getElementById('list-veic').innerHTML = d.map(x => `<div class="prog-item"><span>${x.placa} - ${x.tipo}</span><button class="btn-del" onclick="excluirItem('${DB.veic}', 'placa', '${x.placa}')">×</button></div>`).join('');
         }
         function carregarLogs() {
             const d = JSON.parse(localStorage.getItem(DB.logs) || '[]');
             document.getElementById('list-mon').innerHTML = d.map(x => `<tr><td>${x.data}</td><td>${x.placa}</td><td>${x.user}</td><td>${x.tipo}</td></tr>`).join('');
         }
-
-        // CLIENTE
-        function lancarProgramacao() {
-            const p = document.getElementById('p-placa').value.toUpperCase();
-            if (!p) return;
-            const d = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            d.push({ id: Date.now(), placa: p, destino: document.getElementById('p-destino').value, obs: document.getElementById('p-obs').value });
-            localStorage.setItem(DB.prog, JSON.stringify(d)); carregarProgCliente();
-            document.getElementById('p-placa').value = ''; document.getElementById('p-obs').value = '';
-        }
         function carregarProgCliente() {
-            const d = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            document.getElementById('lista-programacao-cliente').innerHTML = d.map(i => `<div class="prog-item"><div><div class="badge">${i.destino}</div> <b>${i.placa}</b></div><button class="btn-del" onclick="cancelarProg(${i.id})">×</button></div>`).join('');
+            const hoje = new Date().toISOString().split('T')[0];
+            const d = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === hoje);
+            document.getElementById('lista-programacao-cliente').innerHTML = d.map(i => `<div class="prog-item"><div><span class="badge">${i.destino}</span><b>${i.placa}</b></div><button class="btn-del" onclick="excluirProgAdmin(${i.id})">×</button></div>`).join('');
         }
-        function cancelarProg(id) {
-            if (!confirm("Remover da programação?")) return;
-            let d = JSON.parse(localStorage.getItem(DB.prog));
-            localStorage.setItem(DB.prog, JSON.stringify(d.filter(i => i.id !== id))); carregarProgCliente();
+
+        function excluirItem(db, chave, valor) {
+            if (!confirm("Excluir item?")) return;
+            let d = JSON.parse(localStorage.getItem(db));
+            localStorage.setItem(db, JSON.stringify(d.filter(x => x[chave] !== valor)));
+            if (db === DB.colab) carregarListaColab();
+            if (db === DB.veic) carregarListaVeic();
         }
 
         function finalizarChecklist() {
@@ -443,18 +517,23 @@
         function switchTab(t, e) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
             e.target.classList.add('tab-active');
+            document.getElementById('area-prog-view-admin').classList.toggle('hidden', t !== 'prog-view-admin');
             document.getElementById('area-mon').classList.toggle('hidden', t !== 'mon');
             document.getElementById('area-colab').classList.toggle('hidden', t !== 'colab');
             document.getElementById('area-forn').classList.toggle('hidden', t !== 'forn');
             document.getElementById('area-veic').classList.toggle('hidden', t !== 'veic');
+            if (t === 'prog-view-admin') carregarProgAdmin();
             if (t === 'colab') carregarListaColab();
-            if (t === 'forn') carregarListaForn();
             if (t === 'veic') carregarListaVeic();
         }
-        function toggleProgView() {
-            const box = document.getElementById('prog-view'); box.classList.toggle('hidden');
-            const lista = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(i => i.destino === window.sessao.user.tipo);
-            document.getElementById('prog-list-content').innerHTML = lista.map(i => `<div style="margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;"><b>${i.placa}</b><br><small>${i.obs}</small></div>`).join('');
+        function salvarForn() {
+            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+            f.push({ nome: document.getElementById('f-nome').value, user: document.getElementById('f-user').value, pass: document.getElementById('f-pass').value, tipo: document.getElementById('f-tipo').value });
+            localStorage.setItem(DB.forn, JSON.stringify(f)); carregarListaForn();
+        }
+        function carregarListaForn() {
+            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+            document.getElementById('list-forn').innerHTML = f.map(x => `<div class="prog-item"><span>${x.nome} (${x.tipo})</span><button class="btn-del" onclick="excluirItem('${DB.forn}', 'user', '${x.user}')">×</button></div>`).join('');
         }
     </script>
 </body>
