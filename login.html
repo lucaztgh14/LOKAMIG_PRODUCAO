@@ -14,7 +14,6 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --gray: #334155;
             --dark-card: #0f172a;
         }
 
@@ -41,7 +40,7 @@
             border-radius: 20px;
             padding: 25px;
             width: 95%;
-            max-width: 500px;
+            max-width: 550px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -52,6 +51,7 @@
             margin-bottom: 20px;
             color: #fff;
             letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .sub-label {
@@ -62,7 +62,6 @@
             text-transform: uppercase;
         }
 
-        /* Inputs conforme os prints */
         input,
         select,
         textarea {
@@ -77,59 +76,49 @@
             outline: none;
         }
 
-        /* Botões conforme os prints */
+        button {
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
         .btn-orange {
             background: var(--warning);
             color: #000;
-            font-weight: bold;
             border-radius: 12px;
             padding: 15px;
             width: 100%;
             border: none;
-            cursor: pointer;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
             margin-bottom: 10px;
         }
 
         .btn-green {
             background: var(--success);
             color: #fff;
-            font-weight: bold;
             border-radius: 12px;
             padding: 15px;
             width: 100%;
             border: none;
-            cursor: pointer;
-            text-transform: uppercase;
             margin-bottom: 10px;
         }
 
         .btn-gray {
             background: #334155;
             color: #fff;
-            font-weight: bold;
             border-radius: 12px;
             padding: 15px;
             width: 100%;
             border: none;
-            cursor: pointer;
-            text-transform: uppercase;
         }
 
         .btn-white {
             background: #fff;
             color: #000;
-            font-weight: bold;
             border-radius: 12px;
             padding: 15px;
             width: 100%;
             border: none;
-            cursor: pointer;
-            text-transform: uppercase;
             margin-bottom: 10px;
         }
 
@@ -137,29 +126,47 @@
             display: none !important;
         }
 
-        /* Itens da Programação */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 9px;
+            flex: 1;
+            border: 1px solid #334155;
+        }
+
+        .tab-active {
+            background: var(--primary);
+        }
+
         .prog-item {
             background: #0f172a;
             padding: 15px;
             border-radius: 15px;
             margin-bottom: 15px;
-            border-left: 5px solid var(--success);
+            border-left: 5px solid var(--warning);
             text-align: left;
-            position: relative;
         }
 
-        .prog-item.cancelado {
+        .status-execucao {
             border-left-color: var(--danger);
         }
 
-        .tag-ni {
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            background: #000;
-            font-size: 8px;
-            padding: 2px 5px;
-            border-radius: 3px;
+        .status-concluido {
+            border-left-color: var(--success);
+        }
+
+        .status-cancelado {
+            border-left-color: #64748b;
+            opacity: 0.6;
         }
 
         .obs-box {
@@ -169,37 +176,27 @@
             margin-top: 10px;
             font-size: 12px;
             color: #94a3b8;
-            border: 1px solid #d1122a;
+            border: 1px solid var(--primary);
         }
 
-        /* Estilo Calculadora de Orçamento */
         .orc-row {
             display: flex;
             gap: 8px;
             margin-bottom: 8px;
         }
 
-        .total-display {
-            background: var(--success);
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            margin: 15px 0;
-        }
-
         input[type="file"] {
             display: none;
         }
 
-        .file-btn {
+        .file-label {
             display: block;
             background: #475569;
             padding: 12px;
             border-radius: 10px;
             cursor: pointer;
             font-size: 11px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -207,112 +204,119 @@
 <body>
 
     <section id="scr-login" class="container">
-        <h1 id="brand-name">agsn</h1>
-        <input type="text" id="user" placeholder="USUÁRIO">
+        <h1>agsn</h1>
+        <input type="text" id="user" placeholder="USUÁRIO OU CRACHÁ" onclick="ativarNFC()">
         <input type="password" id="pass" placeholder="SENHA">
         <button class="btn-green" onclick="handleLogin()">Entrar</button>
     </section>
 
+    <section id="scr-admin" class="container hidden" style="max-width: 700px;">
+        <h1>ADMINISTRAÇÃO</h1>
+        <div class="tabs">
+            <button class="tab-btn tab-active" onclick="mudarAba('adm-prog')">Programação</button>
+            <button class="tab-btn" onclick="mudarAba('adm-equipe')">Equipe</button>
+            <button class="tab-btn" onclick="mudarAba('adm-forn')">Forn.</button>
+            <button class="tab-btn" onclick="mudarAba('adm-veic')">Veículos</button>
+        </div>
+        <div id="adm-prog">
+            <input type="date" id="filtro-adm" onchange="renderAdmin()">
+            <div id="lista-adm"></div>
+        </div>
+        <div id="adm-equipe" class="hidden">
+            <input type="text" id="e-mat" placeholder="Matrícula"><input type="text" id="e-nome" placeholder="Nome">
+            <button class="btn-green" onclick="salvarItem('colab', {mat: 'e-mat', nome: 'e-nome'})">Cadastrar
+                Colaborador</button>
+        </div>
+        <div id="adm-forn" class="hidden">
+            <input type="text" id="f-nome" placeholder="Empresa"><input type="text" id="f-user" placeholder="Login">
+            <button class="btn-green"
+                onclick="salvarItem('forn', {nome: 'f-nome', user: 'f-user', pass: '123'})">Cadastrar
+                Fornecedor</button>
+        </div>
+        <button class="btn-gray" onclick="location.reload()" style="margin-top:10px;">Sair</button>
+    </section>
+
     <section id="scr-forn-home" class="container hidden">
         <h1 id="display-forn-nome">agsn</h1>
-        <div style="background: #0f172a; padding: 15px; border-radius: 15px; margin-bottom: 15px; text-align: left;">
+        <div style="background: #0f172a; padding: 15px; border-radius: 15px; margin-bottom: 15px;">
             <div class="sub-label">Consultar Programação:</div>
-            <input type="date" id="filtro-data" value="2026-04-14">
-
-            <button class="btn-orange" onclick="abrirProgramacao()">
-                📋 ACESSAR VEÍCULOS
-            </button>
-
-            <button class="btn-white" onclick="abrirOrcamento()">
-                💰 GERAR ORÇAMENTO
-            </button>
+            <input type="date" id="filtro-data-forn" onchange="renderForn()">
+            <button class="btn-orange" onclick="abrir('scr-prog-lista')">📋 ACESSAR VEÍCULOS</button>
+            <button class="btn-white" onclick="abrir('scr-orcamento')">💰 GERAR ORÇAMENTO</button>
         </div>
         <button class="btn-gray" onclick="location.reload()">Sair</button>
     </section>
 
-    <section id="scr-prog-lista" class="container hidden" style="position:fixed; height: 90vh; overflow-y:auto;">
-        <h1>SERVIÇOS DESIGNADOS</h1>
-        <div class="sub-label" style="text-align:center; margin-bottom: 20px;">STATUS EM TEMPO REAL</div>
-
-        <div id="lista-veiculos">
-            <div class="prog-item">
-                <span class="tag-ni">N/I</span>
-                <div style="font-weight:bold; margin-bottom:5px;">TDA1E14</div>
-                <div class="obs-box">OBS: Sem observações</div>
-                <div style="color:var(--success); font-size:10px; margin-top:10px; font-weight:bold;">✓ SERVIÇO
-                    FINALIZADO</div>
-            </div>
-        </div>
-
-        <button class="btn-gray" onclick="voltarParaHome()">VOLTAR</button>
-    </section>
-
     <section id="scr-orcamento" class="container hidden" style="position:fixed; height: 90vh; overflow-y:auto;">
         <h1>NOVO ORÇAMENTO</h1>
-        <div style="text-align:left;">
-            <input type="text" placeholder="CNPJ DO FORNECEDOR">
-            <input type="text" placeholder="ENDEREÇO">
-            <input type="text" id="orc-placa" placeholder="PLACA DO CARRO">
-
-            <div class="sub-label">Calculadora de Peças:</div>
-            <div id="orc-linhas">
-                <div class="orc-row">
-                    <input type="text" placeholder="Peça/Serviço" style="flex:2; margin-bottom:0;">
-                    <input type="number" class="orc-valor" placeholder="R$" style="flex:1; margin-bottom:0;"
-                        oninput="somarTudo()">
-                </div>
+        <input type="text" placeholder="CNPJ">
+        <input type="text" placeholder="PLACA DO CARRO">
+        <div id="orc-linhas">
+            <div class="orc-row">
+                <input type="text" placeholder="Item" style="flex:2; margin-bottom:0;">
+                <input type="number" class="orc-val" placeholder="R$" style="flex:1; margin-bottom:0;"
+                    oninput="calcOrc()">
             </div>
-            <button class="btn-gray" style="font-size:10px; padding:8px; margin-bottom:15px;" onclick="novaLinhaOrc()">+
-                Adicionar Item</button>
-
-            <div class="total-display">TOTAL: R$ <span id="total-final">0,00</span></div>
-
-            <label class="file-btn" for="foto-peca">📸 FOTO DA PEÇA / ORÇAMENTO</label>
-            <input type="file" id="foto-peca">
-
-            <button class="btn-green" onclick="alert('Orçamento enviado!')">ENVIAR AGORA</button>
-            <button class="btn-gray" onclick="voltarParaHome()">CANCELAR</button>
         </div>
+        <button class="btn-gray" style="font-size:10px; margin-bottom:10px;" onclick="addOrc()">+ ITEM</button>
+        <div style="background:var(--success); padding:15px; border-radius:12px; font-weight:bold; margin-bottom:10px;">
+            TOTAL: R$ <span id="tot">0,00</span></div>
+        <label class="file-label" for="f-orc">📸 FOTO DA PEÇA</label>
+        <input type="file" id="f-orc">
+        <button class="btn-green" onclick="alert('Enviado!'); abrir('scr-forn-home')">ENVIAR</button>
+        <button class="btn-gray" onclick="abrir('scr-forn-home')">CANCELAR</button>
+    </section>
+
+    <section id="scr-prog-lista" class="container hidden" style="position:fixed; height: 90vh; overflow-y:auto;">
+        <h1>SERVIÇOS DESIGNADOS</h1>
+        <div id="lista-veiculos-forn"></div>
+        <button class="btn-gray" onclick="abrir('scr-forn-home')">VOLTAR</button>
     </section>
 
     <script>
-        // Lógica Simples para teste
+        const DB = { prog: 'l_prog_v7', forn: 'l_forn_v7', colab: 'l_colab_v7' };
+
         function handleLogin() {
-            document.getElementById('scr-login').classList.add('hidden');
-            document.getElementById('scr-forn-home').classList.remove('hidden');
+            const u = document.getElementById('user').value.toUpperCase();
+            const p = document.getElementById('pass').value;
+            if (u === 'ADMIN' && p === '1234') { abrir('scr-admin'); renderAdmin(); return; }
+            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]').find(x => x.user.toUpperCase() === u);
+            if (f) { window.sessao = { user: f, tipo: 'FORNECEDOR' }; document.getElementById('display-forn-nome').innerText = f.nome; abrir('scr-forn-home'); renderForn(); return; }
+            alert("Acesso negado");
         }
 
-        function abrirProgramacao() {
-            document.getElementById('scr-forn-home').classList.add('hidden');
-            document.getElementById('scr-prog-lista').classList.remove('hidden');
+        function renderForn() {
+            const data = document.getElementById('filtro-data-forn').value || new Date().toISOString().split('T')[0];
+            const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === data && x.destino === window.sessao.user.tipo);
+            document.getElementById('lista-veiculos-forn').innerHTML = dados.map(i => `
+            <div class="prog-item status-${i.status.toLowerCase()}">
+                <b>${i.placa}</b>
+                <div class="obs-box">OBS: ${i.obs}</div>
+                ${i.status === 'CANCELADO' ? '<b>CANCELADO</b>' : `
+                    <label class="file-label" for="f-${i.id}" style="margin-top:10px;">📸 FOTO ${i.status}</label>
+                    <input type="file" id="f-${i.id}" onchange="this.nextElementSibling.classList.remove('hidden')">
+                    <button class="btn-green hidden" onclick="status(${i.id}, '${i.status}')">CONFIRMAR</button>
+                `}
+            </div>
+        `).join('');
         }
 
-        function abrirOrcamento() {
-            document.getElementById('scr-forn-home').classList.add('hidden');
-            document.getElementById('scr-orcamento').classList.remove('hidden');
+        function status(id, at) {
+            let d = JSON.parse(localStorage.getItem(DB.prog));
+            d[d.findIndex(x => x.id === id)].status = at === 'PENDENTE' ? 'EXECUCAO' : 'CONCLUIDO';
+            localStorage.setItem(DB.prog, JSON.stringify(d)); renderForn();
         }
 
-        function voltarParaHome() {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            document.getElementById('scr-forn-home').classList.remove('hidden');
+        function renderAdmin() {
+            const d = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            document.getElementById('lista-adm').innerHTML = d.map(i => `<div class="prog-item"><b>${i.placa}</b> - ${i.status}</div>`).join('');
         }
 
-        function novaLinhaOrc() {
-            const container = document.getElementById('orc-linhas');
-            const div = document.createElement('div');
-            div.className = 'orc-row';
-            div.innerHTML = `<input type="text" placeholder="Item" style="flex:2; margin-bottom:0;">
-                         <input type="number" class="orc-valor" placeholder="R$" style="flex:1; margin-bottom:0;" oninput="somarTudo()">`;
-            container.appendChild(div);
-        }
-
-        function somarTudo() {
-            let total = 0;
-            document.querySelectorAll('.orc-valor').forEach(input => {
-                total += Number(input.value) || 0;
-            });
-            document.getElementById('total-final').innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-        }
+        function ativarNFC() { console.log("NFC Ativado"); }
+        function abrir(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+        function mudarAba(id) { ['adm-prog', 'adm-equipe', 'adm-forn', 'adm-veic'].forEach(a => document.getElementById(a).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+        function addOrc() { const d = document.createElement('div'); d.className = 'orc-row'; d.innerHTML = `<input type="text" placeholder="Item" style="flex:2; margin:0;"><input type="number" class="orc-val" placeholder="R$" style="flex:1; margin:0;" oninput="calcOrc()">`; document.getElementById('orc-linhas').appendChild(d); }
+        function calcOrc() { let t = 0; document.querySelectorAll('.orc-val').forEach(v => t += Number(v.value) || 0); document.getElementById('tot').innerText = t.toLocaleString('pt-BR', { minFractionDigits: 2 }); }
     </script>
 </body>
 
