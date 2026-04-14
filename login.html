@@ -134,16 +134,6 @@
             opacity: 0.7;
         }
 
-        .badge {
-            font-size: 8px;
-            padding: 3px 6px;
-            border-radius: 4px;
-            background: var(--primary);
-            color: #fff;
-            text-transform: uppercase;
-            margin-right: 5px;
-        }
-
         .tabs {
             display: flex;
             gap: 5px;
@@ -169,15 +159,6 @@
             border-color: var(--primary);
         }
 
-        .btn-del {
-            background: none;
-            border: none;
-            color: #ff4444;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
         .obs-box {
             background: rgba(0, 0, 0, 0.3);
             padding: 8px;
@@ -197,12 +178,6 @@
             border: 1px dashed #64748b;
             text-align: center;
             width: 100%;
-        }
-
-        .time-label {
-            font-size: 9px;
-            color: #94a3b8;
-            font-weight: bold;
         }
 
         input[type="file"] {
@@ -237,6 +212,23 @@
         td {
             padding: 8px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Estilos Novos do Orçamento integrados ao seu CSS */
+        .orc-row {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .total-box {
+            background: var(--success);
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 10px 0;
+            text-align: center;
         }
     </style>
 </head>
@@ -308,7 +300,7 @@
         <h1>PROGRAMAÇÃO DIÁRIA</h1>
         <div class="sub">Área do Cliente</div>
         <div class="form-section">
-            <input type="text" id="p-placa" placeholder="PLACA" onblur="buscarInfoVeiculo(this.value)">
+            <input type="text" id="p-placa" placeholder="PLACA">
             <select id="p-destino">
                 <option value="Limpeza">Limpeza</option>
                 <option value="Oficina">Oficina</option>
@@ -325,8 +317,10 @@
         <div id="btn-container-forn" class="hidden">
             <div class="form-section">
                 <input type="date" id="filtro-data-forn" onchange="carregarProgFornecedor()">
-                <button onclick="abrirModalProg()" style="background: var(--warning); color: #000;">📋 ACESSAR
-                    VEÍCULOS</button>
+                <button onclick="abrirModalProg()"
+                    style="background: var(--warning); color: #000; margin-bottom: 10px;">📋 ACESSAR VEÍCULOS</button>
+                <button onclick="show('scr-orcamento')" style="background: #fff; color: #000;">💰 GERAR
+                    ORÇAMENTO</button>
             </div>
         </div>
         <div class="form-section">
@@ -334,6 +328,31 @@
             <button onclick="alert('Checklist salvo!')" style="background: var(--success)">Salvar Checklist</button>
         </div>
         <button onclick="location.reload()" style="background:#334155;">Sair</button>
+    </section>
+
+    <section id="scr-orcamento" class="container hidden"
+        style="position: fixed; z-index: 101; height: 95vh; overflow-y: auto; top: 2.5vh;">
+        <h1>NOVO ORÇAMENTO</h1>
+        <div class="form-section">
+            <input type="text" placeholder="CNPJ DO FORNECEDOR">
+            <input type="text" placeholder="ENDEREÇO COMPLETO">
+            <input type="text" placeholder="PLACA DO VEÍCULO">
+            <div id="orc-itens">
+                <div class="orc-row">
+                    <input type="text" placeholder="Item" style="flex:2; margin:0;">
+                    <input type="number" class="v-item" placeholder="R$" style="flex:1; margin:0;"
+                        oninput="calcTotal()">
+                </div>
+            </div>
+            <button onclick="addItem()" style="background:var(--gray); padding:5px; font-size:9px; margin-top:5px;">+
+                Adicionar Peça</button>
+            <div class="total-box">TOTAL: R$ <span id="total-orc">0,00</span></div>
+            <label class="file-label" for="foto-orc">📸 FOTO DA PEÇA / NOTA</label>
+            <input type="file" id="foto-orc">
+            <button onclick="alert('Orçamento enviado!'); show('scr-form')" style="background:var(--success)">Enviar
+                Orçamento</button>
+        </div>
+        <button onclick="show('scr-form')" style="background:#334155;">Voltar</button>
     </section>
 
     <section id="scr-modal-prog" class="container hidden"
@@ -346,12 +365,11 @@
     <script>
         const DB = { prog: 'l_prog_v7', veic: 'l_veic_v7', forn: 'l_forn_v7', colab: 'l_colab_v7', logs: 'l_logs_v7' };
 
-        // LOGIN CENTRALIZADO
         function handleLogin() {
             const u = document.getElementById('user').value.toUpperCase();
             const p = document.getElementById('pass').value;
             if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarProgAdmin(); return; }
-            if (u === 'CLIENTE') { show('scr-cliente'); carregarProgCliente(); return; }
+            if (u === 'CLIENTE') { show('scr-cliente'); return; }
             const forn = JSON.parse(localStorage.getItem(DB.forn) || '[]').find(f => f.user.toUpperCase() === u && f.pass === p);
             if (forn) { logar(forn, 'FORNECEDOR'); return; }
             alert("Acesso Negado.");
@@ -367,30 +385,12 @@
             }
         }
 
-        // GESTÃO DE PROGRAMAÇÃO
-        function lancarProgramacao() {
-            const p = document.getElementById('p-placa').value.toUpperCase();
-            const agora = new Date();
-            const d = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            d.push({
-                id: Date.now(),
-                data: agora.toISOString().split('T')[0],
-                hora: agora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                placa: p,
-                destino: document.getElementById('p-destino').value,
-                obs: document.getElementById('p-obs').value,
-                status: 'PENDENTE'
-            });
-            localStorage.setItem(DB.prog, JSON.stringify(d));
-            carregarProgCliente();
-        }
-
         function carregarProgFornecedor() {
             const dataBusca = document.getElementById('filtro-data-forn').value;
             const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === dataBusca && x.destino === window.sessao.user.tipo);
             const lista = document.getElementById('prog-list-forn');
             lista.innerHTML = dados.map(i => `
-            <div class="prog-item ${i.status === 'CANCELADO' ? 'status-cancelado' : (i.status === 'PENDENTE' ? 'status-pendente' : (i.status === 'EXECUCAO' ? 'status-execucao' : 'status-concluido'))}">
+            <div class="prog-item ${i.status.toLowerCase() === 'cancelado' ? 'status-cancelado' : 'status-' + i.status.toLowerCase()}">
                 <b>${i.placa} (${i.hora})</b>
                 <div class="obs-box">OBS: ${i.obs}</div>
                 ${i.status !== 'CANCELADO' && i.status !== 'CONCLUIDO' ? `
@@ -412,22 +412,25 @@
             carregarProgFornecedor();
         }
 
-        // AUXILIARES
+        // FUNÇÕES DA CALCULADORA
+        function addItem() {
+            const div = document.createElement('div'); div.className = 'orc-row';
+            div.innerHTML = `<input type="text" placeholder="Item" style="flex:2; margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1; margin:0;" oninput="calcTotal()">`;
+            document.getElementById('orc-itens').appendChild(div);
+        }
+        function calcTotal() {
+            let t = 0; document.querySelectorAll('.v-item').forEach(i => t += Number(i.value) || 0);
+            document.getElementById('total-orc').innerText = t.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+
         function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
         function abrirModalProg() { show('scr-modal-prog'); carregarProgFornecedor(); }
         function fecharModalProg() { show('scr-form'); }
-
-        // ABA ADMIN CARREGAR
-        function carregarProgAdmin() {
-            const d = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            document.getElementById('list-prog-admin').innerHTML = d.map(i => `<div class="prog-item ${i.status}"><b>${i.placa}</b> - ${i.status} <button onclick="excluir(${i.id})">X</button></div>`).join('');
-        }
-        function excluir(id) {
-            let d = JSON.parse(localStorage.getItem(DB.prog));
-            const idx = d.findIndex(x => x.id === id);
-            d[idx].status = 'CANCELADO';
-            localStorage.setItem(DB.prog, JSON.stringify(d));
-            carregarProgAdmin();
+        function switchTab(id, e) {
+            document.querySelectorAll('[id^="area-"]').forEach(a => a.classList.add('hidden'));
+            document.getElementById('area-' + id).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+            e.target.classList.add('tab-active');
         }
     </script>
 </body>
