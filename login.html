@@ -113,7 +113,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: 0.3s;
         }
 
         .status-pendente {
@@ -146,40 +145,6 @@
             margin-right: 5px;
         }
 
-        .tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
-            overflow-x: auto;
-            padding-bottom: 5px;
-        }
-
-        .tab-btn {
-            background: #1e293b;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            color: #fff;
-            cursor: pointer;
-            white-space: nowrap;
-            flex: 1;
-            font-size: 9px;
-        }
-
-        .tab-active {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .btn-del {
-            background: none;
-            border: none;
-            color: #ff4444;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
         .obs-box {
             background: rgba(0, 0, 0, 0.3);
             padding: 8px;
@@ -190,10 +155,33 @@
             border-left: 2px solid var(--primary);
         }
 
+        .photo-area {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            border: 1px dashed #64748b;
+            text-align: center;
+        }
+
         .time-label {
             font-size: 9px;
             color: #94a3b8;
             font-weight: bold;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            display: block;
+            background: #334155;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 10px;
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -203,103 +191,22 @@
     <section id="scr-login" class="container">
         <h1>LOKAMIG</h1>
         <div class="sub">Logística & Programação</div>
-        <input type="text" id="user" placeholder="Matrícula / Usuário / Clique para Crachá"
-            onclick="ativarLeituraNFCLogin()">
+        <input type="text" id="user" placeholder="Matrícula / Usuário / Clique para Crachá">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
-    </section>
-
-    <section id="scr-admin" class="container hidden" style="max-width: 800px;">
-        <h1>ADMINISTRAÇÃO</h1>
-        <div class="tabs">
-            <button class="tab-btn tab-active" onclick="switchTab('prog-view-admin', event)">Programação</button>
-            <button class="tab-btn" onclick="switchTab('mon', event)">Monitoramento</button>
-            <button class="tab-btn" onclick="switchTab('colab', event)">Equipe</button>
-            <button class="tab-btn" onclick="switchTab('forn', event)">Fornecedores</button>
-            <button class="tab-btn" onclick="switchTab('veic', event)">Veículos</button>
-        </div>
-        <div id="area-prog-view-admin">
-            <input type="date" id="filtro-data-admin" onchange="carregarProgAdmin()">
-            <div id="list-prog-admin"></div>
-        </div>
-        <div id="area-mon" class="hidden">
-            <table>
-                <thead>
-                    <tr>
-                        <th>DATA</th>
-                        <th>PLACA</th>
-                        <th>RESP.</th>
-                        <th>TIPO</th>
-                    </tr>
-                </thead>
-                <tbody id="list-mon"></tbody>
-            </table>
-        </div>
-        <div id="area-colab" class="hidden">
-            <div class="form-section"><input type="text" id="c-mat" placeholder="MATRÍCULA"><input type="text"
-                    id="c-nome" placeholder="NOME COMPLETO"><input type="text" id="c-nfc"
-                    placeholder="CLIQUE AQUI E APROXIME O CRACHÁ" readonly onclick="ativarLeituraNFCCadastro()"><button
-                    onclick="salvarColab()" style="background:var(--success)">Cadastrar Colaborador</button></div>
-            <div id="list-colab"></div>
-        </div>
-        <div id="area-forn" class="hidden">
-            <div class="form-section"><input type="text" id="f-nome" placeholder="NOME DA EMPRESA"><input type="text"
-                    id="f-user" placeholder="LOGIN"><input type="text" id="f-pass" placeholder="SENHA"><select
-                    id="f-tipo">
-                    <option value="Limpeza">Limpeza</option>
-                    <option value="Oficina">Oficina</option>
-                </select><button onclick="salvarForn()" style="background:var(--success)">Cadastrar Fornecedor</button>
-            </div>
-            <div id="list-forn"></div>
-        </div>
-        <div id="area-veic" class="hidden">
-            <div class="form-section"><input type="text" id="v-reg-placa" placeholder="PLACA"><select id="v-reg-tipo">
-                    <option value="Operacional">Operacional</option>
-                    <option value="Reserva">Reserva</option>
-                    <option value="Gerencial">Gerencial</option>
-                </select><button onclick="salvarVeiculo()" style="background:var(--success)">Cadastrar Veículo</button>
-            </div>
-            <div id="list-veic"></div>
-        </div>
-        <button onclick="location.reload()" style="background:#334155; margin-top:10px;">Sair</button>
-    </section>
-
-    <section id="scr-cliente" class="container hidden">
-        <h1>PROGRAMAÇÃO DIÁRIA</h1>
-        <div class="sub">Área do Cliente</div>
-        <div class="form-section">
-            <input type="text" id="p-placa" placeholder="PLACA DO VEÍCULO" onblur="buscarInfoVeiculo(this.value)">
-            <select id="p-destino">
-                <option value="Limpeza">Para Limpeza</option>
-                <option value="Oficina">Para Oficina</option>
-            </select>
-            <textarea id="p-obs" placeholder="OBSERVAÇÕES..."></textarea>
-            <button onclick="lancarProgramacao()" style="background:var(--success)">Lançar na Agenda</button>
-        </div>
-        <div id="lista-programacao-cliente" style="max-height: 250px; overflow-y: auto;"></div>
-        <button onclick="location.reload()" style="background:#334155; margin-top:20px;">Sair</button>
     </section>
 
     <section id="scr-form" class="container hidden">
         <h1 id="display-nome">---</h1>
         <div id="btn-container-forn" class="hidden">
-            <div class="form-section"
-                style="background: rgba(245, 158, 11, 0.1); border: 1px solid var(--warning); padding: 10px;">
-                <div class="sub" style="margin-bottom: 5px; color: var(--warning);">Consultar Data:</div>
-                <input type="date" id="filtro-data-forn" onchange="carregarProgFornecedor()"
-                    style="padding: 8px; margin-bottom: 10px;">
-                <button onclick="abrirModalProg()" style="background: var(--warning); color: #000; padding: 10px;">📋
-                    ACESSAR PROGRAMAÇÃO</button>
+            <div class="form-section">
+                <div class="sub" style="margin-bottom: 5px;">Consultar Programação:</div>
+                <input type="date" id="filtro-data-forn" onchange="carregarProgFornecedor()">
+                <button onclick="abrirModalProg()" style="background: var(--warning); color: #000;">📋 ACESSAR
+                    VEÍCULOS</button>
             </div>
         </div>
-        <div class="form-section">
-            <div class="sub">Vistoria / Checklist</div>
-            <input type="text" id="v-placa-check" placeholder="PLACA">
-            <input type="number" id="v-km" placeholder="KM ATUAL">
-            <textarea id="v-obs-check" placeholder="Relatório..."></textarea>
-            <button onclick="finalizarChecklist()" style="background: var(--success)">Finalizar e Salvar</button>
-        </div>
-        <button onclick="location.reload()" style="background:#334155;">Sair</button>
+        <button onclick="location.reload()" style="background:#334155; margin-top: 10px;">Sair</button>
     </section>
 
     <section id="scr-modal-prog" class="container hidden"
@@ -311,22 +218,12 @@
     </section>
 
     <script>
-        const DB = { colab: 'l_colab_v7', forn: 'l_forn_v7', veic: 'l_veic_v7', prog: 'l_prog_v7', logs: 'l_logs_v7' };
-        const CLIENTE_USER = { user: "CLIENTE", pass: "LOKAMIG2026", nome: "CLIENTE MASTER" };
-
-        window.onload = () => {
-            const hoje = new Date().toISOString().split('T')[0];
-            if (document.getElementById('filtro-data-admin')) document.getElementById('filtro-data-admin').value = hoje;
-            if (document.getElementById('filtro-data-forn')) document.getElementById('filtro-data-forn').value = hoje;
-        };
+        const DB = { prog: 'l_prog_v7', veic: 'l_veic_v7', forn: 'l_forn_v7', colab: 'l_colab_v7' };
 
         function handleLogin() {
             const u = document.getElementById('user').value.toUpperCase();
             const p = document.getElementById('pass').value;
-            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarProgAdmin(); return; }
-            if (u === CLIENTE_USER.user && p === CLIENTE_USER.pass) { show('scr-cliente'); carregarProgCliente(); return; }
-            const colab = JSON.parse(localStorage.getItem(DB.colab) || '[]').find(c => c.mat === u || c.nfc === u);
-            if (colab) { logar(colab, 'COLABORADOR'); return; }
+            if (u === 'ADMIN') { show('scr-admin'); return; }
             const forn = JSON.parse(localStorage.getItem(DB.forn) || '[]').find(f => f.user.toUpperCase() === u && f.pass === p);
             if (forn) { logar(forn, 'FORNECEDOR'); return; }
             alert("Acesso Negado.");
@@ -336,15 +233,13 @@
             window.sessao = { user, tipo };
             document.getElementById('display-nome').innerText = user.nome;
             show('scr-form');
-            if (tipo === 'FORNECEDOR') document.getElementById('btn-container-forn').classList.remove('hidden');
+            if (tipo === 'FORNECEDOR') {
+                document.getElementById('btn-container-forn').classList.remove('hidden');
+                document.getElementById('filtro-data-forn').value = new Date().toISOString().split('T')[0];
+            }
         }
 
-        function abrirModalProg() {
-            const data = document.getElementById('filtro-data-forn').value;
-            document.getElementById('data-selecionada-label').innerText = `DATA: ${data.split('-').reverse().join('/')}`;
-            show('scr-modal-prog');
-            carregarProgFornecedor();
-        }
+        function abrirModalProg() { show('scr-modal-prog'); carregarProgFornecedor(); }
         function fecharModalProg() { show('scr-form'); }
 
         function carregarProgFornecedor() {
@@ -352,98 +247,68 @@
             const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === dataBusca && x.destino === window.sessao.user.tipo);
             const lista = document.getElementById('prog-list-forn');
 
-            lista.innerHTML = dados.length === 0 ? "<div class='sub'>Nenhum registro para esta data.</div>" : dados.map(i => {
+            lista.innerHTML = dados.length === 0 ? "<div class='sub'>Nenhum veículo para hoje.</div>" : dados.map(i => {
                 const isCancelado = i.status === 'CANCELADO';
                 const corClass = isCancelado ? 'status-cancelado' : (i.status === 'PENDENTE' ? 'status-pendente' : (i.status === 'EXECUCAO' ? 'status-execucao' : 'status-concluido'));
 
                 return `
-                <div class="prog-item ${corClass}">
-                    <div style="text-align:left; width: 100%;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <b>${i.placa}</b>
-                            <span class="time-label">${i.hora || '--:--'}</span>
-                        </div>
-                        <div style="margin-top:2px;"><span class="badge" style="background:#000; font-size:7px;">${i.tipoVeic}</span></div>
-                        <div class="obs-box">OBS: ${i.obs || 'Sem observações'}</div>
-                        
-                        <div style="margin-top:10px;">
-                            ${isCancelado ? '<b style="color:var(--danger); font-size:10px;">⚠️ PROGRAMAÇÃO CANCELADA PELO CLIENTE</b>' : `
-                                <div style="display:flex; gap:5px;">
-                                    ${i.status === 'PENDENTE' ? `<button onclick="alterarStatus(${i.id}, 'EXECUCAO')" style="padding:8px; background:var(--danger); flex:1;">INICIAR SERVIÇO</button>` : ''}
-                                    ${i.status === 'EXECUCAO' ? `<button onclick="alterarStatus(${i.id}, 'CONCLUIDO')" style="padding:8px; background:var(--success); flex:1;">FINALIZAR AGORA</button>` : ''}
-                                    ${i.status === 'CONCLUIDO' ? `<span style="color:var(--success); font-weight:bold; font-size:9px;">✓ SERVIÇO FINALIZADO</span>` : ''}
-                                </div>
-                            `}
-                        </div>
+                <div class="prog-item ${corClass}" style="flex-direction: column; align-items: flex-start;">
+                    <div style="width: 100%; display: flex; justify-content: space-between;">
+                        <b>${i.placa}</b>
+                        <span class="time-label">${i.hora || '--:--'}</span>
                     </div>
+                    <div class="obs-box" style="width: 100%;">OBS: ${i.obs || 'Sem observações'}</div>
+
+                    ${!isCancelado && i.status !== 'CONCLUIDO' ? `
+                        <div class="photo-area" style="width: 100%;">
+                            <div class="sub" style="color:#fff; margin-bottom:8px;">
+                                ${i.status === 'PENDENTE' ? '📸 FOTOS OBRIGATÓRIAS: INÍCIO' : '📸 FOTOS OBRIGATÓRIAS: CONCLUSÃO'}
+                            </div>
+                            
+                            <label class="file-label" for="photo-${i.id}">
+                                <span id="label-text-${i.id}">Selecionar/Tirar Foto</span>
+                            </label>
+                            <input type="file" id="photo-${i.id}" accept="image/*" onchange="validarFoto(${i.id})">
+                            
+                            <button id="btn-action-${i.id}" class="hidden" onclick="prosseguirStatus(${i.id}, '${i.status}')" 
+                                style="background: var(--success); margin-top: 10px; padding: 8px;">
+                                ${i.status === 'PENDENTE' ? 'CONFIRMAR INÍCIO' : 'CONCLUIR SERVIÇO'}
+                            </button>
+                        </div>
+                    ` : ''}
+
+                    ${i.status === 'CONCLUIDO' ? '<div style="margin-top:10px; color:var(--success); font-weight:bold; font-size:9px;">✓ SERVIÇO FINALIZADO COM FOTOS</div>' : ''}
+                    ${isCancelado ? '<div style="margin-top:10px; color:var(--danger); font-size:9px;">⚠️ CANCELADO PELO CLIENTE</div>' : ''}
                 </div>
             `;
             }).join('');
         }
 
-        function alterarStatus(id, novoStatus) {
-            let d = JSON.parse(localStorage.getItem(DB.prog));
-            const idx = d.findIndex(x => x.id === id);
-            if (idx !== -1) { d[idx].status = novoStatus; localStorage.setItem(DB.prog, JSON.stringify(d)); carregarProgFornecedor(); }
-        }
+        function validarFoto(id) {
+            const input = document.getElementById(`photo-${id}`);
+            const btn = document.getElementById(`btn-action-${id}`);
+            const labelText = document.getElementById(`label-text-${id}`);
 
-        function lancarProgramacao() {
-            const p = document.getElementById('p-placa').value.toUpperCase(); if (!p) return;
-            const vInfo = JSON.parse(localStorage.getItem(DB.veic) || '[]').find(v => v.placa === p) || { tipo: 'N/I' };
-            const agora = new Date();
-            const d = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            d.push({
-                id: Date.now(),
-                data: agora.toISOString().split('T')[0],
-                hora: agora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                placa: p, tipoVeic: vInfo.tipo,
-                destino: document.getElementById('p-destino').value,
-                obs: document.getElementById('p-obs').value, status: 'PENDENTE'
-            });
-            localStorage.setItem(DB.prog, JSON.stringify(d)); carregarProgCliente();
-            document.getElementById('p-placa').value = ''; document.getElementById('p-obs').value = '';
-        }
-
-        // CLIENTE CANCELA (Mas mantém no DB para o Fornecedor ver)
-        function excluirProgAdmin(id) {
-            if (!confirm("Deseja cancelar esta programação?")) return;
-            let d = JSON.parse(localStorage.getItem(DB.prog));
-            const idx = d.findIndex(x => x.id === id);
-            if (idx !== -1) {
-                d[idx].status = 'CANCELADO'; // Em vez de deletar, marcamos como cancelado
-                localStorage.setItem(DB.prog, JSON.stringify(d));
-                if (document.getElementById('scr-admin').classList.contains('hidden')) carregarProgCliente();
-                else carregarProgAdmin();
+            if (input.files && input.files[0]) {
+                labelText.innerText = "✅ Foto Carregada: " + input.files[0].name;
+                btn.classList.remove('hidden');
             }
         }
 
-        // Demais funções (NFC, Cadastros, Abas) permanecem integradas conforme versão anterior...
-        function carregarProgAdmin() {
-            const filtro = document.getElementById('filtro-data-admin').value;
-            const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === filtro);
-            document.getElementById('list-prog-admin').innerHTML = dados.map(i => `
-            <div class="prog-item ${i.status === 'PENDENTE' ? 'status-pendente' : (i.status === 'EXECUCAO' ? 'status-execucao' : (i.status === 'CANCELADO' ? 'status-cancelado' : 'status-concluido'))}">
-                <div><span class="badge">${i.tipoVeic}</span><span class="badge" style="background:#334155">${i.destino}</span><b>${i.placa}</b><br><small>${i.hora} - ${i.status}</small></div>
-                ${i.status !== 'CANCELADO' ? `<button class="btn-del" onclick="excluirProgAdmin(${i.id})">×</button>` : ''}
-            </div>
-        `).join('');
+        function prosseguirStatus(id, statusAtual) {
+            let d = JSON.parse(localStorage.getItem(DB.prog));
+            const idx = d.findIndex(x => x.id === id);
+            if (idx !== -1) {
+                if (statusAtual === 'PENDENTE') d[idx].status = 'EXECUCAO';
+                else if (statusAtual === 'EXECUCAO') d[idx].status = 'CONCLUIDO';
+
+                localStorage.setItem(DB.prog, JSON.stringify(d));
+                alert("Status atualizado com sucesso!");
+                carregarProgFornecedor();
+            }
         }
-        function carregarProgCliente() {
-            const hoje = new Date().toISOString().split('T')[0];
-            const d = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === hoje && x.status !== 'CANCELADO');
-            document.getElementById('lista-programacao-cliente').innerHTML = d.map(i => `<div class="prog-item"><div><span class="badge">${i.destino}</span><b>${i.placa}</b></div><button class="btn-del" onclick="excluirProgAdmin(${i.id})">×</button></div>`).join('');
-        }
+
         function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
-        function switchTab(t, e) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); e.target.classList.add('tab-active');
-            document.getElementById('area-prog-view-admin').classList.toggle('hidden', t !== 'prog-view-admin');
-            document.getElementById('area-mon').classList.toggle('hidden', t !== 'mon');
-            document.getElementById('area-colab').classList.toggle('hidden', t !== 'colab');
-            document.getElementById('area-forn').classList.toggle('hidden', t !== 'forn');
-            document.getElementById('area-veic').classList.toggle('hidden', t !== 'veic');
-            if (t === 'prog-view-admin') carregarProgAdmin();
-        }
-        // (As funções de cadastro de Colab, Forn e Veic continuam as mesmas do comando anterior para manter estabilidade)
     </script>
 </body>
 
