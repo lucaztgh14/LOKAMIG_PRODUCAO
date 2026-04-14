@@ -9,13 +9,13 @@
     <style>
         :root {
             --primary: #d1122a;
-            --bg: #0f172a;
+            --bg: #1e293b;
             --text: #f8fafc;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --gray: #64748b;
-            --card: rgba(30, 41, 59, 0.7);
+            --gray: #334155;
+            --dark-card: #0f172a;
         }
 
         * {
@@ -25,71 +25,111 @@
         }
 
         body {
-            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('Faça_uma_montagem_202604121721.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background: #334155;
             font-family: 'Montserrat', sans-serif;
             color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            margin: 0;
         }
 
         .container {
-            background: var(--card);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 25px;
             width: 95%;
-            max-width: 600px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         h1 {
-            font-size: 22px;
-            margin-bottom: 5px;
+            font-size: 24px;
+            margin-bottom: 20px;
             color: #fff;
-            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .sub {
+        .sub-label {
             font-size: 10px;
             color: #94a3b8;
-            margin-bottom: 20px;
+            text-align: left;
+            margin-bottom: 5px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
+        /* Inputs conforme os prints */
         input,
         select,
         textarea {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(15, 23, 42, 0.8);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: none;
+            background: #0f172a;
             color: #fff;
-            font-size: 13px;
+            font-size: 14px;
             outline: none;
         }
 
-        button {
+        /* Botões conforme os prints */
+        .btn-orange {
+            background: var(--warning);
+            color: #000;
+            font-weight: bold;
+            border-radius: 12px;
+            padding: 15px;
             width: 100%;
-            padding: 14px;
-            border-radius: 10px;
             border: none;
-            background: var(--primary);
-            color: #fff;
-            font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
             text-transform: uppercase;
-            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-green {
+            background: var(--success);
+            color: #fff;
+            font-weight: bold;
+            border-radius: 12px;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .btn-gray {
+            background: #334155;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 12px;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-white {
+            background: #fff;
+            color: #000;
+            font-weight: bold;
+            border-radius: 12px;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
             margin-bottom: 10px;
         }
 
@@ -97,70 +137,69 @@
             display: none !important;
         }
 
-        .form-section {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        /* Itens de Programação */
+        /* Itens da Programação */
         .prog-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: #0f172a;
             padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border-left: 6px solid var(--warning);
-            font-size: 11px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--success);
             text-align: left;
+            position: relative;
         }
 
-        .status-cancelado {
-            border-left-color: var(--gray);
-            opacity: 0.6;
+        .prog-item.cancelado {
+            border-left-color: var(--danger);
         }
 
-        .status-concluido {
-            border-left-color: var(--success);
+        .tag-ni {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            background: #000;
+            font-size: 8px;
+            padding: 2px 5px;
+            border-radius: 3px;
         }
 
-        /* Orçamento */
-        .orc-item {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 5px;
-        }
-
-        .total-box {
-            background: var(--success);
+        .obs-box {
+            background: #1e293b;
             padding: 10px;
             border-radius: 8px;
-            font-weight: bold;
             margin-top: 10px;
-            text-align: right;
+            font-size: 12px;
+            color: #94a3b8;
+            border: 1px solid #d1122a;
         }
 
-        .btn-add {
-            background: var(--gray);
-            padding: 8px;
-            font-size: 9px;
-            width: auto;
+        /* Estilo Calculadora de Orçamento */
+        .orc-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .total-display {
+            background: var(--success);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0;
         }
 
         input[type="file"] {
             display: none;
         }
 
-        .file-label {
+        .file-btn {
             display: block;
-            background: #334155;
-            padding: 10px;
-            border-radius: 8px;
+            background: #475569;
+            padding: 12px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 10px;
-            margin-bottom: 10px;
-            text-align: center;
+            font-size: 11px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -168,136 +207,112 @@
 <body>
 
     <section id="scr-login" class="container">
-        <h1>LOKAMIG</h1>
-        <div class="sub">Logística & Programação</div>
+        <h1 id="brand-name">agsn</h1>
         <input type="text" id="user" placeholder="USUÁRIO">
         <input type="password" id="pass" placeholder="SENHA">
-        <button onclick="handleLogin()">Entrar</button>
+        <button class="btn-green" onclick="handleLogin()">Entrar</button>
     </section>
 
-    <section id="scr-form" class="container hidden">
-        <h1 id="display-nome">FORNECEDOR</h1>
-        <div class="form-section">
-            <div class="sub">Consultar Programação:</div>
-            <input type="date" id="filtro-data-forn">
-            <button onclick="abrirModalProg()" style="background: var(--warning); color: #000;">📋 ACESSAR
-                VEÍCULOS</button>
-            <button onclick="abrirModalOrcamento()" style="background: #fff; color: #000;">💰 GERAR ORÇAMENTO</button>
+    <section id="scr-forn-home" class="container hidden">
+        <h1 id="display-forn-nome">agsn</h1>
+        <div style="background: #0f172a; padding: 15px; border-radius: 15px; margin-bottom: 15px; text-align: left;">
+            <div class="sub-label">Consultar Programação:</div>
+            <input type="date" id="filtro-data" value="2026-04-14">
+
+            <button class="btn-orange" onclick="abrirProgramacao()">
+                📋 ACESSAR VEÍCULOS
+            </button>
+
+            <button class="btn-white" onclick="abrirOrcamento()">
+                💰 GERAR ORÇAMENTO
+            </button>
         </div>
-        <button onclick="location.reload()" style="background:#334155;">Sair</button>
+        <button class="btn-gray" onclick="location.reload()">Sair</button>
     </section>
 
-    <section id="scr-modal-prog" class="container hidden"
-        style="position: fixed; z-index: 100; height: 95vh; overflow-y: auto; top: 2.5vh;">
-        <h1>VEÍCULOS DO DIA</h1>
-        <div id="prog-list-forn"></div>
-        <button onclick="show('scr-form')" style="background: #334155;">Voltar</button>
+    <section id="scr-prog-lista" class="container hidden" style="position:fixed; height: 90vh; overflow-y:auto;">
+        <h1>SERVIÇOS DESIGNADOS</h1>
+        <div class="sub-label" style="text-align:center; margin-bottom: 20px;">STATUS EM TEMPO REAL</div>
+
+        <div id="lista-veiculos">
+            <div class="prog-item">
+                <span class="tag-ni">N/I</span>
+                <div style="font-weight:bold; margin-bottom:5px;">TDA1E14</div>
+                <div class="obs-box">OBS: Sem observações</div>
+                <div style="color:var(--success); font-size:10px; margin-top:10px; font-weight:bold;">✓ SERVIÇO
+                    FINALIZADO</div>
+            </div>
+        </div>
+
+        <button class="btn-gray" onclick="voltarParaHome()">VOLTAR</button>
     </section>
 
-    <section id="scr-modal-orc" class="container hidden"
-        style="position: fixed; z-index: 101; height: 95vh; overflow-y: auto; top: 2.5vh;">
+    <section id="scr-orcamento" class="container hidden" style="position:fixed; height: 90vh; overflow-y:auto;">
         <h1>NOVO ORÇAMENTO</h1>
-        <div class="form-section">
-            <input type="text" id="orc-cnpj" placeholder="CNPJ DO FORNECEDOR">
-            <input type="text" id="orc-endereco" placeholder="ENDEREÇO COMPLETO">
-            <input type="text" id="orc-placa" placeholder="PLACA DO VEÍCULO">
+        <div style="text-align:left;">
+            <input type="text" placeholder="CNPJ DO FORNECEDOR">
+            <input type="text" placeholder="ENDEREÇO">
+            <input type="text" id="orc-placa" placeholder="PLACA DO CARRO">
 
-            <div class="sub">PEÇAS E SERVIÇOS:</div>
-            <div id="orc-itens-container">
-                <div class="orc-item">
-                    <input type="text" placeholder="Item" style="flex: 2; margin-bottom:0;">
-                    <input type="number" class="valor-item" placeholder="R$" style="flex: 1; margin-bottom:0;"
-                        oninput="calcularOrcamento()">
+            <div class="sub-label">Calculadora de Peças:</div>
+            <div id="orc-linhas">
+                <div class="orc-row">
+                    <input type="text" placeholder="Peça/Serviço" style="flex:2; margin-bottom:0;">
+                    <input type="number" class="orc-valor" placeholder="R$" style="flex:1; margin-bottom:0;"
+                        oninput="somarTudo()">
                 </div>
             </div>
-            <button class="btn-add" onclick="addLinhaOrcamento()">+ Adicionar Item</button>
+            <button class="btn-gray" style="font-size:10px; padding:8px; margin-bottom:15px;" onclick="novaLinhaOrc()">+
+                Adicionar Item</button>
 
-            <div class="total-box">TOTAL: R$ <span id="orc-total">0,00</span></div>
+            <div class="total-display">TOTAL: R$ <span id="total-final">0,00</span></div>
 
-            <div class="sub" style="margin-top:15px;">FOTO DA PEÇA / NOTA:</div>
-            <label class="file-label" for="orc-foto">📸 ANEXAR FOTO</label>
-            <input type="file" id="orc-foto">
+            <label class="file-btn" for="foto-peca">📸 FOTO DA PEÇA / ORÇAMENTO</label>
+            <input type="file" id="foto-peca">
 
-            <button onclick="salvarOrcamento()" style="background:var(--success); margin-top:10px;">ENVIAR PARA
-                APROVAÇÃO</button>
+            <button class="btn-green" onclick="alert('Orçamento enviado!')">ENVIAR AGORA</button>
+            <button class="btn-gray" onclick="voltarParaHome()">CANCELAR</button>
         </div>
-        <button onclick="show('scr-form')" style="background: #334155;">Cancelar</button>
     </section>
 
     <script>
-        const DB = { prog: 'l_prog_v7', forn: 'l_forn_v7' };
-
+        // Lógica Simples para teste
         function handleLogin() {
-            const u = document.getElementById('user').value.toUpperCase();
-            const p = document.getElementById('pass').value;
-            if (u === 'ADMIN') { show('scr-admin'); return; }
-            const forn = JSON.parse(localStorage.getItem(DB.forn) || '[]').find(f => f.user.toUpperCase() === u && f.pass === p);
-            if (forn) { logar(forn, 'FORNECEDOR'); return; }
-            alert("Acesso Negado.");
+            document.getElementById('scr-login').classList.add('hidden');
+            document.getElementById('scr-forn-home').classList.remove('hidden');
         }
 
-        function logar(user, tipo) {
-            window.sessao = { user, tipo };
-            document.getElementById('display-nome').innerText = user.nome;
-            document.getElementById('filtro-data-forn').value = new Date().toISOString().split('T')[0];
-            show('scr-form');
+        function abrirProgramacao() {
+            document.getElementById('scr-forn-home').classList.add('hidden');
+            document.getElementById('scr-prog-lista').classList.remove('hidden');
         }
 
-        function abrirModalProg() { show('scr-modal-prog'); carregarProgFornecedor(); }
-
-        function abrirModalOrcamento() {
-            show('scr-modal-orc');
-            // Reset campos
-            document.getElementById('orc-itens-container').innerHTML = `
-            <div class="orc-item">
-                <input type="text" placeholder="Item" style="flex: 2; margin-bottom:0;">
-                <input type="number" class="valor-item" placeholder="R$" style="flex: 1; margin-bottom:0;" oninput="calcularOrcamento()">
-            </div>`;
-            calcularOrcamento();
+        function abrirOrcamento() {
+            document.getElementById('scr-forn-home').classList.add('hidden');
+            document.getElementById('scr-orcamento').classList.remove('hidden');
         }
 
-        function addLinhaOrcamento() {
+        function voltarParaHome() {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('scr-forn-home').classList.remove('hidden');
+        }
+
+        function novaLinhaOrc() {
+            const container = document.getElementById('orc-linhas');
             const div = document.createElement('div');
-            div.className = 'orc-item';
-            div.innerHTML = `
-            <input type="text" placeholder="Item" style="flex: 2; margin-bottom:0;">
-            <input type="number" class="valor-item" placeholder="R$" style="flex: 1; margin-bottom:0;" oninput="calcularOrcamento()">
-        `;
-            document.getElementById('orc-itens-container').appendChild(div);
+            div.className = 'orc-row';
+            div.innerHTML = `<input type="text" placeholder="Item" style="flex:2; margin-bottom:0;">
+                         <input type="number" class="orc-valor" placeholder="R$" style="flex:1; margin-bottom:0;" oninput="somarTudo()">`;
+            container.appendChild(div);
         }
 
-        function calcularOrcamento() {
+        function somarTudo() {
             let total = 0;
-            document.querySelectorAll('.valor-item').forEach(input => {
+            document.querySelectorAll('.orc-valor').forEach(input => {
                 total += Number(input.value) || 0;
             });
-            document.getElementById('orc-total').innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            document.getElementById('total-final').innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         }
-
-        function salvarOrcamento() {
-            alert("Orçamento enviado com sucesso para a LOKAMIG!");
-            show('scr-form');
-        }
-
-        function carregarProgFornecedor() {
-            const dataBusca = document.getElementById('filtro-data-forn').value;
-            const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === dataBusca && x.destino === window.sessao.user.tipo);
-            const lista = document.getElementById('prog-list-forn');
-            lista.innerHTML = dados.length === 0 ? "<div class='sub'>Nenhum veículo encontrado.</div>" : dados.map(i => `
-            <div class="prog-item ${i.status === 'CANCELADO' ? 'status-cancelado' : ''}">
-                <div style="display:flex; justify-content:space-between">
-                    <b>${i.placa}</b>
-                    <span>${i.hora || '--:--'}</span>
-                </div>
-                <div class="obs-box">OBS: ${i.obs}</div>
-                <div style="margin-top:10px; font-weight:bold; color:${i.status === 'CANCELADO' ? 'var(--danger)' : 'var(--warning)'}">
-                    ${i.status === 'CANCELADO' ? '⚠️ CANCELADO' : 'STATUS: ' + i.status}
-                </div>
-            </div>
-        `).join('');
-        }
-
-        function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
     </script>
 </body>
 
