@@ -9,12 +9,12 @@
     <style>
         :root {
             --primary: #d1122a;
-            --bg: #1e293b;
+            --bg: #0f172a;
             --text: #f8fafc;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --dark-card: #0f172a;
+            --gray: #64748b;
         }
 
         * {
@@ -24,106 +24,124 @@
         }
 
         body {
-            background: #334155;
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('Faça_uma_montagem_202604121721.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             font-family: 'Montserrat', sans-serif;
             color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
         }
 
         .container {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 25px;
             width: 95%;
-            max-width: 550px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 22px;
+            margin-bottom: 5px;
             color: #fff;
-            letter-spacing: 2px;
-            text-transform: uppercase;
         }
 
-        .sub-label {
+        .sub {
             font-size: 10px;
             color: #94a3b8;
-            text-align: left;
-            margin-bottom: 5px;
+            margin-bottom: 20px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         input,
         select,
         textarea {
             width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            border: none;
-            background: #0f172a;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.8);
             color: #fff;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
         }
 
         button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
             text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .btn-orange {
-            background: var(--warning);
-            color: #000;
-            border-radius: 12px;
-            padding: 15px;
-            width: 100%;
-            border: none;
-            margin-bottom: 10px;
-        }
-
-        .btn-green {
-            background: var(--success);
-            color: #fff;
-            border-radius: 12px;
-            padding: 15px;
-            width: 100%;
-            border: none;
-            margin-bottom: 10px;
-        }
-
-        .btn-gray {
-            background: #334155;
-            color: #fff;
-            border-radius: 12px;
-            padding: 15px;
-            width: 100%;
-            border: none;
-        }
-
-        .btn-white {
-            background: #fff;
-            color: #000;
-            border-radius: 12px;
-            padding: 15px;
-            width: 100%;
-            border: none;
-            margin-bottom: 10px;
+            font-size: 11px;
         }
 
         .hidden {
             display: none !important;
+        }
+
+        .form-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .prog-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 6px solid var(--warning);
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-pendente {
+            border-left-color: var(--warning);
+        }
+
+        .status-execucao {
+            border-left-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .status-concluido {
+            border-left-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .status-cancelado {
+            border-left-color: var(--gray);
+            background: rgba(100, 116, 139, 0.2);
+            opacity: 0.7;
+        }
+
+        .badge {
+            font-size: 8px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            background: var(--primary);
+            color: #fff;
+            text-transform: uppercase;
+            margin-right: 5px;
         }
 
         .tabs {
@@ -131,58 +149,60 @@
             gap: 5px;
             margin-bottom: 15px;
             overflow-x: auto;
+            padding-bottom: 5px;
         }
 
         .tab-btn {
-            background: #0f172a;
+            background: #1e293b;
             padding: 10px;
             border-radius: 8px;
-            color: #fff;
-            font-size: 9px;
-            flex: 1;
             border: 1px solid #334155;
+            color: #fff;
+            cursor: pointer;
+            white-space: nowrap;
+            flex: 1;
+            font-size: 9px;
         }
 
         .tab-active {
             background: var(--primary);
+            border-color: var(--primary);
         }
 
-        .prog-item {
-            background: #0f172a;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            border-left: 5px solid var(--warning);
-            text-align: left;
-        }
-
-        .status-execucao {
-            border-left-color: var(--danger);
-        }
-
-        .status-concluido {
-            border-left-color: var(--success);
-        }
-
-        .status-cancelado {
-            border-left-color: #64748b;
-            opacity: 0.6;
+        .btn-del {
+            background: none;
+            border: none;
+            color: #ff4444;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
         }
 
         .obs-box {
-            background: #1e293b;
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 12px;
-            color: #94a3b8;
-            border: 1px solid var(--primary);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-size: 10px;
+            color: #cbd5e1;
+            border-left: 2px solid var(--primary);
+            width: 100%;
         }
 
-        .orc-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
+        .photo-area {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            border: 1px dashed #64748b;
+            text-align: center;
+            width: 100%;
+        }
+
+        .time-label {
+            font-size: 9px;
+            color: #94a3b8;
+            font-weight: bold;
         }
 
         input[type="file"] {
@@ -191,12 +211,32 @@
 
         .file-label {
             display: block;
-            background: #475569;
-            padding: 12px;
-            border-radius: 10px;
+            background: #334155;
+            padding: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 11px;
-            margin-bottom: 10px;
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-top: 10px;
+            color: #fff;
+        }
+
+        th {
+            border-bottom: 1px solid var(--primary);
+            padding: 8px;
+            text-align: left;
+            color: var(--primary);
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
     </style>
 </head>
@@ -204,119 +244,191 @@
 <body>
 
     <section id="scr-login" class="container">
-        <h1>agsn</h1>
-        <input type="text" id="user" placeholder="USUÁRIO OU CRACHÁ" onclick="ativarNFC()">
-        <input type="password" id="pass" placeholder="SENHA">
-        <button class="btn-green" onclick="handleLogin()">Entrar</button>
+        <h1>LOKAMIG</h1>
+        <div class="sub">Logística & Programação</div>
+        <input type="text" id="user" placeholder="Matrícula / Usuário / Crachá">
+        <input type="password" id="pass" placeholder="Senha">
+        <button onclick="handleLogin()">Entrar</button>
     </section>
 
-    <section id="scr-admin" class="container hidden" style="max-width: 700px;">
+    <section id="scr-admin" class="container hidden" style="max-width: 800px;">
         <h1>ADMINISTRAÇÃO</h1>
         <div class="tabs">
-            <button class="tab-btn tab-active" onclick="mudarAba('adm-prog')">Programação</button>
-            <button class="tab-btn" onclick="mudarAba('adm-equipe')">Equipe</button>
-            <button class="tab-btn" onclick="mudarAba('adm-forn')">Forn.</button>
-            <button class="tab-btn" onclick="mudarAba('adm-veic')">Veículos</button>
+            <button class="tab-btn tab-active" onclick="switchTab('prog-view-admin', event)">Programação</button>
+            <button class="tab-btn" onclick="switchTab('mon', event)">Monitoramento</button>
+            <button class="tab-btn" onclick="switchTab('colab', event)">Equipe</button>
+            <button class="tab-btn" onclick="switchTab('forn', event)">Fornecedores</button>
+            <button class="tab-btn" onclick="switchTab('veic', event)">Veículos</button>
         </div>
-        <div id="adm-prog">
-            <input type="date" id="filtro-adm" onchange="renderAdmin()">
-            <div id="lista-adm"></div>
+        <div id="area-prog-view-admin">
+            <input type="date" id="filtro-data-admin" onchange="carregarProgAdmin()">
+            <div id="list-prog-admin"></div>
         </div>
-        <div id="adm-equipe" class="hidden">
-            <input type="text" id="e-mat" placeholder="Matrícula"><input type="text" id="e-nome" placeholder="Nome">
-            <button class="btn-green" onclick="salvarItem('colab', {mat: 'e-mat', nome: 'e-nome'})">Cadastrar
-                Colaborador</button>
+        <div id="area-mon" class="hidden">
+            <table>
+                <thead>
+                    <tr>
+                        <th>DATA</th>
+                        <th>PLACA</th>
+                        <th>RESP.</th>
+                        <th>TIPO</th>
+                    </tr>
+                </thead>
+                <tbody id="list-mon"></tbody>
+            </table>
         </div>
-        <div id="adm-forn" class="hidden">
-            <input type="text" id="f-nome" placeholder="Empresa"><input type="text" id="f-user" placeholder="Login">
-            <button class="btn-green"
-                onclick="salvarItem('forn', {nome: 'f-nome', user: 'f-user', pass: '123'})">Cadastrar
-                Fornecedor</button>
+        <div id="area-colab" class="hidden">
+            <div class="form-section"><input type="text" id="c-mat" placeholder="MATRÍCULA"><input type="text"
+                    id="c-nome" placeholder="NOME COMPLETO"><input type="text" id="c-nfc" placeholder="NFC ID" readonly
+                    onclick="alert('Aproxime o cartão')"><button onclick="salvarColab()"
+                    style="background:var(--success)">Cadastrar</button></div>
+            <div id="list-colab"></div>
         </div>
-        <button class="btn-gray" onclick="location.reload()" style="margin-top:10px;">Sair</button>
+        <div id="area-forn" class="hidden">
+            <div class="form-section"><input type="text" id="f-nome" placeholder="EMPRESA"><input type="text"
+                    id="f-user" placeholder="LOGIN"><input type="text" id="f-pass" placeholder="SENHA"><select
+                    id="f-tipo">
+                    <option value="Limpeza">Limpeza</option>
+                    <option value="Oficina">Oficina</option>
+                </select><button onclick="salvarForn()" style="background:var(--success)">Cadastrar</button></div>
+            <div id="list-forn"></div>
+        </div>
+        <div id="area-veic" class="hidden">
+            <div class="form-section"><input type="text" id="v-reg-placa" placeholder="PLACA"><select id="v-reg-tipo">
+                    <option value="Operacional">Operacional</option>
+                    <option value="Reserva">Reserva</option>
+                    <option value="Gerencial">Gerencial</option>
+                </select><button onclick="salvarVeiculo()" style="background:var(--success)">Cadastrar</button></div>
+            <div id="list-veic"></div>
+        </div>
+        <button onclick="location.reload()" style="background:#334155; margin-top:10px;">Sair</button>
     </section>
 
-    <section id="scr-forn-home" class="container hidden">
-        <h1 id="display-forn-nome">agsn</h1>
-        <div style="background: #0f172a; padding: 15px; border-radius: 15px; margin-bottom: 15px;">
-            <div class="sub-label">Consultar Programação:</div>
-            <input type="date" id="filtro-data-forn" onchange="renderForn()">
-            <button class="btn-orange" onclick="abrir('scr-prog-lista')">📋 ACESSAR VEÍCULOS</button>
-            <button class="btn-white" onclick="abrir('scr-orcamento')">💰 GERAR ORÇAMENTO</button>
+    <section id="scr-cliente" class="container hidden">
+        <h1>PROGRAMAÇÃO DIÁRIA</h1>
+        <div class="sub">Área do Cliente</div>
+        <div class="form-section">
+            <input type="text" id="p-placa" placeholder="PLACA" onblur="buscarInfoVeiculo(this.value)">
+            <select id="p-destino">
+                <option value="Limpeza">Limpeza</option>
+                <option value="Oficina">Oficina</option>
+            </select>
+            <textarea id="p-obs" placeholder="Observações..."></textarea>
+            <button onclick="lancarProgramacao()" style="background:var(--success)">Lançar Agenda</button>
         </div>
-        <button class="btn-gray" onclick="location.reload()">Sair</button>
+        <div id="lista-programacao-cliente"></div>
+        <button onclick="location.reload()" style="background:#334155; margin-top:20px;">Sair</button>
     </section>
 
-    <section id="scr-orcamento" class="container hidden" style="position:fixed; height: 90vh; overflow-y:auto;">
-        <h1>NOVO ORÇAMENTO</h1>
-        <input type="text" placeholder="CNPJ">
-        <input type="text" placeholder="PLACA DO CARRO">
-        <div id="orc-linhas">
-            <div class="orc-row">
-                <input type="text" placeholder="Item" style="flex:2; margin-bottom:0;">
-                <input type="number" class="orc-val" placeholder="R$" style="flex:1; margin-bottom:0;"
-                    oninput="calcOrc()">
+    <section id="scr-form" class="container hidden">
+        <h1 id="display-nome">---</h1>
+        <div id="btn-container-forn" class="hidden">
+            <div class="form-section">
+                <input type="date" id="filtro-data-forn" onchange="carregarProgFornecedor()">
+                <button onclick="abrirModalProg()" style="background: var(--warning); color: #000;">📋 ACESSAR
+                    VEÍCULOS</button>
             </div>
         </div>
-        <button class="btn-gray" style="font-size:10px; margin-bottom:10px;" onclick="addOrc()">+ ITEM</button>
-        <div style="background:var(--success); padding:15px; border-radius:12px; font-weight:bold; margin-bottom:10px;">
-            TOTAL: R$ <span id="tot">0,00</span></div>
-        <label class="file-label" for="f-orc">📸 FOTO DA PEÇA</label>
-        <input type="file" id="f-orc">
-        <button class="btn-green" onclick="alert('Enviado!'); abrir('scr-forn-home')">ENVIAR</button>
-        <button class="btn-gray" onclick="abrir('scr-forn-home')">CANCELAR</button>
+        <div class="form-section">
+            <input type="text" id="v-placa-check" placeholder="PLACA VISTORIA">
+            <button onclick="alert('Checklist salvo!')" style="background: var(--success)">Salvar Checklist</button>
+        </div>
+        <button onclick="location.reload()" style="background:#334155;">Sair</button>
     </section>
 
-    <section id="scr-prog-lista" class="container hidden" style="position:fixed; height: 90vh; overflow-y:auto;">
-        <h1>SERVIÇOS DESIGNADOS</h1>
-        <div id="lista-veiculos-forn"></div>
-        <button class="btn-gray" onclick="abrir('scr-forn-home')">VOLTAR</button>
+    <section id="scr-modal-prog" class="container hidden"
+        style="position: fixed; z-index: 100; height: 95vh; overflow-y: auto; top: 2.5vh;">
+        <h1>SERVIÇOS</h1>
+        <div id="prog-list-forn"></div>
+        <button onclick="fecharModalProg()" style="background: #334155; margin-top: 15px;">Voltar</button>
     </section>
 
     <script>
-        const DB = { prog: 'l_prog_v7', forn: 'l_forn_v7', colab: 'l_colab_v7' };
+        const DB = { prog: 'l_prog_v7', veic: 'l_veic_v7', forn: 'l_forn_v7', colab: 'l_colab_v7', logs: 'l_logs_v7' };
 
+        // LOGIN CENTRALIZADO
         function handleLogin() {
             const u = document.getElementById('user').value.toUpperCase();
             const p = document.getElementById('pass').value;
-            if (u === 'ADMIN' && p === '1234') { abrir('scr-admin'); renderAdmin(); return; }
-            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]').find(x => x.user.toUpperCase() === u);
-            if (f) { window.sessao = { user: f, tipo: 'FORNECEDOR' }; document.getElementById('display-forn-nome').innerText = f.nome; abrir('scr-forn-home'); renderForn(); return; }
-            alert("Acesso negado");
+            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarProgAdmin(); return; }
+            if (u === 'CLIENTE') { show('scr-cliente'); carregarProgCliente(); return; }
+            const forn = JSON.parse(localStorage.getItem(DB.forn) || '[]').find(f => f.user.toUpperCase() === u && f.pass === p);
+            if (forn) { logar(forn, 'FORNECEDOR'); return; }
+            alert("Acesso Negado.");
         }
 
-        function renderForn() {
-            const data = document.getElementById('filtro-data-forn').value || new Date().toISOString().split('T')[0];
-            const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === data && x.destino === window.sessao.user.tipo);
-            document.getElementById('lista-veiculos-forn').innerHTML = dados.map(i => `
-            <div class="prog-item status-${i.status.toLowerCase()}">
-                <b>${i.placa}</b>
+        function logar(user, tipo) {
+            window.sessao = { user, tipo };
+            document.getElementById('display-nome').innerText = user.nome;
+            show('scr-form');
+            if (tipo === 'FORNECEDOR') {
+                document.getElementById('btn-container-forn').classList.remove('hidden');
+                document.getElementById('filtro-data-forn').value = new Date().toISOString().split('T')[0];
+            }
+        }
+
+        // GESTÃO DE PROGRAMAÇÃO
+        function lancarProgramacao() {
+            const p = document.getElementById('p-placa').value.toUpperCase();
+            const agora = new Date();
+            const d = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            d.push({
+                id: Date.now(),
+                data: agora.toISOString().split('T')[0],
+                hora: agora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                placa: p,
+                destino: document.getElementById('p-destino').value,
+                obs: document.getElementById('p-obs').value,
+                status: 'PENDENTE'
+            });
+            localStorage.setItem(DB.prog, JSON.stringify(d));
+            carregarProgCliente();
+        }
+
+        function carregarProgFornecedor() {
+            const dataBusca = document.getElementById('filtro-data-forn').value;
+            const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === dataBusca && x.destino === window.sessao.user.tipo);
+            const lista = document.getElementById('prog-list-forn');
+            lista.innerHTML = dados.map(i => `
+            <div class="prog-item ${i.status === 'CANCELADO' ? 'status-cancelado' : (i.status === 'PENDENTE' ? 'status-pendente' : (i.status === 'EXECUCAO' ? 'status-execucao' : 'status-concluido'))}">
+                <b>${i.placa} (${i.hora})</b>
                 <div class="obs-box">OBS: ${i.obs}</div>
-                ${i.status === 'CANCELADO' ? '<b>CANCELADO</b>' : `
-                    <label class="file-label" for="f-${i.id}" style="margin-top:10px;">📸 FOTO ${i.status}</label>
-                    <input type="file" id="f-${i.id}" onchange="this.nextElementSibling.classList.remove('hidden')">
-                    <button class="btn-green hidden" onclick="status(${i.id}, '${i.status}')">CONFIRMAR</button>
-                `}
+                ${i.status !== 'CANCELADO' && i.status !== 'CONCLUIDO' ? `
+                    <div class="photo-area">
+                        <label class="file-label" for="f-${i.id}">📸 FOTO OBRIGATÓRIA</label>
+                        <input type="file" id="f-${i.id}" onchange="document.getElementById('btn-${i.id}').classList.remove('hidden')">
+                        <button id="btn-${i.id}" class="hidden" onclick="alterarStatus(${i.id}, '${i.status}')" style="background:var(--success)">CONFIRMAR</button>
+                    </div>
+                ` : `<div style="margin-top:10px; font-weight:bold;">${i.status}</div>`}
             </div>
         `).join('');
         }
 
-        function status(id, at) {
+        function alterarStatus(id, atual) {
             let d = JSON.parse(localStorage.getItem(DB.prog));
-            d[d.findIndex(x => x.id === id)].status = at === 'PENDENTE' ? 'EXECUCAO' : 'CONCLUIDO';
-            localStorage.setItem(DB.prog, JSON.stringify(d)); renderForn();
+            const idx = d.findIndex(x => x.id === id);
+            d[idx].status = atual === 'PENDENTE' ? 'EXECUCAO' : 'CONCLUIDO';
+            localStorage.setItem(DB.prog, JSON.stringify(d));
+            carregarProgFornecedor();
         }
 
-        function renderAdmin() {
+        // AUXILIARES
+        function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+        function abrirModalProg() { show('scr-modal-prog'); carregarProgFornecedor(); }
+        function fecharModalProg() { show('scr-form'); }
+
+        // ABA ADMIN CARREGAR
+        function carregarProgAdmin() {
             const d = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            document.getElementById('lista-adm').innerHTML = d.map(i => `<div class="prog-item"><b>${i.placa}</b> - ${i.status}</div>`).join('');
+            document.getElementById('list-prog-admin').innerHTML = d.map(i => `<div class="prog-item ${i.status}"><b>${i.placa}</b> - ${i.status} <button onclick="excluir(${i.id})">X</button></div>`).join('');
         }
-
-        function ativarNFC() { console.log("NFC Ativado"); }
-        function abrir(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
-        function mudarAba(id) { ['adm-prog', 'adm-equipe', 'adm-forn', 'adm-veic'].forEach(a => document.getElementById(a).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
-        function addOrc() { const d = document.createElement('div'); d.className = 'orc-row'; d.innerHTML = `<input type="text" placeholder="Item" style="flex:2; margin:0;"><input type="number" class="orc-val" placeholder="R$" style="flex:1; margin:0;" oninput="calcOrc()">`; document.getElementById('orc-linhas').appendChild(d); }
-        function calcOrc() { let t = 0; document.querySelectorAll('.orc-val').forEach(v => t += Number(v.value) || 0); document.getElementById('tot').innerText = t.toLocaleString('pt-BR', { minFractionDigits: 2 }); }
+        function excluir(id) {
+            let d = JSON.parse(localStorage.getItem(DB.prog));
+            const idx = d.findIndex(x => x.id === id);
+            d[idx].status = 'CANCELADO';
+            localStorage.setItem(DB.prog, JSON.stringify(d));
+            carregarProgAdmin();
+        }
     </script>
 </body>
 
