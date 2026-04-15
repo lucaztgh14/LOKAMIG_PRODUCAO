@@ -24,7 +24,7 @@
         }
 
         body {
-            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('Faça_uma_montagem_202604121721.png');
+            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('Faça_uma_montagem_202604121721.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -37,50 +37,55 @@
         }
 
         .container {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 25px;
+            padding: 30px;
             width: 95%;
             max-width: 600px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
             text-align: center;
         }
 
         h1 {
-            font-size: 22px;
+            font-size: 24px;
             margin-bottom: 5px;
-            color: #fff;
+            letter-spacing: 2px;
         }
 
         .sub {
-            font-size: 10px;
-            color: #94a3b8;
-            margin-bottom: 20px;
+            font-size: 11px;
+            color: var(--gray);
+            margin-bottom: 25px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         input,
         select,
         textarea {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin-bottom: 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.9);
             color: #fff;
-            font-size: 13px;
+            font-size: 14px;
             outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(209, 18, 42, 0.3);
         }
 
         button {
             width: 100%;
-            padding: 14px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 12px;
             border: none;
             background: var(--primary);
             color: #fff;
@@ -88,7 +93,11 @@
             cursor: pointer;
             transition: 0.3s;
             text-transform: uppercase;
-            font-size: 11px;
+            font-size: 12px;
+        }
+
+        button:active {
+            transform: scale(0.98);
         }
 
         .hidden {
@@ -96,73 +105,72 @@
         }
 
         .form-section {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 18px;
+            border-radius: 15px;
             margin-bottom: 15px;
             text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .prog-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
             border-left: 6px solid var(--warning);
-            font-size: 11px;
+            font-size: 12px;
             text-align: left;
+        }
+
+        .status-pendente {
+            border-left-color: var(--warning);
+        }
+
+        .status-execucao {
+            border-left-color: var(--danger);
+        }
+
+        .status-concluido {
+            border-left-color: var(--success);
         }
 
         .tabs {
             display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 20px;
             overflow-x: auto;
-            padding-bottom: 5px;
+            padding-bottom: 10px;
         }
 
         .tab-btn {
             background: #1e293b;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             border: 1px solid #334155;
             color: #fff;
             cursor: pointer;
             white-space: nowrap;
             flex: 1;
-            font-size: 9px;
+            font-size: 10px;
         }
 
         .tab-active {
             background: var(--primary);
             border-color: var(--primary);
-        }
-
-        .orc-row {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 8px;
-        }
-
-        .total-box {
-            background: var(--success);
-            padding: 15px;
-            border-radius: 10px;
             font-weight: bold;
-            font-size: 16px;
-            margin: 10px 0;
-            text-align: center;
         }
 
         .file-label {
             display: block;
             background: #334155;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 10px;
-            margin-bottom: 5px;
+            font-size: 11px;
+            margin-top: 10px;
             text-align: center;
+            border: 1px dashed var(--gray);
         }
 
         input[type="file"] {
@@ -179,7 +187,7 @@
         <input type="text" id="user" placeholder="Matrícula / Usuário / Crachá" onclick="ativarNFC('user')">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
-        <p id="nfc-status" style="font-size: 8px; margin-top: 10px; color: var(--gray);"></p>
+        <p id="nfc-status" style="font-size: 10px; margin-top: 15px; color: var(--gray); min-height: 15px;"></p>
     </section>
 
     <section id="scr-admin" class="container hidden" style="max-width: 800px;">
@@ -200,7 +208,7 @@
             <div class="form-section">
                 <input type="text" id="c-mat" placeholder="MATRÍCULA">
                 <input type="text" id="c-nome" placeholder="NOME COMPLETO">
-                <input type="text" id="c-nfc" placeholder="NFC ID (Clique para ler)" readonly
+                <input type="text" id="c-nfc" placeholder="NFC ID (Toque para ler)" readonly
                     onclick="ativarNFC('c-nfc')">
                 <button onclick="salvarColab()" style="background:var(--success)">Cadastrar Colaborador</button>
             </div>
@@ -232,63 +240,37 @@
             </div>
             <div id="list-veic"></div>
         </div>
-        <button onclick="location.reload()" style="background:#334155; margin-top:10px;">Sair</button>
+        <button onclick="location.reload()" style="background:#334155; margin-top:20px;">Sair</button>
     </section>
 
     <section id="scr-cliente" class="container hidden">
-        <h1>PROGRAMAÇÃO DIÁRIA</h1>
-        <div class="sub">Área do Cliente</div>
+        <h1>PROGRAMAÇÃO</h1>
+        <div class="sub">Novo Agendamento</div>
         <div class="form-section">
             <input type="text" id="p-placa" placeholder="PLACA">
             <select id="p-destino">
                 <option value="Limpeza">Limpeza</option>
                 <option value="Oficina">Oficina</option>
             </select>
-            <textarea id="p-obs" placeholder="Observações..."></textarea>
-            <button onclick="lancarProgramacao()" style="background:var(--success)">Lançar Agenda</button>
+            <textarea id="p-obs" placeholder="Observações do veículo..."></textarea>
+            <button onclick="lancarProgramacao()" style="background:var(--success)">Lançar na Agenda</button>
         </div>
         <div id="lista-programacao-cliente"></div>
         <button onclick="location.reload()" style="background:#334155; margin-top:20px;">Sair</button>
     </section>
 
     <section id="scr-form" class="container hidden">
-        <h1 id="display-nome">---</h1>
+        <h1 id="display-nome">FORNECEDOR</h1>
         <div id="btn-container-forn" class="hidden">
             <div class="form-section">
                 <input type="date" id="filtro-data-forn" onchange="carregarProgFornecedor()">
                 <button onclick="abrirModalProg()"
-                    style="background: var(--warning); color: #000; margin-bottom: 10px;">📋 ACESSAR VEÍCULOS</button>
-                <button onclick="show('scr-orcamento')" style="background: #fff; color: #000;">💰 GERAR
+                    style="background: var(--warning); color: #000; margin-bottom: 12px;">📋 VER VEÍCULOS HOJE</button>
+                <button onclick="show('scr-orcamento')" style="background: #fff; color: #000;">💰 CRIAR
                     ORÇAMENTO</button>
             </div>
         </div>
-        <div class="form-section">
-            <input type="text" id="v-placa-check" placeholder="PLACA VISTORIA">
-            <button onclick="alert('Vistoria salva com sucesso!')" style="background: var(--success)">Salvar
-                Checklist</button>
-        </div>
         <button onclick="location.reload()" style="background:#334155;">Sair</button>
-    </section>
-
-    <section id="scr-orcamento" class="container hidden"
-        style="position: fixed; z-index: 101; height: 95vh; overflow-y: auto; top: 2.5vh;">
-        <h1>NOVO ORÇAMENTO</h1>
-        <div class="form-section">
-            <input type="text" id="orc-cnpj" placeholder="CNPJ">
-            <input type="text" id="orc-placa" placeholder="PLACA">
-            <div id="orc-itens">
-                <div class="orc-row"><input type="text" placeholder="Item" style="flex:2; margin:0;"><input
-                        type="number" class="v-item" placeholder="R$" style="flex:1; margin:0;" oninput="calcTotal()">
-                </div>
-            </div>
-            <button onclick="addItem()" style="background:var(--gray); padding:5px; margin-top:5px;">+ ITEM</button>
-            <div class="total-box">TOTAL: R$ <span id="total-orc">0,00</span></div>
-            <label class="file-label" for="foto-orc">📸 FOTO DA PEÇA</label>
-            <input type="file" id="foto-orc">
-            <button onclick="alert('Orçamento enviado!'); show('scr-form')"
-                style="background:var(--success)">Enviar</button>
-        </div>
-        <button onclick="show('scr-form')" style="background:#334155;">Voltar</button>
     </section>
 
     <section id="scr-modal-prog" class="container hidden"
@@ -298,142 +280,216 @@
         <button onclick="fecharModalProg()" style="background: #334155; margin-top: 15px;">Voltar</button>
     </section>
 
+    <section id="scr-orcamento" class="container hidden"
+        style="position: fixed; z-index: 101; height: 95vh; overflow-y: auto; top: 2.5vh;">
+        <h1>NOVO ORÇAMENTO</h1>
+        <div class="form-section">
+            <input type="text" id="orc-placa" placeholder="PLACA">
+            <div id="orc-itens">
+                <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="text" placeholder="Item"
+                        style="flex:2; margin:0;"><input type="number" class="v-item" placeholder="R$"
+                        style="flex:1; margin:0;" oninput="calcTotal()"></div>
+            </div>
+            <button onclick="addItem()" style="background:var(--gray); padding:8px; margin-top:5px; font-size:10px;">+
+                ADICIONAR ITEM</button>
+            <div
+                style="background:var(--success); padding:15px; border-radius:10px; font-weight:bold; font-size:18px; margin:15px 0;">
+                TOTAL: R$ <span id="total-orc">0,00</span></div>
+            <button onclick="alert('Orçamento enviado com sucesso!'); show('scr-form')"
+                style="background:var(--success)">Enviar para Aprovação</button>
+        </div>
+        <button onclick="show('scr-form')" style="background:#334155;">Voltar</button>
+    </section>
+
     <script>
         const DB = { prog: 'l_prog_v7', veic: 'l_veic_v7', forn: 'l_forn_v7', colab: 'l_colab_v7' };
 
-        // NFC
+        // MECANISMO NFC
         async function ativarNFC(targetId) {
             if ('NDEFReader' in window) {
                 try {
-                    const ndef = new NDEFReader(); await ndef.scan();
-                    document.getElementById('nfc-status').innerText = "Aproxime o crachá...";
-                    ndef.onreading = e => {
-                        document.getElementById(targetId).value = e.serialNumber;
+                    const ndef = new NDEFReader();
+                    await ndef.scan();
+                    document.getElementById('nfc-status').innerText = "Aproxime o crachá da traseira do celular...";
+                    ndef.onreading = event => {
+                        document.getElementById(targetId).value = event.serialNumber;
+                        document.getElementById('nfc-status').innerText = "Leitura concluída!";
                         if (targetId === 'user') handleLogin();
                     };
-                } catch (err) { alert("Erro NFC: " + err); }
-            } else { alert("NFC não disponível."); }
+                } catch (error) {
+                    alert("Erro no sensor: " + error);
+                }
+            } else {
+                alert("NFC não suportado neste dispositivo/navegador.");
+            }
         }
 
         // LOGIN
         function handleLogin() {
             const u = document.getElementById('user').value.toUpperCase();
             const p = document.getElementById('pass').value;
-            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarProgAdmin(); renderList('colab'); return; }
+
+            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarProgAdmin(); return; }
             if (u === 'CLIENTE') { show('scr-cliente'); carregarProgCliente(); return; }
-            const f = JSON.parse(localStorage.getItem(DB.forn) || '[]').find(x => x.user.toUpperCase() === u && x.pass === p);
-            if (f) { logar(f, 'FORNECEDOR'); return; }
-            alert("Acesso Negado.");
-        }
 
-        function logar(user, tipo) {
-            window.sessao = { user, tipo };
-            document.getElementById('display-nome').innerText = user.nome;
-            show('scr-form');
-            if (tipo === 'FORNECEDOR') {
+            const fornecedores = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+            const fFound = fornecedores.find(f => f.user.toUpperCase() === u && f.pass === p);
+
+            if (fFound) {
+                window.sessao = { user: fFound, tipo: 'FORNECEDOR' };
+                document.getElementById('display-nome').innerText = fFound.nome;
+                show('scr-form');
                 document.getElementById('btn-container-forn').classList.remove('hidden');
-                document.getElementById('filtro-data-forn').value = new Date().toISOString().split('T')[0];
+                return;
             }
+            alert("Usuário ou senha inválidos.");
         }
 
-        // FUNÇÕES DE CADASTRO (O QUE ESTAVA FALTANDO)
+        // WORKFLOW FORNECEDOR (FOTOS ENTRADA/SAÍDA)
+        function carregarProgFornecedor() {
+            const dataFiltro = document.getElementById('filtro-data-forn').value || new Date().toISOString().split('T')[0];
+            const todos = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const filtrados = todos.filter(x => x.data === dataFiltro && x.destino === window.sessao.user.tipo);
+
+            const listaDiv = document.getElementById('prog-list-forn');
+            listaDiv.innerHTML = filtrados.length ? filtrados.map(item => {
+                let labelFoto = item.status === 'PENDENTE' ? 'FOTO DE ENTRADA' : 'FOTO DE SAÍDA';
+                let textoBotao = item.status === 'PENDENTE' ? 'INICIAR SERVIÇO' : 'FINALIZAR SERVIÇO';
+
+                return `
+            <div class="prog-item status-${item.status.toLowerCase()}">
+                <b>${item.placa}</b> | ${item.hora}<br>
+                <div style="margin-top:5px; color:#94a3b8;">OBS: ${item.obs}</div>
+                ${item.status !== 'CONCLUIDO' ? `
+                    <label class="file-label" for="f-${item.id}">📸 TIRAR ${labelFoto}</label>
+                    <input type="file" id="f-${item.id}" capture="environment" onchange="document.getElementById('btn-${item.id}').classList.remove('hidden')">
+                    <button id="btn-${item.id}" class="hidden" onclick="alterarStatus(${item.id}, '${item.status}')" style="background:var(--success); margin-top:10px;">${textoBotao}</button>
+                ` : `<div style="color:var(--success); font-weight:bold; margin-top:10px;">✓ SERVIÇO FINALIZADO</div>`}
+            </div>`;
+            }).join('') : '<p style="font-size:12px; color:var(--gray);">Nenhum veículo para esta data.</p>';
+        }
+
+        function alterarStatus(id, statusAtual) {
+            let dados = JSON.parse(localStorage.getItem(DB.prog));
+            const index = dados.findIndex(x => x.id === id);
+
+            if (statusAtual === 'PENDENTE') {
+                dados[index].status = 'EXECUCAO';
+            } else {
+                dados[index].status = 'CONCLUIDO';
+            }
+
+            localStorage.setItem(DB.prog, JSON.stringify(dados));
+            carregarProgFornecedor();
+        }
+
+        // FUNÇÕES DE CADASTRO ADMIN
         function salvarColab() {
-            const d = { mat: document.getElementById('c-mat').value, nome: document.getElementById('c-nome').value, nfc: document.getElementById('c-nfc').value };
-            if (!d.mat || !d.nome) return alert("Preencha tudo");
+            const nome = document.getElementById('c-nome').value;
+            const mat = document.getElementById('c-mat').value;
+            const nfc = document.getElementById('c-nfc').value;
+            if (!nome || !mat) return alert("Preencha Nome e Matrícula");
+
             let list = JSON.parse(localStorage.getItem(DB.colab) || '[]');
-            list.push(d); localStorage.setItem(DB.colab, JSON.stringify(list));
-            renderList('colab'); alert("Colaborador salvo!");
+            list.push({ nome, mat, nfc });
+            localStorage.setItem(DB.colab, JSON.stringify(list));
+            alert("Colaborador salvo!");
+            renderAdminList('colab');
         }
 
         function salvarForn() {
-            const d = { nome: document.getElementById('f-nome').value, user: document.getElementById('f-user').value, pass: document.getElementById('f-pass').value, tipo: document.getElementById('f-tipo').value };
+            const nome = document.getElementById('f-nome').value;
+            const user = document.getElementById('f-user').value;
+            const pass = document.getElementById('f-pass').value;
+            const tipo = document.getElementById('f-tipo').value;
+
             let list = JSON.parse(localStorage.getItem(DB.forn) || '[]');
-            list.push(d); localStorage.setItem(DB.forn, JSON.stringify(list));
-            renderList('forn'); alert("Fornecedor salvo!");
+            list.push({ nome, user, pass, tipo });
+            localStorage.setItem(DB.forn, JSON.stringify(list));
+            alert("Fornecedor cadastrado!");
+            renderAdminList('forn');
         }
 
         function salvarVeiculo() {
-            const d = { placa: document.getElementById('v-reg-placa').value.toUpperCase(), tipo: document.getElementById('v-reg-tipo').value };
+            const placa = document.getElementById('v-reg-placa').value.toUpperCase();
+            const tipo = document.getElementById('v-reg-tipo').value;
+
             let list = JSON.parse(localStorage.getItem(DB.veic) || '[]');
-            list.push(d); localStorage.setItem(DB.veic, JSON.stringify(list));
-            renderList('veic'); alert("Veículo salvo!");
+            list.push({ placa, tipo });
+            localStorage.setItem(DB.veic, JSON.stringify(list));
+            alert("Veículo cadastrado!");
+            renderAdminList('veic');
+        }
+
+        // UTILITÁRIOS
+        function renderAdminList(key) {
+            const items = JSON.parse(localStorage.getItem(DB[key]) || '[]');
+            document.getElementById(`list-${key}`).innerHTML = items.map((it, idx) => `
+            <div class="prog-item" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>${it.nome || it.placa}</span>
+                <button onclick="removerItem('${key}', ${idx})" style="width:30px; padding:5px; background:var(--danger);">X</button>
+            </div>`).join('');
+        }
+
+        function removerItem(key, idx) {
+            let items = JSON.parse(localStorage.getItem(DB[key]));
+            items.splice(idx, 1);
+            localStorage.setItem(DB[key], JSON.stringify(items));
+            renderAdminList(key);
         }
 
         function lancarProgramacao() {
             const placa = document.getElementById('p-placa').value.toUpperCase();
-            if (!placa) return alert("Placa vazia!");
-            const agora = new Date();
+            if (!placa) return alert("Insira a placa!");
+
             let prog = JSON.parse(localStorage.getItem(DB.prog) || '[]');
             prog.push({
                 id: Date.now(),
-                data: agora.toISOString().split('T')[0],
-                hora: agora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                data: new Date().toISOString().split('T')[0],
+                hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 placa: placa,
                 destino: document.getElementById('p-destino').value,
                 obs: document.getElementById('p-obs').value,
                 status: 'PENDENTE'
             });
             localStorage.setItem(DB.prog, JSON.stringify(prog));
-            carregarProgCliente(); alert("Agenda lançada!");
-        }
-
-        // RENDERIZAÇÃO
-        function renderList(key) {
-            const list = JSON.parse(localStorage.getItem(DB[key]) || '[]');
-            document.getElementById(`list-${key}`).innerHTML = list.map((item, idx) => `
-            <div class="prog-item">
-                ${item.nome || item.placa || item.user} 
-                <button onclick="remover('${key}', ${idx})" style="width:30px; float:right; background:var(--danger); padding:2px;">X</button>
-            </div>`).join('');
-        }
-
-        function remover(key, idx) {
-            let list = JSON.parse(localStorage.getItem(DB[key]));
-            list.splice(idx, 1); localStorage.setItem(DB[key], JSON.stringify(list));
-            renderList(key);
+            carregarProgCliente();
+            alert("Veículo agendado!");
         }
 
         function carregarProgAdmin() {
-            const data = document.getElementById('filtro-data-admin').value;
-            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => !data || x.data === data);
-            document.getElementById('list-prog-admin').innerHTML = list.map(i => `<div class="prog-item"><b>${i.placa}</b> - ${i.destino} (${i.status})</div>`).join('');
+            const dt = document.getElementById('filtro-data-admin').value;
+            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => !dt || x.data === dt);
+            document.getElementById('list-prog-admin').innerHTML = list.map(i => `<div class="prog-item"><b>${i.placa}</b> | ${i.destino} | ${i.status}</div>`).join('');
         }
 
         function carregarProgCliente() {
             const list = JSON.parse(localStorage.getItem(DB.prog) || '[]').reverse();
-            document.getElementById('lista-programacao-cliente').innerHTML = list.slice(0, 5).map(i => `<div class="prog-item">${i.placa} -> ${i.destino}</div>`).join('');
+            document.getElementById('lista-programacao-cliente').innerHTML = list.slice(0, 5).map(i => `<div class="prog-item">${i.placa} -> ${i.destino} (${i.status})</div>`).join('');
         }
 
-        function carregarProgFornecedor() {
-            const data = document.getElementById('filtro-data-forn').value;
-            const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === data && x.destino === window.sessao.user.tipo);
-            document.getElementById('prog-list-forn').innerHTML = dados.map(i => `
-            <div class="prog-item status-${i.status.toLowerCase()}">
-                <b>${i.placa} (${i.hora})</b><br>OBS: ${i.obs}
-                ${i.status === 'PENDENTE' || i.status === 'EXECUCAO' ? `<br><input type="file" id="f-${i.id}" onchange="this.nextElementSibling.classList.remove('hidden')"><button class="hidden" onclick="alterarStatus(${i.id}, '${i.status}')" style="background:var(--success); margin-top:5px;">CONFIRMAR</button>` : ''}
-            </div>`).join('');
-        }
-
-        function alterarStatus(id, at) {
-            let d = JSON.parse(localStorage.getItem(DB.prog));
-            const idx = d.findIndex(x => x.id === id);
-            d[idx].status = at === 'PENDENTE' ? 'EXECUCAO' : 'CONCLUIDO';
-            localStorage.setItem(DB.prog, JSON.stringify(d)); carregarProgFornecedor();
-        }
-
-        // UTILITÁRIOS
         function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
         function switchTab(id, e) {
             document.querySelectorAll('[id^="area-"]').forEach(a => a.classList.add('hidden'));
             document.getElementById('area-' + id).classList.remove('hidden');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
             e.target.classList.add('tab-active');
-            if (id !== 'prog-view-admin') renderList(id.replace('area-', ''));
+            if (id !== 'prog-view-admin') renderAdminList(id);
         }
-        function addItem() { const d = document.createElement('div'); d.className = 'orc-row'; d.innerHTML = `<input type="text" placeholder="Item" style="flex:2; margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1; margin:0;" oninput="calcTotal()">`; document.getElementById('orc-itens').appendChild(d); }
-        function calcTotal() { let t = 0; document.querySelectorAll('.v-item').forEach(i => t += Number(i.value) || 0); document.getElementById('total-orc').innerText = t.toLocaleString('pt-BR', { minFractionDigits: 2 }); }
         function abrirModalProg() { show('scr-modal-prog'); carregarProgFornecedor(); }
         function fecharModalProg() { show('scr-form'); }
+        function addItem() {
+            const container = document.getElementById('orc-itens');
+            const row = document.createElement('div');
+            row.style.display = "flex"; row.style.gap = "5px"; row.style.marginBottom = "5px";
+            row.innerHTML = `<input type="text" placeholder="Item" style="flex:2; margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1; margin:0;" oninput="calcTotal()">`;
+            container.appendChild(row);
+        }
+        function calcTotal() {
+            let total = 0;
+            document.querySelectorAll('.v-item').forEach(i => total += Number(i.value) || 0);
+            document.getElementById('total-orc').innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
     </script>
 </body>
 
