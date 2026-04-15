@@ -214,7 +214,6 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* Estilos Novos do Orçamento integrados ao seu CSS */
         .orc-row {
             display: flex;
             gap: 5px;
@@ -238,9 +237,10 @@
     <section id="scr-login" class="container">
         <h1>LOKAMIG</h1>
         <div class="sub">Logística & Programação</div>
-        <input type="text" id="user" placeholder="Matrícula / Usuário / Crachá">
+        <input type="text" id="user" placeholder="Matrícula / Usuário / Crachá" onclick="ativarNFC()">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="handleLogin()">Entrar</button>
+        <p id="nfc-status" style="font-size: 8px; margin-top: 10px; color: var(--gray);"></p>
     </section>
 
     <section id="scr-admin" class="container hidden" style="max-width: 800px;">
@@ -272,7 +272,7 @@
         <div id="area-colab" class="hidden">
             <div class="form-section"><input type="text" id="c-mat" placeholder="MATRÍCULA"><input type="text"
                     id="c-nome" placeholder="NOME COMPLETO"><input type="text" id="c-nfc" placeholder="NFC ID" readonly
-                    onclick="alert('Aproxime o cartão')"><button onclick="salvarColab()"
+                    onclick="ativarNFC('c-nfc')"><button onclick="salvarColab()"
                     style="background:var(--success)">Cadastrar</button></div>
             <div id="list-colab"></div>
         </div>
@@ -334,23 +334,18 @@
         style="position: fixed; z-index: 101; height: 95vh; overflow-y: auto; top: 2.5vh;">
         <h1>NOVO ORÇAMENTO</h1>
         <div class="form-section">
-            <input type="text" placeholder="CNPJ DO FORNECEDOR">
-            <input type="text" placeholder="ENDEREÇO COMPLETO">
-            <input type="text" placeholder="PLACA DO VEÍCULO">
+            <input type="text" placeholder="CNPJ">
+            <input type="text" placeholder="PLACA">
             <div id="orc-itens">
-                <div class="orc-row">
-                    <input type="text" placeholder="Item" style="flex:2; margin:0;">
-                    <input type="number" class="v-item" placeholder="R$" style="flex:1; margin:0;"
-                        oninput="calcTotal()">
+                <div class="orc-row"><input type="text" placeholder="Item" style="flex:2; margin:0;"><input
+                        type="number" class="v-item" placeholder="R$" style="flex:1; margin:0;" oninput="calcTotal()">
                 </div>
             </div>
-            <button onclick="addItem()" style="background:var(--gray); padding:5px; font-size:9px; margin-top:5px;">+
-                Adicionar Peça</button>
+            <button onclick="addItem()" style="background:var(--gray); padding:5px; margin-top:5px;">+ ITEM</button>
             <div class="total-box">TOTAL: R$ <span id="total-orc">0,00</span></div>
-            <label class="file-label" for="foto-orc">📸 FOTO DA PEÇA / NOTA</label>
+            <label class="file-label" for="foto-orc">📸 FOTO DA PEÇA</label>
             <input type="file" id="foto-orc">
-            <button onclick="alert('Orçamento enviado!'); show('scr-form')" style="background:var(--success)">Enviar
-                Orçamento</button>
+            <button onclick="alert('Enviado!'); show('scr-form')" style="background:var(--success)">Enviar</button>
         </div>
         <button onclick="show('scr-form')" style="background:#334155;">Voltar</button>
     </section>
@@ -363,14 +358,37 @@
     </section>
 
     <script>
-        const DB = { prog: 'l_prog_v7', veic: 'l_veic_v7', forn: 'l_forn_v7', colab: 'l_colab_v7', logs: 'l_logs_v7' };
+        const DB = { prog: 'l_prog_v7', veic: 'l_veic_v7', forn: 'l_forn_v7', colab: 'l_colab_v7' };
+
+        // FUNÇÃO NFC HABILITADA
+        async function ativarNFC(targetId = 'user') {
+            const status = document.getElementById('nfc-status');
+            if ('NDEFReader' in window) {
+                try {
+                    const ndef = new NDEFReader();
+                    await ndef.scan();
+                    if (status) status.innerText = "Aproxime o crachá...";
+
+                    ndef.onreading = event => {
+                        const id = event.serialNumber;
+                        document.getElementById(targetId).value = id;
+                        if (status) status.innerText = "Leitura realizada!";
+                        if (targetId === 'user') handleLogin();
+                    };
+                } catch (error) {
+                    alert("Erro NFC: " + error);
+                }
+            } else {
+                alert("NFC não suportado neste navegador.");
+            }
+        }
 
         function handleLogin() {
             const u = document.getElementById('user').value.toUpperCase();
             const p = document.getElementById('pass').value;
-            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarProgAdmin(); return; }
+            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); return; }
             if (u === 'CLIENTE') { show('scr-cliente'); return; }
-            const forn = JSON.parse(localStorage.getItem(DB.forn) || '[]').find(f => f.user.toUpperCase() === u && f.pass === p);
+            const forn = JSON.parse(localStorage.getItem(DB.forn) || '[]').find(f => f.user.toUpperCase() === u || f.nfc === u);
             if (forn) { logar(forn, 'FORNECEDOR'); return; }
             alert("Acesso Negado.");
         }
@@ -386,11 +404,10 @@
         }
 
         function carregarProgFornecedor() {
-            const dataBusca = document.getElementById('filtro-data-forn').value;
-            const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === dataBusca && x.destino === window.sessao.user.tipo);
-            const lista = document.getElementById('prog-list-forn');
-            lista.innerHTML = dados.map(i => `
-            <div class="prog-item ${i.status.toLowerCase() === 'cancelado' ? 'status-cancelado' : 'status-' + i.status.toLowerCase()}">
+            const data = document.getElementById('filtro-data-forn').value;
+            const dados = JSON.parse(localStorage.getItem(DB.prog) || '[]').filter(x => x.data === data && x.destino === window.sessao.user.tipo);
+            document.getElementById('prog-list-forn').innerHTML = dados.map(i => `
+            <div class="prog-item status-${i.status.toLowerCase()}">
                 <b>${i.placa} (${i.hora})</b>
                 <div class="obs-box">OBS: ${i.obs}</div>
                 ${i.status !== 'CANCELADO' && i.status !== 'CONCLUIDO' ? `
@@ -399,20 +416,16 @@
                         <input type="file" id="f-${i.id}" onchange="document.getElementById('btn-${i.id}').classList.remove('hidden')">
                         <button id="btn-${i.id}" class="hidden" onclick="alterarStatus(${i.id}, '${i.status}')" style="background:var(--success)">CONFIRMAR</button>
                     </div>
-                ` : `<div style="margin-top:10px; font-weight:bold;">${i.status}</div>`}
-            </div>
-        `).join('');
+                ` : `<b>${i.status}</b>`}
+            </div>`).join('');
         }
 
-        function alterarStatus(id, atual) {
+        function alterarStatus(id, at) {
             let d = JSON.parse(localStorage.getItem(DB.prog));
-            const idx = d.findIndex(x => x.id === id);
-            d[idx].status = atual === 'PENDENTE' ? 'EXECUCAO' : 'CONCLUIDO';
-            localStorage.setItem(DB.prog, JSON.stringify(d));
-            carregarProgFornecedor();
+            d[d.findIndex(x => x.id === id)].status = at === 'PENDENTE' ? 'EXECUCAO' : 'CONCLUIDO';
+            localStorage.setItem(DB.prog, JSON.stringify(d)); carregarProgFornecedor();
         }
 
-        // FUNÇÕES DA CALCULADORA
         function addItem() {
             const div = document.createElement('div'); div.className = 'orc-row';
             div.innerHTML = `<input type="text" placeholder="Item" style="flex:2; margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1; margin:0;" oninput="calcTotal()">`;
