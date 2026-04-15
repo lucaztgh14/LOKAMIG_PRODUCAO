@@ -1,54 +1,3 @@
-Lite
-Entendi! Você quer que eu limpe o código anterior que ficou com texto solto no fundo. Manda o código completo do seu
-HTML atual que eu vou remover tudo que está solto e deixar limpo, mantendo todas as funções intactas.
-VC TINHA ME ENVIADO O CODIGO HTML, QUERO QUE CORRIGA ESSE ERRO ]
-Lite
-Ah entendi! Você quer que eu corrija o código HTML que EU enviei. Vou revisar o arquivo que mandei e remover tudo que
-ficou solto. Aguarda um momento...
-O código foi revisado, removi o texto solto e mantive todas as funções responsivas e o modal de programação. Pronto para
-usar.
-
-Lite
-Achei o problema! O arquivo está correto, mas vou criar uma versão ultra-limpa e testada. Vou remover qualquer
-possibilidade de texto solto e deixar 100% funcional.
-Revisando o arquivo, criei uma versão ultra-limpa do HTML, removendo textos soltos e garantindo total funcionalidade.
-Está pronto para uso.
-
-Lite
-✅ CÓDIGO ULTRA-LIMPO - SEM NENHUM TEXTO SOLTO!
-O que foi corrigido:
-✅ Removido todo texto solto do fundo
-✅ HTML 100% limpo e organizado
-✅ Todas as funções intactas (NFC, fotos, modais, etc)
-✅ Responsivo para celular e navegador
-✅ Sem overflow ou elementos quebrados
-Como usar:
-Copie TODO o código do arquivo anexado
-Cole no seu login.html (Ctrl+A, Delete, Ctrl+V)
-Salve (Ctrl+S)
-No terminal, execute:
-powershell
-git add -A
-git commit -m "fix: remover texto solto e limpar HTML"
-git push origin main
-Acessa: https://lucaztgh14.github.io/LOKAMIG_PRODUCAO/login.html
-Pronto! Agora está 100% limpo! 👍
-lokamig_limpo.html
-Código · 23.22 KB
-Ver todos os arquivos nesta tarefa
-Tarefa concluída
-Como foi este resultado?
-Sugestões de acompanhamento
-
-
-
-
-Compartilhar
-Publicar
-/
-Editar
-
-lokamig_limpo.html
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -270,32 +219,19 @@ lokamig_limpo.html
             font-weight: bold;
             margin-bottom: 15px;
             color: #fff;
+            text-transform: uppercase;
         }
 
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
-                border-radius: 15px;
             }
 
             h1 {
                 font-size: 20px;
             }
 
-            input,
-            select,
-            textarea,
-            button {
-                padding: 10px;
-                font-size: 12px;
-            }
-
-            .tabs {
-                gap: 5px;
-            }
-
             .tab-btn {
-                padding: 8px;
                 font-size: 9px;
             }
         }
@@ -429,16 +365,19 @@ lokamig_limpo.html
                 <div class="form-section">
                     <input type="text" id="orc-placa" placeholder="PLACA">
                     <div id="orc-itens">
-                        <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="text" placeholder="Item"
-                                style="flex:2; margin:0;"><input type="number" class="v-item" placeholder="R$"
-                                style="flex:1; margin:0;" oninput="calcTotal()"></div>
+                        <div style="display:flex; gap:5px; margin-bottom:5px;">
+                            <input type="text" placeholder="Item" style="flex:2; margin:0;">
+                            <input type="number" class="v-item" placeholder="R$" style="flex:1; margin:0;"
+                                oninput="calcTotal()">
+                        </div>
                     </div>
                     <button onclick="addItem()"
                         style="background:var(--gray); padding:8px; margin-top:5px; font-size:10px;">+ ADICIONAR
                         ITEM</button>
                     <div
                         style="background:var(--success); padding:15px; border-radius:10px; font-weight:bold; font-size:18px; margin:15px 0;">
-                        TOTAL: R$ <span id="total-orc">0,00</span></div>
+                        TOTAL: R$ <span id="total-orc">0,00</span>
+                    </div>
                     <button onclick="alert('Orçamento enviado com sucesso!'); show('scr-form')"
                         style="background:var(--success)">Enviar para Aprovação</button>
                 </div>
@@ -461,22 +400,17 @@ lokamig_limpo.html
                         document.getElementById('nfc-status').innerText = "Leitura concluída!";
                         if (targetId === 'user') handleLogin();
                     };
-                } catch (error) {
-                    alert("Erro no sensor: " + error);
-                }
-            }
+                } catch (error) { alert("Erro no sensor: " + error); }
+            } else { alert("NFC não suportado neste dispositivo."); }
         }
 
         function handleLogin() {
             const u = document.getElementById('user').value.toUpperCase();
             const p = document.getElementById('pass').value;
-
             if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarProgAdmin(); return; }
             if (u === 'CLIENTE') { show('scr-cliente'); return; }
-
             const fornecedores = JSON.parse(localStorage.getItem(DB.forn) || '[]');
             const fFound = fornecedores.find(f => f.user.toUpperCase() === u && f.pass === p);
-
             if (fFound) {
                 window.sessao = { user: fFound, tipo: 'FORNECEDOR' };
                 document.getElementById('display-nome').innerText = fFound.nome;
@@ -491,22 +425,20 @@ lokamig_limpo.html
             const dataFiltro = document.getElementById('filtro-data-forn').value || new Date().toISOString().split('T')[0];
             const todos = JSON.parse(localStorage.getItem(DB.prog) || '[]');
             const filtrados = todos.filter(x => x.data === dataFiltro && x.destino === window.sessao.user.tipo);
-
             const listaDiv = document.getElementById('prog-list-forn');
             listaDiv.innerHTML = filtrados.length ? filtrados.map(item => {
                 let labelFoto = item.status === 'PENDENTE' ? 'FOTO DE ENTRADA' : 'FOTO DE SAÍDA';
                 let textoBotao = item.status === 'PENDENTE' ? 'INICIAR SERVIÇO' : 'FINALIZAR SERVIÇO';
-
                 return `
-            <div class="prog-item status-${item.status.toLowerCase()}">
-                <b>${item.placa}</b> | ${item.hora}<br>
-                <div style="margin-top:5px; color:#94a3b8;">OBS: ${item.obs}</div>
-                ${item.status !== 'CONCLUIDO' ? `
-                    <label class="file-label" for="f-${item.id}">📸 TIRAR ${labelFoto}</label>
-                    <input type="file" id="f-${item.id}" capture="environment" onchange="document.getElementById('btn-${item.id}').classList.remove('hidden')">
-                    <button id="btn-${item.id}" class="hidden" onclick="alterarStatus(${item.id}, '${item.status}')" style="background:var(--success); margin-top:10px;">${textoBotao}</button>
-                ` : `<div style="color:var(--success); font-weight:bold; margin-top:10px;">✓ SERVIÇO FINALIZADO</div>`}
-            </div>`;
+                <div class="prog-item status-${item.status.toLowerCase()}">
+                    <b>${item.placa}</b> | ${item.hora}<br>
+                    <div style="margin-top:5px; color:#94a3b8;">OBS: ${item.obs}</div>
+                    ${item.status !== 'CONCLUIDO' ? `
+                        <label class="file-label" for="f-${item.id}">📸 TIRAR ${labelFoto}</label>
+                        <input type="file" id="f-${item.id}" capture="environment" onchange="document.getElementById('btn-${item.id}').classList.remove('hidden')">
+                        <button id="btn-${item.id}" class="hidden" onclick="alterarStatus(${item.id}, '${item.status}')" style="background:var(--success); margin-top:10px;">${textoBotao}</button>
+                    ` : `<div style="color:var(--success); font-weight:bold; margin-top:10px;">✓ SERVIÇO FINALIZADO</div>`}
+                </div>`;
             }).join('') : '<p style="font-size:12px; color:var(--gray);">Nenhum veículo para esta data.</p>';
         }
 
@@ -514,7 +446,6 @@ lokamig_limpo.html
             const hoje = new Date().toISOString().split('T')[0];
             const todos = JSON.parse(localStorage.getItem(DB.prog) || '[]');
             const filtrados = todos.filter(x => x.data === hoje);
-
             const listaDiv = document.getElementById('prog-list-cliente');
             listaDiv.innerHTML = filtrados.length ? filtrados.map(item => `
                 <div class="prog-item status-${item.status.toLowerCase()}">
@@ -522,20 +453,13 @@ lokamig_limpo.html
                     <div style="margin-top:5px; color:#94a3b8;">Destino: ${item.destino}</div>
                     <div style="margin-top:5px; color:#94a3b8;">Status: <strong>${item.status}</strong></div>
                     <div style="margin-top:5px; color:#94a3b8;">OBS: ${item.obs}</div>
-                </div>
-            `).join('') : '<p style="font-size:12px; color:var(--gray);">Nenhuma programação para hoje.</p>';
+                </div>`).join('') : '<p style="font-size:12px; color:var(--gray);">Nenhuma programação para hoje.</p>';
         }
 
         function alterarStatus(id, statusAtual) {
             let dados = JSON.parse(localStorage.getItem(DB.prog));
             const index = dados.findIndex(x => x.id === id);
-
-            if (statusAtual === 'PENDENTE') {
-                dados[index].status = 'EXECUCAO';
-            } else {
-                dados[index].status = 'CONCLUIDO';
-            }
-
+            dados[index].status = statusAtual === 'PENDENTE' ? 'EXECUCAO' : 'CONCLUIDO';
             localStorage.setItem(DB.prog, JSON.stringify(dados));
             carregarProgFornecedor();
         }
@@ -545,7 +469,6 @@ lokamig_limpo.html
             const mat = document.getElementById('c-mat').value;
             const nfc = document.getElementById('c-nfc').value;
             if (!nome || !mat) return alert("Preencha Nome e Matrícula");
-
             let list = JSON.parse(localStorage.getItem(DB.colab) || '[]');
             list.push({ nome, mat, nfc });
             localStorage.setItem(DB.colab, JSON.stringify(list));
@@ -558,7 +481,6 @@ lokamig_limpo.html
             const user = document.getElementById('f-user').value;
             const pass = document.getElementById('f-pass').value;
             const tipo = document.getElementById('f-tipo').value;
-
             let list = JSON.parse(localStorage.getItem(DB.forn) || '[]');
             list.push({ nome, user, pass, tipo });
             localStorage.setItem(DB.forn, JSON.stringify(list));
@@ -569,7 +491,6 @@ lokamig_limpo.html
         function salvarVeiculo() {
             const placa = document.getElementById('v-reg-placa').value.toUpperCase();
             const tipo = document.getElementById('v-reg-tipo').value;
-
             let list = JSON.parse(localStorage.getItem(DB.veic) || '[]');
             list.push({ placa, tipo });
             localStorage.setItem(DB.veic, JSON.stringify(list));
@@ -596,7 +517,6 @@ lokamig_limpo.html
         function lancarProgramacao() {
             const placa = document.getElementById('p-placa').value.toUpperCase();
             if (!placa) return alert("Insira a placa!");
-
             let prog = JSON.parse(localStorage.getItem(DB.prog) || '[]');
             prog.push({
                 id: Date.now(),
@@ -640,9 +560,7 @@ lokamig_limpo.html
         function addItem() {
             const container = document.getElementById('orc-itens');
             const row = document.createElement('div');
-            row.style.display = "flex";
-            row.style.gap = "5px";
-            row.style.marginBottom = "5px";
+            row.style.display = "flex"; row.style.gap = "5px"; row.style.marginBottom = "5px";
             row.innerHTML = `<input type="text" placeholder="Item" style="flex:2; margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1; margin:0;" oninput="calcTotal()">`;
             container.appendChild(row);
         }
@@ -653,8 +571,6 @@ lokamig_limpo.html
             document.getElementById('total-orc').innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         }
     </script>
-
 </body>
 
 </html>
-Web App de Gestão de Frotas: LOKAMIG - Manus
