@@ -4,8 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOKAMIG | Gestão de Frotas Pro</title>
+    <title>LOKAMIG | Gestão Operacional 360°</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Bibliotecas para PDF Profissional -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         :root {
             --primary: #d1122a;
@@ -16,6 +21,7 @@
             --danger: #ef4444;
             --gray: #94a3b8;
             --joint: #8b5cf6;
+            --return: #3b82f6;
         }
 
         * {
@@ -115,11 +121,19 @@
         .btn-danger {
             background: var(--danger);
             width: auto;
-            padding: 5px 10px;
+            padding: 6px 12px;
         }
 
         .btn-info {
             background: #3b82f6;
+            width: auto;
+            padding: 6px 12px;
+        }
+
+        .btn-pdf {
+            background: #ff5722;
+            width: auto;
+            padding: 6px 12px;
         }
 
         .hidden {
@@ -165,7 +179,7 @@
 
         .tab-btn {
             background: rgba(30, 41, 59, 0.8);
-            padding: 8px 12px;
+            padding: 10px 12px;
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #fff;
@@ -179,55 +193,76 @@
             font-weight: bold;
         }
 
-        .critical-grid {
+        .preview-area {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
             margin: 10px 0;
         }
 
-        .critical-btn {
-            background: rgba(255, 255, 255, 0.05);
-            font-size: 8px;
-            padding: 10px;
-            border: 1px dashed var(--gray);
-            text-align: center;
-            border-radius: 8px;
+        .photo-card {
+            position: relative;
+            width: 100%;
+            height: 65px;
+        }
+
+        .thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid var(--primary);
+        }
+
+        .del-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            border: 2px solid #fff;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .budget-builder {
-            background: rgba(139, 92, 246, 0.1);
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid var(--joint);
-            margin: 10px 0;
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+            display: none;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- TELA LOGIN -->
     <section id="scr-login" class="container">
         <h1>LOKAMIG</h1>
         <div class="sub">Logística & Gestão Operacional</div>
         <input type="text" id="user" placeholder="Usuário">
         <input type="password" id="pass" placeholder="Senha">
-        <button onclick="handleLogin()">Entrar no Sistema</button>
+        <button onclick="handleLogin()">Entrar</button>
     </section>
 
-    <!-- ADMIN COMPLETO -->
+    <!-- ADMIN -->
     <section id="scr-admin" class="container hidden">
         <h1>ADMINISTRAÇÃO</h1>
         <div class="tabs">
             <button class="tab-btn tab-active" onclick="switchTab('monitor', event)">Monitor</button>
             <button class="tab-btn" onclick="switchTab('history', event)">Histórico</button>
-            <button class="tab-btn" onclick="switchTab('budgets', event)">Orçamentos</button>
             <button class="tab-btn" onclick="switchTab('forn', event)">Fornecedores</button>
-            <button class="tab-btn" onclick="switchTab('colab', event)">Equipe</button>
-            <button class="tab-btn" onclick="switchTab('veic', event)">Frota</button>
-            <button class="tab-btn" onclick="switchTab('progs', event)">Gestores</button>
             <button class="tab-btn" onclick="switchTab('config', event)">Backup</button>
         </div>
         <div id="area-monitor">
@@ -236,155 +271,214 @@
         <div id="area-history" class="hidden">
             <div id="list-history-admin"></div>
         </div>
-        <div id="area-budgets" class="hidden">
-            <div id="list-budgets-admin"></div>
-        </div>
         <div id="area-forn" class="hidden">
-            <div id="forn-main-view">
-                <div class="form-section"><input type="text" id="f-nome" placeholder="NOME EMPRESA"><button
-                        onclick="salvarNovoFornecedor()" class="btn-success">Cadastrar</button></div>
-                <div id="list-forn"></div>
-            </div>
-            <div id="forn-detail-view" class="hidden"><button onclick="fecharDetalhesForn()"
-                    style="width:auto">Voltar</button>
-                <h3 id="view-forn-title"></h3>
-                <div id="list-forn-users"></div>
-            </div>
-        </div>
-        <div id="area-colab" class="hidden">
-            <div class="form-section"><input type="text" id="c-mat" placeholder="MATRÍCULA"><input type="text"
-                    id="c-nome" placeholder="NOME"><button
-                    onclick="salvarItem('colab', {mat:document.getElementById('c-mat').value, nome:document.getElementById('c-nome').value})"
-                    class="btn-success">Salvar</button></div>
-            <div id="list-colab"></div>
-        </div>
-        <div id="area-veic" class="hidden">
-            <div class="form-section"><input type="text" id="v-placa" placeholder="PLACA"><button
-                    onclick="salvarItem('veic', {placa:document.getElementById('v-placa').value})"
-                    class="btn-success">Salvar</button></div>
-            <div id="list-veic"></div>
-        </div>
-        <div id="area-progs" class="hidden">
-            <div id="list-progs"></div>
+            <div id="list-forn"></div>
         </div>
         <div id="area-config" class="hidden"><button onclick="exportarDados()">📥 Exportar Backup</button></div>
         <button onclick="handleLogout()" style="background:#334155; margin-top:20px;">Sair</button>
     </section>
 
-    <!-- GESTOR -->
+    <!-- TELA GESTOR (PAULISTA) -->
     <section id="scr-programador" class="container hidden">
-        <h1>LANÇAR AGENDA</h1>
+        <h1>CHECKLIST & LANÇAMENTOS</h1>
+
         <div class="form-section">
+            <label style="font-size: 10px; color: var(--gray);">TIPO DE OPERAÇÃO:</label>
+            <select id="p-tipo-op" onchange="toggleFornSelect(this.value)">
+                <option value="SAÍDA">SAÍDA (Enviar para Fornecedor)</option>
+                <option value="RETORNO">RETORNO (Entrada no Pátio)</option>
+            </select>
+
             <input type="text" id="p-placa" placeholder="PLACA">
-            <select id="p-fornecedor-select"></select>
-            <button onclick="lancarProgramacao()" class="btn-success">Enviar para Fornecedor</button>
+            <input type="number" id="p-km" placeholder="KM ATUAL">
+
+            <div id="p-forn-div">
+                <label style="font-size: 10px; color: var(--gray);">FORNECEDOR DESTINO:</label>
+                <select id="p-fornecedor-select"></select>
+            </div>
+
+            <textarea id="p-obs" placeholder="Relato de Avarias / Peças / Observações..."></textarea>
+
+            <input type="file" id="p-fotos" multiple accept="image/*" class="hidden" onchange="handleNewUpload(this)">
+            <button onclick="document.getElementById('p-fotos').click()" style="background:var(--joint)">📷 Tirar Fotos
+                do Checklist</button>
+            <div id="p-preview-fotos" class="preview-area"></div>
+
+            <button onclick="lancarProgramacao()" class="btn-success">Finalizar Checklist</button>
         </div>
+
         <input type="date" id="p-filter-date" onchange="carregarProgGeral()" style="margin-bottom:10px;">
         <div id="list-prog-geral"></div>
         <button onclick="handleLogout()" style="background:#334155;">Sair</button>
     </section>
 
-    <!-- FORNECEDOR -->
-    <section id="scr-fornecedor" class="container hidden">
-        <h1 id="forn-name-screen"></h1>
-        <input type="date" id="forn-filter-date" onchange="carregarServicosForn(currentUser)"
-            style="margin-bottom:15px;">
-        <div id="list-forn-servicos"></div>
-        <button onclick="handleLogout()" style="background:#334155; margin-top:20px;">Sair</button>
-    </section>
+    <!-- MODAL GALERIA -->
+    <div id="modal-galeria" class="modal">
+        <h2 style="color:var(--primary)">Galeria do Veículo</h2>
+        <p id="galeria-placa" style="font-size:12px;"></p>
+        <button onclick="document.getElementById('add-more-photos').click()" class="btn-success">➕ Adicionar Mais
+            Fotos</button>
+        <input type="file" id="add-more-photos" multiple accept="image/*" class="hidden"
+            onchange="adicionarFotosGaleria(this)">
+        <div id="grid-fotos-galeria" class="preview-area" style="grid-template-columns: repeat(3, 1fr);"></div>
+        <button onclick="fecharGaleria()" style="background:#334155; margin-top:20px;">Fechar Galeria</button>
+    </div>
+
+    <!-- TEMPLATE PDF (COM LOGO) -->
+    <div id="pdf-template"
+        style="position:fixed; left:-9999px; width:800px; background:#fff; color:#000; padding:40px;">
+        <div
+            style="display:flex; justify-content:space-between; align-items:center; border-bottom:4px solid #d1122a; padding-bottom:15px; margin-bottom:20px;">
+            <img src="https://www.lokamig.com.br/wp-content/themes/lokamig/img/logo-lokamig.png" style="width:180px;">
+            <div style="text-align:right;">
+                <h2 id="pdf-titulo" style="margin:0; color:#d1122a;">RELATÓRIO DE CHECKLIST</h2>
+                <p id="pdf-data-geracao" style="margin:0; font-size:12px;"></p>
+            </div>
+        </div>
+        <div id="pdf-body" style="font-size:14px; line-height:1.6;"></div>
+        <div id="pdf-photos" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px;"></div>
+        <div style="margin-top:50px; border-top:1px solid #000; padding-top:10px; text-align:center; font-size:12px;">
+            <b>Responsável Operacional:</b> <span id="pdf-programador"></span>
+        </div>
+    </div>
 
     <script>
-        const DB = { prog: 'l_prog_v21', forn: 'l_forn_v21', fornUsers: 'l_fusers_v21', progs: 'l_progs_v21', colab: 'l_colab_v21', veic: 'l_veic_v21' };
-        let currentUser = null;
-        let selectedForn = null;
-        let tempBudgetItems = [];
+        const DB = { prog: 'l_prog_v45', forn: 'l_forn_v45', fornUsers: 'l_fusers_v45', progs: 'l_progs_v45' };
+        let tempFotos = [];
+        let galeriaAtivaIdx = null;
+        let programadorLogado = "Paulista";
 
         window.onload = () => {
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('p-filter-date').value = hoje;
-            document.getElementById('forn-filter-date').value = hoje;
             if (!localStorage.getItem(DB.progs)) {
-                localStorage.setItem(DB.forn, JSON.stringify([{ "nome": "AGSN" }, { "nome": "MEGA CENTER" }, { "nome": "Lava jato Maximu's" }]));
-                localStorage.setItem(DB.fornUsers, JSON.stringify([{ "user": "rodolfo", "pass": "1234", "empresa": "MEGA CENTER", "tipo": "Oficina" }, { "user": "fiu", "pass": "1234", "empresa": "Lava jato Maximu's", "tipo": "Limpeza" }, { "user": "taty", "pass": "1234", "empresa": "AGSN", "tipo": "Oficina" }]));
                 localStorage.setItem(DB.progs, JSON.stringify([{ "nome": "Paulista", "user": "paulista", "pass": "1234" }]));
+                localStorage.setItem(DB.forn, JSON.stringify([{ "nome": "AGSN" }, { "nome": "MEGA CENTER" }, { "nome": "Lava jato Maximu's" }]));
             }
             popularSeletorFornecedores();
         };
+
+        function toggleFornSelect(val) {
+            document.getElementById('p-forn-div').classList.toggle('hidden', val === 'RETORNO');
+        }
 
         function handleLogin() {
             const u = document.getElementById('user').value.trim().toUpperCase();
             const p = document.getElementById('pass').value.trim();
             if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarProgAdmin(); return; }
             const gestores = JSON.parse(localStorage.getItem(DB.progs) || '[]');
-            const gestor = gestores.find(x => x.user.toUpperCase() === u && x.pass === p);
-            if (gestor) { show('scr-programador'); carregarProgGeral(); return; }
-            const fUsers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]');
-            const fUser = fUsers.find(x => x.user.toUpperCase() === u && x.pass === p);
-            if (fUser) { currentUser = fUser; show('scr-fornecedor'); document.getElementById('forn-name-screen').innerText = fUser.empresa; carregarServicosForn(fUser); return; }
-            alert("Usuário ou Senha incorretos.");
+            const g = gestores.find(x => x.user.toUpperCase() === u && x.pass === p);
+            if (g) { programadorLogado = g.nome; show('scr-programador'); carregarProgGeral(); return; }
+            alert("Acesso Negado.");
         }
 
-        function carregarServicosForn(user) {
-            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            const dt = document.getElementById('forn-filter-date').value;
-            const meus = list.filter(s => ((user.empresa === "MEGA CENTER" || user.empresa.includes('Max')) ? (s.fornecedor === user.empresa || s.fornecedor.includes('+')) : s.fornecedor === user.empresa) && s.data === dt);
-            document.getElementById('list-forn-servicos').innerHTML = meus.map((s) => {
-                const gIdx = list.indexOf(s);
-                let html = `<div class="prog-item" style="border-left-color:${s.status_flow === 'CONCLUÍDO' ? 'var(--success)' : 'var(--danger)'}">
-                    <span class="status-badge">${s.status_flow}</span><b>${s.placa}</b><br>`;
-                if (s.status_flow === 'PENDENTE') {
-                    html += `<div class="critical-grid"><div class="critical-btn" onclick="this.style.color='var(--success)'">📸 FRENTE</div><div class="critical-btn" onclick="this.style.color='var(--success)'">📸 TRASEIRA</div><div class="critical-btn" onclick="alert('Gravando...')">🎥 VÍDEO</div></div><button class="btn-warning" onclick="atualizarStatus(${gIdx}, 'EM EXECUÇÃO')">Iniciar Atendimento</button>`;
-                } else if (s.status_flow === 'EM EXECUÇÃO') {
-                    if (user.tipo === 'Oficina') html += `<div class="budget-builder"><input type="text" id="it-d-${gIdx}" placeholder="Item"><input type="number" id="it-v-${gIdx}" placeholder="R$"><button onclick="addBudgetItem(${gIdx})" class="btn-info">+</button><div id="temp-${gIdx}"></div><button onclick="subOrcamento(${gIdx})">Enviar Orçamento</button></div>`;
-                    html += `<button class="btn-success" onclick="atualizarStatus(${gIdx}, 'CONCLUÍDO')">Finalizar Tudo</button>`;
-                } else { html += `<p style="color:var(--success)">✓ Concluído às ${s.hora_fim}</p><button class="btn-warning" style="background:#64748b" onclick="atualizarStatus(${gIdx}, 'EM EXECUÇÃO')">↩ Voltar</button>`; }
-                return html + `</div>`;
-            }).join('') || "Sem veículos.";
+        // --- GESTÃO PAULISTA ---
+        function handleNewUpload(input) {
+            [...input.files].forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => { tempFotos.push(e.target.result); renderNewPreviews(); };
+                reader.readAsDataURL(file);
+            });
         }
-
-        function addBudgetItem(gIdx) {
-            const d = document.getElementById(`it-d-${gIdx}`).value; const v = document.getElementById(`it-v-${gIdx}`).value;
-            if (!d || !v) return; tempBudgetItems.push({ d, v: parseFloat(v) });
-            document.getElementById(`temp-${gIdx}`).innerHTML = tempBudgetItems.map(i => `<div>• ${i.d}: R$ ${i.v}</div>`).join('');
-        }
-
-        function subOrcamento(gIdx) {
-            let list = JSON.parse(localStorage.getItem(DB.prog)); list[gIdx].budget_items = tempBudgetItems; list[gIdx].budget_status = 'AGUARDANDO';
-            localStorage.setItem(DB.prog, JSON.stringify(list)); tempBudgetItems = []; alert("Enviado!"); carregarServicosForn(currentUser);
+        function renderNewPreviews() {
+            document.getElementById('p-preview-fotos').innerHTML = tempFotos.map((f, i) => `<div class="photo-card"><img src="${f}" class="thumb"><button class="del-btn" onclick="tempFotos.splice(${i},1); renderNewPreviews()">X</button></div>`).join('');
         }
 
         function lancarProgramacao() {
-            const p = document.getElementById('p-placa').value.toUpperCase(); if (!p) return alert("Digite a placa!");
-            const agora = new Date(); let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            list.push({ data: agora.toISOString().split('T')[0], timestamp: agora.toLocaleTimeString(), placa: p, fornecedor: document.getElementById('p-fornecedor-select').value, status_flow: 'PENDENTE' });
-            localStorage.setItem(DB.prog, JSON.stringify(list)); document.getElementById('p-placa').value = ""; carregarProgGeral();
+            const p = document.getElementById('p-placa').value.toUpperCase();
+            const tipoOp = document.getElementById('p-tipo-op').value;
+            if (!p) return alert("Digite a placa!");
+
+            let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            list.push({
+                id: Date.now(),
+                tipo: tipoOp,
+                data: new Date().toISOString().split('T')[0],
+                timestamp: new Date().toLocaleString(),
+                placa: p,
+                km: document.getElementById('p-km').value,
+                fornecedor: tipoOp === 'RETORNO' ? 'LOKAMIG PÁTIO' : document.getElementById('p-fornecedor-select').value,
+                obs: document.getElementById('p-obs').value,
+                fotos: [...tempFotos],
+                programador: programadorLogado,
+                status_flow: tipoOp === 'RETORNO' ? 'FINALIZADO' : 'PENDENTE'
+            });
+            localStorage.setItem(DB.prog, JSON.stringify(list));
+            tempFotos = []; renderNewPreviews();
+            document.getElementById('p-placa').value = ""; document.getElementById('p-km').value = ""; document.getElementById('p-obs').value = "";
+            carregarProgGeral();
+            alert(tipoOp === 'RETORNO' ? "Retorno registrado!" : "Veículo enviado para fornecedor!");
         }
 
         function carregarProgGeral() {
-            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const dt = document.getElementById('p-filter-date').value;
-            document.getElementById('list-prog-geral').innerHTML = list.filter(i => i.data === dt).map((i) => `
-                <div class="prog-item"><b>${i.placa}</b> - ${i.status_flow} 
-                <button class="btn-danger" style="float:right; padding:2px 8px;" onclick="cancelarCarro(${list.indexOf(i)})">X</button>
-                </div>`).reverse().join('') || "Agenda vazia.";
+            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const dt = document.getElementById('p-filter-date').value;
+            document.getElementById('list-prog-geral').innerHTML = list.filter(i => i.data === dt).map((i) => {
+                const gIdx = list.indexOf(i);
+                const isRetorno = i.tipo === 'RETORNO';
+                return `
+                <div class="prog-item" style="border-left-color:${isRetorno ? 'var(--return)' : 'var(--primary)'}">
+                    <span class="status-badge" style="background:${isRetorno ? 'var(--return)' : 'var(--danger)'}">${isRetorno ? 'RETORNO' : i.status_flow}</span>
+                    <b>🚗 ${i.placa}</b><br>
+                    <small>📍 ${i.fornecedor} | 🕒 ${i.timestamp}</small><br>
+                    <small style="color:var(--warning)">📝 Obs: ${i.obs || 'Nenhuma'}</small><br>
+                    <div style="display:flex; gap:5px; margin-top:10px; flex-wrap:wrap;">
+                        <button class="btn-info" onclick="abrirGaleria(${gIdx})">📸 FOTOS (${i.fotos.length})</button>
+                        <button class="btn-pdf" onclick="gerarPDFProfissional(${gIdx})">📄 PDF</button>
+                        <button class="btn-info" style="background:var(--joint)" onclick="editarObs(${gIdx})">✏️ EDITAR</button>
+                        <button class="btn-danger" onclick="cancelarCarro(${gIdx})">❌ CANCELAR</button>
+                    </div>
+                </div>`;
+            }).reverse().join('') || "Sem registros.";
         }
 
-        function cancelarCarro(idx) { let list = JSON.parse(localStorage.getItem(DB.prog)); list.splice(idx, 1); localStorage.setItem(DB.prog, JSON.stringify(list)); carregarProgGeral(); }
-        function switchTab(id, e) { document.querySelectorAll('[id^="area-"]').forEach(a => a.classList.add('hidden')); document.getElementById('area-' + id).classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); if (e) e.target.classList.add('tab-active'); if (id === 'monitor') carregarProgAdmin(); else if (id === 'history') carregarHistoryAdmin(); else renderAdminList(id); }
-        function carregarProgAdmin() { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); document.getElementById('list-prog-admin').innerHTML = list.filter(s => s.status_flow !== 'CONCLUÍDO').map(s => `<div class="prog-item"><span class="status-badge">${s.status_flow}</span><b>${s.placa}</b><br><small>${s.fornecedor}</small></div>`).reverse().join(''); }
-        function carregarHistoryAdmin() { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); document.getElementById('list-history-admin').innerHTML = list.filter(s => s.status_flow === 'CONCLUÍDO').map(s => `<div class="prog-item" style="border-color:var(--success)"><b>${s.placa}</b> - ${s.fornecedor}</div>`).reverse().join(''); }
-        function renderAdminList(key) { const list = JSON.parse(localStorage.getItem(DB[key]) || '[]'); const cont = document.getElementById('list-' + key); if (cont) cont.innerHTML = list.map((i, idx) => `<div class="prog-item"><span>${i.nome || i.placa || i.mat || i.user}</span> <button class="btn-danger" onclick="excluirItem('${key}',${idx})">X</button></div>`).join(''); }
-        function verDetalhesForn(n) { selectedForn = n; document.getElementById('forn-main-view').classList.add('hidden'); document.getElementById('forn-detail-view').classList.remove('hidden'); document.getElementById('view-forn-title').innerText = n; renderFornUsers(); }
+        // --- GALERIA & PDF ---
+        function abrirGaleria(idx) { galeriaAtivaIdx = idx; const item = JSON.parse(localStorage.getItem(DB.prog))[idx]; document.getElementById('galeria-placa').innerText = `Veículo: ${item.placa}`; document.getElementById('modal-galeria').style.display = 'block'; renderGaleriaItems(); }
+        function fecharGaleria() { document.getElementById('modal-galeria').style.display = 'none'; carregarProgGeral(); }
+        function renderGaleriaItems() { const item = JSON.parse(localStorage.getItem(DB.prog))[galeriaAtivaIdx]; document.getElementById('grid-fotos-galeria').innerHTML = item.fotos.map((f, i) => `<div class="photo-card" style="height:120px;"><img src="${f}" class="thumb"><button class="del-btn" onclick="removerFotoGaleria(${i})">X</button></div>`).join(''); }
+        function removerFotoGaleria(i) { let list = JSON.parse(localStorage.getItem(DB.prog)); list[galeriaAtivaIdx].fotos.splice(i, 1); localStorage.setItem(DB.prog, JSON.stringify(list)); renderGaleriaItems(); }
+        function adicionarFotosGaleria(input) { let list = JSON.parse(localStorage.getItem(DB.prog));[...input.files].forEach(file => { const reader = new FileReader(); reader.onload = e => { list[galeriaAtivaIdx].fotos.push(e.target.result); localStorage.setItem(DB.prog, JSON.stringify(list)); renderGaleriaItems(); }; reader.readAsDataURL(file); }); }
+
+        async function gerarPDFProfissional(idx) {
+            const item = JSON.parse(localStorage.getItem(DB.prog))[idx];
+            const { jsPDF } = window.jspdf;
+            document.getElementById('pdf-titulo').innerText = `CHECKLIST DE ${item.tipo || 'SAÍDA'}`;
+            document.getElementById('pdf-data-geracao').innerText = item.timestamp;
+            document.getElementById('pdf-programador').innerText = item.programador;
+            document.getElementById('pdf-body').innerHTML = `
+                <p><b>PLACA DO VEÍCULO:</b> ${item.placa} &nbsp;&nbsp;&nbsp; <b>KM NO REGISTRO:</b> ${item.km || 'N/I'}</p>
+                <p><b>LOCAL/FORNECEDOR:</b> ${item.fornecedor}</p>
+                <p><b>OBSERVAÇÕES REGISTRADAS:</b> ${item.obs || 'Nenhuma.'}</p>
+            `;
+            const grid = document.getElementById('pdf-photos'); grid.innerHTML = '';
+            item.fotos.forEach(f => { grid.innerHTML += `<img src="${f}" style="width:100%; border:1px solid #ddd; border-radius:5px;">`; });
+            html2canvas(document.getElementById('pdf-template'), { scale: 2, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = doc.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                doc.save(`${item.tipo}_LOKAMIG_${item.placa}.pdf`);
+            });
+        }
+
+        // --- AUXILIARES ---
         function popularSeletorFornecedores() { const forns = JSON.parse(localStorage.getItem(DB.forn) || '[]'); let o = forns.map(f => `<option value="${f.nome}">${f.nome}</option>`).join(''); o += `<option value="MEGA CENTER + MAXIMU'S">🤝 Parceria</option>`; document.getElementById('p-fornecedor-select').innerHTML = o; }
         function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
         function handleLogout() { show('scr-login'); }
-        function salvarItem(k, v) { let list = JSON.parse(localStorage.getItem(DB[k]) || '[]'); list.push(v); localStorage.setItem(DB[k], JSON.stringify(list)); renderAdminList(k); }
-        function excluirItem(k, i) { let list = JSON.parse(localStorage.getItem(DB[k])); list.splice(i, 1); localStorage.setItem(DB[k], JSON.stringify(list)); renderAdminList(k); }
-        function atualizarStatus(idx, novo) { let list = JSON.parse(localStorage.getItem(DB.prog)); list[idx].status_flow = novo; if (novo === 'CONCLUÍDO') list[idx].hora_fim = new Date().toLocaleTimeString(); localStorage.setItem(DB.prog, JSON.stringify(list)); carregarServicosForn(currentUser); }
+        function editarObs(idx) { let list = JSON.parse(localStorage.getItem(DB.prog)); const n = prompt("Nova observação:", list[idx].obs); if (n !== null) { list[idx].obs = n; localStorage.setItem(DB.prog, JSON.stringify(list)); carregarProgGeral(); } }
+        function cancelarCarro(idx) { if (confirm("Remover registro?")) { let list = JSON.parse(localStorage.getItem(DB.prog)); list.splice(idx, 1); localStorage.setItem(DB.prog, JSON.stringify(list)); carregarProgGeral(); } }
+        function switchTab(id, e) { document.querySelectorAll('[id^="area-"]').forEach(a => a.classList.add('hidden')); document.getElementById('area-' + id).classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); if (e) e.target.classList.add('tab-active'); }
+        function carregarProgAdmin() { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); document.getElementById('list-prog-admin').innerHTML = list.map(s => `<div class="prog-item"><b>${s.placa}</b> - ${s.status_flow}</div>`).reverse().join(''); }
         function exportarDados() { const data = {}; Object.keys(DB).forEach(k => data[k] = localStorage.getItem(DB[k])); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' })); a.download = 'backup.json'; a.click(); }
-        function fecharDetalhesForn() { document.getElementById('forn-main-view').classList.remove('hidden'); document.getElementById('forn-detail-view').classList.add('hidden'); }
+        function renderAdminList(key) { const list = JSON.parse(localStorage.getItem(DB[key]) || '[]'); const cont = document.getElementById('list-' + key); if (cont) cont.innerHTML = list.map((i, idx) => `<div class="prog-item"><span>${i.nome || i.placa || i.mat}</span><button class="btn-danger" onclick="excluirItem('${key}',${idx})">X</button></div>`).join(''); }
+        function salvarItem(k, v) { let list = JSON.parse(localStorage.getItem(DB[k]) || '[]'); list.push(v); localStorage.setItem(DB[k], JSON.stringify(list)); carregarProgAdmin(); }
+        function excluirItem(k, i) { let list = JSON.parse(localStorage.getItem(DB[k])); list.splice(i, 1); localStorage.setItem(DB[k], JSON.stringify(list)); renderAdminList(k); }
         function salvarNovoFornecedor() { const n = document.getElementById('f-nome').value.trim(); if (!n) return; let list = JSON.parse(localStorage.getItem(DB.forn) || '[]'); list.push({ nome: n }); localStorage.setItem(DB.forn, JSON.stringify(list)); renderAdminList('forn'); popularSeletorFornecedores(); }
+        function verDetalhesForn(n) { selectedForn = n; document.getElementById('forn-main-view').classList.add('hidden'); document.getElementById('forn-detail-view').classList.remove('hidden'); document.getElementById('view-forn-title').innerText = n; renderFornUsers(); }
+        function fecharDetalhesForn() { document.getElementById('forn-main-view').classList.remove('hidden'); document.getElementById('forn-detail-view').classList.add('hidden'); }
         function renderFornUsers() { const all = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]'); const f = all.filter(u => u.empresa === selectedForn); document.getElementById('list-forn-users').innerHTML = f.map(u => `<div class="prog-item">👤 ${u.user}</div>`).join(''); }
-        function salvarUsuarioForn() { const u = document.getElementById('fu-user').value.trim(); const p = document.getElementById('fu-pass').value.trim(); if (!u || !p) return; let list = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]'); list.push({ user: u, pass: p, empresa: selectedForn, tipo: (selectedForn.includes('Lava') ? 'Limpeza' : 'Oficina') }); localStorage.setItem(DB.fornUsers, JSON.stringify(list)); renderFornUsers(); }
+        function salvarUsuarioForn() { const u = document.getElementById('fu-user').value.trim(); const p = document.getElementById('fu-pass').value.trim(); if (!u || !p) return; let list = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]'); list.push({ user: u, pass: p, empresa: selectedForn, tipo: 'Mista' }); localStorage.setItem(DB.fornUsers, JSON.stringify(list)); renderFornUsers(); }
     </script>
 </body>
 
