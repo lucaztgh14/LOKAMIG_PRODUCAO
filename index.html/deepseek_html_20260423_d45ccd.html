@@ -1481,7 +1481,14 @@
             localStorage.setItem(DB.veic, JSON.stringify(list));
 
             // Salva no Supabase (nuvem)
-            await salvarNoBanco('veiculos', novoVeiculo);
+            try {
+                const resultado = await salvarNoBanco('veiculos', novoVeiculo);
+                if (!resultado) {
+                    alert('Erro: Não foi possível sincronizar com a nuvem. Verifique a conexão com a Internet.');
+                }
+            } catch (e) {
+                alert('Falha na comunicação com o Supabase: ' + e.message);
+            }
 
             document.getElementById('v-placa').value = '';
             document.getElementById('v-modelo').value = '';
