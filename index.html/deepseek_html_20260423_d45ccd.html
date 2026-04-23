@@ -1,4 +1,3 @@
-<!-- Deploy funcionando v1.0 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -11,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="LOKAMIG">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg">
-    <title>LOKAMIG | Gestão Operacional Pro v3.4</title>
+    <title>LOKAMIG | Gestão Operacional Pro v3.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -586,7 +585,6 @@
 </head>
 
 <body class="login-bg">
-    <!-- Deploy funcionando v1.0 -->
 
     <div id="success-overlay">
         <div class="check-v">✓</div>
@@ -598,7 +596,7 @@
     <section id="scr-login" class="container">
         <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg" alt="LOKAMIG" class="login-logo"
             onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22100%22><rect fill=%22%23d1122a%22 width=%22200%22 height=%22100%22/><text fill=%22white%22 font-size=%2224%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22>LOKAMIG</text></svg>';">
-        <div class="sub">Logística & Gestão Operacional Pro v3.4</div>
+        <div class="sub">Logística & Gestão Operacional Pro v3.5</div>
         <input type="text" id="user" placeholder="Usuário / Crachá" autocomplete="off" maxlength="50">
         <input type="password" id="pass" placeholder="Senha" maxlength="50">
         <button onclick="handleLogin()">Entrar</button>
@@ -662,7 +660,6 @@
             <h3 style="margin-bottom:15px;">📋 Histórico</h3>
             <div id="list-history-admin"></div>
         </div>
-
         <div id="area-forn" class="admin-content hidden">
             <div class="form-section">
                 <input type="text" id="f-nome" placeholder="EMPRESA"><input type="text" id="f-user"
@@ -675,7 +672,6 @@
             </div>
             <div id="list-forn"></div>
         </div>
-
         <div id="area-colab" class="admin-content hidden">
             <div class="form-section">
                 <input type="text" id="c-mat" placeholder="MATRÍCULA"><input type="text" id="c-nome"
@@ -689,7 +685,6 @@
             </div>
             <div id="list-colab"></div>
         </div>
-
         <div id="area-veic" class="admin-content hidden">
             <div class="form-section">
                 <input type="text" id="v-placa" placeholder="PLACA" oninput="this.value=this.value.toUpperCase()"
@@ -706,7 +701,6 @@
             </div>
             <div id="list-veic"></div>
         </div>
-
         <div id="area-manutencao" class="admin-content hidden">
             <div class="form-section">
                 <select id="m-veiculo"></select><input type="text" id="m-descricao" placeholder="Descrição"><input
@@ -715,11 +709,9 @@
             </div>
             <div id="list-manutencoes"></div>
         </div>
-
         <div id="area-orcamentos" class="admin-content hidden">
             <div id="list-orcamentos-admin"></div>
         </div>
-
         <div id="area-combustivel" class="admin-content hidden">
             <div class="form-section">
                 <select id="ab-veiculo"></select><input type="number" id="ab-litros" placeholder="Litros"
@@ -740,14 +732,12 @@
             </div>
             <div id="list-abastecimentos"></div>
         </div>
-
         <div id="area-emails" class="admin-content hidden">
             <div class="form-section"><input type="email" id="email-destinatario" placeholder="E-mail"><input
                     type="text" id="email-nome" placeholder="Nome"><button onclick="adicionarEmail()"
                     class="btn-success">Adicionar</button></div>
             <div id="list-emails"></div>
         </div>
-
         <div id="area-auditoria" class="admin-content hidden">
             <h4>📝 Logs</h4>
             <div id="list-auditoria"></div>
@@ -930,10 +920,10 @@
         // ============================================
         const LOGO_URL = 'https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg';
         const DB = {
-            prog: 'l_prog_v34', forn: 'l_forn_v34', fornUsers: 'l_fusers_v34', progs: 'l_progs_v34',
-            colab: 'l_colab_v34', veic: 'l_veic_v34', orc: 'l_orc_v34', manutencao: 'l_manut_v34',
-            combustivel: 'l_comb_v34', avaliacoes: 'l_aval_v34', emails: 'l_emails_v34',
-            auditoria: 'l_audit_v34', permissoes: 'l_perm_v34'
+            prog: 'l_prog_v35', forn: 'l_forn_v35', fornUsers: 'l_fusers_v35', progs: 'l_progs_v35',
+            colab: 'l_colab_v35', veic: 'l_veic_v35', orc: 'l_orc_v35', manutencao: 'l_manut_v35',
+            combustivel: 'l_comb_v35', avaliacoes: 'l_aval_v35', emails: 'l_emails_v35',
+            auditoria: 'l_audit_v35', permissoes: 'l_perm_v35'
         };
 
         const PERMISSOES_PADRAO = {
@@ -947,6 +937,69 @@
         let statusPendente = { idx: null, novoStatus: null, fotos: [], rating: 0 };
         let orcDetalheOrigem = 'admin';
 
+        // ============================================
+        // MIGRAÇÃO SUPABASE - NOVAS FUNÇÕES
+        // ============================================
+        async function salvarNoBanco(tabela, dados) {
+            try {
+                // Salva no Supabase
+                if (window.DB_API) {
+                    await DB_API.salvar(tabela, dados);
+                }
+                // Backup local
+                const chave = 'l_' + tabela + '_v35';
+                const existentes = JSON.parse(localStorage.getItem(chave) || '[]');
+                const index = existentes.findIndex(item => item.id === dados.id);
+                if (index >= 0) {
+                    existentes[index] = dados;
+                } else {
+                    existentes.push(dados);
+                }
+                localStorage.setItem(chave, JSON.stringify(existentes));
+                return true;
+            } catch (e) {
+                console.error('Erro ao salvar:', e);
+                return false;
+            }
+        }
+
+        async function buscarNoBanco(tabela) {
+            try {
+                // Tenta buscar do Supabase primeiro
+                if (window.DB_API && navigator.onLine) {
+                    const dados = await DB_API.buscar(tabela);
+                    if (dados.length > 0) return dados;
+                }
+                // Fallback para localStorage
+                const chave = 'l_' + tabela + '_v35';
+                return JSON.parse(localStorage.getItem(chave) || '[]');
+            } catch (e) {
+                console.error('Erro ao buscar:', e);
+                const chave = 'l_' + tabela + '_v35';
+                return JSON.parse(localStorage.getItem(chave) || '[]');
+            }
+        }
+
+        async function carregarDadosIniciais() {
+            try {
+                const progData = await DB_API.buscar('programacoes');
+                if (progData.length > 0) {
+                    localStorage.setItem(DB.prog, JSON.stringify(progData));
+                }
+                const veicData = await DB_API.buscar('veiculos');
+                if (veicData.length > 0) {
+                    localStorage.setItem(DB.veic, JSON.stringify(veicData));
+                }
+                const fornData = await DB_API.buscar('fornecedores');
+                if (fornData.length > 0) {
+                    localStorage.setItem(DB.forn, JSON.stringify(fornData));
+                }
+                console.log('✅ Dados carregados do Supabase!');
+            } catch (e) {
+                console.log('Usando dados locais (offline)');
+            }
+        }
+
         // INICIALIZAÇÃO
         window.onload = () => {
             const hoje = new Date().toISOString().split('T')[0];
@@ -959,6 +1012,11 @@
             if (!localStorage.getItem(DB.permissoes)) localStorage.setItem(DB.permissoes, JSON.stringify(PERMISSOES_PADRAO));
             popularSeletorFornecedores();
             popularSeletorVeiculos();
+
+            // Carregar dados do Supabase (se disponível)
+            if (navigator.onLine && window.DB_API) {
+                carregarDadosIniciais();
+            }
         };
 
         // NAVEGAÇÃO
@@ -1098,7 +1156,7 @@
             cont.innerHTML = tempFotos.map((f, i) => `<div class="photo-card"><img src="${f.data}" class="thumb" onclick="verFotoGrande('${f.data}')"><div class="timestamp-overlay">${f.metadata.data} ${f.metadata.hora}</div><button class="del-btn" onclick="tempFotos.splice(${i},1);renderNewPreviews()">✕</button></div>`).join('');
         }
 
-        function lancarProgramacao() {
+        async function lancarProgramacao() {
             const placa = document.getElementById('p-placa').value;
             if (!placa) return alert('Selecione um veículo!');
             const tipo = document.getElementById('p-tipo-op').value;
@@ -1107,15 +1165,16 @@
             const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
             const veic = veics.find(v => v.placa === placa);
 
-            let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            list.push({
+            const novoRegistro = {
                 id: Date.now(), data: new Date().toISOString().split('T')[0], timestamp: new Date().toLocaleString('pt-BR'),
                 placa, setor: veic?.tipo || '', km: document.getElementById('p-km').value, fornecedor,
                 obs: DOMPurify.sanitize(document.getElementById('p-obs').value), fotos: tempFotos.map(f => f.data),
                 fotos_metadata: tempFotos.map(f => f.metadata), programador: currentUser?.nome || 'Sistema',
                 status_flow: tipo === 'RETORNO' ? 'CONCLUIDO' : 'PENDENTE', tipo_op: tipo, cancelled: false
-            });
-            localStorage.setItem(DB.prog, JSON.stringify(list));
+            };
+
+            // Salva no banco (Supabase + localStorage)
+            await salvarNoBanco('programacoes', novoRegistro);
 
             document.getElementById('success-overlay').style.display = 'flex';
             setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 2000);
@@ -1123,8 +1182,9 @@
             document.getElementById('p-setor-display').style.display = 'none'; renderNewPreviews(); carregarProgGeral();
         }
 
-        function carregarProgGeral() {
-            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+        async function carregarProgGeral() {
+            // Buscar dados (Supabase ou localStorage)
+            const list = await buscarNoBanco('programacoes');
             const dt = document.getElementById('p-filter-date').value;
             const filtrados = list.filter(i => i.data === dt).reverse();
             const cont = document.getElementById('list-prog-geral');
@@ -1180,9 +1240,9 @@
         }
 
         // FORNECEDOR
-        function carregarServicosForn(user) {
+        async function carregarServicosForn(user) {
             const dt = document.getElementById('forn-filter-date').value || new Date().toISOString().split('T')[0];
-            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const list = await buscarNoBanco('programacoes');
             const meus = list.filter(s => s.data === dt && s.status_flow !== 'CANCELADO' && (s.fornecedor === user.empresa || (s.fornecedor && s.fornecedor.includes('+'))));
             const cont = document.getElementById('list-forn-servicos');
             if (!meus.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum serviço hoje.</p>'; return; }
@@ -1334,8 +1394,8 @@
         }
 
         // ADMIN
-        function carregarProgAdmin() {
-            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+        async function carregarProgAdmin() {
+            const list = await buscarNoBanco('programacoes');
             const filtroData = document.getElementById('mon-filter-date')?.value || new Date().toISOString().split('T')[0];
             const filtroPlaca = (document.getElementById('mon-filter-placa')?.value || '').toUpperCase();
             const filtroStatus = document.getElementById('mon-filter-status')?.value || '';
