@@ -1,0 +1,21 @@
+{
+    "name": "LOKAMIG Gestão Operacional",
+    "short_name": "LOKAMIG",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#d1122a",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg",
+            "sizes": "192x192",
+            "type": "image/jpeg"
+        },
+        {
+            "src": "https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg",
+            "sizes": "512x512",
+            "type": "image/jpeg"
+        }
+    ]
+}
