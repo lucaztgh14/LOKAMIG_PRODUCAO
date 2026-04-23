@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="LOKAMIG">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg">
-    <title>LOKAMIG | Gestão Operacional Pro v3.6</title>
+    <title>LOKAMIG | Gestão Operacional Pro v3.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -55,16 +55,14 @@
         }
 
         body.login-bg {
-            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)),
-                url('https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg');
+            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
 
         body.app-bg {
-            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)),
-                url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -596,7 +594,7 @@
     <section id="scr-login" class="container">
         <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg" alt="LOKAMIG" class="login-logo"
             onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22100%22><rect fill=%22%23d1122a%22 width=%22200%22 height=%22100%22/><text fill=%22white%22 font-size=%2224%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22>LOKAMIG</text></svg>';">
-        <div class="sub">Logística & Gestão Operacional Pro v3.6</div>
+        <div class="sub">Logística & Gestão Operacional Pro v3.7</div>
         <input type="text" id="user" placeholder="Usuário / Crachá" autocomplete="off" maxlength="50">
         <input type="password" id="pass" placeholder="Senha" maxlength="50">
         <button onclick="handleLogin()">Entrar</button>
@@ -920,10 +918,10 @@
         // ============================================
         const LOGO_URL = 'https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg';
         const DB = {
-            prog: 'l_prog_v36', forn: 'l_forn_v36', fornUsers: 'l_fusers_v36', progs: 'l_progs_v36',
-            colab: 'l_colab_v36', veic: 'l_veic_v36', orc: 'l_orc_v36', manutencao: 'l_manut_v36',
-            combustivel: 'l_comb_v36', avaliacoes: 'l_aval_v36', emails: 'l_emails_v36',
-            auditoria: 'l_audit_v36', permissoes: 'l_perm_v36'
+            prog: 'l_prog_v37', forn: 'l_forn_v37', fornUsers: 'l_fusers_v37', progs: 'l_progs_v37',
+            colab: 'l_colab_v37', veic: 'l_veic_v37', orc: 'l_orc_v37', manutencao: 'l_manut_v37',
+            combustivel: 'l_comb_v37', avaliacoes: 'l_aval_v37', emails: 'l_emails_v37',
+            auditoria: 'l_audit_v37', permissoes: 'l_perm_v37'
         };
 
         const PERMISSOES_PADRAO = {
@@ -938,7 +936,7 @@
         let orcDetalheOrigem = 'admin';
 
         // ============================================
-        // MIGRAÇÃO SUPABASE - NOVAS FUNÇÕES
+        // MIGRAÇÃO SUPABASE - FUNÇÃO CORRIGIDA
         // ============================================
         async function salvarNoBanco(tabela, dados) {
             const URL = 'https://rpsdrhaptipvujixoxa.supabase.co/rest/v1/' + tabela;
@@ -955,34 +953,29 @@
                     body: JSON.stringify(dados)
                 });
                 if (!response.ok) {
-                    const erro = await response.text();
-                    console.error('Erro Supabase:', erro);
-                    alert('Erro ao salvar no Supabase: ' + response.status + ' - ' + erro);
+                    const textoErro = await response.text();
+                    console.error('Erro Supabase:', textoErro);
                     return false;
                 }
-                // Sucesso
-                console.log('✅ Dados salvos no Supabase!', dados);
+                console.log('✅ Salvo no Supabase:', dados.placa || dados.nome || '');
                 return true;
             } catch (e) {
                 console.error('Falha na rede:', e);
-                alert('Falha na rede ao tentar salvar no Supabase: ' + e.message);
                 return false;
             }
         }
 
         async function buscarNoBanco(tabela) {
             try {
-                // Tenta buscar do Supabase primeiro
                 if (window.DB_API && navigator.onLine) {
                     const dados = await DB_API.buscar(tabela);
                     if (dados.length > 0) return dados;
                 }
-                // Fallback para localStorage
-                const chave = 'l_' + tabela + '_v36';
+                const chave = 'l_' + tabela + '_v37';
                 return JSON.parse(localStorage.getItem(chave) || '[]');
             } catch (e) {
                 console.error('Erro ao buscar:', e);
-                const chave = 'l_' + tabela + '_v36';
+                const chave = 'l_' + tabela + '_v37';
                 return JSON.parse(localStorage.getItem(chave) || '[]');
             }
         }
@@ -990,17 +983,11 @@
         async function carregarDadosIniciais() {
             try {
                 const progData = await DB_API.buscar('programacoes');
-                if (progData.length > 0) {
-                    localStorage.setItem(DB.prog, JSON.stringify(progData));
-                }
+                if (progData.length > 0) localStorage.setItem(DB.prog, JSON.stringify(progData));
                 const veicData = await DB_API.buscar('veiculos');
-                if (veicData.length > 0) {
-                    localStorage.setItem(DB.veic, JSON.stringify(veicData));
-                }
+                if (veicData.length > 0) localStorage.setItem(DB.veic, JSON.stringify(veicData));
                 const fornData = await DB_API.buscar('fornecedores');
-                if (fornData.length > 0) {
-                    localStorage.setItem(DB.forn, JSON.stringify(fornData));
-                }
+                if (fornData.length > 0) localStorage.setItem(DB.forn, JSON.stringify(fornData));
                 console.log('✅ Dados carregados do Supabase!');
             } catch (e) {
                 console.log('Usando dados locais (offline)');
@@ -1019,11 +1006,7 @@
             if (!localStorage.getItem(DB.permissoes)) localStorage.setItem(DB.permissoes, JSON.stringify(PERMISSOES_PADRAO));
             popularSeletorFornecedores();
             popularSeletorVeiculos();
-
-            // Carregar dados do Supabase (se disponível)
-            if (navigator.onLine && window.DB_API) {
-                carregarDadosIniciais();
-            }
+            if (navigator.onLine && window.DB_API) carregarDadosIniciais();
         };
 
         // NAVEGAÇÃO
@@ -1058,17 +1041,13 @@
             const u = DOMPurify.sanitize(document.getElementById('user').value.trim().toUpperCase());
             const p = document.getElementById('pass').value.trim();
             if (!u || !p) return alert('Preencha todos os campos!');
-
             if (u === 'ADMIN' && p === '1234') { currentUser = { nome: 'Administrador', role: 'admin' }; show('scr-admin'); atualizarDashboard(); carregarProgAdmin(); carregarPermissoes(); return; }
-
             const progs = JSON.parse(localStorage.getItem(DB.progs) || '[]');
             const prog = progs.find(x => x.user.toUpperCase() === u && x.pass === p);
             if (prog) { currentUser = { ...prog, role: 'programador' }; show('scr-programador'); carregarProgGeral(); return; }
-
             const fornUsers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]');
             const forn = fornUsers.find(x => x.user.toUpperCase() === u && x.pass === p);
             if (forn) { currentUser = { ...forn, role: 'fornecedor' }; document.getElementById('forn-name-screen').innerText = forn.empresa; show('scr-fornecedor'); carregarServicosForn(forn); carregarAlertasRevisaoFornecedor(); return; }
-
             const colabs = JSON.parse(localStorage.getItem(DB.colab) || '[]');
             const colab = colabs.find(x => x.mat === u && x.nfc === p);
             if (colab) {
@@ -1078,7 +1057,6 @@
                 if (perfil === 'supervisor') { show('scr-admin'); aplicarPermissoesSupervisor(); atualizarDashboard(); carregarProgAdmin(); return; }
                 show('scr-admin'); aplicarPermissoesMotorista(); atualizarDashboard(); carregarProgAdmin(); return;
             }
-
             alert('Acesso Negado.');
         }
 
@@ -1089,11 +1067,9 @@
             const hojeList = list.filter(i => i.data === hoje && i.status_flow !== 'CANCELADO');
             const veiculosUnicos = [...new Set(hojeList.map(i => i.placa))];
             const concluidos = hojeList.filter(i => i.status_flow === 'CONCLUIDO' && i.tipo_op === 'SAÍDA').length;
-
             document.getElementById('met-total-hoje').textContent = veiculosUnicos.length;
             document.getElementById('met-concluidos').textContent = concluidos;
             document.getElementById('met-tempo-medio').textContent = concluidos > 0 ? '2.5h' : '0h';
-
             const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
             const mesAtual = new Date().getMonth();
             const gastosMes = orcs.filter(o => { const parts = o.timestamp.split('/'); return parts.length >= 2 && parseInt(parts[1]) === mesAtual + 1 && o.status === 'APROVADO'; }).reduce((s, o) => s + o.total, 0);
@@ -1171,7 +1147,6 @@
             if (tipo === 'SAÍDA' && !fornecedor) return alert('Selecione um fornecedor!');
             const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
             const veic = veics.find(v => v.placa === placa);
-
             const novoRegistro = {
                 id: Date.now(), data: new Date().toISOString().split('T')[0], timestamp: new Date().toLocaleString('pt-BR'),
                 placa, setor: veic?.tipo || '', km: document.getElementById('p-km').value, fornecedor,
@@ -1179,10 +1154,7 @@
                 fotos_metadata: tempFotos.map(f => f.metadata), programador: currentUser?.nome || 'Sistema',
                 status_flow: tipo === 'RETORNO' ? 'CONCLUIDO' : 'PENDENTE', tipo_op: tipo, cancelled: false
             };
-
-            // Salva no banco (Supabase + localStorage)
             await salvarNoBanco('programacoes', novoRegistro);
-
             document.getElementById('success-overlay').style.display = 'flex';
             setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 2000);
             tempFotos = []; document.getElementById('p-placa').value = ''; document.getElementById('p-km').value = ''; document.getElementById('p-obs').value = '';
@@ -1190,37 +1162,19 @@
         }
 
         async function carregarProgGeral() {
-            // Buscar dados (Supabase ou localStorage)
             const list = await buscarNoBanco('programacoes');
             const dt = document.getElementById('p-filter-date').value;
             const filtrados = list.filter(i => i.data === dt).reverse();
             const cont = document.getElementById('list-prog-geral');
             if (!filtrados.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum lançamento.</p>'; return; }
-
             cont.innerHTML = filtrados.map(i => {
                 const idx = list.indexOf(i);
                 const isCancelled = i.status_flow === 'CANCELADO';
                 const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[i.status_flow] || 'var(--gray)';
                 const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
                 const veic = veics.find(v => v.placa === i.placa);
-                const revisaoHTML = veic?.km_proxima_revisao ? `
-            <div class="revisao-inline">
-                🔧 <b>Revisão:</b> Próxima em ${veic.km_proxima_revisao}km
-                <div style="margin-top:5px;">
-                    <input type="number" id="rev-km-${idx}" placeholder="KM da troca" style="width:100px; padding:5px; font-size:10px;">
-                    <input type="date" id="rev-data-${idx}" style="width:120px; padding:5px; font-size:10px;">
-                    <input type="number" id="rev-prox-${idx}" placeholder="Próx. revisão" style="width:120px; padding:5px; font-size:10px;">
-                    <button class="btn-warning btn-sm" onclick="registrarRevisaoCard(${idx},'${veic.placa}')">✓ Registrar Revisão</button>
-                </div>
-            </div>` : '';
-
-                return `<div class="prog-item ${isCancelled ? 'cancelled' : ''}">
-            <span class="status-badge" style="background:${statusColor}; color:${i.status_flow === 'PENDENTE' ? '#000' : '#fff'}">${i.status_flow}</span>
-            <b>🚗 ${i.placa}</b> — ${i.tipo_op}<br>
-            <span style="color:var(--gray); font-size:11px;">${i.fornecedor} | KM: ${i.km || '—'} | ${i.timestamp}</span>
-            ${revisaoHTML}
-            ${!isCancelled ? `<div style="display:flex; gap:5px; margin-top:8px;"><button class="btn-pdf btn-sm" onclick="gerarPDF(${idx})">📄 PDF</button><button class="btn-cancel btn-sm" onclick="cancelarProgramacao(${idx})">🚫 Cancelar</button><button class="btn-danger btn-sm" onclick="removerProgramacao(${idx})">❌ Remover</button></div>` : ''}
-        </div>`;
+                const revisaoHTML = veic?.km_proxima_revisao ? `<div class="revisao-inline">🔧 <b>Revisão:</b> Próxima em ${veic.km_proxima_revisao}km<div style="margin-top:5px;"><input type="number" id="rev-km-${idx}" placeholder="KM da troca" style="width:100px; padding:5px; font-size:10px;"><input type="date" id="rev-data-${idx}" style="width:120px; padding:5px; font-size:10px;"><input type="number" id="rev-prox-${idx}" placeholder="Próx. revisão" style="width:120px; padding:5px; font-size:10px;"><button class="btn-warning btn-sm" onclick="registrarRevisaoCard(${idx},'${veic.placa}')">✓ Registrar Revisão</button></div></div>` : '';
+                return `<div class="prog-item ${isCancelled ? 'cancelled' : ''}"><span class="status-badge" style="background:${statusColor}; color:${i.status_flow === 'PENDENTE' ? '#000' : '#fff'}">${i.status_flow}</span><b>🚗 ${i.placa}</b> — ${i.tipo_op}<br><span style="color:var(--gray); font-size:11px;">${i.fornecedor} | KM: ${i.km || '—'} | ${i.timestamp}</span>${revisaoHTML}${!isCancelled ? `<div style="display:flex; gap:5px; margin-top:8px;"><button class="btn-pdf btn-sm" onclick="gerarPDF(${idx})">📄 PDF</button><button class="btn-cancel btn-sm" onclick="cancelarProgramacao(${idx})">🚫 Cancelar</button><button class="btn-danger btn-sm" onclick="removerProgramacao(${idx})">❌ Remover</button></div>` : ''}</div>`;
             }).join('');
         }
 
@@ -1253,35 +1207,14 @@
             const meus = list.filter(s => s.data === dt && s.status_flow !== 'CANCELADO' && (s.fornecedor === user.empresa || (s.fornecedor && s.fornecedor.includes('+'))));
             const cont = document.getElementById('list-forn-servicos');
             if (!meus.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum serviço hoje.</p>'; return; }
-
             cont.innerHTML = meus.map(s => {
                 const idx = list.indexOf(s);
                 const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[s.status_flow] || 'var(--gray)';
                 const concluido = s.status_flow === 'CONCLUIDO';
                 const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
                 const veic = veics.find(v => v.placa === s.placa);
-                const revisaoHTML = veic?.km_proxima_revisao ? `
-            <div class="revisao-inline">
-                🔧 <b>Revisão:</b> ${veic.km_proxima_revisao}km
-                <div style="margin-top:5px;">
-                    <input type="number" id="f-rev-km-${idx}" placeholder="KM troca" style="width:90px; padding:3px; font-size:10px;">
-                    <input type="date" id="f-rev-data-${idx}" style="width:110px; padding:3px; font-size:10px;">
-                    <input type="number" id="f-rev-prox-${idx}" placeholder="Próx. KM" style="width:100px; padding:3px; font-size:10px;">
-                    <button class="btn-warning btn-sm" onclick="registrarRevisaoCard(${idx},'${s.placa}'); carregarServicosForn(currentUser);">✓ OK</button>
-                </div>
-            </div>` : '';
-
-                return `<div class="prog-item">
-            <span class="status-badge" style="background:${statusColor}; color:${s.status_flow === 'PENDENTE' ? '#000' : '#fff'}">${s.status_flow}</span>
-            <b>${s.placa}</b> — ${s.tipo_op || ''}<br>
-            <span style="color:var(--gray); font-size:11px;">KM: ${s.km || '—'} | ${s.timestamp}</span>
-            ${s.obs ? `<div style="color:var(--gray); font-size:11px;">OBS: ${s.obs}</div>` : ''}
-            ${revisaoHTML}
-            ${concluido ? '<div style="color:var(--success); font-weight:bold; margin-top:5px;">✓ FINALIZADO</div>' :
-                        `<div style="display:flex; gap:5px; margin-top:8px;">
-                    ${s.status_flow === 'PENDENTE' ? `<button class="btn-success btn-sm" onclick="abrirModalStatus(${idx},'EM EXECUÇÃO')">▶ INICIAR</button>` : `<button class="btn-success btn-sm" onclick="abrirModalStatus(${idx},'CONCLUIDO')">✓ FINALIZAR</button>`}
-                </div>`}
-        </div>`;
+                const revisaoHTML = veic?.km_proxima_revisao ? `<div class="revisao-inline">🔧 <b>Revisão:</b> ${veic.km_proxima_revisao}km<div style="margin-top:5px;"><input type="number" id="f-rev-km-${idx}" placeholder="KM troca" style="width:90px; padding:3px; font-size:10px;"><input type="date" id="f-rev-data-${idx}" style="width:110px; padding:3px; font-size:10px;"><input type="number" id="f-rev-prox-${idx}" placeholder="Próx. KM" style="width:100px; padding:3px; font-size:10px;"><button class="btn-warning btn-sm" onclick="registrarRevisaoCard(${idx},'${s.placa}'); carregarServicosForn(currentUser);">✓ OK</button></div></div>` : '';
+                return `<div class="prog-item"><span class="status-badge" style="background:${statusColor}; color:${s.status_flow === 'PENDENTE' ? '#000' : '#fff'}">${s.status_flow}</span><b>${s.placa}</b> — ${s.tipo_op || ''}<br><span style="color:var(--gray); font-size:11px;">KM: ${s.km || '—'} | ${s.timestamp}</span>${s.obs ? `<div style="color:var(--gray); font-size:11px;">OBS: ${s.obs}</div>` : ''}${revisaoHTML}${concluido ? '<div style="color:var(--success); font-weight:bold; margin-top:5px;">✓ FINALIZADO</div>' : `<div style="display:flex; gap:5px; margin-top:8px;">${s.status_flow === 'PENDENTE' ? `<button class="btn-success btn-sm" onclick="abrirModalStatus(${idx},'EM EXECUÇÃO')">▶ INICIAR</button>` : `<button class="btn-success btn-sm" onclick="abrirModalStatus(${idx},'CONCLUIDO')">✓ FINALIZAR</button>`}</div>`}</div>`;
             }).join('');
         }
 
@@ -1367,16 +1300,8 @@
             const perfis = ['admin', 'programador', 'supervisor', 'motorista'];
             const telas = ['monitor', 'history', 'forn', 'colab', 'veic', 'manutencao', 'orcamentos', 'combustivel', 'emails', 'auditoria', 'permissoes', 'config', 'programacao', 'fornecedor'];
             const nomes = { monitor: 'Monitor', history: 'Histórico', forn: 'Fornecedores', colab: 'Equipe', veic: 'Frota', manutencao: 'Manutenções', orcamentos: 'Orçamentos', combustivel: 'Combustível', emails: 'E-mails', auditoria: 'Auditoria', permissoes: 'Aba Mestre', config: 'Backup', programacao: 'Tela Programação', fornecedor: 'Tela Fornecedor' };
-
             const cont = document.getElementById('permissoes-grid');
-            cont.innerHTML = perfis.map(perfil => `
-        <div class="permissao-card">
-            <h4 style="color:var(--primary); text-transform:uppercase; margin-bottom:10px;">${perfil}</h4>
-            ${telas.map(tela => `
-                <label><input type="checkbox" ${permissoes[perfil]?.[tela] ? 'checked' : ''} onchange="togglePermissao('${perfil}','${tela}',this.checked)"> ${nomes[tela] || tela}</label>
-            `).join('')}
-        </div>
-    `).join('');
+            cont.innerHTML = perfis.map(perfil => `<div class="permissao-card"><h4 style="color:var(--primary); text-transform:uppercase; margin-bottom:10px;">${perfil}</h4>${telas.map(tela => `<label><input type="checkbox" ${permissoes[perfil]?.[tela] ? 'checked' : ''} onchange="togglePermissao('${perfil}','${tela}',this.checked)"> ${nomes[tela] || tela}</label>`).join('')}</div>`).join('');
         }
         function togglePermissao(perfil, tela, checked) {
             const permissoes = JSON.parse(localStorage.getItem(DB.permissoes) || PERMISSOES_PADRAO);
@@ -1414,10 +1339,7 @@
             if (!filtrados.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum lançamento.</p>'; return; }
             cont.innerHTML = filtrados.map(s => {
                 const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)', 'CANCELADO': 'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
-                return `<div class="prog-item ${s.status_flow === 'CANCELADO' ? 'cancelled' : ''}" ${s.status_flow !== 'CANCELADO' ? `onclick="abrirDetalheAdmin(${list.indexOf(s)})" style="cursor:pointer;"` : ''}>
-            <span class="status-badge" style="background:${statusColor}; color:${s.status_flow === 'PENDENTE' ? '#000' : '#fff'}">${s.status_flow}</span>
-            <b>${s.placa}</b> — ${s.tipo_op || ''} → ${s.fornecedor || ''}
-        </div>`;
+                return `<div class="prog-item ${s.status_flow === 'CANCELADO' ? 'cancelled' : ''}" ${s.status_flow !== 'CANCELADO' ? `onclick="abrirDetalheAdmin(${list.indexOf(s)})" style="cursor:pointer;"` : ''}><span class="status-badge" style="background:${statusColor}; color:${s.status_flow === 'PENDENTE' ? '#000' : '#fff'}">${s.status_flow}</span><b>${s.placa}</b> — ${s.tipo_op || ''} → ${s.fornecedor || ''}</div>`;
             }).join('');
         }
 
@@ -1462,48 +1384,30 @@
             let list = JSON.parse(localStorage.getItem(DB.colab) || '[]'); list.push({ nome, mat, nfc, perfil }); localStorage.setItem(DB.colab, JSON.stringify(list));
             document.getElementById('c-nome').value = ''; document.getElementById('c-mat').value = ''; document.getElementById('c-nfc').value = ''; renderAdminList('colab'); alert('Cadastrado!');
         }
-        // FUNÇÃO CORRIGIDA PARA SINCRONIZAR COM SUPABASE
         async function salvarVeiculo() {
             const placa = document.getElementById('v-placa').value.toUpperCase().trim();
             const modelo = document.getElementById('v-modelo').value.trim();
             const ano = document.getElementById('v-ano').value;
             const kmRev = document.getElementById('v-km-revisao').value;
             const tipo = document.getElementById('v-tipo').value;
-
             if (!placa) return alert('Informe a placa!');
-
-            const novoVeiculo = {
-                placa,
-                modelo,
-                ano: parseInt(ano) || 0,
-                km_proxima_revisao: kmRev || null,
-                tipo,
-                created_at: new Date().toISOString()
-            };
-
-            // Salva no localStorage (backup local)
+            const novoVeiculo = { placa, modelo, ano: parseInt(ano) || 0, km_proxima_revisao: kmRev || null, tipo, created_at: new Date().toISOString() };
             let list = JSON.parse(localStorage.getItem(DB.veic) || '[]');
             if (list.some(v => v.placa === placa)) return alert('Placa já cadastrada!');
             list.push(novoVeiculo);
             localStorage.setItem(DB.veic, JSON.stringify(list));
-
-            // Salva no Supabase (nuvem)
-            try {
-                const resultado = await salvarNoBanco('veiculos', novoVeiculo);
-                if (!resultado) {
-                    alert('Erro: Não foi possível sincronizar com a nuvem. Verifique a conexão com a Internet.');
-                }
-            } catch (e) {
-                alert('Falha na comunicação com o Supabase: ' + e.message);
-            }
-
+            const sincronizou = await salvarNoBanco('veiculos', novoVeiculo);
             document.getElementById('v-placa').value = '';
             document.getElementById('v-modelo').value = '';
             document.getElementById('v-ano').value = '';
             document.getElementById('v-km-revisao').value = '';
             renderAdminList('veic');
             popularSeletorVeiculos();
-            alert('Veículo cadastrado e sincronizado com a nuvem!');
+            if (sincronizou) {
+                alert('Veículo cadastrado e sincronizado com a nuvem! ✅');
+            } else {
+                alert('Veículo cadastrado localmente, mas houve falha na sincronização com a nuvem. Verifique sua conexão.');
+            }
         }
 
         function salvarManutencao() {
@@ -1628,6 +1532,6 @@
         }
     </script>
 </body>
-<!-- v3.6 -->
+<!-- v3.7 -->
 
 </html>
