@@ -941,24 +941,31 @@
         // MIGRAÇÃO SUPABASE - NOVAS FUNÇÕES
         // ============================================
         async function salvarNoBanco(tabela, dados) {
+            const URL = 'https://rpsdrhaptipvujixoxa.supabase.co/rest/v1/' + tabela;
+            const KEY = 'sb_publishable_GfjR_Qn3le_MGf_33iBy0A_I58MFly-';
             try {
-                // Salva no Supabase
-                if (window.DB_API) {
-                    await DB_API.salvar(tabela, dados);
+                const response = await fetch(URL, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': KEY,
+                        'Authorization': 'Bearer ' + KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(dados)
+                });
+                if (!response.ok) {
+                    const erro = await response.text();
+                    console.error('Erro Supabase:', erro);
+                    alert('Erro ao salvar no Supabase: ' + response.status + ' - ' + erro);
+                    return false;
                 }
-                // Backup local
-                const chave = 'l_' + tabela + '_v36';
-                const existentes = JSON.parse(localStorage.getItem(chave) || '[]');
-                const index = existentes.findIndex(item => item.id === dados.id);
-                if (index >= 0) {
-                    existentes[index] = dados;
-                } else {
-                    existentes.push(dados);
-                }
-                localStorage.setItem(chave, JSON.stringify(existentes));
+                // Sucesso
+                console.log('✅ Dados salvos no Supabase!', dados);
                 return true;
             } catch (e) {
-                console.error('Erro ao salvar:', e);
+                console.error('Falha na rede:', e);
+                alert('Falha na rede ao tentar salvar no Supabase: ' + e.message);
                 return false;
             }
         }
