@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="LOKAMIG">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg">
-    <title>LOKAMIG | Gestão Operacional Pro v3.5</title>
+    <title>LOKAMIG | Gestão Operacional Pro v3.6</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -596,7 +596,7 @@
     <section id="scr-login" class="container">
         <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg" alt="LOKAMIG" class="login-logo"
             onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22100%22><rect fill=%22%23d1122a%22 width=%22200%22 height=%22100%22/><text fill=%22white%22 font-size=%2224%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22>LOKAMIG</text></svg>';">
-        <div class="sub">Logística & Gestão Operacional Pro v3.5</div>
+        <div class="sub">Logística & Gestão Operacional Pro v3.6</div>
         <input type="text" id="user" placeholder="Usuário / Crachá" autocomplete="off" maxlength="50">
         <input type="password" id="pass" placeholder="Senha" maxlength="50">
         <button onclick="handleLogin()">Entrar</button>
@@ -920,10 +920,10 @@
         // ============================================
         const LOGO_URL = 'https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg';
         const DB = {
-            prog: 'l_prog_v35', forn: 'l_forn_v35', fornUsers: 'l_fusers_v35', progs: 'l_progs_v35',
-            colab: 'l_colab_v35', veic: 'l_veic_v35', orc: 'l_orc_v35', manutencao: 'l_manut_v35',
-            combustivel: 'l_comb_v35', avaliacoes: 'l_aval_v35', emails: 'l_emails_v35',
-            auditoria: 'l_audit_v35', permissoes: 'l_perm_v35'
+            prog: 'l_prog_v36', forn: 'l_forn_v36', fornUsers: 'l_fusers_v36', progs: 'l_progs_v36',
+            colab: 'l_colab_v36', veic: 'l_veic_v36', orc: 'l_orc_v36', manutencao: 'l_manut_v36',
+            combustivel: 'l_comb_v36', avaliacoes: 'l_aval_v36', emails: 'l_emails_v36',
+            auditoria: 'l_audit_v36', permissoes: 'l_perm_v36'
         };
 
         const PERMISSOES_PADRAO = {
@@ -947,7 +947,7 @@
                     await DB_API.salvar(tabela, dados);
                 }
                 // Backup local
-                const chave = 'l_' + tabela + '_v35';
+                const chave = 'l_' + tabela + '_v36';
                 const existentes = JSON.parse(localStorage.getItem(chave) || '[]');
                 const index = existentes.findIndex(item => item.id === dados.id);
                 if (index >= 0) {
@@ -971,11 +971,11 @@
                     if (dados.length > 0) return dados;
                 }
                 // Fallback para localStorage
-                const chave = 'l_' + tabela + '_v35';
+                const chave = 'l_' + tabela + '_v36';
                 return JSON.parse(localStorage.getItem(chave) || '[]');
             } catch (e) {
                 console.error('Erro ao buscar:', e);
-                const chave = 'l_' + tabela + '_v35';
+                const chave = 'l_' + tabela + '_v36';
                 return JSON.parse(localStorage.getItem(chave) || '[]');
             }
         }
@@ -1455,14 +1455,41 @@
             let list = JSON.parse(localStorage.getItem(DB.colab) || '[]'); list.push({ nome, mat, nfc, perfil }); localStorage.setItem(DB.colab, JSON.stringify(list));
             document.getElementById('c-nome').value = ''; document.getElementById('c-mat').value = ''; document.getElementById('c-nfc').value = ''; renderAdminList('colab'); alert('Cadastrado!');
         }
-        function salvarVeiculo() {
-            const placa = document.getElementById('v-placa').value.toUpperCase().trim(), modelo = document.getElementById('v-modelo').value.trim(), ano = document.getElementById('v-ano').value, kmRev = document.getElementById('v-km-revisao').value, tipo = document.getElementById('v-tipo').value;
+        // FUNÇÃO CORRIGIDA PARA SINCRONIZAR COM SUPABASE
+        async function salvarVeiculo() {
+            const placa = document.getElementById('v-placa').value.toUpperCase().trim();
+            const modelo = document.getElementById('v-modelo').value.trim();
+            const ano = document.getElementById('v-ano').value;
+            const kmRev = document.getElementById('v-km-revisao').value;
+            const tipo = document.getElementById('v-tipo').value;
+
             if (!placa) return alert('Informe a placa!');
+
+            const novoVeiculo = {
+                placa,
+                modelo,
+                ano: parseInt(ano) || 0,
+                km_proxima_revisao: kmRev || null,
+                tipo,
+                created_at: new Date().toISOString()
+            };
+
+            // Salva no localStorage (backup local)
             let list = JSON.parse(localStorage.getItem(DB.veic) || '[]');
             if (list.some(v => v.placa === placa)) return alert('Placa já cadastrada!');
-            list.push({ placa, modelo, ano: parseInt(ano) || 0, km_proxima_revisao: kmRev || null, tipo }); localStorage.setItem(DB.veic, JSON.stringify(list));
-            document.getElementById('v-placa').value = ''; document.getElementById('v-modelo').value = ''; document.getElementById('v-ano').value = ''; document.getElementById('v-km-revisao').value = '';
-            renderAdminList('veic'); popularSeletorVeiculos(); alert('Cadastrado!');
+            list.push(novoVeiculo);
+            localStorage.setItem(DB.veic, JSON.stringify(list));
+
+            // Salva no Supabase (nuvem)
+            await salvarNoBanco('veiculos', novoVeiculo);
+
+            document.getElementById('v-placa').value = '';
+            document.getElementById('v-modelo').value = '';
+            document.getElementById('v-ano').value = '';
+            document.getElementById('v-km-revisao').value = '';
+            renderAdminList('veic');
+            popularSeletorVeiculos();
+            alert('Veículo cadastrado e sincronizado com a nuvem!');
         }
 
         function salvarManutencao() {
@@ -1587,8 +1614,6 @@
         }
     </script>
 </body>
-
-<!-- v3.5.1 -->
+<!-- v3.6 -->
 
 </html>
-<!-- v3.5 -->
