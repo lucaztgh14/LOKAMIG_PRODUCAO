@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOKAMIG | Gestão Operacional 360°</title>
+    <title>LOKAMIG | Gestão Operacional Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-
-    <!-- Bibliotecas para PDF Profissional -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
     <style>
         :root {
             --primary: #d1122a;
@@ -22,464 +18,1204 @@
             --gray: #94a3b8;
             --joint: #8b5cf6;
             --return: #3b82f6;
+            --gerencial: #f97316;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html,
+        .orc-card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--warning); font-size: 12px; text-align: left; }
+        .orc-card.aprovado { border-left-color: var(--success); }
+        .orc-card.rejeitado { border-left-color: var(--danger); }
+        .evidencia-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 10px 0; }
+        .ev-card { position: relative; border-radius: 8px; overflow: hidden; background: #000; aspect-ratio: 1; cursor: pointer; }
+        .ev-card img, .ev-card video { width: 100%; height: 100%; object-fit: cover; }
+        .ev-card .del-btn { position: absolute; top: 3px; right: 3px; }
+        .ev-type-badge { position: absolute; bottom: 3px; left: 3px; background: rgba(0,0,0,0.7); color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 4px; }
+        .setor-badge { display: inline-block; font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 4px; margin-left: 5px; }
+        .setor-Operacional { background: #1e40af; color: #bfdbfe; }
+        .setor-Reserva     { background: #065f46; color: #a7f3d0; }
+        .setor-Gerencial   { background: #7c2d12; color: #fed7aa; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; height: 100%; overflow-x: hidden; }
         body {
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
+            background: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.9)),
+                url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            font-family: 'Montserrat', sans-serif; color: var(--text);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 10px;
         }
-
-        body {
-            background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            font-family: 'Montserrat', sans-serif;
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 10px;
-        }
-
         .container {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 20px;
-            width: 100%;
-            max-width: 700px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
-            text-align: center;
-            max-height: 95vh;
-            overflow-y: auto;
+            background: rgba(30,41,59,0.6); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+            padding: 20px; width: 100%; max-width: 750px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6); text-align: center;
+            max-height: 95vh; overflow-y: auto;
         }
-
-        h1 {
-            font-size: 22px;
-            margin-bottom: 5px;
-            color: var(--primary);
-            font-weight: 700;
-            letter-spacing: 2px;
+        h1 { font-size: 22px; margin-bottom: 5px; color: var(--primary); font-weight: 700; letter-spacing: 2px; }
+        .sub { font-size: 10px; color: var(--gray); margin-bottom: 15px; text-transform: uppercase; }
+        input, select, textarea {
+            width: 100%; padding: 10px; margin-bottom: 10px;
+            border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(15,23,42,0.8); color: #fff; font-size: 13px; outline: none; transition: 0.3s;
         }
-
-        .sub {
-            font-size: 10px;
-            color: var(--gray);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(15, 23, 42, 0.8);
-            color: #fff;
-            font-size: 13px;
-            outline: none;
-        }
-
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(209,18,42,0.3); }
         button {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background: var(--primary);
-            color: #fff;
-            font-weight: 700;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 10px;
-            transition: 0.3s;
-            margin-bottom: 5px;
+            width: 100%; padding: 12px; border-radius: 10px; border: none;
+            background: var(--primary); color: #fff; font-weight: 700;
+            cursor: pointer; text-transform: uppercase; font-size: 10px;
+            transition: 0.3s; margin-bottom: 5px;
         }
-
-        .btn-success {
-            background: var(--success);
-        }
-
-        .btn-warning {
-            background: var(--warning);
-            color: #000;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            width: auto;
-            padding: 6px 12px;
-        }
-
-        .btn-info {
-            background: #3b82f6;
-            width: auto;
-            padding: 6px 12px;
-        }
-
-        .btn-pdf {
-            background: #ff5722;
-            width: auto;
-            padding: 6px 12px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
+        button:active { transform: scale(0.98); }
+        .btn-success { background: var(--success); }
+        .btn-warning { background: var(--warning); color: #000; }
+        .btn-gray    { background: #334155; }
+        .btn-info    { background: #3b82f6; width: auto; padding: 8px 12px; }
+        .btn-pdf     { background: #ff5722; width: auto; padding: 8px 12px; }
+        .btn-danger  { background: var(--danger); width: auto; padding: 8px 12px; }
+        .btn-purple  { background: var(--joint); width: auto; padding: 8px 12px; }
+        .hidden { display: none !important; }
         .form-section {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            text-align: left;
+            background: rgba(0,0,0,0.2); padding: 15px;
+            border-radius: 15px; margin-bottom: 10px; text-align: left;
         }
-
         .prog-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border-left: 5px solid var(--danger);
-            font-size: 12px;
-            text-align: left;
-            position: relative;
+            background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;
+            margin-bottom: 10px; border-left: 5px solid var(--warning);
+            font-size: 12px; text-align: left; position: relative;
         }
-
+        .status-PENDENTE   { border-left-color: var(--warning); }
+        .status-EXECUCAO   { border-left-color: var(--danger); }
+        .status-CONCLUIDO  { border-left-color: var(--success); }
         .status-badge {
-            padding: 3px 7px;
-            border-radius: 4px;
-            font-size: 8px;
-            font-weight: bold;
-            float: right;
-            text-transform: uppercase;
+            padding: 3px 7px; border-radius: 4px; font-size: 8px;
+            font-weight: bold; float: right; text-transform: uppercase;
         }
-
         .tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            scrollbar-width: none;
+            display: flex; gap: 5px; margin-bottom: 15px;
+            overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;
         }
-
         .tab-btn {
-            background: rgba(30, 41, 59, 0.8);
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            cursor: pointer;
-            white-space: nowrap;
-            font-size: 9px;
+            background: rgba(30,41,59,0.8); padding: 8px 12px;
+            border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; cursor: pointer; white-space: nowrap; font-size: 9px;
         }
+        .tab-active { background: var(--primary); font-weight: bold; }
 
-        .tab-active {
-            background: var(--primary);
-            font-weight: bold;
-        }
-
-        .preview-area {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin: 10px 0;
-        }
-
-        .photo-card {
-            position: relative;
-            width: 100%;
-            height: 65px;
-        }
-
-        .thumb {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 1px solid var(--primary);
-        }
-
+        /* Fotos */
+        .preview-area { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin: 10px 0; }
+        .photo-card { position: relative; width: 100%; height: 65px; }
+        .thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 5px; border: 1px solid var(--primary); cursor: zoom-in; }
         .del-btn {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--danger);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 10px;
-            border: 2px solid #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: absolute; top: -5px; right: -5px;
+            background: var(--danger); color: #fff; border-radius: 50%;
+            width: 20px; height: 20px; font-size: 10px; border: 2px solid #fff;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            z-index: 10; padding: 0;
+        }
+        .file-label {
+            display: block; background: #334155; padding: 10px;
+            border-radius: 10px; cursor: pointer; font-size: 11px;
+            margin-top: 10px; text-align: center; border: 1px dashed var(--gray);
         }
 
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            padding: 20px;
-            overflow-y: auto;
-            display: none;
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85); display: flex;
+            justify-content: center; align-items: center; z-index: 1000; padding: 10px;
         }
+        .modal-content {
+            background: rgba(30,41,59,0.98); border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1); padding: 20px;
+            max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto;
+        }
+        .modal-header {
+            font-size: 16px; font-weight: bold; margin-bottom: 15px;
+            color: #fff; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; padding: 20px; overflow-y: auto; display: none; }
+
+        /* Zoom */
+        #img-viewer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000;
+            display: none; justify-content: center; align-items: center; cursor: zoom-out;
+        }
+        #img-viewer img { max-width: 90%; max-height: 90%; border-radius: 10px; border: 2px solid var(--primary); }
+
+        /* Sucesso */
+        #success-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15,23,42,0.98); z-index: 5000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .check-v {
+            width: 80px; height: 80px; background: var(--success); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 50px; color: white; margin-bottom: 20px;
+            animation: pop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+        @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+        /* NFC status */
+        #nfc-status { font-size: 10px; margin-top: 10px; color: var(--gray); min-height: 15px; }
+
+        /* Orçamento */
+        .orc-row { display: flex; gap: 5px; margin-bottom: 5px; }
+        .orc-row input { margin: 0; }
     </style>
 </head>
-
 <body>
 
-    <section id="scr-login" class="container">
-        <h1>LOKAMIG</h1>
-        <div class="sub">Logística & Gestão Operacional</div>
-        <input type="text" id="user" placeholder="Usuário">
-        <input type="password" id="pass" placeholder="Senha">
-        <button onclick="handleLogin()">Entrar</button>
-    </section>
+<!-- OVERLAY DE SUCESSO -->
+<div id="success-overlay">
+    <div class="check-v">✓</div>
+    <h2 style="color:white; letter-spacing:2px;">ENVIADO COM SUCESSO!</h2>
+</div>
 
-    <!-- ADMIN -->
-    <section id="scr-admin" class="container hidden">
-        <h1>ADMINISTRAÇÃO</h1>
-        <div class="tabs">
-            <button class="tab-btn tab-active" onclick="switchTab('monitor', event)">Monitor</button>
-            <button class="tab-btn" onclick="switchTab('history', event)">Histórico</button>
-            <button class="tab-btn" onclick="switchTab('forn', event)">Fornecedores</button>
-            <button class="tab-btn" onclick="switchTab('config', event)">Backup</button>
-        </div>
-        <div id="area-monitor">
-            <div id="list-prog-admin"></div>
-        </div>
-        <div id="area-history" class="hidden">
-            <div id="list-history-admin"></div>
-        </div>
-        <div id="area-forn" class="hidden">
+<!-- ZOOM -->
+<div id="img-viewer" onclick="this.style.display='none'">
+    <img src="" id="full-img">
+</div>
+
+<!-- ===================== LOGIN ===================== -->
+<section id="scr-login" class="container">
+    <h1>LOKAMIG</h1>
+    <div class="sub">Logística & Gestão Operacional</div>
+    <input type="text" id="user" placeholder="Usuário / Crachá" onclick="ativarNFC('user')">
+    <input type="password" id="pass" placeholder="Senha">
+    <button onclick="handleLogin()">Entrar</button>
+    <p id="nfc-status"></p>
+    <div style="font-size:10px; color:var(--success); cursor:pointer; margin-top:5px;" onclick="ativarNFC('user')">📡 Acesso via NFC (Crachá)</div>
+</section>
+
+<!-- ===================== ADMIN ===================== -->
+<section id="scr-admin" class="container hidden">
+    <h1>ADMINISTRAÇÃO</h1>
+    <div class="tabs">
+        <button class="tab-btn tab-active" onclick="switchTab('monitor', event)">Monitor</button>
+        <button class="tab-btn" onclick="switchTab('checklists', event)">📋 Checklists</button>
+        <button class="tab-btn" onclick="switchTab('history', event)">Histórico</button>
+        <button class="tab-btn" onclick="switchTab('forn', event)">Fornecedores</button>
+        <button class="tab-btn" onclick="switchTab('colab', event)">Equipe</button>
+        <button class="tab-btn" onclick="switchTab('veic', event)">Frota</button>
+        <button class="tab-btn" onclick="switchTab('config', event)">Backup</button>
+        <button class="tab-btn" onclick="switchTab('orcamentos', event)">💰 Orçamentos</button>
+    </div>
+
+    <!-- Monitor -->
+    <div id="area-monitor" class="admin-content">
+        <div id="list-prog-admin"></div>
+    </div>
+
+    <!-- Checklists -->
+    <div id="area-checklists" class="admin-content hidden">
+        <div id="list-check-admin"></div>
+    </div>
+
+    <!-- Histórico -->
+    <div id="area-history" class="admin-content hidden">
+        <div id="list-history-admin"></div>
+    </div>
+
+    <!-- Fornecedores -->
+    <div id="area-forn" class="admin-content hidden">
+        <div id="forn-main-view">
+            <div class="form-section">
+                <input type="text" id="f-nome" placeholder="NOME DA EMPRESA">
+                <input type="text" id="f-user" placeholder="LOGIN">
+                <input type="text" id="f-pass" placeholder="SENHA">
+                <select id="f-tipo">
+                    <option value="Oficina">Oficina</option>
+                    <option value="Limpeza">Limpeza</option>
+                </select>
+                <button onclick="salvarNovoFornecedor()" class="btn-success">Cadastrar Fornecedor</button>
+            </div>
             <div id="list-forn"></div>
         </div>
-        <div id="area-config" class="hidden"><button onclick="exportarDados()">📥 Exportar Backup</button></div>
-        <button onclick="handleLogout()" style="background:#334155; margin-top:20px;">Sair</button>
-    </section>
+        <div id="forn-detail-view" class="hidden">
+            <button onclick="fecharDetalhesForn()" style="width:auto; margin-bottom:10px;">← Voltar</button>
+            <h3 id="view-forn-title" style="margin-bottom:10px;"></h3>
+            <div id="list-forn-users"></div>
+        </div>
+    </div>
 
-    <!-- TELA GESTOR (PAULISTA) -->
-    <section id="scr-programador" class="container hidden">
-        <h1>CHECKLIST & LANÇAMENTOS</h1>
-
+    <!-- Equipe -->
+    <div id="area-colab" class="admin-content hidden">
         <div class="form-section">
-            <label style="font-size: 10px; color: var(--gray);">TIPO DE OPERAÇÃO:</label>
-            <select id="p-tipo-op" onchange="toggleFornSelect(this.value)">
-                <option value="SAÍDA">SAÍDA (Enviar para Fornecedor)</option>
-                <option value="RETORNO">RETORNO (Entrada no Pátio)</option>
+            <input type="text" id="c-mat" placeholder="MATRÍCULA">
+            <input type="text" id="c-nome" placeholder="NOME COMPLETO">
+            <input type="text" id="c-nfc" placeholder="NFC ID (toque para ler)" readonly onclick="ativarNFC('c-nfc')">
+            <button onclick="salvarColab()" class="btn-success">Cadastrar Colaborador</button>
+        </div>
+        <div id="list-colab"></div>
+    </div>
+
+    <!-- Frota -->
+    <div id="area-veic" class="admin-content hidden">
+        <div class="form-section">
+            <input type="text" id="v-placa" placeholder="PLACA">
+            <select id="v-tipo">
+                <option value="Operacional">Operacional</option>
+                <option value="Reserva">Reserva</option>
+                <option value="Gerencial">Gerencial</option>
             </select>
-
-            <input type="text" id="p-placa" placeholder="PLACA">
-            <input type="number" id="p-km" placeholder="KM ATUAL">
-
-            <div id="p-forn-div">
-                <label style="font-size: 10px; color: var(--gray);">FORNECEDOR DESTINO:</label>
-                <select id="p-fornecedor-select"></select>
-            </div>
-
-            <textarea id="p-obs" placeholder="Relato de Avarias / Peças / Observações..."></textarea>
-
-            <input type="file" id="p-fotos" multiple accept="image/*" class="hidden" onchange="handleNewUpload(this)">
-            <button onclick="document.getElementById('p-fotos').click()" style="background:var(--joint)">📷 Tirar Fotos
-                do Checklist</button>
-            <div id="p-preview-fotos" class="preview-area"></div>
-
-            <button onclick="lancarProgramacao()" class="btn-success">Finalizar Checklist</button>
+            <button onclick="salvarVeiculo()" class="btn-success">Cadastrar Veículo</button>
         </div>
-
-        <input type="date" id="p-filter-date" onchange="carregarProgGeral()" style="margin-bottom:10px;">
-        <div id="list-prog-geral"></div>
-        <button onclick="handleLogout()" style="background:#334155;">Sair</button>
-    </section>
-
-    <!-- MODAL GALERIA -->
-    <div id="modal-galeria" class="modal">
-        <h2 style="color:var(--primary)">Galeria do Veículo</h2>
-        <p id="galeria-placa" style="font-size:12px;"></p>
-        <button onclick="document.getElementById('add-more-photos').click()" class="btn-success">➕ Adicionar Mais
-            Fotos</button>
-        <input type="file" id="add-more-photos" multiple accept="image/*" class="hidden"
-            onchange="adicionarFotosGaleria(this)">
-        <div id="grid-fotos-galeria" class="preview-area" style="grid-template-columns: repeat(3, 1fr);"></div>
-        <button onclick="fecharGaleria()" style="background:#334155; margin-top:20px;">Fechar Galeria</button>
+        <div id="list-veic"></div>
     </div>
 
-    <!-- TEMPLATE PDF (COM LOGO) -->
-    <div id="pdf-template"
-        style="position:fixed; left:-9999px; width:800px; background:#fff; color:#000; padding:40px;">
-        <div
-            style="display:flex; justify-content:space-between; align-items:center; border-bottom:4px solid #d1122a; padding-bottom:15px; margin-bottom:20px;">
-            <img src="https://www.lokamig.com.br/wp-content/themes/lokamig/img/logo-lokamig.png" style="width:180px;">
-            <div style="text-align:right;">
-                <h2 id="pdf-titulo" style="margin:0; color:#d1122a;">RELATÓRIO DE CHECKLIST</h2>
-                <p id="pdf-data-geracao" style="margin:0; font-size:12px;"></p>
-            </div>
-        </div>
-        <div id="pdf-body" style="font-size:14px; line-height:1.6;"></div>
-        <div id="pdf-photos" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px;"></div>
-        <div style="margin-top:50px; border-top:1px solid #000; padding-top:10px; text-align:center; font-size:12px;">
-            <b>Responsável Operacional:</b> <span id="pdf-programador"></span>
-        </div>
+    <!-- Backup -->
+    <div id="area-config" class="admin-content hidden">
+        <button onclick="exportarDados()">📥 Exportar Backup JSON</button>
     </div>
 
-    <script>
-        const DB = { prog: 'l_prog_v45', forn: 'l_forn_v45', fornUsers: 'l_fusers_v45', progs: 'l_progs_v45' };
-        let tempFotos = [];
-        let galeriaAtivaIdx = null;
-        let programadorLogado = "Paulista";
+    <!-- Orçamentos -->
+    <div id="area-orcamentos" class="admin-content hidden">
+        <div id="list-orcamentos-admin"></div>
+    </div>
 
-        window.onload = () => {
-            const hoje = new Date().toISOString().split('T')[0];
-            document.getElementById('p-filter-date').value = hoje;
-            if (!localStorage.getItem(DB.progs)) {
-                localStorage.setItem(DB.progs, JSON.stringify([{ "nome": "Paulista", "user": "paulista", "pass": "1234" }]));
-                localStorage.setItem(DB.forn, JSON.stringify([{ "nome": "AGSN" }, { "nome": "MEGA CENTER" }, { "nome": "Lava jato Maximu's" }]));
-            }
-            popularSeletorFornecedores();
-        };
+    <button onclick="handleLogout()" class="btn-gray" style="margin-top:20px;">Sair</button>
+</section>
 
-        function toggleFornSelect(val) {
-            document.getElementById('p-forn-div').classList.toggle('hidden', val === 'RETORNO');
-        }
+<!-- ===================== PROGRAMADOR ===================== -->
+<section id="scr-programador" class="container hidden">
+    <h1>CHECKLIST & LANÇAMENTOS</h1>
+    <div class="form-section">
+        <select id="p-placa" onchange="atualizarSetor()">
+            <option value="">— Selecione o veículo —</option>
+        </select>
+        <div id="p-setor-display" style="display:none; margin-bottom:10px; padding:8px 12px; border-radius:8px; background:rgba(255,255,255,0.05); font-size:12px; color:var(--gray);">
+            Setor: <span id="p-setor-label" style="font-weight:bold; color:#fff;"></span>
+        </div>
+        <select id="p-tipo-op" onchange="toggleFornDiv()">
+            <option value="SAÍDA">SAÍDA</option>
+            <option value="RETORNO">RETORNO</option>
+        </select>
+        <input type="number" id="p-km" placeholder="KM ATUAL">
+        <div id="p-forn-div">
+            <select id="p-fornecedor-select"></select>
+        </div>
+        <textarea id="p-obs" placeholder="Observações..."></textarea>
 
-        function handleLogin() {
-            const u = document.getElementById('user').value.trim().toUpperCase();
-            const p = document.getElementById('pass').value.trim();
-            if (u === 'ADMIN' && p === '1234') { show('scr-admin'); carregarProgAdmin(); return; }
-            const gestores = JSON.parse(localStorage.getItem(DB.progs) || '[]');
-            const g = gestores.find(x => x.user.toUpperCase() === u && x.pass === p);
-            if (g) { programadorLogado = g.nome; show('scr-programador'); carregarProgGeral(); return; }
-            alert("Acesso Negado.");
-        }
+        <div style="display:flex; gap:5px; margin-bottom:10px;">
+            <button onclick="document.getElementById('p-fotos-cam').click()" style="background:var(--joint); flex:1; margin:0;">📸 CÂMERA</button>
+            <button onclick="document.getElementById('p-fotos-gal').click()" style="background:var(--return); flex:1; margin:0;">🖼️ GALERIA</button>
+        </div>
+        <input type="file" id="p-fotos-cam" capture="camera" accept="image/*" class="hidden" onchange="handleNewUpload(this)">
+        <input type="file" id="p-fotos-gal" multiple accept="image/*" class="hidden" onchange="handleNewUpload(this)">
+        <div id="p-preview-fotos" class="preview-area"></div>
 
-        // --- GESTÃO PAULISTA ---
-        function handleNewUpload(input) {
-            [...input.files].forEach(file => {
-                const reader = new FileReader();
-                reader.onload = e => { tempFotos.push(e.target.result); renderNewPreviews(); };
-                reader.readAsDataURL(file);
-            });
-        }
-        function renderNewPreviews() {
-            document.getElementById('p-preview-fotos').innerHTML = tempFotos.map((f, i) => `<div class="photo-card"><img src="${f}" class="thumb"><button class="del-btn" onclick="tempFotos.splice(${i},1); renderNewPreviews()">X</button></div>`).join('');
-        }
+        <button onclick="lancarProgramacao()" class="btn-success">Finalizar e Enviar</button>
+    </div>
 
-        function lancarProgramacao() {
-            const p = document.getElementById('p-placa').value.toUpperCase();
-            const tipoOp = document.getElementById('p-tipo-op').value;
-            if (!p) return alert("Digite a placa!");
+    <input type="date" id="p-filter-date" onchange="carregarProgGeral()">
+    <div id="list-prog-geral"></div>
+    <button onclick="handleLogout()" class="btn-gray">Sair</button>
+</section>
 
-            let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            list.push({
-                id: Date.now(),
-                tipo: tipoOp,
-                data: new Date().toISOString().split('T')[0],
-                timestamp: new Date().toLocaleString(),
-                placa: p,
-                km: document.getElementById('p-km').value,
-                fornecedor: tipoOp === 'RETORNO' ? 'LOKAMIG PÁTIO' : document.getElementById('p-fornecedor-select').value,
-                obs: document.getElementById('p-obs').value,
-                fotos: [...tempFotos],
-                programador: programadorLogado,
-                status_flow: tipoOp === 'RETORNO' ? 'FINALIZADO' : 'PENDENTE'
-            });
-            localStorage.setItem(DB.prog, JSON.stringify(list));
-            tempFotos = []; renderNewPreviews();
-            document.getElementById('p-placa').value = ""; document.getElementById('p-km').value = ""; document.getElementById('p-obs').value = "";
-            carregarProgGeral();
-            alert(tipoOp === 'RETORNO' ? "Retorno registrado!" : "Veículo enviado para fornecedor!");
-        }
+<!-- ===================== FORNECEDOR ===================== -->
+<section id="scr-fornecedor" class="container hidden">
+    <h1 id="forn-name-screen"></h1>
+    <div class="sub">Serviços do Dia</div>
+    <input type="date" id="forn-filter-date" onchange="carregarServicosForn(currentUser)">
+    <div id="list-forn-servicos"></div>
+    <div style="display:flex; gap:5px; margin-top:10px;">
+        <button onclick="show('scr-orcamento')" class="btn-warning" style="flex:1;">💰 CRIAR ORÇAMENTO</button>
+        <button onclick="abrirOrcamentosEnviados()" style="flex:1; background:#7c3aed;">📋 VER ORÇAMENTOS</button>
+    </div>
+    <button onclick="handleLogout()" class="btn-gray" style="margin-top:8px;">Sair</button>
+</section>
 
-        function carregarProgGeral() {
-            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            const dt = document.getElementById('p-filter-date').value;
-            document.getElementById('list-prog-geral').innerHTML = list.filter(i => i.data === dt).map((i) => {
-                const gIdx = list.indexOf(i);
-                const isRetorno = i.tipo === 'RETORNO';
-                return `
-                <div class="prog-item" style="border-left-color:${isRetorno ? 'var(--return)' : 'var(--primary)'}">
-                    <span class="status-badge" style="background:${isRetorno ? 'var(--return)' : 'var(--danger)'}">${isRetorno ? 'RETORNO' : i.status_flow}</span>
-                    <b>🚗 ${i.placa}</b><br>
-                    <small>📍 ${i.fornecedor} | 🕒 ${i.timestamp}</small><br>
-                    <small style="color:var(--warning)">📝 Obs: ${i.obs || 'Nenhuma'}</small><br>
-                    <div style="display:flex; gap:5px; margin-top:10px; flex-wrap:wrap;">
-                        <button class="btn-info" onclick="abrirGaleria(${gIdx})">📸 FOTOS (${i.fotos.length})</button>
-                        <button class="btn-pdf" onclick="gerarPDFProfissional(${gIdx})">📄 PDF</button>
-                        <button class="btn-info" style="background:var(--joint)" onclick="editarObs(${gIdx})">✏️ EDITAR</button>
-                        <button class="btn-danger" onclick="cancelarCarro(${gIdx})">❌ CANCELAR</button>
+<!-- ===================== MODAL GALERIA ===================== -->
+<div id="modal-galeria" class="modal">
+    <div style="max-width:650px; margin:0 auto;">
+        <h2 style="color:var(--primary); margin-bottom:15px;">📸 Galeria do Veículo</h2>
+        <div id="grid-fotos-galeria" class="preview-area" style="grid-template-columns:repeat(3,1fr);"></div>
+        <label class="file-label" for="gal-add-input">+ Adicionar Fotos</label>
+        <input type="file" id="gal-add-input" multiple accept="image/*" class="hidden" onchange="adicionarFotosGaleria(this)">
+        <button onclick="fecharGaleria()" class="btn-gray" style="margin-top:15px;">Fechar</button>
+    </div>
+</div>
+
+<!-- ===================== MODAL PROGRAMAÇÃO (Fornecedor) ===================== -->
+<section id="scr-modal-forn-prog" class="hidden">
+    <div class="modal-overlay" onclick="fecharModalFornProg()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">VEÍCULOS DO DIA</div>
+            <div id="prog-list-forn-modal"></div>
+            <button onclick="fecharModalFornProg()" class="btn-gray" style="margin-top:15px;">Voltar</button>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== MODAL STATUS COM FOTO (Fornecedor) ===================== -->
+<section id="scr-modal-status" class="hidden">
+    <div class="modal-overlay">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header" id="modal-status-titulo">INICIAR SERVIÇO</div>
+            <p style="font-size:12px; color:var(--gray); margin-bottom:15px;">Tire uma foto obrigatória para continuar.</p>
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <button onclick="document.getElementById('status-foto-cam').click()" style="background:var(--joint); flex:1; margin:0;">📸 CÂMERA</button>
+                <button onclick="document.getElementById('status-foto-gal').click()" style="background:var(--return); flex:1; margin:0;">🖼️ GALERIA</button>
+            </div>
+            <input type="file" id="status-foto-cam" capture="camera" accept="image/*" class="hidden" onchange="handleStatusFoto(this)">
+            <input type="file" id="status-foto-gal" accept="image/*" class="hidden" onchange="handleStatusFoto(this)">
+            <div id="status-foto-preview" class="preview-area"></div>
+            <button id="btn-confirmar-status" class="btn-success hidden" onclick="confirmarAlteracaoStatus()">✓ CONFIRMAR</button>
+            <button onclick="fecharModalStatus()" class="btn-gray" style="margin-top:5px;">Cancelar</button>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== ORÇAMENTO ===================== -->
+<section id="scr-orcamento" class="hidden">
+    <div class="modal-overlay" onclick="show('scr-fornecedor')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">💰 NOVO ORÇAMENTO</div>
+            <div class="form-section">
+                <input type="text" id="orc-placa" placeholder="PLACA DO VEÍCULO">
+                <textarea id="orc-desc" placeholder="Descrição dos serviços / observações..." style="height:70px;"></textarea>
+                <div id="orc-itens">
+                    <div class="orc-row">
+                        <input type="text" placeholder="Descrição do item" style="flex:2;">
+                        <input type="number" class="v-item" placeholder="R$" style="flex:1;" oninput="calcTotal()">
                     </div>
+                </div>
+                <button onclick="addItem()" style="background:var(--gray); padding:8px; font-size:10px;">+ ITEM</button>
+                <div style="background:rgba(16,185,129,0.2); border:1px solid var(--success); padding:12px; border-radius:10px; font-weight:bold; font-size:16px; margin:12px 0; text-align:center;">
+                    TOTAL: R$ <span id="total-orc">0,00</span>
+                </div>
+
+                <!-- EVIDÊNCIAS -->
+                <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:12px; margin-top:4px;">
+                    <p style="font-size:11px; color:var(--gray); margin-bottom:8px;">EVIDÊNCIAS (fotos, vídeos, documentos)</p>
+                    <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px;">
+                        <button onclick="document.getElementById('ev-foto-cam').click()" style="background:var(--joint); flex:1; margin:0; font-size:9px;">📸 FOTO</button>
+                        <button onclick="document.getElementById('ev-video-cam').click()" style="background:#0891b2; flex:1; margin:0; font-size:9px;">🎥 VÍDEO</button>
+                        <button onclick="document.getElementById('ev-doc').click()" style="background:#6b7280; flex:1; margin:0; font-size:9px;">📎 DOC/NF</button>
+                    </div>
+                    <input type="file" id="ev-foto-cam" capture="camera" accept="image/*" class="hidden" onchange="handleEvidencia(this,'foto')">
+                    <input type="file" id="ev-video-cam" accept="video/*" capture="camcorder" class="hidden" onchange="handleEvidencia(this,'video')">
+                    <input type="file" id="ev-doc" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,image/*" class="hidden" onchange="handleEvidencia(this,'doc')">
+                    <div id="ev-preview" class="evidencia-grid"></div>
+                </div>
+
+                <button onclick="enviarOrcamento()" class="btn-success" style="margin-top:8px;">📤 Enviar para Aprovação</button>
+            </div>
+            <button onclick="show('scr-fornecedor')" class="btn-gray">Voltar</button>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== MODAL ORÇAMENTOS ENVIADOS (Fornecedor) ===================== -->
+<section id="scr-orc-enviados" class="hidden">
+    <div class="modal-overlay" onclick="show('scr-fornecedor')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">📋 MEUS ORÇAMENTOS</div>
+            <div id="list-orc-enviados"></div>
+            <button onclick="show('scr-fornecedor')" class="btn-gray" style="margin-top:10px;">Voltar</button>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== MODAL DETALHE ORÇAMENTO (Admin + Fornecedor) ===================== -->
+<section id="scr-orc-detalhe" class="hidden">
+    <div class="modal-overlay" onclick="fecharDetalheOrc()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header" id="orc-det-titulo">ORÇAMENTO</div>
+            <div id="orc-det-body"></div>
+            <div id="orc-det-acoes" style="margin-top:12px;"></div>
+            <button onclick="fecharDetalheOrc()" class="btn-gray" style="margin-top:8px;">Fechar</button>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== TEMPLATE PDF ===================== -->
+<div id="pdf-template" style="position:fixed; left:-9999px; width:800px; background:#fff; color:#000; padding:40px; font-family: Arial, sans-serif;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:4px solid #d1122a; padding-bottom:15px; margin-bottom:20px;">
+        <img src="https://www.lokamig.com.br/wp-content/themes/lokamig/img/logo-lokamig.png" style="width:180px; height:auto;">
+        <div style="text-align:right;">
+            <h2 id="pdf-titulo" style="margin:0; color:#d1122a;"></h2>
+            <p id="pdf-data-geracao" style="margin:0; font-size:12px; color:#666;"></p>
+        </div>
+    </div>
+    <div id="pdf-body" style="font-size:14px; line-height:1.8;"></div>
+    <div id="pdf-photos" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;"></div>
+</div>
+
+<script>
+    const DB = {
+        prog:      'l_prog_final_v85',
+        forn:      'l_forn_v85',
+        fornUsers: 'l_fusers_v85',
+        progs:     'l_progs_v85',
+        colab:     'l_colab_v85',
+        veic:      'l_veic_v85',
+        orc:       'l_orc_v85'
+    };
+
+    let tempFotos = [];
+    let tempEvidencias = [];
+    let currentUser = null;
+    let galeriaAtivaIdx = null;
+    let statusPendente = { idx: null, novoStatus: null, foto: null };
+    let orcDetalheOrigem = 'admin';
+
+    // ===================== INIT =====================
+    window.onload = () => {
+        const hoje = new Date().toISOString().split('T')[0];
+        const dtProg = document.getElementById('p-filter-date');
+        if (dtProg) dtProg.value = hoje;
+        const dtForn = document.getElementById('forn-filter-date');
+        if (dtForn) dtForn.value = hoje;
+
+        if (!localStorage.getItem(DB.progs)) {
+            localStorage.setItem(DB.progs, JSON.stringify([
+                { nome: 'Paulista', user: 'paulista', pass: '1234' }
+            ]));
+        }
+        if (!localStorage.getItem(DB.forn)) {
+            localStorage.setItem(DB.forn, JSON.stringify([
+                { nome: 'AGSN' },
+                { nome: 'MEGA CENTER' },
+                { nome: "Lava Jato Maximu's" }
+            ]));
+        }
+        if (!localStorage.getItem(DB.fornUsers)) {
+            localStorage.setItem(DB.fornUsers, JSON.stringify([
+                { user: 'rodolfo', pass: '1234', empresa: 'MEGA CENTER',      tipo: 'Oficina'  },
+                { user: 'fiu',     pass: '1234', empresa: "Lava Jato Maximu's", tipo: 'Limpeza' },
+                { user: 'taty',    pass: '1234', empresa: 'AGSN',              tipo: 'Oficina'  }
+            ]));
+        }
+        popularSeletorFornecedores();
+        popularSeletorVeiculos();
+    };
+
+    // ===================== NAVEGAÇÃO =====================
+    function show(id) {
+        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function handleLogout() {
+        currentUser = null;
+        tempFotos = [];
+        tempEvidencias = [];
+        show('scr-login');
+        document.getElementById('user').value = '';
+        document.getElementById('pass').value = '';
+        document.getElementById('nfc-status').innerText = '';
+    }
+
+    function switchTab(id, e) {
+        document.querySelectorAll('.admin-content').forEach(a => a.classList.add('hidden'));
+        document.getElementById('area-' + id).classList.remove('hidden');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+        if (e) e.target.classList.add('tab-active');
+        if (id === 'monitor')    carregarProgAdmin();
+        if (id === 'forn')       renderListaForn();
+        if (id === 'colab')      renderAdminList('colab');
+        if (id === 'veic')       renderAdminList('veic');
+        if (id === 'history')    renderHistorico();
+        if (id === 'orcamentos') renderOrcamentosAdmin();
+    }
+
+    // ===================== NFC =====================
+    async function ativarNFC(targetId) {
+        if ('NDEFReader' in window) {
+            try {
+                const ndef = new NDEFReader();
+                await ndef.scan();
+                document.getElementById('nfc-status').innerText = '📡 Aproxime o crachá...';
+                ndef.onreading = event => {
+                    const el = document.getElementById(targetId);
+                    if (el) el.value = event.serialNumber;
+                    document.getElementById('nfc-status').innerText = '✓ Leitura concluída!';
+                    if (targetId === 'user') handleLogin();
+                };
+            } catch (err) {
+                document.getElementById('nfc-status').innerText = 'Erro NFC: ' + err;
+            }
+        } else {
+            document.getElementById('nfc-status').innerText = 'NFC não suportado neste dispositivo.';
+        }
+    }
+
+    // ===================== LOGIN =====================
+    function handleLogin() {
+        const u = document.getElementById('user').value.trim().toUpperCase();
+        const p = document.getElementById('pass').value.trim();
+
+        if (u === 'ADMIN' && p === '1234') {
+            show('scr-admin');
+            carregarProgAdmin();
+            return;
+        }
+
+        const progs = JSON.parse(localStorage.getItem(DB.progs) || '[]');
+        const prog = progs.find(x => x.user.toUpperCase() === u && x.pass === p);
+        if (prog) {
+            currentUser = prog;
+            show('scr-programador');
+            carregarProgGeral();
+            return;
+        }
+
+        const fornUsers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]');
+        const forn = fornUsers.find(x => x.user.toUpperCase() === u && x.pass === p);
+        if (forn) {
+            currentUser = forn;
+            document.getElementById('forn-name-screen').innerText = forn.empresa;
+            show('scr-fornecedor');
+            carregarServicosForn(forn);
+            return;
+        }
+
+        alert('Acesso Negado. Verifique usuário e senha.');
+    }
+
+    // ===================== PROGRAMADOR =====================
+    function toggleFornDiv() {
+        const tipo = document.getElementById('p-tipo-op').value;
+        document.getElementById('p-forn-div').style.display = tipo === 'RETORNO' ? 'none' : 'block';
+    }
+
+    function popularSeletorVeiculos() {
+        const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+        const sel = document.getElementById('p-placa');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">— Selecione o veículo —</option>' +
+            veics.map(v => `<option value="${v.placa}" data-tipo="${v.tipo}">${v.placa} — ${v.tipo}</option>`).join('');
+    }
+
+    function atualizarSetor() {
+        const sel = document.getElementById('p-placa');
+        const opt = sel.options[sel.selectedIndex];
+        const tipo = opt ? opt.getAttribute('data-tipo') : '';
+        const display = document.getElementById('p-setor-display');
+        const label = document.getElementById('p-setor-label');
+        if (tipo) {
+            const cores = { Operacional: '#3b82f6', Reserva: '#10b981', Gerencial: '#f97316' };
+            label.innerText = tipo.toUpperCase();
+            label.style.color = cores[tipo] || '#fff';
+            display.style.display = 'block';
+        } else {
+            display.style.display = 'none';
+        }
+    }
+
+    function popularSeletorFornecedores() {
+        const forns = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+        let opts = forns.map(f => `<option value="${f.nome}">${f.nome}</option>`).join('');
+        opts += `<option value="MEGA CENTER + MAXIMU'S">🤝 Parceria (MEGA + Maximu's)</option>`;
+        document.getElementById('p-fornecedor-select').innerHTML = opts;
+    }
+
+    function handleNewUpload(input) {
+        [...input.files].forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => { tempFotos.push(e.target.result); renderNewPreviews(); };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function renderNewPreviews() {
+        document.getElementById('p-preview-fotos').innerHTML = tempFotos.map((f, i) =>
+            `<div class="photo-card">
+                <img src="${f}" class="thumb" onclick="verFotoGrande('${f}')">
+                <button class="del-btn" onclick="tempFotos.splice(${i},1); renderNewPreviews()">✕</button>
+            </div>`
+        ).join('');
+    }
+
+    function lancarProgramacao() {
+        const sel = document.getElementById('p-placa');
+        const placa = sel.value;
+        if (!placa) return alert('Selecione um veículo!');
+        const opt = sel.options[sel.selectedIndex];
+        const setor = opt ? opt.getAttribute('data-tipo') : '';
+        const tipo = document.getElementById('p-tipo-op').value;
+        const fornecedor = tipo === 'RETORNO' ? 'PÁTIO' : document.getElementById('p-fornecedor-select').value;
+
+        let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+        list.push({
+            id:          Date.now(),
+            data:        new Date().toISOString().split('T')[0],
+            timestamp:   new Date().toLocaleString('pt-BR'),
+            placa:       placa,
+            setor:       setor,
+            km:          document.getElementById('p-km').value,
+            fornecedor:  fornecedor,
+            obs:         document.getElementById('p-obs').value,
+            fotos:       [...tempFotos],
+            programador: currentUser ? currentUser.nome : 'Sistema',
+            status_flow: 'PENDENTE',
+            tipo_op:     tipo
+        });
+        localStorage.setItem(DB.prog, JSON.stringify(list));
+
+        document.getElementById('success-overlay').style.display = 'flex';
+        setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 2000);
+
+        tempFotos = [];
+        document.getElementById('p-placa').value = '';
+        document.getElementById('p-km').value = '';
+        document.getElementById('p-obs').value = '';
+        document.getElementById('p-setor-display').style.display = 'none';
+        renderNewPreviews();
+        carregarProgGeral();
+    }
+
+    function carregarProgGeral() {
+        const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+        const dt = document.getElementById('p-filter-date').value;
+        const filtrados = list.filter(i => i.data === dt).reverse();
+        const cont = document.getElementById('list-prog-geral');
+        if (!filtrados.length) { cont.innerHTML = '<p style="font-size:12px; color:var(--gray); text-align:center; padding:10px;">Nenhum lançamento nesta data.</p>'; return; }
+        cont.innerHTML = filtrados.map(i => {
+            const idx = list.indexOf(i);
+            const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': 'var(--danger)', 'CONCLUIDO': 'var(--success)' }[i.status_flow] || 'var(--gray)';
+            const badgeSetor = i.setor ? `<span class="setor-badge setor-${i.setor}">${i.setor}</span>` : '';
+            return `<div class="prog-item">
+                <span class="status-badge" style="background:${statusColor}; color:${i.status_flow==='PENDENTE'?'#000':'#fff'}">${i.status_flow}</span>
+                <b>🚗 ${i.placa}</b>${badgeSetor} — ${i.tipo_op}<br>
+                <span style="color:var(--gray); font-size:11px;">${i.fornecedor} | KM: ${i.km||'—'} | ${i.timestamp||i.data}</span><br>
+                <div style="display:flex; gap:5px; margin-top:8px; flex-wrap:wrap;">
+                    <button class="btn-info" onclick="abrirGaleria(${idx})">📸 Fotos (${(i.fotos||[]).length})</button>
+                    <button class="btn-pdf"  onclick="gerarPDF(${idx})">📄 PDF</button>
+                    <button class="btn-danger" onclick="cancelarCarro(${idx})">❌ Remover</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // ===================== FORNECEDOR TELA =====================
+    function carregarServicosForn(user) {
+        const dt = document.getElementById('forn-filter-date').value || new Date().toISOString().split('T')[0];
+        const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+        const meus = list.filter(s => {
+            if (!s.data || s.data !== dt) return false;
+            if (user.empresa === 'MEGA CENTER' || user.empresa.includes('Max')) {
+                return s.fornecedor === user.empresa || (s.fornecedor && s.fornecedor.includes('+'));
+            }
+            return s.fornecedor === user.empresa;
+        });
+        const cont = document.getElementById('list-forn-servicos');
+        if (!meus.length) { cont.innerHTML = '<p style="font-size:12px; color:var(--gray); text-align:center; padding:10px;">Nenhum serviço para hoje.</p>'; return; }
+        cont.innerHTML = meus.map(s => {
+            const idx = list.indexOf(s);
+            const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': 'var(--danger)', 'CONCLUIDO': 'var(--success)' }[s.status_flow] || 'var(--gray)';
+            const concluido = s.status_flow === 'CONCLUIDO';
+            return `<div class="prog-item">
+                <span class="status-badge" style="background:${statusColor}; color:${s.status_flow==='PENDENTE'?'#000':'#fff'}">${s.status_flow}</span>
+                <b>${s.placa}</b> — ${s.tipo_op||''}<br>
+                <span style="color:var(--gray); font-size:11px;">KM: ${s.km||'—'} | ${s.timestamp||s.data}</span>
+                ${s.obs ? `<div style="color:var(--gray); font-size:11px; margin-top:4px;">OBS: ${s.obs}</div>` : ''}
+                ${concluido
+                    ? `<div style="color:var(--success); font-weight:bold; margin-top:8px; font-size:11px;">✓ SERVIÇO FINALIZADO</div>`
+                    : `<div style="display:flex; gap:5px; margin-top:8px; flex-wrap:wrap;">
+                        ${s.status_flow === 'PENDENTE'
+                            ? `<button class="btn-success" style="flex:1;" onclick="abrirModalStatus(${idx}, 'EM EXECUÇÃO')">▶ INICIAR SERVIÇO</button>`
+                            : `<button class="btn-success" style="flex:1;" onclick="abrirModalStatus(${idx}, 'CONCLUIDO')">✓ FINALIZAR SERVIÇO</button>`
+                        }
+                        <button class="btn-purple" onclick="abrirGaleria(${idx})">📸</button>
+                       </div>`
+                }
+            </div>`;
+        }).join('');
+
+        // Botão de orçamento no rodapé da tela
+        const orcBtn = document.getElementById('btn-orc-forn');
+        if (!orcBtn) {
+            const b = document.createElement('button');
+            b.id = 'btn-orc-forn';
+            b.className = 'btn-warning';
+            b.style.marginTop = '10px';
+            b.innerText = '💰 CRIAR ORÇAMENTO';
+            b.onclick = () => show('scr-orcamento');
+            cont.after(b);
+        }
+    }
+
+    // ===================== MODAL STATUS COM FOTO =====================
+    function abrirModalStatus(idx, novoStatus) {
+        statusPendente = { idx, novoStatus, foto: null };
+        document.getElementById('modal-status-titulo').innerText =
+            novoStatus === 'EM EXECUÇÃO' ? '📸 FOTO DE ENTRADA — INICIAR SERVIÇO' : '📸 FOTO DE SAÍDA — FINALIZAR SERVIÇO';
+        document.getElementById('status-foto-preview').innerHTML = '';
+        document.getElementById('btn-confirmar-status').classList.add('hidden');
+        show('scr-modal-status');
+    }
+
+    function handleStatusFoto(input) {
+        const file = input.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            statusPendente.foto = e.target.result;
+            document.getElementById('status-foto-preview').innerHTML =
+                `<div class="photo-card"><img src="${e.target.result}" class="thumb"></div>`;
+            document.getElementById('btn-confirmar-status').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function confirmarAlteracaoStatus() {
+        if (!statusPendente.foto) return alert('Tire uma foto para continuar!');
+        let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+        const item = list[statusPendente.idx];
+        if (!item) return;
+        item.status_flow = statusPendente.novoStatus;
+        if (!item.fotos) item.fotos = [];
+        item.fotos.push(statusPendente.foto);
+        localStorage.setItem(DB.prog, JSON.stringify(list));
+
+        document.getElementById('success-overlay').style.display = 'flex';
+        setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 1500);
+
+        fecharModalStatus();
+        carregarServicosForn(currentUser);
+    }
+
+    function fecharModalStatus() {
+        show('scr-fornecedor');
+        statusPendente = { idx: null, novoStatus: null, foto: null };
+    }
+
+    // ===================== GALERIA =====================
+    function abrirGaleria(idx) {
+        galeriaAtivaIdx = idx;
+        document.getElementById('modal-galeria').style.display = 'block';
+        renderGaleriaItems();
+    }
+
+    function fecharGaleria() {
+        document.getElementById('modal-galeria').style.display = 'none';
+    }
+
+    function renderGaleriaItems() {
+        const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+        const item = list[galeriaAtivaIdx];
+        const fotos = item ? (item.fotos || []) : [];
+        document.getElementById('grid-fotos-galeria').innerHTML = fotos.length
+            ? fotos.map((f, i) =>
+                `<div class="photo-card" style="height:100px;">
+                    <img src="${f}" class="thumb" onclick="verFotoGrande('${f}')">
+                    <button class="del-btn" onclick="removerFotoGaleria(${i})">✕</button>
+                </div>`
+              ).join('')
+            : '<p style="font-size:12px; color:var(--gray);">Nenhuma foto neste registro.</p>';
+    }
+
+    function removerFotoGaleria(i) {
+        let list = JSON.parse(localStorage.getItem(DB.prog));
+        list[galeriaAtivaIdx].fotos.splice(i, 1);
+        localStorage.setItem(DB.prog, JSON.stringify(list));
+        renderGaleriaItems();
+    }
+
+    function adicionarFotosGaleria(input) {
+        let list = JSON.parse(localStorage.getItem(DB.prog));
+        [...input.files].forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                if (!list[galeriaAtivaIdx].fotos) list[galeriaAtivaIdx].fotos = [];
+                list[galeriaAtivaIdx].fotos.push(e.target.result);
+                localStorage.setItem(DB.prog, JSON.stringify(list));
+                renderGaleriaItems();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function verFotoGrande(src) {
+        document.getElementById('full-img').src = src;
+        document.getElementById('img-viewer').style.display = 'flex';
+    }
+
+    // ===================== ORÇAMENTO =====================
+    function addItem() {
+        const cont = document.getElementById('orc-itens');
+        const row = document.createElement('div');
+        row.className = 'orc-row';
+        row.innerHTML = `<input type="text" placeholder="Descrição do item" style="flex:2;">
+                         <input type="number" class="v-item" placeholder="R$" style="flex:1;" oninput="calcTotal()">`;
+        cont.appendChild(row);
+    }
+
+    function calcTotal() {
+        let total = 0;
+        document.querySelectorAll('.v-item').forEach(i => total += Number(i.value) || 0);
+        document.getElementById('total-orc').innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    }
+
+    // Evidências do orçamento
+    function handleEvidencia(input, tipo) {
+        [...input.files].forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                tempEvidencias.push({ tipo, nome: file.name, data: e.target.result, mime: file.type });
+                renderEvidencias();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function renderEvidencias() {
+        const cont = document.getElementById('ev-preview');
+        if (!cont) return;
+        cont.innerHTML = tempEvidencias.map((ev, i) => {
+            let preview = '';
+            if (ev.tipo === 'foto') {
+                preview = `<img src="${ev.data}" onclick="verFotoGrande('${ev.data}')">`;
+            } else if (ev.tipo === 'video') {
+                preview = `<video src="${ev.data}" controls></video>`;
+            } else {
+                preview = `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:rgba(255,255,255,0.1);font-size:9px;padding:5px;text-align:center;color:#fff;">📎<br>${ev.nome}</div>`;
+            }
+            return `<div class="ev-card">
+                ${preview}
+                <span class="ev-type-badge">${ev.tipo.toUpperCase()}</span>
+                <button class="del-btn" onclick="tempEvidencias.splice(${i},1);renderEvidencias()">✕</button>
+            </div>`;
+        }).join('');
+    }
+
+    function enviarOrcamento() {
+        const placa = document.getElementById('orc-placa').value.toUpperCase();
+        if (!placa) return alert('Informe a placa!');
+        const itens = [...document.querySelectorAll('#orc-itens .orc-row')].map(row => {
+            const inputs = row.querySelectorAll('input');
+            return { desc: inputs[0]?.value || '', valor: Number(inputs[1]?.value) || 0 };
+        }).filter(it => it.desc || it.valor);
+        const total = itens.reduce((s, it) => s + it.valor, 0);
+
+        let orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
+        orcs.push({
+            id:          Date.now(),
+            timestamp:   new Date().toLocaleString('pt-BR'),
+            empresa:     currentUser ? currentUser.empresa : '—',
+            placa:       placa,
+            descricao:   document.getElementById('orc-desc').value,
+            itens:       itens,
+            total:       total,
+            evidencias:  [...tempEvidencias],
+            status:      'PENDENTE'
+        });
+        localStorage.setItem(DB.orc, JSON.stringify(orcs));
+
+        tempEvidencias = [];
+        document.getElementById('orc-placa').value = '';
+        document.getElementById('orc-desc').value = '';
+        document.getElementById('orc-itens').innerHTML = `<div class="orc-row">
+            <input type="text" placeholder="Descrição do item" style="flex:2;">
+            <input type="number" class="v-item" placeholder="R$" style="flex:1;" oninput="calcTotal()">
+        </div>`;
+        document.getElementById('total-orc').innerText = '0,00';
+        renderEvidencias();
+
+        document.getElementById('success-overlay').style.display = 'flex';
+        setTimeout(() => {
+            document.getElementById('success-overlay').style.display = 'none';
+            show('scr-fornecedor');
+        }, 2000);
+    }
+
+    // Orçamentos enviados — tela do fornecedor
+    function abrirOrcamentosEnviados() {
+        orcDetalheOrigem = 'fornecedor';
+        const empresa = currentUser ? currentUser.empresa : '';
+        const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]').filter(o => o.empresa === empresa).reverse();
+        const cont = document.getElementById('list-orc-enviados');
+        cont.innerHTML = orcs.length ? orcs.map((o, i) => {
+            const statusColor = o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : 'var(--warning)';
+            const idx = JSON.parse(localStorage.getItem(DB.orc) || '[]').indexOf(o);
+            const realIdx = JSON.parse(localStorage.getItem(DB.orc) || '[]').findIndex(x => x.id === o.id);
+            return `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrc(${realIdx})">
+                <span class="status-badge" style="background:${statusColor}; color:${o.status==='PENDENTE'?'#000':'#fff'}; float:right;">${o.status}</span>
+                <b>${o.placa}</b> — R$ ${o.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}<br>
+                <span style="color:var(--gray); font-size:11px;">${o.empresa} | ${o.timestamp}</span><br>
+                <span style="font-size:11px; color:var(--gray);">📎 ${o.evidencias.length} evidência(s)</span>
+            </div>`;
+        }).join('') : '<p style="font-size:12px; color:var(--gray); text-align:center;">Nenhum orçamento enviado.</p>';
+        show('scr-orc-enviados');
+    }
+
+    // Detalhe de orçamento (admin e fornecedor)
+    function abrirDetalheOrc(idx) {
+        const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
+        const o = orcs[idx];
+        if (!o) return;
+        document.getElementById('orc-det-titulo').innerText = `ORÇAMENTO — ${o.placa}`;
+        document.getElementById('orc-det-body').innerHTML = `
+            <div style="font-size:12px; color:var(--gray); margin-bottom:10px;">${o.empresa} | ${o.timestamp}</div>
+            ${o.descricao ? `<div style="font-size:12px; margin-bottom:10px; padding:8px; background:rgba(255,255,255,0.05); border-radius:8px;">${o.descricao}</div>` : ''}
+            <table style="width:100%; font-size:12px; border-collapse:collapse; margin-bottom:10px;">
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <th style="text-align:left; padding:6px; color:var(--gray);">Item</th>
+                    <th style="text-align:right; padding:6px; color:var(--gray);">Valor</th>
+                </tr>
+                ${o.itens.map(it => `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <td style="padding:6px;">${it.desc}</td>
+                    <td style="text-align:right; padding:6px;">R$ ${it.valor.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+                </tr>`).join('')}
+                <tr>
+                    <td style="padding:6px; font-weight:bold;">TOTAL</td>
+                    <td style="text-align:right; padding:6px; font-weight:bold; color:var(--success);">R$ ${o.total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+                </tr>
+            </table>
+            ${o.evidencias.length ? `
+                <p style="font-size:11px; color:var(--gray); margin-bottom:8px;">EVIDÊNCIAS (${o.evidencias.length})</p>
+                <div class="evidencia-grid">
+                    ${o.evidencias.map(ev => {
+                        if (ev.tipo === 'foto') return `<div class="ev-card"><img src="${ev.data}" onclick="verFotoGrande('${ev.data}')"><span class="ev-type-badge">FOTO</span></div>`;
+                        if (ev.tipo === 'video') return `<div class="ev-card"><video src="${ev.data}" controls></video><span class="ev-type-badge">VÍDEO</span></div>`;
+                        return `<div class="ev-card"><div style="display:flex;align-items:center;justify-content:center;height:100%;background:rgba(255,255,255,0.1);font-size:9px;padding:5px;text-align:center;color:#fff;">📎<br>${ev.nome}</div><span class="ev-type-badge">DOC</span></div>`;
+                    }).join('')}
+                </div>` : ''}`;
+
+        // Ações de aprovação só para admin
+        const acoes = document.getElementById('orc-det-acoes');
+        if (orcDetalheOrigem === 'admin' && o.status === 'PENDENTE') {
+            acoes.innerHTML = `
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-success" style="flex:1;" onclick="mudarStatusOrc(${idx},'APROVADO')">✓ APROVAR</button>
+                    <button class="btn-danger" style="flex:1; background:var(--danger);" onclick="mudarStatusOrc(${idx},'REJEITADO')">✕ REJEITAR</button>
                 </div>`;
-            }).reverse().join('') || "Sem registros.";
+        } else {
+            const statusColor = o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : 'var(--warning)';
+            acoes.innerHTML = `<div style="text-align:center; font-weight:bold; color:${statusColor}; font-size:13px; padding:8px;">Status: ${o.status}</div>`;
+        }
+        show('scr-orc-detalhe');
+    }
+
+    function mudarStatusOrc(idx, novoStatus) {
+        let orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
+        orcs[idx].status = novoStatus;
+        localStorage.setItem(DB.orc, JSON.stringify(orcs));
+        renderOrcamentosAdmin();
+        abrirDetalheOrc(idx);
+    }
+
+    function fecharDetalheOrc() {
+        if (orcDetalheOrigem === 'admin') { show('scr-admin'); renderOrcamentosAdmin(); }
+        else { show('scr-orc-enviados'); abrirOrcamentosEnviados(); }
+    }
+
+    // Orçamentos no admin
+    function renderOrcamentosAdmin() {
+        const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]').reverse();
+        const cont = document.getElementById('list-orcamentos-admin');
+        if (!cont) return;
+        const pendentes = orcs.filter(o => o.status === 'PENDENTE').length;
+        cont.innerHTML = (pendentes ? `<div style="background:rgba(209,18,42,0.2); border:1px solid var(--primary); border-radius:8px; padding:8px 12px; font-size:11px; margin-bottom:12px; text-align:center;">${pendentes} orçamento(s) aguardando aprovação</div>` : '') +
+            (orcs.length ? orcs.map((o, i) => {
+                const realIdx = JSON.parse(localStorage.getItem(DB.orc) || '[]').findIndex(x => x.id === o.id);
+                const statusColor = o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : 'var(--warning)';
+                return `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrcAdmin(${realIdx})" style="cursor:pointer;">
+                    <span class="status-badge" style="background:${statusColor}; color:${o.status==='PENDENTE'?'#000':'#fff'}; float:right;">${o.status}</span>
+                    <b>${o.placa}</b> — R$ ${o.total.toLocaleString('pt-BR',{minimumFractionDigits:2})}<br>
+                    <span style="color:var(--gray); font-size:11px;">${o.empresa} | ${o.timestamp}</span><br>
+                    <span style="font-size:11px; color:var(--gray);">📎 ${o.evidencias.length} evidência(s)</span>
+                </div>`;
+            }).join('') : '<p style="font-size:12px; color:var(--gray); text-align:center;">Nenhum orçamento recebido.</p>');
+    }
+
+    function abrirDetalheOrcAdmin(idx) {
+        orcDetalheOrigem = 'admin';
+        abrirDetalheOrc(idx);
+    }
+
+    // ===================== ADMIN =====================
+    function carregarProgAdmin() {
+        const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+        const cont = document.getElementById('list-prog-admin');
+        if (!list.length) { cont.innerHTML = '<p style="font-size:12px; color:var(--gray); text-align:center;">Nenhum lançamento.</p>'; return; }
+        cont.innerHTML = [...list].reverse().map(s => {
+            const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': 'var(--danger)', 'CONCLUIDO': 'var(--success)' }[s.status_flow] || 'var(--gray)';
+            return `<div class="prog-item">
+                <span class="status-badge" style="background:${statusColor}; color:${s.status_flow==='PENDENTE'?'#000':'#fff'}">${s.status_flow}</span>
+                <b>${s.placa}</b> — ${s.tipo_op||''} → ${s.fornecedor||''}<br>
+                <span style="color:var(--gray); font-size:11px;">${s.timestamp||s.data} | ${s.programador||'—'}</span>
+            </div>`;
+        }).join('');
+    }
+
+    function renderHistorico() {
+        const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+        const concluidos = list.filter(x => x.status_flow === 'CONCLUIDO').reverse();
+        const cont = document.getElementById('list-history-admin');
+        cont.innerHTML = concluidos.length
+            ? concluidos.map(s =>
+                `<div class="prog-item status-CONCLUIDO">
+                    <b>${s.placa}</b> — ${s.fornecedor||''}<br>
+                    <span style="color:var(--gray); font-size:11px;">${s.timestamp||s.data}</span>
+                </div>`
+              ).join('')
+            : '<p style="font-size:12px; color:var(--gray); text-align:center;">Nenhum serviço concluído.</p>';
+    }
+
+    function renderAdminList(key) {
+        const items = JSON.parse(localStorage.getItem(DB[key]) || '[]');
+        const cont = document.getElementById('list-' + key);
+        if (!cont) return;
+        cont.innerHTML = items.map((it, idx) =>
+            `<div class="prog-item" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>${it.nome || it.placa || it.mat || '—'}</span>
+                <button class="btn-danger" onclick="excluirItem('${key}',${idx})" style="width:auto; padding:5px 10px;">✕</button>
+            </div>`
+        ).join('') || '<p style="font-size:12px; color:var(--gray); text-align:center;">Nenhum cadastro.</p>';
+    }
+
+    function excluirItem(key, idx) {
+        if (!confirm('Remover este item?')) return;
+        let list = JSON.parse(localStorage.getItem(DB[key]));
+        list.splice(idx, 1);
+        localStorage.setItem(DB[key], JSON.stringify(list));
+        renderAdminList(key);
+    }
+
+    // Fornecedores admin — lista com detalhe
+    function renderListaForn() {
+        const items = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+        const cont = document.getElementById('list-forn');
+        cont.innerHTML = items.map((it, idx) =>
+            `<div class="prog-item" style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="cursor:pointer; color:var(--primary);" onclick="verDetalhesForn(${idx})">${it.nome}</span>
+                <button class="btn-danger" onclick="excluirItem('forn',${idx})" style="width:auto; padding:5px 10px;">✕</button>
+            </div>`
+        ).join('') || '<p style="font-size:12px; color:var(--gray); text-align:center;">Nenhum fornecedor.</p>';
+    }
+
+    function salvarNovoFornecedor() {
+        const nome = document.getElementById('f-nome').value.trim();
+        const user = document.getElementById('f-user').value.trim();
+        const pass = document.getElementById('f-pass').value.trim();
+        const tipo = document.getElementById('f-tipo').value;
+        if (!nome) return alert('Informe o nome da empresa!');
+
+        // Salva na lista de fornecedores
+        let forn = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+        forn.push({ nome });
+        localStorage.setItem(DB.forn, JSON.stringify(forn));
+
+        // Se tiver user/pass, cria usuário de acesso
+        if (user && pass) {
+            let fusers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]');
+            fusers.push({ user, pass, empresa: nome, tipo });
+            localStorage.setItem(DB.fornUsers, JSON.stringify(fusers));
         }
 
-        // --- GALERIA & PDF ---
-        function abrirGaleria(idx) { galeriaAtivaIdx = idx; const item = JSON.parse(localStorage.getItem(DB.prog))[idx]; document.getElementById('galeria-placa').innerText = `Veículo: ${item.placa}`; document.getElementById('modal-galeria').style.display = 'block'; renderGaleriaItems(); }
-        function fecharGaleria() { document.getElementById('modal-galeria').style.display = 'none'; carregarProgGeral(); }
-        function renderGaleriaItems() { const item = JSON.parse(localStorage.getItem(DB.prog))[galeriaAtivaIdx]; document.getElementById('grid-fotos-galeria').innerHTML = item.fotos.map((f, i) => `<div class="photo-card" style="height:120px;"><img src="${f}" class="thumb"><button class="del-btn" onclick="removerFotoGaleria(${i})">X</button></div>`).join(''); }
-        function removerFotoGaleria(i) { let list = JSON.parse(localStorage.getItem(DB.prog)); list[galeriaAtivaIdx].fotos.splice(i, 1); localStorage.setItem(DB.prog, JSON.stringify(list)); renderGaleriaItems(); }
-        function adicionarFotosGaleria(input) { let list = JSON.parse(localStorage.getItem(DB.prog));[...input.files].forEach(file => { const reader = new FileReader(); reader.onload = e => { list[galeriaAtivaIdx].fotos.push(e.target.result); localStorage.setItem(DB.prog, JSON.stringify(list)); renderGaleriaItems(); }; reader.readAsDataURL(file); }); }
+        document.getElementById('f-nome').value = '';
+        document.getElementById('f-user').value = '';
+        document.getElementById('f-pass').value = '';
+        popularSeletorFornecedores();
+        renderListaForn();
+        alert('Fornecedor cadastrado!');
+    }
 
-        async function gerarPDFProfissional(idx) {
-            const item = JSON.parse(localStorage.getItem(DB.prog))[idx];
-            const { jsPDF } = window.jspdf;
-            document.getElementById('pdf-titulo').innerText = `CHECKLIST DE ${item.tipo || 'SAÍDA'}`;
-            document.getElementById('pdf-data-geracao').innerText = item.timestamp;
-            document.getElementById('pdf-programador').innerText = item.programador;
-            document.getElementById('pdf-body').innerHTML = `
-                <p><b>PLACA DO VEÍCULO:</b> ${item.placa} &nbsp;&nbsp;&nbsp; <b>KM NO REGISTRO:</b> ${item.km || 'N/I'}</p>
-                <p><b>LOCAL/FORNECEDOR:</b> ${item.fornecedor}</p>
-                <p><b>OBSERVAÇÕES REGISTRADAS:</b> ${item.obs || 'Nenhuma.'}</p>
-            `;
-            const grid = document.getElementById('pdf-photos'); grid.innerHTML = '';
-            item.fotos.forEach(f => { grid.innerHTML += `<img src="${f}" style="width:100%; border:1px solid #ddd; border-radius:5px;">`; });
-            html2canvas(document.getElementById('pdf-template'), { scale: 2, useCORS: true }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const doc = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = doc.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                doc.save(`${item.tipo}_LOKAMIG_${item.placa}.pdf`);
-            });
+    function verDetalhesForn(idx) {
+        const forn = JSON.parse(localStorage.getItem(DB.forn) || '[]')[idx];
+        const fusers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]').filter(u => u.empresa === forn.nome);
+        document.getElementById('view-forn-title').innerText = forn.nome;
+        document.getElementById('list-forn-users').innerHTML = fusers.length
+            ? fusers.map(u => `<div class="prog-item"><b>${u.user}</b> — ${u.tipo}</div>`).join('')
+            : '<p style="font-size:12px; color:var(--gray);">Nenhum usuário vinculado.</p>';
+        document.getElementById('forn-main-view').classList.add('hidden');
+        document.getElementById('forn-detail-view').classList.remove('hidden');
+    }
+
+    function fecharDetalhesForn() {
+        document.getElementById('forn-main-view').classList.remove('hidden');
+        document.getElementById('forn-detail-view').classList.add('hidden');
+    }
+
+    function salvarColab() {
+        const nome = document.getElementById('c-nome').value.trim();
+        const mat  = document.getElementById('c-mat').value.trim();
+        const nfc  = document.getElementById('c-nfc').value.trim();
+        if (!nome || !mat) return alert('Preencha Nome e Matrícula!');
+        let list = JSON.parse(localStorage.getItem(DB.colab) || '[]');
+        list.push({ nome, mat, nfc });
+        localStorage.setItem(DB.colab, JSON.stringify(list));
+        document.getElementById('c-nome').value = '';
+        document.getElementById('c-mat').value = '';
+        document.getElementById('c-nfc').value = '';
+        renderAdminList('colab');
+        alert('Colaborador cadastrado!');
+    }
+
+    function salvarVeiculo() {
+        const placa = document.getElementById('v-placa').value.toUpperCase().trim();
+        const tipo  = document.getElementById('v-tipo').value;
+        if (!placa) return alert('Informe a placa!');
+        let list = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+        list.push({ placa, tipo });
+        localStorage.setItem(DB.veic, JSON.stringify(list));
+        document.getElementById('v-placa').value = '';
+        renderAdminList('veic');
+        popularSeletorVeiculos();
+        alert('Veículo cadastrado!');
+    }
+
+    // ===================== PDF =====================
+    async function gerarPDF(idx) {
+        const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+        const item = list[idx];
+        if (!item) return alert('Registro não encontrado.');
+
+        document.getElementById('pdf-titulo').innerText = `RELATÓRIO — ${item.tipo_op || 'OPERAÇÃO'}`;
+        document.getElementById('pdf-data-geracao').innerText = `Gerado em: ${new Date().toLocaleString('pt-BR')}`;
+        document.getElementById('pdf-body').innerHTML = `
+            <table style="width:100%; border-collapse:collapse; margin-bottom:10px;">
+                <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold; width:30%;">Placa</td><td style="padding:6px; border:1px solid #ddd;">${item.placa}</td></tr>
+                <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">KM</td><td style="padding:6px; border:1px solid #ddd;">${item.km || '—'}</td></tr>
+                <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Fornecedor</td><td style="padding:6px; border:1px solid #ddd;">${item.fornecedor || '—'}</td></tr>
+                <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Status</td><td style="padding:6px; border:1px solid #ddd;">${item.status_flow}</td></tr>
+                <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Data/Hora</td><td style="padding:6px; border:1px solid #ddd;">${item.timestamp || item.data}</td></tr>
+                <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Programador</td><td style="padding:6px; border:1px solid #ddd;">${item.programador || '—'}</td></tr>
+                <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Observações</td><td style="padding:6px; border:1px solid #ddd;">${item.obs || '—'}</td></tr>
+            </table>`;
+
+        const grid = document.getElementById('pdf-photos');
+        grid.innerHTML = '';
+        (item.fotos || []).forEach(f => {
+            grid.innerHTML += `<img src="${f}" style="width:100%; border:1px solid #ddd; border-radius:4px;">`;
+        });
+
+        try {
+            const canvas = await html2canvas(document.getElementById('pdf-template'), { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const doc = new jspdf.jsPDF('p', 'mm', 'a4');
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            doc.save(`Lokamig_${item.placa}_${item.data}.pdf`);
+        } catch (e) {
+            alert('Erro ao gerar PDF: ' + e.message);
         }
+    }
 
-        // --- AUXILIARES ---
-        function popularSeletorFornecedores() { const forns = JSON.parse(localStorage.getItem(DB.forn) || '[]'); let o = forns.map(f => `<option value="${f.nome}">${f.nome}</option>`).join(''); o += `<option value="MEGA CENTER + MAXIMU'S">🤝 Parceria</option>`; document.getElementById('p-fornecedor-select').innerHTML = o; }
-        function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
-        function handleLogout() { show('scr-login'); }
-        function editarObs(idx) { let list = JSON.parse(localStorage.getItem(DB.prog)); const n = prompt("Nova observação:", list[idx].obs); if (n !== null) { list[idx].obs = n; localStorage.setItem(DB.prog, JSON.stringify(list)); carregarProgGeral(); } }
-        function cancelarCarro(idx) { if (confirm("Remover registro?")) { let list = JSON.parse(localStorage.getItem(DB.prog)); list.splice(idx, 1); localStorage.setItem(DB.prog, JSON.stringify(list)); carregarProgGeral(); } }
-        function switchTab(id, e) { document.querySelectorAll('[id^="area-"]').forEach(a => a.classList.add('hidden')); document.getElementById('area-' + id).classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); if (e) e.target.classList.add('tab-active'); }
-        function carregarProgAdmin() { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); document.getElementById('list-prog-admin').innerHTML = list.map(s => `<div class="prog-item"><b>${s.placa}</b> - ${s.status_flow}</div>`).reverse().join(''); }
-        function exportarDados() { const data = {}; Object.keys(DB).forEach(k => data[k] = localStorage.getItem(DB[k])); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' })); a.download = 'backup.json'; a.click(); }
-        function renderAdminList(key) { const list = JSON.parse(localStorage.getItem(DB[key]) || '[]'); const cont = document.getElementById('list-' + key); if (cont) cont.innerHTML = list.map((i, idx) => `<div class="prog-item"><span>${i.nome || i.placa || i.mat}</span><button class="btn-danger" onclick="excluirItem('${key}',${idx})">X</button></div>`).join(''); }
-        function salvarItem(k, v) { let list = JSON.parse(localStorage.getItem(DB[k]) || '[]'); list.push(v); localStorage.setItem(DB[k], JSON.stringify(list)); carregarProgAdmin(); }
-        function excluirItem(k, i) { let list = JSON.parse(localStorage.getItem(DB[k])); list.splice(i, 1); localStorage.setItem(DB[k], JSON.stringify(list)); renderAdminList(k); }
-        function salvarNovoFornecedor() { const n = document.getElementById('f-nome').value.trim(); if (!n) return; let list = JSON.parse(localStorage.getItem(DB.forn) || '[]'); list.push({ nome: n }); localStorage.setItem(DB.forn, JSON.stringify(list)); renderAdminList('forn'); popularSeletorFornecedores(); }
-        function verDetalhesForn(n) { selectedForn = n; document.getElementById('forn-main-view').classList.add('hidden'); document.getElementById('forn-detail-view').classList.remove('hidden'); document.getElementById('view-forn-title').innerText = n; renderFornUsers(); }
-        function fecharDetalhesForn() { document.getElementById('forn-main-view').classList.remove('hidden'); document.getElementById('forn-detail-view').classList.add('hidden'); }
-        function renderFornUsers() { const all = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]'); const f = all.filter(u => u.empresa === selectedForn); document.getElementById('list-forn-users').innerHTML = f.map(u => `<div class="prog-item">👤 ${u.user}</div>`).join(''); }
-        function salvarUsuarioForn() { const u = document.getElementById('fu-user').value.trim(); const p = document.getElementById('fu-pass').value.trim(); if (!u || !p) return; let list = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]'); list.push({ user: u, pass: p, empresa: selectedForn, tipo: 'Mista' }); localStorage.setItem(DB.fornUsers, JSON.stringify(list)); renderFornUsers(); }
-    </script>
+    // ===================== OUTRAS AÇÕES =====================
+    function cancelarCarro(idx) {
+        if (!confirm('Remover este lançamento?')) return;
+        let list = JSON.parse(localStorage.getItem(DB.prog));
+        list.splice(idx, 1);
+        localStorage.setItem(DB.prog, JSON.stringify(list));
+        carregarProgGeral();
+    }
+
+    function exportarDados() {
+        const data = {};
+        Object.keys(DB).forEach(k => { data[k] = localStorage.getItem(DB[k]); });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+        a.download = `lokamig_backup_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+    }
+
+    function atualizarStatus(idx, novoStatus) {
+        abrirModalStatus(idx, novoStatus);
+    }
+</script>
 </body>
-
 </html>
