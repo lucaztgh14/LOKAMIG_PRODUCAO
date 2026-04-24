@@ -958,19 +958,18 @@
         function popularSeletorVeiculos() { const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');['p-placa', 'm-veiculo', 'ab-veiculo'].forEach(id => { const sel = document.getElementById(id); if (!sel) return; sel.innerHTML = '<option value="">— Selecione —</option>' + veics.map(v => `<option value="${v.placa}">${v.placa} - ${v.tipo || 'Operacional'}</option>`).join(''); }); }
         function popularSeletorFornecedores() { const forns = JSON.parse(localStorage.getItem(DB.forn) || '[]'); const sel = document.getElementById('p-fornecedor-select'); if (!sel) return; sel.innerHTML = forns.map(f => `<option value="${f.nome}">${f.nome}</option>`).join(''); }
         function atualizarSetor() { const sel = document.getElementById('p-placa'); const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]'); const veic = veics.find(v => v.placa === sel.value); const display = document.getElementById('p-setor-display'); if (veic) { document.getElementById('p-setor-label').innerText = veic.tipo; display.style.display = 'block'; } else display.style.display = 'none'; }
-        function handleNewUpload(input) { const files = input.files; for (let i = 0; i < files.length; i++) { const reader = new FileReader(); reader.onload = function (e) { tempFotos.push(e.target.result); renderNewPreviews(); }; reader.readAsDataURL(files[i]); } }
-        function renderNewPreviews() { const cont = document.getElementById('p-preview-fotos'); if (!cont) return; cont.innerHTML = tempFotos.map((f, i) => `<div class="photo-card"><img src="${f}" class="thumb" onclick="verFotoGrande('${f}')"><button class="del-btn" onclick="tempFotos.splice(${i},1);renderNewPreviews()">✕</button></div>`).join(''); }
-        function lancarProgramacao() {
-            const placa = document.getElementById('p-placa').value;
-            if (!placa) return alert('Selecione um veículo!');
-            const tipo = document.getElementById('p-tipo-op').value;
-            const fornecedor = tipo === 'RETORNO' ? 'PÁTIO' : document.getElementById('p-fornecedor-select').value;
-            let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            list.push({ id: Date.now(), data: new Date().toISOString().split('T')[0], timestamp: new Date().toLocaleString('pt-BR'), placa, setor: document.getElementById('p-setor-label')?.innerText || '', km: document.getElementById('p-km').value, fornecedor, obs: DOMPurify.sanitize(document.getElementById('p-obs').value), fotos: [...tempFotos], programador: currentUser?.nome || 'Sistema', status_flow: tipo === 'RETORNO' ? 'CONCLUIDO' : 'PENDENTE', tipo_op: tipo, cancelled: false });
-            localStorage.setItem(DB.prog, JSON.stringify(list));
-            document.getElementById('success-overlay').style.display = 'flex';
-            setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 2000);
-            tempFotos = []; document.getElementById('p-placa').value = ''; document.getElementById('p-km').value = ''; document.getElementById('p-obs').value = ''; renderNewPreviews(); carregarProgGeral();
+        function handleNewUpload(input) {
+            var files = input.files;
+            for (var i = 0; i < files.length; i++) {
+                var reader = new FileReader();
+                reader.onload = (function (fileRef) {
+                    return function (e) {
+                        tempFotos.push(e.target.result);
+                        renderNewPreviews();
+                    };
+                })(files[i]);
+                reader.readAsDataURL(files[i]);
+            }
         }
         function carregarProgGeral() { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const dt = document.getElementById('p-filter-date').value; const filtrados = list.filter(i => i.data === dt).reverse(); const cont = document.getElementById('list-prog-geral'); if (!filtrados.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum lançamento.</p>'; return; } cont.innerHTML = filtrados.map(i => { const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[i.status_flow] || 'var(--gray)'; return `<div class="prog-item"><span class="status-badge" style="background:${statusColor}">${i.status_flow}</span><b>${i.placa}</b> — ${i.tipo_op}<br><small>${i.fornecedor} | KM:${i.km || '—'} | ${i.timestamp}</small></div>`; }).join(''); }
 
