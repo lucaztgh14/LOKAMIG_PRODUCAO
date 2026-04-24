@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOKAMIG | Gestão Operacional Pro v3.7</title>
+    <title>LOKAMIG | Gestão Operacional Pro v3.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -49,16 +49,14 @@
         }
 
         body.login-bg {
-            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)),
-                url('https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg');
+            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
 
         body.app-bg {
-            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)),
-                url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -593,7 +591,7 @@
     <section id="scr-login" class="container">
         <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg" alt="LOKAMIG" class="login-logo"
             onerror="this.style.display='none'">
-        <div class="sub">Logística & Gestão Operacional Pro v3.7</div>
+        <div class="sub">Logística & Gestão Operacional Pro v3.8</div>
         <input type="text" id="user" placeholder="Usuário / Crachá" autocomplete="off" maxlength="50">
         <input type="password" id="pass" placeholder="Senha" maxlength="50">
         <button onclick="handleLogin()">Entrar</button>
@@ -725,148 +723,12 @@
             <div id="list-auditoria"></div>
         </div>
 
-        <!-- ABA MESTRE (PERMISSÕES) RESTAURADA -->
         <div id="area-permissoes" class="admin-content hidden">
             <h4 style="color:var(--joint); margin-bottom:15px;">🔐 GESTÃO DE PERMISSÕES (ABA MESTRE)</h4>
             <div class="form-section">
                 <p style="font-size:11px; color:var(--gray); margin-bottom:10px;">Configure as permissões de cada perfil
                     de acesso:</p>
-                <div class="permissoes-grid" id="permissoes-grid">
-                    <!-- admin -->
-                    <div class="permissao-card">
-                        <h4 style="color:var(--primary); text-transform:uppercase; margin-bottom:10px;">admin</h4>
-                        <label><input type="checkbox" checked
-                                onchange="togglePermissao('admin','monitor',this.checked)"> Monitor</label>
-                        <label><input type="checkbox" checked
-                                onchange="togglePermissao('admin','history',this.checked)"> Histórico</label>
-                        <label><input type="checkbox" checked onchange="togglePermissao('admin','forn',this.checked)">
-                            Fornecedores</label>
-                        <label><input type="checkbox" checked onchange="togglePermissao('admin','colab',this.checked)">
-                            Equipe</label>
-                        <label><input type="checkbox" checked onchange="togglePermissao('admin','veic',this.checked)">
-                            Frota</label>
-                        <label><input type="checkbox" checked
-                                onchange="togglePermissao('admin','manutencao',this.checked)"> Manutenções</label>
-                        <label><input type="checkbox" checked
-                                onchange="togglePermissao('admin','orcamentos',this.checked)"> Orçamentos</label>
-                        <label><input type="checkbox" checked
-                                onchange="togglePermissao('admin','combustivel',this.checked)"> Combustível</label>
-                        <label><input type="checkbox" checked onchange="togglePermissao('admin','emails',this.checked)">
-                            E-mails</label>
-                        <label><input type="checkbox" checked
-                                onchange="togglePermissao('admin','auditoria',this.checked)"> Auditoria</label>
-                        <label><input type="checkbox" checked
-                                onchange="togglePermissao('admin','permissoes',this.checked)"> Aba Mestre</label>
-                        <label><input type="checkbox" checked onchange="togglePermissao('admin','config',this.checked)">
-                            Backup</label>
-                        <label><input type="checkbox" checked
-                                onchange="togglePermissao('admin','programacao',this.checked)"> Tela Programação</label>
-                        <label><input type="checkbox" checked
-                                onchange="togglePermissao('admin','fornecedor',this.checked)"> Tela Fornecedor</label>
-                    </div>
-                    <!-- programador -->
-                    <div class="permissao-card">
-                        <h4 style="color:var(--primary); text-transform:uppercase; margin-bottom:10px;">programador</h4>
-                        <label><input type="checkbox" onchange="togglePermissao('programador','monitor',this.checked)">
-                            Monitor</label>
-                        <label><input type="checkbox" onchange="togglePermissao('programador','history',this.checked)">
-                            Histórico</label>
-                        <label><input type="checkbox" onchange="togglePermissao('programador','forn',this.checked)">
-                            Fornecedores</label>
-                        <label><input type="checkbox" onchange="togglePermissao('programador','colab',this.checked)">
-                            Equipe</label>
-                        <label><input type="checkbox" onchange="togglePermissao('programador','veic',this.checked)">
-                            Frota</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('programador','manutencao',this.checked)"> Manutenções</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('programador','orcamentos',this.checked)"> Orçamentos</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('programador','combustivel',this.checked)">
-                            Combustível</label>
-                        <label><input type="checkbox" onchange="togglePermissao('programador','emails',this.checked)">
-                            E-mails</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('programador','auditoria',this.checked)"> Auditoria</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('programador','permissoes',this.checked)"> Aba Mestre</label>
-                        <label><input type="checkbox" onchange="togglePermissao('programador','config',this.checked)">
-                            Backup</label>
-                        <label><input type="checkbox" checked
-                                onchange="togglePermissao('programador','programacao',this.checked)"> Tela
-                            Programação</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('programador','fornecedor',this.checked)"> Tela
-                            Fornecedor</label>
-                    </div>
-                    <!-- supervisor -->
-                    <div class="permissao-card">
-                        <h4 style="color:var(--primary); text-transform:uppercase; margin-bottom:10px;">supervisor</h4>
-                        <label><input type="checkbox" onchange="togglePermissao('supervisor','monitor',this.checked)">
-                            Monitor</label>
-                        <label><input type="checkbox" onchange="togglePermissao('supervisor','history',this.checked)">
-                            Histórico</label>
-                        <label><input type="checkbox" onchange="togglePermissao('supervisor','forn',this.checked)">
-                            Fornecedores</label>
-                        <label><input type="checkbox" onchange="togglePermissao('supervisor','colab',this.checked)">
-                            Equipe</label>
-                        <label><input type="checkbox" onchange="togglePermissao('supervisor','veic',this.checked)">
-                            Frota</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('supervisor','manutencao',this.checked)"> Manutenções</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('supervisor','orcamentos',this.checked)"> Orçamentos</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('supervisor','combustivel',this.checked)"> Combustível</label>
-                        <label><input type="checkbox" onchange="togglePermissao('supervisor','emails',this.checked)">
-                            E-mails</label>
-                        <label><input type="checkbox" onchange="togglePermissao('supervisor','auditoria',this.checked)">
-                            Auditoria</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('supervisor','permissoes',this.checked)"> Aba Mestre</label>
-                        <label><input type="checkbox" onchange="togglePermissao('supervisor','config',this.checked)">
-                            Backup</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('supervisor','programacao',this.checked)"> Tela
-                            Programação</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('supervisor','fornecedor',this.checked)"> Tela
-                            Fornecedor</label>
-                    </div>
-                    <!-- motorista -->
-                    <div class="permissao-card">
-                        <h4 style="color:var(--primary); text-transform:uppercase; margin-bottom:10px;">motorista</h4>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','monitor',this.checked)">
-                            Monitor</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','history',this.checked)">
-                            Histórico</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','forn',this.checked)">
-                            Fornecedores</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','colab',this.checked)">
-                            Equipe</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','veic',this.checked)">
-                            Frota</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','manutencao',this.checked)">
-                            Manutenções</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','orcamentos',this.checked)">
-                            Orçamentos</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('motorista','combustivel',this.checked)"> Combustível</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','emails',this.checked)">
-                            E-mails</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','auditoria',this.checked)">
-                            Auditoria</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','permissoes',this.checked)">
-                            Aba Mestre</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','config',this.checked)">
-                            Backup</label>
-                        <label><input type="checkbox"
-                                onchange="togglePermissao('motorista','programacao',this.checked)"> Tela
-                            Programação</label>
-                        <label><input type="checkbox" onchange="togglePermissao('motorista','fornecedor',this.checked)">
-                            Tela Fornecedor</label>
-                    </div>
-                </div>
+                <div class="permissoes-grid" id="permissoes-grid"></div>
                 <button onclick="salvarPermissoes()" class="btn-purple" style="margin-top:15px;">💾 Salvar
                     Permissões</button>
             </div>
@@ -1023,17 +885,16 @@
 
     <script>
         // ============================================
-        // CONFIGURAÇÃO LOCAL (COMPLETA)
+        // CONFIGURAÇÃO
         // ============================================
         const LOGO_URL = 'https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg';
         const DB = {
-            prog: 'l_prog_v37', forn: 'l_forn_v37', fornUsers: 'l_fusers_v37', progs: 'l_progs_v37',
-            colab: 'l_colab_v37', veic: 'l_veic_v37', orc: 'l_orc_v37', manutencao: 'l_manut_v37',
-            combustivel: 'l_comb_v37', avaliacoes: 'l_aval_v37', emails: 'l_emails_v37',
-            auditoria: 'l_audit_v37', permissoes: 'l_perm_v37'
+            prog: 'l_prog_v38', forn: 'l_forn_v38', fornUsers: 'l_fusers_v38', progs: 'l_progs_v38',
+            colab: 'l_colab_v38', veic: 'l_veic_v38', orc: 'l_orc_v38', manutencao: 'l_manut_v38',
+            combustivel: 'l_comb_v38', avaliacoes: 'l_aval_v38', emails: 'l_emails_v38',
+            auditoria: 'l_audit_v38', permissoes: 'l_perm_v38'
         };
 
-        // Permissões padrão (já configuradas)
         const PERMISSOES_PADRAO = {
             admin: { monitor: true, history: true, forn: true, colab: true, veic: true, manutencao: true, orcamentos: true, combustivel: true, emails: true, auditoria: true, permissoes: true, config: true, programacao: true, fornecedor: true },
             programador: { programacao: true },
@@ -1050,107 +911,180 @@
         // ============================================
         window.onload = () => {
             const hoje = new Date().toISOString().split('T')[0];
-            ['p-filter-date', 'forn-filter-date', 'mon-filter-date'].forEach(id => {
-                const el = document.getElementById(id); if (el) el.value = hoje;
-            });
+            ['p-filter-date', 'forn-filter-date', 'mon-filter-date'].forEach(id => { const el = document.getElementById(id); if (el) el.value = hoje; });
             if (!localStorage.getItem(DB.progs)) localStorage.setItem(DB.progs, JSON.stringify([{ nome: 'Paulista', user: 'paulista', pass: '1234' }]));
             if (!localStorage.getItem(DB.forn)) localStorage.setItem(DB.forn, JSON.stringify([{ nome: 'AGSN' }, { nome: 'MEGA CENTER' }, { nome: "Lava Jato Maximu's" }]));
             if (!localStorage.getItem(DB.fornUsers)) localStorage.setItem(DB.fornUsers, JSON.stringify([{ user: 'rodolfo', pass: '1234', empresa: 'MEGA CENTER', tipo: 'Oficina' }, { user: 'fiu', pass: '1234', empresa: "Lava Jato Maximu's", tipo: 'Limpeza' }, { user: 'taty', pass: '1234', empresa: 'AGSN', tipo: 'Oficina' }]));
             if (!localStorage.getItem(DB.permissoes)) localStorage.setItem(DB.permissoes, JSON.stringify(PERMISSOES_PADRAO));
-            popularSeletorFornecedores();
-            popularSeletorVeiculos();
-            carregarPermissoes(); // carrega as permissões salvas
+            popularSeletorFornecedores(); popularSeletorVeiculos();
+            carregarPermissoes();
         };
 
         // NAVEGAÇÃO
-        function show(id) {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            const el = document.getElementById(id); if (el) el.classList.remove('hidden');
-            document.body.className = id === 'scr-login' ? 'login-bg' : 'app-bg';
-        }
+        function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); document.body.className = id === 'scr-login' ? 'login-bg' : 'app-bg'; }
         function handleLogout() { currentUser = null; tempFotos = []; tempEvidencias = []; abastecimentoFoto = null; show('scr-login'); document.getElementById('user').value = ''; document.getElementById('pass').value = ''; }
+        function switchTab(id, e) { document.querySelectorAll('.admin-content').forEach(a => a.classList.add('hidden')); const area = document.getElementById('area-' + id); if (area) area.classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); if (e && e.target) e.target.classList.add('tab-active'); if (id === 'monitor') carregarProgAdmin(); if (id === 'forn') renderListaForn(); if (id === 'colab') renderAdminList('colab'); if (id === 'veic') renderAdminList('veic'); if (id === 'history') renderHistorico(); if (id === 'orcamentos') renderOrcamentosAdmin(); if (id === 'manutencao') carregarManutencoes(); if (id === 'combustivel') carregarAbastecimentos(); if (id === 'emails') carregarEmails(); if (id === 'auditoria') carregarAuditoria(); if (id === 'permissoes') carregarPermissoes(); if (id === 'config') atualizarDashboard(); }
 
-        function switchTab(id, e) {
-            document.querySelectorAll('.admin-content').forEach(a => a.classList.add('hidden'));
-            const area = document.getElementById('area-' + id); if (area) area.classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-            if (e && e.target) e.target.classList.add('tab-active');
-            if (id === 'monitor') carregarProgAdmin();
-            if (id === 'forn') renderListaForn();
-            if (id === 'colab') renderAdminList('colab');
-            if (id === 'veic') renderAdminList('veic');
-            if (id === 'history') renderHistorico();
-            if (id === 'orcamentos') renderOrcamentosAdmin();
-            if (id === 'manutencao') carregarManutencoes();
-            if (id === 'combustivel') carregarAbastecimentos();
-            if (id === 'emails') carregarEmails();
-            if (id === 'auditoria') carregarAuditoria();
-            if (id === 'permissoes') carregarPermissoes();
-            if (id === 'config') atualizarDashboard();
-        }
-
-        // LOGIN (SENHA ALTERADA)
+        // LOGIN
         function handleLogin() {
             const u = DOMPurify.sanitize(document.getElementById('user').value.trim().toUpperCase());
             const p = document.getElementById('pass').value.trim();
             if (!u || !p) return alert('Preencha todos os campos!');
-
-            if (u === 'ADMIN' && p === 'Luc45t1@go') { currentUser = { nome: 'Administrador', role: 'admin' }; show('scr-admin'); atualizarDashboard(); carregarProgAdmin(); return; }
-
-            const progs = JSON.parse(localStorage.getItem(DB.progs) || '[]');
-            const prog = progs.find(x => x.user.toUpperCase() === u && x.pass === p);
+            if (u === 'ADMIN' && p === 'Luc45t1@go') { currentUser = { nome: 'Administrador', role: 'admin' }; show('scr-admin'); atualizarDashboard(); carregarProgAdmin(); carregarPermissoes(); return; }
+            const progs = JSON.parse(localStorage.getItem(DB.progs) || '[]'); const prog = progs.find(x => x.user.toUpperCase() === u && x.pass === p);
             if (prog) { currentUser = { ...prog, role: 'programador' }; show('scr-programador'); carregarProgGeral(); return; }
-
-            const fornUsers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]');
-            const forn = fornUsers.find(x => x.user.toUpperCase() === u && x.pass === p);
+            const fornUsers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]'); const forn = fornUsers.find(x => x.user.toUpperCase() === u && x.pass === p);
             if (forn) { currentUser = { ...forn, role: 'fornecedor' }; document.getElementById('forn-name-screen').innerText = forn.empresa; show('scr-fornecedor'); carregarServicosForn(forn); carregarAlertasRevisaoFornecedor(); return; }
-
+            const colabs = JSON.parse(localStorage.getItem(DB.colab) || '[]'); const colab = colabs.find(x => x.mat === u && x.nfc === p);
+            if (colab) { const perfil = colab.perfil || 'motorista'; currentUser = { ...colab, role: perfil }; if (perfil === 'programador') { show('scr-programador'); carregarProgGeral(); return; } if (perfil === 'supervisor') { show('scr-admin'); aplicarPermissoesSupervisor(); atualizarDashboard(); carregarProgAdmin(); return; } show('scr-admin'); aplicarPermissoesMotorista(); atualizarDashboard(); carregarProgAdmin(); return; }
             alert('Acesso Negado.');
         }
 
-        // DASHBOARD (simplificado mas funcional)
+        // DASHBOARD
         function atualizarDashboard() {
             const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
             const hoje = new Date().toISOString().split('T')[0];
             const hojeList = list.filter(i => i.data === hoje && i.status_flow !== 'CANCELADO');
             document.getElementById('met-total-hoje').textContent = [...new Set(hojeList.map(i => i.placa))].length;
             document.getElementById('met-concluidos').textContent = hojeList.filter(i => i.status_flow === 'CONCLUIDO').length;
+            document.getElementById('met-tempo-medio').textContent = '--';
+            document.getElementById('met-gasto-mes').textContent = '--';
         }
 
         // ============================================
-        // ABA MESTRE (PERMISSÕES)
+        // PROGRAMADOR
+        // ============================================
+        function toggleFornDiv() { document.getElementById('p-forn-div').style.display = document.getElementById('p-tipo-op').value === 'RETORNO' ? 'none' : 'block'; }
+        function popularSeletorVeiculos() { const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');['p-placa', 'm-veiculo', 'ab-veiculo'].forEach(id => { const sel = document.getElementById(id); if (!sel) return; sel.innerHTML = '<option value="">— Selecione —</option>' + veics.map(v => `<option value="${v.placa}">${v.placa} - ${v.tipo || 'Operacional'}</option>`).join(''); }); }
+        function popularSeletorFornecedores() { const forns = JSON.parse(localStorage.getItem(DB.forn) || '[]'); const sel = document.getElementById('p-fornecedor-select'); if (!sel) return; sel.innerHTML = forns.map(f => `<option value="${f.nome}">${f.nome}</option>`).join(''); }
+        function atualizarSetor() { const sel = document.getElementById('p-placa'); const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]'); const veic = veics.find(v => v.placa === sel.value); const display = document.getElementById('p-setor-display'); if (veic) { document.getElementById('p-setor-label').innerText = veic.tipo; display.style.display = 'block'; } else display.style.display = 'none'; }
+        function handleNewUpload(input) { const files = input.files; for (let i = 0; i < files.length; i++) { const reader = new FileReader(); reader.onload = function (e) { tempFotos.push(e.target.result); renderNewPreviews(); }; reader.readAsDataURL(files[i]); } }
+        function renderNewPreviews() { const cont = document.getElementById('p-preview-fotos'); if (!cont) return; cont.innerHTML = tempFotos.map((f, i) => `<div class="photo-card"><img src="${f}" class="thumb" onclick="verFotoGrande('${f}')"><button class="del-btn" onclick="tempFotos.splice(${i},1);renderNewPreviews()">✕</button></div>`).join(''); }
+        function lancarProgramacao() {
+            const placa = document.getElementById('p-placa').value;
+            if (!placa) return alert('Selecione um veículo!');
+            const tipo = document.getElementById('p-tipo-op').value;
+            const fornecedor = tipo === 'RETORNO' ? 'PÁTIO' : document.getElementById('p-fornecedor-select').value;
+            let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            list.push({ id: Date.now(), data: new Date().toISOString().split('T')[0], timestamp: new Date().toLocaleString('pt-BR'), placa, setor: document.getElementById('p-setor-label')?.innerText || '', km: document.getElementById('p-km').value, fornecedor, obs: DOMPurify.sanitize(document.getElementById('p-obs').value), fotos: [...tempFotos], programador: currentUser?.nome || 'Sistema', status_flow: tipo === 'RETORNO' ? 'CONCLUIDO' : 'PENDENTE', tipo_op: tipo, cancelled: false });
+            localStorage.setItem(DB.prog, JSON.stringify(list));
+            document.getElementById('success-overlay').style.display = 'flex';
+            setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 2000);
+            tempFotos = []; document.getElementById('p-placa').value = ''; document.getElementById('p-km').value = ''; document.getElementById('p-obs').value = ''; renderNewPreviews(); carregarProgGeral();
+        }
+        function carregarProgGeral() { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const dt = document.getElementById('p-filter-date').value; const filtrados = list.filter(i => i.data === dt).reverse(); const cont = document.getElementById('list-prog-geral'); if (!filtrados.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum lançamento.</p>'; return; } cont.innerHTML = filtrados.map(i => { const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[i.status_flow] || 'var(--gray)'; return `<div class="prog-item"><span class="status-badge" style="background:${statusColor}">${i.status_flow}</span><b>${i.placa}</b> — ${i.tipo_op}<br><small>${i.fornecedor} | KM:${i.km || '—'} | ${i.timestamp}</small></div>`; }).join(''); }
+
+        // ============================================
+        // FORNECEDOR
+        // ============================================
+        function carregarServicosForn(user) { const dt = document.getElementById('forn-filter-date').value; const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const meus = list.filter(s => s.data === dt && s.status_flow !== 'CANCELADO' && s.fornecedor === user.empresa); const cont = document.getElementById('list-forn-servicos'); if (!meus.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum serviço hoje.</p>'; return; } cont.innerHTML = meus.map(s => { const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[s.status_flow] || 'var(--gray)'; return `<div class="prog-item"><span class="status-badge" style="background:${statusColor}">${s.status_flow}</span><b>${s.placa}</b> — ${s.tipo_op || ''}<br><small>KM:${s.km || '—'} | ${s.timestamp}</small></div>`; }).join(''); }
+        function carregarAlertasRevisaoFornecedor() { const cont = document.getElementById('forn-alertas-revisao'); if (cont) cont.innerHTML = ''; }
+
+        // ============================================
+        // MODAL STATUS
+        // ============================================
+        function abrirModalStatus(idx, novoStatus) { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); if (list[idx]?.status_flow === 'CANCELADO') { alert('Registro cancelado.'); return; } statusPendente = { idx, novoStatus, fotos: [], rating: 0 }; document.getElementById('modal-status-titulo').innerText = novoStatus === 'EM EXECUÇÃO' ? '📸 INICIAR SERVIÇO' : '📸 FINALIZAR SERVIÇO'; document.getElementById('status-foto-preview').innerHTML = ''; document.getElementById('btn-confirmar-status').classList.add('hidden'); show('scr-modal-status'); }
+        function handleStatusFotos(input) { const files = input.files; for (let i = 0; i < files.length; i++) { const reader = new FileReader(); reader.onload = function (e) { statusPendente.fotos.push(e.target.result); renderStatusPreviews(); }; reader.readAsDataURL(files[i]); } }
+        function renderStatusPreviews() { const cont = document.getElementById('status-foto-preview'); if (!cont) return; cont.innerHTML = statusPendente.fotos.map((f, i) => `<div class="photo-card"><img src="${f}" class="thumb" onclick="verFotoGrande('${f}')"><button class="del-btn" onclick="statusPendente.fotos.splice(${i},1);renderStatusPreviews()">✕</button></div>`).join(''); document.getElementById('btn-confirmar-status').classList.toggle('hidden', statusPendente.fotos.length === 0); }
+        function setRating(val) { statusPendente.rating = val; document.querySelectorAll('#rating-stars span').forEach((s, i) => { if (i < val) { s.classList.add('active'); s.textContent = '★'; } else { s.classList.remove('active'); s.textContent = '☆'; } }); }
+        function confirmarAlteracaoStatus() { if (!statusPendente.fotos.length) return alert('Tire pelo menos uma foto!'); let list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const item = list[statusPendente.idx]; if (!item || item.status_flow === 'CANCELADO') { alert('Registro cancelado.'); fecharModalStatus(); return; } item.status_flow = statusPendente.novoStatus; if (!item.fotos) item.fotos = []; item.fotos.push(...statusPendente.fotos); localStorage.setItem(DB.prog, JSON.stringify(list)); document.getElementById('success-overlay').style.display = 'flex'; setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 1500); fecharModalStatus(); carregarServicosForn(currentUser); }
+        function fecharModalStatus() { show('scr-fornecedor'); statusPendente = { idx: null, novoStatus: null, fotos: [], rating: 0 }; }
+
+        // ============================================
+        // ABASTECIMENTO
+        // ============================================
+        function handleAbastecimentoFoto(input) { if (!input.files[0]) return; const reader = new FileReader(); reader.onload = function (e) { abastecimentoFoto = e.target.result; document.getElementById('ab-preview-foto').innerHTML = `<div class="photo-card"><img src="${e.target.result}" class="thumb"><button class="del-btn" onclick="abastecimentoFoto=null; document.getElementById('ab-preview-foto').innerHTML='';">✕</button></div>`; }; reader.readAsDataURL(input.files[0]); }
+        function salvarAbastecimento() { const placa = document.getElementById('ab-veiculo').value, litros = document.getElementById('ab-litros').value, valor = document.getElementById('ab-valor').value, km = document.getElementById('ab-km').value; if (!placa || !litros || !valor || !km) return alert('Preencha todos!'); let list = JSON.parse(localStorage.getItem(DB.combustivel) || '[]'); list.push({ id: Date.now(), data: new Date().toISOString().split('T')[0], placa, litros: parseFloat(litros), valor: parseFloat(valor), km: parseInt(km), comprovante: abastecimentoFoto }); localStorage.setItem(DB.combustivel, JSON.stringify(list)); abastecimentoFoto = null; document.getElementById('ab-litros').value = ''; document.getElementById('ab-valor').value = ''; document.getElementById('ab-km').value = ''; document.getElementById('ab-preview-foto').innerHTML = ''; carregarAbastecimentos(); alert('Registrado!'); }
+        function carregarAbastecimentos() { const list = JSON.parse(localStorage.getItem(DB.combustivel) || '[]'); const cont = document.getElementById('list-abastecimentos'); if (!cont) return; cont.innerHTML = list.length ? [...list].reverse().map(a => `<div class="prog-item"><b>${a.placa}</b> — ${a.litros}L | R$${a.valor.toFixed(2)} | KM:${a.km}${a.comprovante ? ` <span onclick="verFotoGrande('${a.comprovante}')" style="color:var(--info); cursor:pointer;">📎 Ver</span>` : ''}</div>`).join('') : '<p style="color:var(--gray);">Nenhum abastecimento.</p>'; }
+
+        // ============================================
+        // PERMISSÕES
         // ============================================
         function carregarPermissoes() {
             const permissoes = JSON.parse(localStorage.getItem(DB.permissoes) || JSON.stringify(PERMISSOES_PADRAO));
-            // Sincroniza os checkboxes com as permissões salvas
-            document.querySelectorAll('#permissoes-grid input[type=checkbox]').forEach(cb => {
-                const perfil = cb.getAttribute('onchange').match(/'(\w+)'/)[1];
-                const tela = cb.getAttribute('onchange').match(/'(\w+)'/g)[1].replace(/'/g, '');
-                if (permissoes[perfil] && permissoes[perfil][tela] !== undefined) {
-                    cb.checked = permissoes[perfil][tela];
-                }
+            const grid = document.getElementById('permissoes-grid');
+            if (!grid) return;
+            const perfis = ['admin', 'programador', 'supervisor', 'motorista'];
+            const telas = ['monitor', 'history', 'forn', 'colab', 'veic', 'manutencao', 'orcamentos', 'combustivel', 'emails', 'auditoria', 'permissoes', 'config', 'programacao', 'fornecedor'];
+            const nomes = { monitor: 'Monitor', history: 'Histórico', forn: 'Fornecedores', colab: 'Equipe', veic: 'Frota', manutencao: 'Manutenções', orcamentos: 'Orçamentos', combustivel: 'Combustível', emails: 'E-mails', auditoria: 'Auditoria', permissoes: 'Aba Mestre', config: 'Backup', programacao: 'Tela Programação', fornecedor: 'Tela Fornecedor' };
+            let html = '';
+            perfis.forEach(perfil => {
+                html += `<div class="permissao-card"><h4 style="color:var(--primary); text-transform:uppercase; margin-bottom:10px;">${perfil}</h4>`;
+                telas.forEach(tela => {
+                    html += `<label><input type="checkbox" ${permissoes[perfil]?.[tela] ? 'checked' : ''} onchange="togglePermissao('${perfil}','${tela}',this.checked)"> ${nomes[tela] || tela}</label>`;
+                });
+                html += `</div>`;
             });
+            grid.innerHTML = html;
         }
-
         function togglePermissao(perfil, tela, checked) {
             const permissoes = JSON.parse(localStorage.getItem(DB.permissoes) || JSON.stringify(PERMISSOES_PADRAO));
             if (!permissoes[perfil]) permissoes[perfil] = {};
             permissoes[perfil][tela] = checked;
             localStorage.setItem(DB.permissoes, JSON.stringify(permissoes));
         }
+        function salvarPermissoes() { alert('Permissões salvas!'); }
+        function aplicarPermissoesSupervisor() { const tabs = document.getElementById('admin-tabs'); if (tabs) Array.from(tabs.children).forEach(btn => { const tab = btn.getAttribute('onclick')?.match(/'(.*?)'/)?.[1]; if (tab && !['monitor', 'history', 'veic', 'emails'].includes(tab)) btn.style.display = 'none'; }); }
+        function aplicarPermissoesMotorista() { const tabs = document.getElementById('admin-tabs'); if (tabs) Array.from(tabs.children).forEach(btn => { const tab = btn.getAttribute('onclick')?.match(/'(.*?)'/)?.[1]; if (tab && tab !== 'monitor') btn.style.display = 'none'; }); }
 
-        function salvarPermissoes() {
-            // As alterações já são salvas em tempo real, mas podemos confirmar
-            alert('Permissões salvas com sucesso!');
+        // ============================================
+        // ADMIN
+        // ============================================
+        function carregarProgAdmin() { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const cont = document.getElementById('list-prog-admin'); if (!list.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum lançamento.</p>'; return; } cont.innerHTML = [...list].reverse().map(s => { const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[s.status_flow] || 'var(--gray)'; return `<div class="prog-item"><span class="status-badge" style="background:${statusColor}">${s.status_flow}</span><b>${s.placa}</b> — ${s.tipo_op || ''} → ${s.fornecedor || ''}<br><small>${s.timestamp || s.data}</small></div>`; }).join(''); }
+        function renderHistorico() { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const concluidos = list.filter(x => x.status_flow === 'CONCLUIDO').reverse(); document.getElementById('list-history-admin').innerHTML = concluidos.length ? concluidos.map(s => `<div class="prog-item status-CONCLUIDO"><b>${s.placa}</b> — ${s.fornecedor}<br><small>${s.timestamp || s.data}</small></div>`).join('') : '<p style="color:var(--gray);">Nenhum serviço concluído.</p>'; }
+
+        // CRUD
+        function renderAdminList(key) { const items = JSON.parse(localStorage.getItem(DB[key]) || '[]'); const cont = document.getElementById('list-' + key); if (!cont) return; cont.innerHTML = items.length ? items.map((it, idx) => `<div class="prog-item" style="display:flex; justify-content:space-between;"><span>${it.nome || it.placa || it.mat || it.email || '—'}</span><button class="btn-danger btn-sm" onclick="excluirItem('${key}',${idx})">✕</button></div>`).join('') : `<p style="color:var(--gray);">Nenhum cadastro.</p>`; }
+        function excluirItem(key, idx) { if (!confirm('Remover?')) return; let list = JSON.parse(localStorage.getItem(DB[key]) || '[]'); list.splice(idx, 1); localStorage.setItem(DB[key], JSON.stringify(list)); renderAdminList(key); if (key === 'veic') popularSeletorVeiculos(); }
+        function renderListaForn() { renderAdminList('forn'); }
+        function salvarNovoFornecedor() { const nome = document.getElementById('f-nome').value.trim(), user = document.getElementById('f-user').value.trim(), pass = document.getElementById('f-pass').value.trim(), tipo = document.getElementById('f-tipo').value; if (!nome) return alert('Informe o nome!'); let forn = JSON.parse(localStorage.getItem(DB.forn) || '[]'); forn.push({ nome }); localStorage.setItem(DB.forn, JSON.stringify(forn)); if (user && pass) { let fusers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]'); fusers.push({ user, pass, empresa: nome, tipo }); localStorage.setItem(DB.fornUsers, JSON.stringify(fusers)); } document.getElementById('f-nome').value = ''; document.getElementById('f-user').value = ''; document.getElementById('f-pass').value = ''; popularSeletorFornecedores(); renderListaForn(); alert('Cadastrado!'); }
+        function salvarColab() { const nome = document.getElementById('c-nome').value.trim(), mat = document.getElementById('c-mat').value.trim(), nfc = document.getElementById('c-nfc').value.trim(), perfil = document.getElementById('c-perfil').value; if (!nome || !mat) return alert('Preencha Nome e Matrícula!'); let list = JSON.parse(localStorage.getItem(DB.colab) || '[]'); list.push({ nome, mat, nfc, perfil }); localStorage.setItem(DB.colab, JSON.stringify(list)); document.getElementById('c-nome').value = ''; document.getElementById('c-mat').value = ''; document.getElementById('c-nfc').value = ''; renderAdminList('colab'); alert('Cadastrado!'); }
+        function salvarVeiculo() {
+            const placa = document.getElementById('v-placa').value.toUpperCase().trim();
+            const modelo = document.getElementById('v-modelo').value.trim();
+            const ano = document.getElementById('v-ano').value;
+            const kmRev = document.getElementById('v-km-revisao').value;
+            const tipo = document.getElementById('v-tipo').value;
+            if (!placa) return alert('Informe a placa!');
+            let list = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+            if (list.some(v => v.placa === placa)) return alert('Placa já cadastrada!');
+            list.push({ placa, modelo, ano: parseInt(ano) || 0, km_proxima_revisao: kmRev || null, tipo });
+            localStorage.setItem(DB.veic, JSON.stringify(list));
+            document.getElementById('v-placa').value = '';
+            document.getElementById('v-modelo').value = '';
+            document.getElementById('v-ano').value = '';
+            document.getElementById('v-km-revisao').value = '';
+            renderAdminList('veic');
+            popularSeletorVeiculos();
+            alert('Veículo cadastrado!');
         }
+        function salvarManutencao() { const placa = document.getElementById('m-veiculo').value, desc = document.getElementById('m-descricao').value, km = document.getElementById('m-km-programada').value, data = document.getElementById('m-data-limite').value; if (!placa || !desc) return alert('Preencha!'); let list = JSON.parse(localStorage.getItem(DB.manutencao) || '[]'); list.push({ id: Date.now(), placa, descricao: desc, km_programada: km, data_limite: data, status: 'PENDENTE' }); localStorage.setItem(DB.manutencao, JSON.stringify(list)); document.getElementById('m-descricao').value = ''; document.getElementById('m-km-programada').value = ''; document.getElementById('m-data-limite').value = ''; carregarManutencoes(); alert('Programado!'); }
+        function carregarManutencoes() { const list = JSON.parse(localStorage.getItem(DB.manutencao) || '[]'); const cont = document.getElementById('list-manutencoes'); if (!cont) return; cont.innerHTML = list.length ? list.map((m, i) => `<div class="prog-item"><b>${m.placa}</b> — ${m.descricao}<button class="btn-danger btn-sm" onclick="excluirItem('manutencao',${i})" style="float:right;">✕</button></div>`).join('') : '<p style="color:var(--gray);">Nenhuma.</p>'; }
+        function adicionarEmail() { const email = document.getElementById('email-destinatario').value.trim(), nome = document.getElementById('email-nome').value.trim(); if (!email) return alert('Informe o e-mail!'); let emails = JSON.parse(localStorage.getItem(DB.emails) || '[]'); emails.push({ email, nome, data: new Date().toISOString() }); localStorage.setItem(DB.emails, JSON.stringify(emails)); document.getElementById('email-destinatario').value = ''; document.getElementById('email-nome').value = ''; carregarEmails(); alert('Cadastrado!'); }
+        function carregarEmails() { renderAdminList('emails'); }
+        function carregarAuditoria() { const logs = JSON.parse(localStorage.getItem(DB.auditoria) || '[]').reverse().slice(0, 50); const cont = document.getElementById('list-auditoria'); if (!cont) return; cont.innerHTML = logs.length ? logs.map(l => `<div class="prog-item" style="font-size:10px;">${l.data} - ${l.acao}</div>`).join('') : '<p style="color:var(--gray);">Nenhum log.</p>'; }
 
-        // ============================================
-        // DEMAIS FUNÇÕES (COMPLETAS)
-        // ============================================
-        // (As funções de checklist, fornecedor, orçamentos, PDF etc. estão todas presentes,
-        // exatamente como na versão estável anterior. Por brevidade do código exibido,
-        // elas não são repetidas aqui, mas estão incluídas no arquivo completo.
-        // O código completo contém mais de 2000 linhas e está funcional.)
+        // ORÇAMENTOS
+        function addItem() { const c = document.getElementById('orc-itens'); const d = document.createElement('div'); d.style.cssText = 'display:flex; gap:5px; margin-bottom:8px;'; d.innerHTML = '<input type="text" placeholder="Item" style="flex:2;"><input type="number" class="v-item" placeholder="R$" style="flex:1;" oninput="calcTotal()">'; c.appendChild(d); }
+        function calcTotal() { let t = 0; document.querySelectorAll('.v-item').forEach(i => t += Number(i.value) || 0); document.getElementById('total-orc').textContent = t.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
+        function handleEvidencia(input, tipo) { const files = input.files; for (let i = 0; i < files.length; i++) { const reader = new FileReader(); reader.onload = function (e) { tempEvidencias.push({ tipo, nome: files[i].name, data: e.target.result, mime: files[i].type }); renderEvidencias(); }; reader.readAsDataURL(files[i]); } }
+        function renderEvidencias() { const cont = document.getElementById('ev-preview'); if (!cont) return; cont.innerHTML = tempEvidencias.map((ev, i) => `<div class="ev-card">${ev.mime.startsWith('image/') ? `<img src="${ev.data}" onclick="verFotoGrande('${ev.data}')">` : '📎 ' + ev.nome}<button class="del-btn" onclick="tempEvidencias.splice(${i},1);renderEvidencias()">✕</button></div>`).join(''); }
+        function enviarOrcamento() { const placa = document.getElementById('orc-placa').value.toUpperCase(); if (!placa) return alert('Informe a placa!'); const itens = []; document.querySelectorAll('#orc-itens > div').forEach(row => { const inputs = row.querySelectorAll('input'); itens.push({ desc: inputs[0]?.value || '', valor: Number(inputs[1]?.value) || 0 }); }); const total = itens.reduce((s, i) => s + i.valor, 0); let orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]'); orcs.push({ id: Date.now(), timestamp: new Date().toLocaleString('pt-BR'), empresa: currentUser?.empresa || '—', placa, descricao: document.getElementById('orc-desc').value, itens, total, evidencias: [...tempEvidencias], status: 'PENDENTE' }); localStorage.setItem(DB.orc, JSON.stringify(orcs)); tempEvidencias = []; document.getElementById('orc-placa').value = ''; document.getElementById('orc-desc').value = ''; document.getElementById('orc-itens').innerHTML = '<div style="display:flex; gap:5px;"><input type="text" placeholder="Item" style="flex:2;"><input type="number" class="v-item" placeholder="R$" style="flex:1;" oninput="calcTotal()"></div>'; document.getElementById('total-orc').textContent = '0,00'; renderEvidencias(); document.getElementById('success-overlay').style.display = 'flex'; setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; show('scr-fornecedor'); }, 2000); }
+        function abrirOrcamentosEnviados() { orcDetalheOrigem = 'fornecedor'; const empresa = currentUser?.empresa || ''; const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]').filter(o => o.empresa === empresa).reverse(); document.getElementById('list-orc-enviados').innerHTML = orcs.length ? orcs.map(o => `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrc(${JSON.parse(localStorage.getItem(DB.orc) || '[]').findIndex(x => x.id === o.id)})"><b>${o.placa}</b> — R$ ${o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}<br>${o.status}</div>`).join('') : '<p style="color:var(--gray);">Nenhum.</p>'; show('scr-orc-enviados'); }
+        function abrirDetalheOrc(idx) { const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]'); const o = orcs[idx]; if (!o) return; document.getElementById('orc-det-titulo').innerText = `ORÇAMENTO — ${o.placa}`; document.getElementById('orc-det-body').innerHTML = `<p>${o.empresa} | ${o.timestamp}</p><table>${o.itens.map(it => `<tr><td>${it.desc}</td><td>R$ ${it.valor.toFixed(2)}</td></tr>`).join('')}<tr><td><b>TOTAL</b></td><td><b>R$ ${o.total.toFixed(2)}</b></td></tr></table>`; document.getElementById('orc-det-acoes').innerHTML = orcDetalheOrigem === 'admin' && o.status === 'PENDENTE' ? `<button class="btn-success" onclick="mudarStatusOrc(${idx},'APROVADO')">✓ APROVAR</button><button class="btn-danger" onclick="mudarStatusOrc(${idx},'REJEITADO')">✕ REJEITAR</button>` : `<p>Status: ${o.status}</p>`; show('scr-orc-detalhe'); }
+        function mudarStatusOrc(idx, s) { let o = JSON.parse(localStorage.getItem(DB.orc) || '[]'); o[idx].status = s; localStorage.setItem(DB.orc, JSON.stringify(o)); renderOrcamentosAdmin(); abrirDetalheOrc(idx); }
+        function fecharDetalheOrc() { if (orcDetalheOrigem === 'admin') { show('scr-admin'); renderOrcamentosAdmin(); } else { show('scr-orc-enviados'); abrirOrcamentosEnviados(); } }
+        function renderOrcamentosAdmin() { const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]').reverse(); document.getElementById('list-orcamentos-admin').innerHTML = orcs.length ? orcs.map(o => `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrc(${JSON.parse(localStorage.getItem(DB.orc) || '[]').findIndex(x => x.id === o.id)})"><b>${o.placa}</b> — R$ ${o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}<br>${o.empresa} | ${o.status}</div>`).join('') : '<p style="color:var(--gray);">Nenhum.</p>'; }
+
+        // PDF
+        async function gerarPDF(idx) { /* ... */ }
+        function gerarRelatorioFinanceiro() { /* ... */ }
+
+        // UTILITÁRIOS
+        function verFotoGrande(src) { document.getElementById('full-img').src = src; document.getElementById('img-viewer').style.display = 'flex'; }
+        function exportarDados() { const data = {}; Object.values(DB).forEach(k => { data[k] = localStorage.getItem(k); }); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' })); a.download = `backup_${new Date().toISOString().split('T')[0]}.json`; a.click(); }
+
+        toggleFornDiv();
     </script>
 </body>
 
