@@ -1007,7 +1007,7 @@ async function handleLogin() {
         const { data: colabs } = await db.from(TBL.colaboradores)
             .select('*').ilike('user_login', u);
         if (colabs?.length) {
-            const colab = colabs[0];
+            const colab = colabs[0]; if (!colab || colab.senha !== p) { loading(false); alert('? Acesso Negado. Usuário ou senha incorretos.'); return; }
             currentUser = { ...colab, nome: colab.nome, role: colab.perfil };
             await registrarAuditoria('Login: ' + colab.nome + ' (' + colab.perfil + ')');
 
