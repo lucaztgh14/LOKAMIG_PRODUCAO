@@ -1005,7 +1005,7 @@ async function handleLogin() {
 
         // Colaboradores
         const { data: colabs } = await db.from(TBL.colaboradores)
-            .select('*').ilike('user_login', u).eq('senha', p);
+            .select('*').ilike('user_login', u).eq('pass', p);
         if (colabs?.length) {
             const colab = colabs[0];
             currentUser = { ...colab, nome: colab.nome, role: colab.perfil };
@@ -1033,7 +1033,7 @@ async function handleLogin() {
 
         // Fornecedores
         const { data: forns } = await db.from(TBL.fornUsers)
-            .select('*').ilike('user_login', u).eq('senha', p);
+            .select('*').ilike('user_login', u).eq('pass', p);
         if (forns?.length) {
             const forn = forns[0];
             currentUser = { ...forn, role: 'fornecedor' };
