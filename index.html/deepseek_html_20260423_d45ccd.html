@@ -4,12 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOKAMIG | Gestão Operacional Pro v4.1</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>LOKAMIG | Gestão Operacional v6.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary: #d1122a;
@@ -25,6 +26,7 @@
             --gerencial: #f97316;
             --info: #06b6d4;
             --cancelled: #6b7280;
+            --purple: #7c3aed;
         }
 
         * {
@@ -51,9 +53,8 @@
         }
 
         body.login-bg {
-            background: radial-gradient(circle at top left, rgba(209, 18, 42, 0.3) 0%, transparent 50%), radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.2) 0%, transparent 50%), linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: radial-gradient(circle at top left, rgba(209, 18, 42, .3) 0%, transparent 50%), radial-gradient(circle at bottom right, rgba(16, 185, 129, .2) 0%, transparent 50%), linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             background-size: cover;
-            background-position: center;
             background-attachment: fixed;
             display: flex;
             justify-content: center;
@@ -61,36 +62,37 @@
         }
 
         body.app-bg {
-            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background: linear-gradient(rgba(15, 23, 42, .95), rgba(15, 23, 42, .95)), url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
             background-size: cover;
-            background-position: center;
             background-attachment: fixed;
         }
 
+        /* CONTAINER */
         .container {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(30, 41, 59, .7);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, .15);
             border-radius: 24px;
             padding: 20px;
             width: 100%;
-            max-width: 950px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+            max-width: 960px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, .7);
             text-align: center;
             margin: 10px auto;
             max-height: 95vh;
             overflow-y: auto;
         }
 
+        /* LOGIN */
         .login-box {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, .85);
             backdrop-filter: blur(25px);
             border-radius: 30px;
             padding: 40px 30px;
             width: 100%;
             max-width: 420px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, .2);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, .6);
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -103,7 +105,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(209, 18, 42, 0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(209, 18, 42, .15) 0%, transparent 70%);
             animation: rotate 20s linear infinite;
             z-index: -1;
         }
@@ -119,7 +121,7 @@
             height: auto;
             margin: 0 auto 20px;
             display: block;
-            filter: drop-shadow(0 0 25px rgba(209, 18, 42, 0.8));
+            filter: drop-shadow(0 0 25px rgba(209, 18, 42, .8));
         }
 
         .login-box h1 {
@@ -139,22 +141,22 @@
         }
 
         .login-box input {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .2);
             border-radius: 14px;
             padding: 14px 20px;
             color: #fff;
             font-size: 15px;
             margin-bottom: 16px;
-            transition: all 0.3s;
+            transition: all .3s;
             width: 100%;
             outline: none;
         }
 
         .login-box input:focus {
             border-color: var(--primary);
-            background: rgba(209, 18, 42, 0.1);
-            box-shadow: 0 0 15px rgba(209, 18, 42, 0.3);
+            background: rgba(209, 18, 42, .1);
+            box-shadow: 0 0 15px rgba(209, 18, 42, .3);
         }
 
         .login-box button {
@@ -166,7 +168,7 @@
             border-radius: 14px;
             border: none;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all .3s;
             text-transform: uppercase;
             letter-spacing: 1px;
             width: 100%;
@@ -176,7 +178,7 @@
         .login-box button:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(209, 18, 42, 0.4);
+            box-shadow: 0 10px 25px rgba(209, 18, 42, .4);
         }
 
         .login-box .footer-text {
@@ -185,8 +187,9 @@
             color: var(--gray);
         }
 
+        /* TIPOGRAFIA GERAL */
         h1 {
-            font-size: 24px;
+            font-size: 22px;
             margin-bottom: 5px;
             color: var(--primary);
             font-weight: 700;
@@ -200,6 +203,7 @@
             text-transform: uppercase;
         }
 
+        /* INPUTS */
         input,
         select,
         textarea {
@@ -207,21 +211,27 @@
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, .15);
+            background: rgba(15, 23, 42, .9);
             color: #fff;
             font-size: 13px;
             outline: none;
-            transition: 0.3s;
+            transition: .3s;
         }
 
         input:focus,
         select:focus,
         textarea:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(209, 18, 42, 0.4);
+            box-shadow: 0 0 10px rgba(209, 18, 42, .4);
         }
 
+        select option {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        /* BOTÕES */
         button {
             width: 100%;
             padding: 12px;
@@ -233,18 +243,19 @@
             cursor: pointer;
             text-transform: uppercase;
             font-size: 11px;
-            transition: 0.3s;
+            transition: .3s;
             margin-bottom: 5px;
             letter-spacing: 1px;
+            font-family: 'Montserrat', sans-serif;
         }
 
         button:hover {
-            opacity: 0.9;
+            opacity: .9;
             transform: translateY(-2px);
         }
 
         button:active {
-            transform: scale(0.98);
+            transform: scale(.98);
         }
 
         .btn-success {
@@ -284,16 +295,28 @@
             padding: 8px 14px;
         }
 
+        .btn-purple {
+            background: var(--purple);
+            color: #fff;
+        }
+
         .btn-sm {
             padding: 6px 10px;
             font-size: 10px;
             width: auto;
         }
 
+        .btn-flex {
+            flex: 1;
+            margin: 0 !important;
+        }
+
+        /* HIDDEN */
         .hidden {
             display: none !important;
         }
 
+        /* DASHBOARD */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -302,11 +325,16 @@
         }
 
         .metric-card {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, .08);
             border-radius: 12px;
             padding: 15px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .metric-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
         }
 
         .metric-value {
@@ -323,8 +351,9 @@
             margin-top: 5px;
         }
 
+        /* CARDS DE PROGRAMAÇÃO */
         .prog-item {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, .06);
             padding: 14px;
             border-radius: 14px;
             margin-bottom: 10px;
@@ -332,20 +361,19 @@
             font-size: 12px;
             text-align: left;
             position: relative;
-            transition: 0.3s;
+            transition: .3s;
         }
 
         .prog-item:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, .1);
         }
 
-        .prog-item.cancelled {
+        .prog-item.cancelado {
             border-left-color: var(--cancelled);
-            opacity: 0.6;
-            pointer-events: none;
+            opacity: .6;
         }
 
-        .prog-item.cancelled::after {
+        .prog-item.cancelado::after {
             content: 'CANCELADO';
             position: absolute;
             top: 50%;
@@ -353,7 +381,7 @@
             transform: translate(-50%, -50%) rotate(-15deg);
             font-size: 24px;
             font-weight: 900;
-            color: rgba(239, 68, 68, 0.3);
+            color: rgba(239, 68, 68, .4);
             pointer-events: none;
         }
 
@@ -361,7 +389,7 @@
             border-left-color: var(--warning);
         }
 
-        .status-EXECUCAO {
+        .status-EM-EXECUÇÃO {
             border-left-color: #ef4444;
         }
 
@@ -376,6 +404,7 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: inline-block;
         }
 
         .setor-badge {
@@ -402,6 +431,7 @@
             color: #fed7aa;
         }
 
+        /* TABS */
         .tabs {
             display: flex;
             gap: 5px;
@@ -411,16 +441,21 @@
             scrollbar-width: none;
         }
 
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
         .tab-btn {
-            background: rgba(30, 41, 59, 0.8);
+            background: rgba(30, 41, 59, .8);
             padding: 8px 14px;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, .1);
             color: #fff;
             cursor: pointer;
             white-space: nowrap;
             font-size: 9px;
-            transition: 0.3s;
+            transition: .3s;
+            margin-bottom: 0;
         }
 
         .tab-active {
@@ -428,6 +463,7 @@
             font-weight: bold;
         }
 
+        /* FOTOS */
         .preview-area {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -467,6 +503,10 @@
             align-items: center;
             justify-content: center;
             z-index: 10;
+            padding: 0;
+            margin: 0;
+            width: 22px;
+            min-width: unset;
         }
 
         .timestamp-overlay {
@@ -474,24 +514,27 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            background: linear-gradient(transparent, rgba(0, 0, 0, .9));
             color: #fff;
             padding: 12px 6px 4px;
             font-size: 8px;
             text-align: left;
-            line-height: 1.3;
+            line-height: 1.4;
+            pointer-events: none;
         }
 
+        /* SEÇÕES */
         .form-section {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, .3);
             padding: 15px;
             border-radius: 15px;
             margin-bottom: 10px;
             text-align: left;
         }
 
+        /* ALERTAS */
         .alert-card {
-            background: rgba(245, 158, 11, 0.15);
+            background: rgba(245, 158, 11, .15);
             border: 1px solid var(--warning);
             padding: 12px;
             border-radius: 10px;
@@ -501,17 +544,28 @@
         }
 
         .alert-danger {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid var(--danger);
+            background: rgba(239, 68, 68, .15);
+            border-color: var(--danger);
         }
 
+        .alert-info {
+            background: rgba(6, 182, 212, .15);
+            border-color: var(--info);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, .15);
+            border-color: var(--success);
+        }
+
+        /* MODAL */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, .9);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -520,9 +574,9 @@
         }
 
         .modal-content {
-            background: rgba(30, 41, 59, 0.98);
+            background: rgba(30, 41, 59, .98);
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, .1);
             padding: 20px;
             max-width: 700px;
             width: 100%;
@@ -530,8 +584,18 @@
             overflow-y: auto;
         }
 
+        .modal-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        /* REVISÃO INLINE */
         .revisao-inline {
-            background: rgba(139, 92, 246, 0.1);
+            background: rgba(139, 92, 246, .1);
             border: 1px solid var(--joint);
             padding: 10px;
             border-radius: 8px;
@@ -539,18 +603,26 @@
             font-size: 11px;
         }
 
+        /* PERMISSÕES */
         .permissoes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 10px;
             margin-top: 10px;
         }
 
         .permissao-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, .05);
             padding: 12px;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .permissao-card h4 {
+            font-size: 12px;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
         }
 
         .permissao-card label {
@@ -559,15 +631,22 @@
             align-items: center;
             gap: 8px;
             margin: 5px 0;
+            cursor: pointer;
         }
 
+        .permissao-card input[type=checkbox] {
+            width: auto;
+            margin: 0;
+        }
+
+        /* VIEWER */
         #img-viewer {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, .95);
             z-index: 2000;
             display: none;
             justify-content: center;
@@ -582,13 +661,14 @@
             border: 2px solid var(--primary);
         }
 
+        /* SUCCESS */
         #success-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.98);
+            background: rgba(15, 23, 42, .98);
             z-index: 5000;
             display: none;
             flex-direction: column;
@@ -607,7 +687,7 @@
             font-size: 50px;
             color: white;
             margin-bottom: 20px;
-            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: pop .4s cubic-bezier(.175, .885, .32, 1.275);
         }
 
         @keyframes pop {
@@ -620,8 +700,9 @@
             }
         }
 
+        /* ORÇAMENTOS */
         .orc-card {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, .06);
             border-radius: 12px;
             padding: 12px;
             margin-bottom: 10px;
@@ -629,7 +710,11 @@
             font-size: 12px;
             text-align: left;
             cursor: pointer;
-            transition: 0.3s;
+            transition: .3s;
+        }
+
+        .orc-card:hover {
+            background: rgba(255, 255, 255, .1);
         }
 
         .orc-card.aprovado {
@@ -640,6 +725,11 @@
             border-left-color: var(--danger);
         }
 
+        .orc-card.pendente {
+            border-left-color: var(--warning);
+        }
+
+        /* EVIDÊNCIAS */
         .evidencia-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -663,49 +753,207 @@
             object-fit: cover;
         }
 
+        .ev-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 10px;
+            color: var(--gray);
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* STARS */
         .stars {
             font-size: 28px;
             cursor: pointer;
+            margin: 10px 0;
         }
 
         .stars span {
             color: var(--gray);
-            transition: 0.2s;
+            transition: .2s;
         }
 
         .stars span.active {
             color: #fbbf24;
+        }
+
+        /* TABELA */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+
+        table td,
+        table th {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            text-align: left;
+        }
+
+        table th {
+            color: var(--gray);
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* PDF TEMPLATE */
+        #pdf-template {
+            position: fixed;
+            left: -9999px;
+            width: 800px;
+            background: #fff;
+            color: #000;
+            padding: 40px;
+            font-family: Arial;
+        }
+
+        /* BOTÕES INLINE FLEX */
+        .btn-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-row button {
+            flex: 1;
+            margin: 0;
+        }
+
+        /* SEARCH BAR */
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar input,
+        .search-bar select {
+            flex: 1;
+            margin: 0;
+        }
+
+        /* CARD ACOES */
+        .card-acoes {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .card-acoes button {
+            flex: 1;
+            margin: 0;
+            padding: 6px 8px;
+            font-size: 9px;
+        }
+
+        /* BADGE STATUS COLORIDO */
+        .badge-PENDENTE {
+            background: rgba(245, 158, 11, .3);
+            color: #f59e0b;
+        }
+
+        .badge-EM.EXECUÇÃO {
+            background: rgba(239, 68, 68, .3);
+            color: #ef4444;
+        }
+
+        .badge-CONCLUIDO {
+            background: rgba(16, 185, 129, .3);
+            color: #10b981;
+        }
+
+        .badge-CANCELADO {
+            background: rgba(107, 114, 128, .3);
+            color: #9ca3af;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width:480px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .preview-area {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .evidencia-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .permissoes-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
 <body class="login-bg">
 
+    <!-- OVERLAYS GLOBAIS -->
     <div id="success-overlay">
         <div class="check-v">✓</div>
-        <h2 style="color:white; letter-spacing:2px;">ENVIADO COM SUCESSO!</h2>
+        <h2 style="color:white;letter-spacing:2px;" id="success-msg">ENVIADO COM SUCESSO!</h2>
     </div>
-    <div id="img-viewer" onclick="this.style.display='none'"><img src="" id="full-img"></div>
+    <div id="img-viewer" onclick="this.style.display='none'">
+        <img src="" id="full-img" alt="">
+    </div>
 
-    <!-- LOGIN -->
-    <section id="scr-login"
-        style="display:flex; justify-content:center; align-items:center; width:100%; min-height:100vh;">
+    <!-- PDF TEMPLATE -->
+    <div id="pdf-template"
+        style="position:fixed;left:-9999px;width:800px;background:#fff;color:#000;padding:40px;font-family:Arial;">
+        <div
+            style="display:flex;justify-content:space-between;border-bottom:4px solid #d1122a;padding-bottom:15px;margin-bottom:20px;">
+            <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg"
+                style="width:180px;mix-blend-mode:multiply;" id="pdf-logo" onerror="this.style.display='none'">
+            <div>
+                <h2 id="pdf-titulo" style="color:#d1122a;"></h2>
+                <p id="pdf-data-geracao" style="font-size:12px;color:#666;"></p>
+            </div>
+        </div>
+        <div id="pdf-body"></div>
+        <div id="pdf-photos" style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px;"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TELA 1: LOGIN -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section id="scr-login" style="display:flex;justify-content:center;align-items:center;width:100%;min-height:100vh;">
         <div class="login-box">
             <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg" alt="LOKAMIG"
                 class="login-logo" onerror="this.style.display='none'">
             <h1>LOKAMIG</h1>
-            <div class="subtitle">Gestão Operacional Inteligente</div>
-            <input type="text" id="user" placeholder="Usuário" autocomplete="off">
-            <input type="password" id="pass" placeholder="Senha">
-            <button onclick="handleLogin()">Acessar Sistema</button>
-            <div class="footer-text">Plataforma integrada de logística e frotas</div>
+            <div class="subtitle">Gestão Operacional · v6.0 · Realtime</div>
+            <input type="text" id="user" placeholder="Usuário" autocomplete="off"
+                onkeydown="if(event.key==='Enter') document.getElementById('pass').focus()">
+            <input type="password" id="pass" placeholder="Senha" onkeydown="if(event.key==='Enter') handleLogin()">
+            <button onclick="handleLogin()">🔐 Acessar Sistema</button>
+            <div class="footer-text">Plataforma integrada de logística e frotas · v5.0</div>
         </div>
     </section>
 
-    <!-- ADMIN (mantido exatamente como v4.0) -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TELA 2: ADMINISTRAÇÃO -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-admin" class="container hidden">
         <h1>📊 ADMINISTRAÇÃO</h1>
-        <div class="dashboard-grid" id="dashboard-metrics">
+        <div class="sub" id="admin-user-label">Bem-vindo, Administrador</div>
+
+        <!-- DASHBOARD METRICS -->
+        <div class="dashboard-grid">
             <div class="metric-card">
                 <div class="metric-icon">🚗</div><span class="metric-value" id="met-total-hoje">0</span><span
                     class="metric-label">Serviços Hoje</span>
@@ -715,519 +963,2165 @@
                     class="metric-label">Concluídos</span>
             </div>
             <div class="metric-card">
-                <div class="metric-icon">⏱️</div><span class="metric-value" id="met-tempo-medio">0h</span><span
-                    class="metric-label">Tempo Médio</span>
+                <div class="metric-icon">⏱️</div><span class="metric-value" id="met-pendentes">0</span><span
+                    class="metric-label">Pendentes</span>
             </div>
             <div class="metric-card">
                 <div class="metric-icon">💰</div><span class="metric-value" id="met-gasto-mes">R$0</span><span
-                    class="metric-label">Gastos do Mês</span>
+                    class="metric-label">Combustível/Mês</span>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">🚛</div><span class="metric-value" id="met-frota">0</span><span
+                    class="metric-label">Veículos Ativos</span>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">⚠️</div><span class="metric-value" id="met-manut">0</span><span
+                    class="metric-label">Manutenções</span>
             </div>
         </div>
 
+        <!-- TABS -->
         <div class="tabs" id="admin-tabs">
-            <button class="tab-btn tab-active" onclick="switchTab('monitor', event)">📡 Monitor</button>
-            <button class="tab-btn" onclick="switchTab('history', event)">📋 Histórico</button>
-            <button class="tab-btn" onclick="switchTab('forn', event)">🏢 Fornecedores</button>
-            <button class="tab-btn" onclick="switchTab('colab', event)">👥 Equipe</button>
-            <button class="tab-btn" onclick="switchTab('veic', event)">🚛 Frota</button>
-            <button class="tab-btn" onclick="switchTab('manutencao', event)">🔧 Manutenções</button>
-            <button class="tab-btn" onclick="switchTab('orcamentos', event)">💰 Orçamentos</button>
-            <button class="tab-btn" onclick="switchTab('combustivel', event)">⛽ Combustível</button>
-            <button class="tab-btn" onclick="switchTab('emails', event)">📧 E-mails</button>
-            <button class="tab-btn" onclick="switchTab('auditoria', event)">📝 Auditoria</button>
-            <button class="tab-btn" onclick="switchTab('permissoes', event)">🔐 Aba Mestre</button>
-            <button class="tab-btn" onclick="switchTab('config', event)">⚙️ Backup</button>
+            <button class="tab-btn tab-active" onclick="switchTab('monitor',event)">📡 Monitor</button>
+            <button class="tab-btn" onclick="switchTab('history',event)">📋 Histórico</button>
+            <button class="tab-btn" onclick="switchTab('forn',event)">🏢 Fornecedores</button>
+            <button class="tab-btn" onclick="switchTab('colab',event)">👥 Equipe</button>
+            <button class="tab-btn" onclick="switchTab('veic',event)">🚛 Frota</button>
+            <button class="tab-btn" onclick="switchTab('manutencao',event)">🔧 Manutenções</button>
+            <button class="tab-btn" onclick="switchTab('orcamentos',event)">💰 Orçamentos</button>
+            <button class="tab-btn" onclick="switchTab('combustivel',event)">⛽ Combustível</button>
+            <button class="tab-btn" onclick="switchTab('emails',event)">📧 E-mails</button>
+            <button class="tab-btn" onclick="switchTab('auditoria',event)">📝 Auditoria</button>
+            <button class="tab-btn" onclick="switchTab('permissoes',event)">🔐 Aba Mestre</button>
+            <button class="tab-btn" onclick="switchTab('config',event)">⚙️ Config</button>
         </div>
 
+        <!-- ── MONITOR ── -->
         <div id="area-monitor" class="admin-content">
-            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-                <input type="date" id="mon-filter-date" onchange="carregarProgAdmin()" style="flex:1; margin:0;">
-                <input type="text" id="mon-filter-placa" placeholder="🔍 Filtrar placa" oninput="carregarProgAdmin()"
-                    style="flex:1; margin:0;">
-                <select id="mon-filter-status" onchange="carregarProgAdmin()" style="flex:1; margin:0;">
+            <div class="search-bar">
+                <input type="date" id="mon-filter-date" onchange="carregarProgAdmin()">
+                <input type="text" id="mon-filter-placa" placeholder="🔍 Placa" oninput="carregarProgAdmin()">
+                <select id="mon-filter-status" onchange="carregarProgAdmin()">
                     <option value="">Todos os status</option>
                     <option value="PENDENTE">Pendente</option>
                     <option value="EM EXECUÇÃO">Em Execução</option>
                     <option value="CONCLUIDO">Concluído</option>
                     <option value="CANCELADO">Cancelado</option>
                 </select>
+                <select id="mon-filter-setor" onchange="carregarProgAdmin()">
+                    <option value="">Todos os setores</option>
+                    <option value="Operacional">Operacional</option>
+                    <option value="Reserva">Reserva</option>
+                    <option value="Gerencial">Gerencial</option>
+                </select>
             </div>
             <div id="alertas-garantia"></div>
             <div id="list-prog-admin"></div>
         </div>
 
+        <!-- ── HISTÓRICO ── -->
         <div id="area-history" class="admin-content hidden">
-            <h3 style="margin-bottom:15px;">📋 Histórico de Serviços</h3>
+            <h3 style="margin-bottom:12px;">📋 Histórico de Serviços</h3>
+            <div class="search-bar">
+                <input type="date" id="hist-filter-date" onchange="renderHistorico()">
+                <input type="text" id="hist-filter-placa" placeholder="🔍 Placa" oninput="renderHistorico()">
+                <select id="hist-filter-forn" onchange="renderHistorico()">
+                    <option value="">Todos fornecedores</option>
+                </select>
+            </div>
             <div id="list-history-admin"></div>
         </div>
+
+        <!-- ── FORNECEDORES ── -->
         <div id="area-forn" class="admin-content hidden">
-            <div class="form-section"><input type="text" id="f-nome" placeholder="Nome da empresa"><input type="text"
-                    id="f-user" placeholder="Login de acesso"><input type="password" id="f-pass"
-                    placeholder="Senha"><select id="f-tipo">
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">➕ Novo Fornecedor</h4>
+                <input type="text" id="f-nome" placeholder="Nome da empresa">
+                <input type="text" id="f-user" placeholder="Login de acesso">
+                <input type="password" id="f-pass" placeholder="Senha">
+                <select id="f-tipo">
                     <option value="Oficina">Oficina</option>
                     <option value="Limpeza">Limpeza</option>
-                </select><button onclick="salvarNovoFornecedor()" class="btn-success">Cadastrar Fornecedor</button>
+                    <option value="Posto">Posto de Combustível</option>
+                    <option value="Outros">Outros</option>
+                </select>
+                <button onclick="salvarNovoFornecedor()" class="btn-success">✅ Cadastrar Fornecedor</button>
             </div>
             <div id="list-forn"></div>
         </div>
+
+        <!-- ── EQUIPE ── -->
         <div id="area-colab" class="admin-content hidden">
-            <div class="form-section"><input type="text" id="c-mat" placeholder="Matrícula"><input type="text"
-                    id="c-nome" placeholder="Nome completo"><input type="text" id="c-nfc" placeholder="NFC ID"><select
-                    id="c-perfil">
-                    <option value="programador">Programador</option>
-                    <option value="supervisor">Supervisor</option>
-                    <option value="motorista">Motorista</option>
-                </select><button onclick="salvarColab()" class="btn-success">Cadastrar Colaborador</button></div>
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">➕ Novo Colaborador / Programador</h4>
+                <input type="text" id="c-mat" placeholder="Matrícula">
+                <input type="text" id="c-nome" placeholder="Nome completo">
+                <input type="text" id="c-user" placeholder="Login de acesso">
+                <input type="password" id="c-pass" placeholder="Senha">
+                <input type="text" id="c-nfc" placeholder="NFC ID (opcional)">
+                <select id="c-perfil">
+                    <option value="programador">Programador (acessa tela de lançamentos)</option>
+                    <option value="supervisor">Supervisor (admin limitado)</option>
+                    <option value="motorista">Motorista (somente monitor)</option>
+                </select>
+                <button onclick="salvarColab()" class="btn-success">✅ Cadastrar Colaborador</button>
+            </div>
             <div id="list-colab"></div>
         </div>
+
+        <!-- ── FROTA ── -->
         <div id="area-veic" class="admin-content hidden">
-            <div class="form-section"><input type="text" id="v-placa" placeholder="Placa do veículo"
-                    oninput="this.value=this.value.toUpperCase()" maxlength="8"><input type="text" id="v-modelo"
-                    placeholder="Modelo"><input type="number" id="v-ano" placeholder="Ano" min="2000"><input
-                    type="number" id="v-km-revisao" placeholder="KM próxima revisão"><select id="v-tipo">
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">➕ Novo Veículo</h4>
+                <input type="text" id="v-placa" placeholder="Placa (ex: ABC1D23)"
+                    oninput="this.value=this.value.toUpperCase()" maxlength="8">
+                <input type="text" id="v-modelo" placeholder="Modelo (ex: Fiat Fiorino 2022)">
+                <input type="number" id="v-ano" placeholder="Ano fabricação" min="2000" max="2030">
+                <input type="number" id="v-km-atual" placeholder="KM atual">
+                <input type="number" id="v-km-revisao" placeholder="KM próxima revisão">
+                <select id="v-tipo">
                     <option value="Operacional">Operacional</option>
                     <option value="Reserva">Reserva</option>
                     <option value="Gerencial">Gerencial</option>
-                </select><button onclick="salvarVeiculo()" class="btn-success">Cadastrar Veículo</button></div>
+                </select>
+                <button onclick="salvarVeiculo()" class="btn-success">✅ Cadastrar Veículo</button>
+            </div>
             <div id="list-veic"></div>
         </div>
+
+        <!-- ── MANUTENÇÕES ── -->
         <div id="area-manutencao" class="admin-content hidden">
-            <div class="form-section"><select id="m-veiculo"></select><input type="text" id="m-descricao"
-                    placeholder="Descrição da revisão"><input type="number" id="m-km-programada"
-                    placeholder="KM programada"><input type="date" id="m-data-limite"><button
-                    onclick="salvarManutencao()" class="btn-success">Programar Revisão</button></div>
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">🔧 Programar Revisão</h4>
+                <select id="m-veiculo">
+                    <option value="">— Selecione o veículo —</option>
+                </select>
+                <input type="text" id="m-descricao" placeholder="Descrição da revisão / serviço">
+                <input type="number" id="m-km-programada" placeholder="KM programada">
+                <input type="date" id="m-data-limite">
+                <select id="m-urgencia">
+                    <option value="normal">Normal</option>
+                    <option value="urgente">Urgente</option>
+                    <option value="critico">Crítico</option>
+                </select>
+                <button onclick="salvarManutencao()" class="btn-success">✅ Programar Revisão</button>
+            </div>
             <div id="list-manutencoes"></div>
         </div>
+
+        <!-- ── ORÇAMENTOS ── -->
         <div id="area-orcamentos" class="admin-content hidden">
+            <div class="search-bar">
+                <select id="orc-filter-status" onchange="renderOrcamentosAdmin()">
+                    <option value="">Todos</option>
+                    <option value="PENDENTE">Pendentes</option>
+                    <option value="APROVADO">Aprovados</option>
+                    <option value="REJEITADO">Rejeitados</option>
+                </select>
+                <input type="text" id="orc-filter-placa" placeholder="🔍 Filtrar placa"
+                    oninput="renderOrcamentosAdmin()">
+            </div>
             <div id="list-orcamentos-admin"></div>
         </div>
+
+        <!-- ── COMBUSTÍVEL ── -->
         <div id="area-combustivel" class="admin-content hidden">
-            <div class="form-section"><select id="ab-veiculo"></select><input type="number" id="ab-litros"
-                    placeholder="Litros" step="0.01"><input type="number" id="ab-valor" placeholder="Valor total R$"
-                    step="0.01"><input type="number" id="ab-km" placeholder="KM atual">
-                <div style="display:flex; gap:5px; margin:10px 0;"><button
-                        onclick="document.getElementById('ab-foto-cam').click()"
-                        style="background:var(--joint); flex:1; margin:0;">📸 Câmera</button><button
-                        onclick="document.getElementById('ab-foto-gal').click()"
-                        style="background:var(--return); flex:1; margin:0;">🖼️ Galeria</button></div><input type="file"
-                    id="ab-foto-cam" capture="environment" accept="image/*" class="hidden"
-                    onchange="handleAbastecimentoFoto(this)"><input type="file" id="ab-foto-gal" accept="image/*"
-                    class="hidden" onchange="handleAbastecimentoFoto(this)">
-                <div id="ab-preview-foto" class="preview-area"></div><button onclick="salvarAbastecimento()"
-                    class="btn-success">Registrar Abastecimento</button>
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">⛽ Registrar Abastecimento</h4>
+                <select id="ab-veiculo">
+                    <option value="">— Selecione o veículo —</option>
+                </select>
+                <input type="number" id="ab-litros" placeholder="Litros abastecidos" step="0.01">
+                <input type="number" id="ab-valor" placeholder="Valor total R$" step="0.01">
+                <input type="number" id="ab-km" placeholder="KM atual do veículo">
+                <div class="btn-row">
+                    <button onclick="document.getElementById('ab-foto-cam').click()" style="background:var(--joint);"
+                        class="btn-flex">📸 Câmera</button>
+                    <button onclick="document.getElementById('ab-foto-gal').click()" style="background:var(--return);"
+                        class="btn-flex">🖼️ Galeria</button>
+                </div>
+                <input type="file" id="ab-foto-cam" capture="environment" accept="image/*" class="hidden"
+                    onchange="handleAbastecimentoFoto(this)">
+                <input type="file" id="ab-foto-gal" accept="image/*" class="hidden"
+                    onchange="handleAbastecimentoFoto(this)">
+                <div id="ab-preview-foto" class="preview-area"></div>
+                <button onclick="salvarAbastecimento()" class="btn-success">✅ Registrar Abastecimento</button>
+            </div>
+            <!-- FILTRO POR MÊS + RESUMO + PDF -->
+            <div
+                style="background:rgba(6,182,212,.08);border:1px solid var(--info);border-radius:12px;padding:12px;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                    <label style="font-size:11px;color:var(--info);font-weight:bold;white-space:nowrap;">📅 Filtrar por
+                        mês:</label>
+                    <input type="month" id="ab-filter-mes" style="flex:1;margin:0;" onchange="carregarAbastecimentos()">
+                    <button onclick="gerarPDFAbastecimentosMes()"
+                        style="background:#ff5722;width:auto;padding:8px 14px;margin:0;" class="btn-sm">📄 PDF do
+                        Mês</button>
+                </div>
+                <div id="resumo-combustivel" style="font-size:12px;"></div>
             </div>
             <div id="list-abastecimentos"></div>
         </div>
+
+        <!-- ── E-MAILS ── -->
         <div id="area-emails" class="admin-content hidden">
-            <div class="form-section"><input type="email" id="email-destinatario" placeholder="E‑mail"><input
-                    type="text" id="email-nome" placeholder="Nome"><button onclick="adicionarEmail()"
-                    class="btn-success">Adicionar</button></div>
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">📧 Cadastrar Destinatário</h4>
+                <input type="email" id="email-destinatario" placeholder="E-mail">
+                <input type="text" id="email-nome" placeholder="Nome / Empresa">
+                <button onclick="adicionarEmail()" class="btn-success">✅ Adicionar</button>
+            </div>
             <div id="list-emails"></div>
         </div>
+
+        <!-- ── AUDITORIA ── -->
         <div id="area-auditoria" class="admin-content hidden">
-            <h4>📝 Registro de Atividades</h4>
+            <h4 style="margin-bottom:10px;">📝 Registro de Atividades</h4>
+            <div style="display:flex;gap:5px;margin-bottom:10px;">
+                <button onclick="carregarAuditoria()" class="btn-info btn-sm">🔄 Atualizar</button>
+                <button onclick="limparAuditoria()" class="btn-danger btn-sm">🗑️ Limpar</button>
+            </div>
             <div id="list-auditoria"></div>
         </div>
+
+        <!-- ── ABA MESTRE / PERMISSÕES ── -->
         <div id="area-permissoes" class="admin-content hidden">
-            <h4 style="color:var(--joint); margin-bottom:15px;">🔐 GESTÃO DE PERMISSÕES (ABA MESTRE)</h4>
+            <h4 style="color:var(--joint);margin-bottom:15px;">🔐 GESTÃO DE PERMISSÕES</h4>
             <div class="form-section">
-                <p style="font-size:11px; color:var(--gray); margin-bottom:10px;">Configure o acesso de cada perfil às
+                <p style="font-size:11px;color:var(--gray);margin-bottom:10px;">Configure o acesso de cada perfil às
                     telas do sistema:</p>
-                <div class="permissoes-grid" id="permissoes-grid"></div><button onclick="salvarPermissoes()"
-                    class="btn-purple" style="margin-top:15px;">💾 Salvar Permissões</button>
+                <div class="permissoes-grid" id="permissoes-grid"></div>
+                <button onclick="salvarPermissoes()" class="btn-purple" style="margin-top:15px;">💾 Salvar
+                    Permissões</button>
             </div>
         </div>
+
+        <!-- ── CONFIG / BACKUP ── -->
         <div id="area-config" class="admin-content hidden">
-            <button onclick="exportarDados()" class="btn-purple">📥 Exportar Backup JSON</button>
-            <button onclick="gerarRelatorioFinanceiro()" class="btn-pdf" style="margin-top:5px;">📊 Relatório Financeiro
-                PDF</button>
+            <div class="form-section">
+                <h4 style="color:var(--info);margin-bottom:12px;">⚙️ Configurações do Sistema</h4>
+                <div class="btn-row">
+                    <button onclick="exportarDados()" style="background:var(--joint);" class="btn-flex">📥 Exportar
+                        Backup JSON</button>
+                    <button onclick="document.getElementById('input-restore').click()" style="background:var(--return);"
+                        class="btn-flex">📤 Restaurar Backup</button>
+                </div>
+                <input type="file" id="input-restore" accept=".json" class="hidden" onchange="importarDados(this)">
+                <button onclick="gerarRelatorioFinanceiro()" style="background:#ff5722;margin-top:5px;">📊 Relatório
+                    Financeiro PDF</button>
+                <div
+                    style="margin-top:15px;padding:12px;background:rgba(239,68,68,.1);border:1px solid var(--danger);border-radius:10px;">
+                    <h5 style="color:var(--danger);margin-bottom:8px;">⚠️ Zona de Perigo</h5>
+                    <button onclick="resetarSistema()" class="btn-danger btn-sm">🗑️ Apagar todos os dados</button>
+                </div>
+            </div>
+            <div id="config-emailjs" class="form-section" style="margin-top:10px;">
+                <h4 style="color:var(--info);margin-bottom:10px;">📧 Configuração EmailJS</h4>
+                <input type="text" id="cfg-ejs-userid" placeholder="EmailJS User ID">
+                <input type="text" id="cfg-ejs-serviceid" placeholder="EmailJS Service ID">
+                <input type="text" id="cfg-ejs-templateid" placeholder="EmailJS Template ID">
+                <button onclick="salvarConfigEmailJS()" class="btn-success">💾 Salvar Config EmailJS</button>
+            </div>
         </div>
+
         <button onclick="handleLogout()" class="btn-gray" style="margin-top:20px;">🚪 Sair do Sistema</button>
     </section>
 
-    <!-- PROGRAMADOR (mantido) -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TELA 3: PROGRAMADOR -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-programador" class="container hidden">
-        <h1>📋 CHECKLIST & LANÇAMENTOS</h1>
+        <h1>📋 LANÇAMENTOS</h1>
+        <div class="sub" id="prog-user-label"></div>
+
         <div class="form-section">
+            <h4 style="color:var(--info);margin-bottom:10px;">Novo Lançamento</h4>
             <select id="p-placa" onchange="atualizarSetor()">
                 <option value="">— Selecione o veículo —</option>
             </select>
             <div id="p-setor-display"
-                style="display:none; margin-bottom:10px; padding:8px 12px; border-radius:8px; background:rgba(255,255,255,0.05); font-size:12px;">
-                Setor: <span id="p-setor-label"></span></div>
+                style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.05);font-size:12px;">
+                Setor: <span id="p-setor-label"></span>
+                <span id="p-revisao-alerta" style="color:var(--warning);font-weight:bold;"></span>
+            </div>
             <select id="p-tipo-op" onchange="toggleFornDiv()">
                 <option value="SAÍDA">SAÍDA</option>
                 <option value="RETORNO">RETORNO</option>
             </select>
-            <input type="number" id="p-km" placeholder="KM ATUAL">
-            <div id="p-forn-div"><select id="p-fornecedor-select"></select></div>
-            <textarea id="p-obs" placeholder="Observações..." rows="2" maxlength="500"></textarea>
-            <div style="display:flex; gap:5px; margin-bottom:10px;"><button
-                    onclick="document.getElementById('p-fotos-cam').click()"
-                    style="background:var(--joint); flex:1; margin:0;">📸 CÂMERA</button><button
-                    onclick="document.getElementById('p-fotos-gal').click()"
-                    style="background:var(--return); flex:1; margin:0;">🖼️ GALERIA</button></div>
+            <input type="number" id="p-km" placeholder="KM atual do veículo">
+            <div id="p-forn-div">
+                <select id="p-fornecedor-select">
+                    <option value="">— Selecione o destino —</option>
+                </select>
+            </div>
+            <textarea id="p-obs" placeholder="Observações adicionais..." rows="2" maxlength="500"></textarea>
+            <div class="btn-row">
+                <button onclick="document.getElementById('p-fotos-cam').click()" style="background:var(--joint);"
+                    class="btn-flex">📸 CÂMERA</button>
+                <button onclick="document.getElementById('p-fotos-gal').click()" style="background:var(--return);"
+                    class="btn-flex">🖼️ GALERIA</button>
+            </div>
             <input type="file" id="p-fotos-cam" capture="environment" accept="image/*" class="hidden"
                 onchange="handleNewUpload(this)">
             <input type="file" id="p-fotos-gal" multiple accept="image/*" class="hidden"
                 onchange="handleNewUpload(this)">
             <div id="p-preview-fotos" class="preview-area"></div>
-            <button onclick="lancarProgramacao()" class="btn-success">✓ Finalizar e Enviar</button>
+            <button onclick="lancarProgramacao()" class="btn-success" style="margin-top:5px;">✅ Finalizar e
+                Enviar</button>
         </div>
-        <input type="date" id="p-filter-date" onchange="carregarProgGeral()">
+
+        <input type="date" id="p-filter-date" onchange="carregarProgGeral()" style="margin-bottom:10px;">
         <div id="list-prog-geral"></div>
-        <button onclick="handleLogout()" class="btn-gray">Sair</button>
+        <button onclick="handleLogout()" class="btn-gray">🚪 Sair</button>
     </section>
 
-    <!-- FORNECEDOR (mantido) -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TELA 4: FORNECEDOR -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-fornecedor" class="container hidden">
         <h1 id="forn-name-screen"></h1>
         <div class="sub">Serviços do Dia</div>
         <div id="forn-alertas-revisao"></div>
-        <input type="date" id="forn-filter-date" onchange="carregarServicosForn(currentUser)">
+        <input type="date" id="forn-filter-date" onchange="carregarServicosForn()">
         <div id="list-forn-servicos"></div>
-        <div style="display:flex; gap:5px; margin-top:10px;"><button onclick="show('scr-orcamento')" class="btn-warning"
-                style="flex:1;">💰 CRIAR ORÇAMENTO</button><button onclick="abrirOrcamentosEnviados()"
-                style="flex:1; background:#7c3aed;">📋 VER ORÇAMENTOS</button></div>
-        <button onclick="handleLogout()" class="btn-gray" style="margin-top:8px;">Sair</button>
+        <div class="btn-row" style="margin-top:10px;">
+            <button onclick="show('scr-orcamento')" style="background:var(--warning);color:#000;" class="btn-flex">💰
+                CRIAR ORÇAMENTO</button>
+            <button onclick="abrirOrcamentosEnviados()" style="background:var(--purple);" class="btn-flex">📋 VER
+                ORÇAMENTOS</button>
+        </div>
+        <button onclick="handleLogout()" class="btn-gray" style="margin-top:8px;">🚪 Sair</button>
     </section>
 
-    <!-- MODAL STATUS (mantido) -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- MODAL: ALTERAR STATUS (FORNECEDOR) -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-modal-status" class="hidden">
         <div class="modal-overlay">
             <div class="modal-content" onclick="event.stopPropagation()">
-                <div class="modal-header" id="modal-status-titulo"></div>
-                <div style="display:flex; gap:5px; margin-bottom:10px;"><button
-                        onclick="document.getElementById('status-foto-cam').click()"
-                        style="background:var(--joint); flex:1; margin:0;">📸 CÂMERA</button><button
-                        onclick="document.getElementById('status-foto-gal').click()"
-                        style="background:var(--return); flex:1; margin:0;">🖼️ GALERIA</button></div><input type="file"
-                    id="status-foto-cam" capture="environment" accept="image/*" class="hidden"
-                    onchange="handleStatusFotos(this)"><input type="file" id="status-foto-gal" multiple accept="image/*"
-                    class="hidden" onchange="handleStatusFotos(this)">
+                <div class="modal-header" id="modal-status-titulo">📸 Registrar Status</div>
+                <p style="font-size:11px;color:var(--gray);margin-bottom:10px;">Registre pelo menos uma foto para
+                    confirmar:</p>
+                <div class="btn-row">
+                    <button onclick="document.getElementById('status-foto-cam').click()"
+                        style="background:var(--joint);" class="btn-flex">📸 CÂMERA</button>
+                    <button onclick="document.getElementById('status-foto-gal').click()"
+                        style="background:var(--return);" class="btn-flex">🖼️ GALERIA</button>
+                </div>
+                <input type="file" id="status-foto-cam" capture="environment" accept="image/*" class="hidden"
+                    onchange="handleStatusFotos(this)">
+                <input type="file" id="status-foto-gal" multiple accept="image/*" class="hidden"
+                    onchange="handleStatusFotos(this)">
                 <div id="status-foto-preview" class="preview-area"></div>
-                <div class="stars" id="rating-stars"><span onclick="setRating(1)">☆</span><span
-                        onclick="setRating(2)">☆</span><span onclick="setRating(3)">☆</span><span
-                        onclick="setRating(4)">☆</span><span onclick="setRating(5)">☆</span></div><button
-                    id="btn-confirmar-status" class="btn-success hidden" onclick="confirmarAlteracaoStatus()">✓
-                    CONFIRMAR</button><button onclick="fecharModalStatus()" class="btn-gray btn-sm">Cancelar</button>
+                <div id="rating-area" class="hidden">
+                    <p style="font-size:11px;color:var(--gray);margin-bottom:5px;">Avalie o serviço:</p>
+                    <div class="stars" id="rating-stars">
+                        <span onclick="setRating(1)">☆</span>
+                        <span onclick="setRating(2)">☆</span>
+                        <span onclick="setRating(3)">☆</span>
+                        <span onclick="setRating(4)">☆</span>
+                        <span onclick="setRating(5)">☆</span>
+                    </div>
+                </div>
+                <textarea id="status-obs" placeholder="Observações sobre o serviço..." rows="2"
+                    style="margin-top:8px;"></textarea>
+                <button id="btn-confirmar-status" class="btn-success hidden" onclick="confirmarAlteracaoStatus()">✅
+                    CONFIRMAR</button>
+                <button onclick="fecharModalStatus()" class="btn-gray btn-sm" style="margin-top:5px;">Cancelar</button>
             </div>
         </div>
     </section>
 
-    <!-- ORÇAMENTO (mantido) -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- MODAL: CRIAR ORÇAMENTO -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-orcamento" class="hidden">
         <div class="modal-overlay" onclick="show('scr-fornecedor')">
             <div class="modal-content" onclick="event.stopPropagation()">
-                <div class="modal-header">💰 NOVO ORÇAMENTO</div><input type="text" id="orc-placa"
-                    placeholder="PLACA DO VEÍCULO" oninput="this.value=this.value.toUpperCase()" maxlength="8"><textarea
-                    id="orc-desc" placeholder="Descrição dos serviços" rows="3"></textarea>
+                <div class="modal-header">💰 NOVO ORÇAMENTO</div>
+                <input type="text" id="orc-placa" placeholder="PLACA DO VEÍCULO"
+                    oninput="this.value=this.value.toUpperCase()" maxlength="8">
+                <textarea id="orc-desc" placeholder="Descrição geral dos serviços" rows="3"></textarea>
                 <div id="orc-itens">
-                    <div style="display:flex; gap:5px; margin-bottom:8px;"><input type="text" placeholder="Item"
-                            style="flex:2;"><input type="number" class="v-item" placeholder="R$" style="flex:1;"
-                            oninput="calcTotal()"></div>
-                </div><button onclick="addItem()" class="btn-gray btn-sm">+ Adicionar Item</button>
+                    <div style="display:flex;gap:5px;margin-bottom:8px;">
+                        <input type="text" placeholder="Descrição do item" style="flex:2;margin:0;">
+                        <input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;"
+                            oninput="calcTotal()">
+                    </div>
+                </div>
+                <button onclick="addItem()" class="btn-gray btn-sm" style="margin-bottom:10px;">➕ Adicionar
+                    Item</button>
                 <div
-                    style="background:rgba(16,185,129,0.2); border:1px solid var(--success); padding:12px; border-radius:10px; font-weight:bold; margin:12px 0;">
-                    TOTAL: R$ <span id="total-orc">0,00</span></div>
-                <div style="display:flex; gap:5px; margin-bottom:8px;"><button
-                        onclick="document.getElementById('ev-foto-cam').click()"
-                        style="background:var(--joint); flex:1;">📸 FOTO</button><button
-                        onclick="document.getElementById('ev-video-cam').click()" style="background:#0891b2; flex:1;">🎥
-                        VÍDEO</button><button onclick="document.getElementById('ev-doc').click()"
-                        style="background:#6b7280; flex:1;">📎 DOCUMENTO</button></div><input type="file"
-                    id="ev-foto-cam" capture="environment" accept="image/*" class="hidden"
-                    onchange="handleEvidencia(this,'foto')"><input type="file" id="ev-video-cam" accept="video/*"
-                    capture="camcorder" class="hidden" onchange="handleEvidencia(this,'video')"><input type="file"
-                    id="ev-doc" multiple accept=".pdf,.doc,.docx,image/*" class="hidden"
+                    style="background:rgba(16,185,129,.2);border:1px solid var(--success);padding:12px;border-radius:10px;font-weight:bold;margin:12px 0;font-size:14px;">
+                    TOTAL: R$ <span id="total-orc">0,00</span>
+                </div>
+                <div class="btn-row">
+                    <button onclick="document.getElementById('ev-foto-cam').click()" style="background:var(--joint);"
+                        class="btn-flex">📸 FOTO</button>
+                    <button onclick="document.getElementById('ev-video-cam').click()" style="background:#0891b2;"
+                        class="btn-flex">🎥 VÍDEO</button>
+                    <button onclick="document.getElementById('ev-doc').click()" style="background:#6b7280;"
+                        class="btn-flex">📎 DOC</button>
+                </div>
+                <input type="file" id="ev-foto-cam" capture="environment" accept="image/*" class="hidden"
+                    onchange="handleEvidencia(this,'foto')">
+                <input type="file" id="ev-video-cam" accept="video/*" capture="camcorder" class="hidden"
+                    onchange="handleEvidencia(this,'video')">
+                <input type="file" id="ev-doc" multiple accept=".pdf,.doc,.docx,image/*" class="hidden"
                     onchange="handleEvidencia(this,'doc')">
-                <div id="ev-preview" class="evidencia-grid"></div><button onclick="enviarOrcamento()"
-                    class="btn-success">📤 Enviar para Aprovação</button><button onclick="show('scr-fornecedor')"
-                    class="btn-gray btn-sm">Voltar</button>
+                <div id="ev-preview" class="evidencia-grid"></div>
+                <button onclick="enviarOrcamento()" class="btn-success">📤 Enviar para Aprovação</button>
+                <button onclick="show('scr-fornecedor')" class="btn-gray btn-sm">← Voltar</button>
             </div>
         </div>
     </section>
 
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- MODAL: ORÇAMENTOS ENVIADOS (FORNECEDOR) -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-orc-enviados" class="hidden">
         <div class="modal-overlay" onclick="show('scr-fornecedor')">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <div class="modal-header">📋 MEUS ORÇAMENTOS</div>
-                <div id="list-orc-enviados"></div><button onclick="show('scr-fornecedor')"
-                    class="btn-gray btn-sm">Voltar</button>
+                <div id="list-orc-enviados"></div>
+                <button onclick="show('scr-fornecedor')" class="btn-gray btn-sm">← Voltar</button>
             </div>
         </div>
     </section>
 
-    <!-- DETALHE ORÇAMENTO (COM BOTÃO E‑MAIL) -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- MODAL: DETALHE DO ORÇAMENTO -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-orc-detalhe" class="hidden">
         <div class="modal-overlay" onclick="fecharDetalheOrc()">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <div class="modal-header" id="orc-det-titulo"></div>
                 <div id="orc-det-body"></div>
-                <div id="orc-det-acoes"></div>
-                <div style="margin-top:12px;" id="orc-email-actions">
-                    <button class="btn-info" onclick="enviarOrcamentoPorEmail()">📧 Enviar por E‑mail</button>
+                <div id="orc-det-evidencias" class="evidencia-grid"></div>
+                <div id="orc-det-acoes" style="margin-top:10px;"></div>
+                <div style="margin-top:10px;" id="orc-email-actions">
+                    <button class="btn-info" onclick="enviarOrcamentoPorEmail()">📧 Enviar por E-mail</button>
+                    <button class="btn-pdf btn-sm" onclick="gerarPDFOrcamento()">📄 Gerar PDF</button>
                 </div>
                 <button onclick="fecharDetalheOrc()" class="btn-gray btn-sm" style="margin-top:8px;">Fechar</button>
             </div>
         </div>
     </section>
 
-    <div id="pdf-template"
-        style="position:fixed; left:-9999px; width:800px; background:#fff; color:#000; padding:40px; font-family:Arial;">
-        <div
-            style="display:flex; justify-content:space-between; border-bottom:4px solid #d1122a; padding-bottom:15px; margin-bottom:20px;">
-            <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg"
-                style="width:180px; mix-blend-mode: multiply;" id="pdf-logo" onerror="this.style.display='none'">
-            <div>
-                <h2 id="pdf-titulo" style="color:#d1122a;"></h2>
-                <p id="pdf-data-geracao" style="font-size:12px; color:#666;"></p>
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- MODAL: DETALHE DO SERVIÇO (ADMIN) -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section id="scr-servico-detalhe" class="hidden">
+        <div class="modal-overlay" onclick="fecharDetalheServico()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header" id="srv-det-titulo"></div>
+                <div id="srv-det-body"></div>
+                <div id="srv-det-fotos" class="preview-area" style="margin-top:10px;"></div>
+                <div id="srv-det-revisao"></div>
+                <div id="srv-det-acoes" style="margin-top:12px;"></div>
+                <button onclick="fecharDetalheServico()" class="btn-gray btn-sm" style="margin-top:8px;">Fechar</button>
             </div>
         </div>
-        <div id="pdf-body"></div>
-        <div id="pdf-photos" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;"></div>
-    </div>
+    </section>
 
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- JAVASCRIPT COMPLETO                                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
     <script>
-        // ============================================
+        'use strict';
+
+        // ─────────────────────────────────────────────
         // CONFIGURAÇÃO EMAILJS
-        // ============================================
-        (function () { emailjs.init('SEU_USER_ID'); })(); // <-- substitua SEU_USER_ID pelo seu User ID
+        // ─────────────────────────────────────────────
+        (function () {
+            const cfg = JSON.parse(localStorage.getItem('l_emailjs_cfg') || '{}');
+            if (cfg.userId) emailjs.init(cfg.userId);
+        })();
 
-        // ============================================
-        // CONFIGURAÇÃO GLOBAL
-        // ============================================
-        const LOGO_URL = 'https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg';
+        // ─────────────────────────────────────────────
+        // BANCO DE DADOS (chaves localStorage)
+        // ─────────────────────────────────────────────
         const DB = {
-            prog: 'l_prog_v41', forn: 'l_forn_v41', fornUsers: 'l_fusers_v41', progs: 'l_progs_v41',
-            colab: 'l_colab_v41', veic: 'l_veic_v41', orc: 'l_orc_v41', manutencao: 'l_manut_v41',
-            combustivel: 'l_comb_v41', avaliacoes: 'l_aval_v41', emails: 'l_emails_v41',
-            auditoria: 'l_audit_v41', permissoes: 'l_perm_v41'
+            prog: 'l_prog_v5',
+            forn: 'l_forn_v5',
+            fornUsers: 'l_fusers_v5',
+            progs: 'l_progs_v5',        // programadores/colabs com login
+            colab: 'l_colab_v5',        // cadastro de colaboradores
+            veic: 'l_veic_v5',
+            orc: 'l_orc_v5',
+            manutencao: 'l_manut_v5',
+            combustivel: 'l_comb_v5',
+            avaliacoes: 'l_aval_v5',
+            emails: 'l_emails_v5',
+            auditoria: 'l_audit_v5',
+            permissoes: 'l_perm_v5'
         };
 
+        const LOGO_URL = 'https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg';
+
+        // ─────────────────────────────────────────────
+        // PERMISSÕES PADRÃO
+        // ─────────────────────────────────────────────
         const PERMISSOES_PADRAO = {
-            admin: { monitor: true, history: true, forn: true, colab: true, veic: true, manutencao: true, orcamentos: true, combustivel: true, emails: true, auditoria: true, permissoes: true, config: true, programacao: true, fornecedor: true },
-            programador: { programacao: true },
-            supervisor: { monitor: true, history: true, veic: true, emails: true },
-            motorista: { monitor: true }
+            admin: { monitor: true, history: true, forn: true, colab: true, veic: true, manutencao: true, orcamentos: true, combustivel: true, emails: true, auditoria: true, permissoes: true, config: true },
+            programador: { monitor: false, history: false, forn: false, colab: false, veic: false, manutencao: false, orcamentos: false, combustivel: false, emails: false, auditoria: false, permissoes: false, config: false },
+            supervisor: { monitor: true, history: true, forn: false, colab: false, veic: true, manutencao: true, orcamentos: true, combustivel: false, emails: true, auditoria: false, permissoes: false, config: false },
+            motorista: { monitor: true, history: false, forn: false, colab: false, veic: false, manutencao: false, orcamentos: false, combustivel: false, emails: false, auditoria: false, permissoes: false, config: false }
         };
 
-        let tempFotos = [], tempEvidencias = [], currentUser = null, abastecimentoFoto = null;
+        const NOMES_TABS = {
+            monitor: '📡 Monitor', history: '📋 Histórico', forn: '🏢 Fornecedores',
+            colab: '👥 Equipe', veic: '🚛 Frota', manutencao: '🔧 Manutenções',
+            orcamentos: '💰 Orçamentos', combustivel: '⛽ Combustível',
+            emails: '📧 E-mails', auditoria: '📝 Auditoria',
+            permissoes: '🔐 Aba Mestre', config: '⚙️ Config'
+        };
+
+        // ─────────────────────────────────────────────
+        // ESTADO GLOBAL
+        // ─────────────────────────────────────────────
+        let tempFotos = [];
+        let tempEvidencias = [];
+        let currentUser = null;
+        let abastecimentoFoto = null;
         let statusPendente = { idx: null, novoStatus: null, fotos: [], rating: 0 };
         let orcDetalheOrigem = 'admin';
-        let orcAtual = null; // guarda o orçamento sendo visualizado
+        let orcAtual = null;
+        let servicoDetalheIdx = null;
+        let telaAnteriorOrc = 'scr-admin'; // rastreia de onde viemos
 
-        // ============================================
+        // ─────────────────────────────────────────────
         // INICIALIZAÇÃO
-        // ============================================
-        window.onload = () => {
+        // ─────────────────────────────────────────────
+        window.onload = function () {
             const hoje = new Date().toISOString().split('T')[0];
-            ['p-filter-date', 'forn-filter-date', 'mon-filter-date'].forEach(id => { const el = document.getElementById(id); if (el) el.value = hoje; });
-            if (!localStorage.getItem(DB.progs)) localStorage.setItem(DB.progs, JSON.stringify([{ nome: 'Paulista', user: 'paulista', pass: '1234' }]));
-            if (!localStorage.getItem(DB.forn)) localStorage.setItem(DB.forn, JSON.stringify([{ nome: 'AGSN' }, { nome: 'MEGA CENTER' }, { nome: "Lava Jato Maximu's" }]));
-            if (!localStorage.getItem(DB.fornUsers)) localStorage.setItem(DB.fornUsers, JSON.stringify([{ user: 'rodolfo', pass: '1234', empresa: 'MEGA CENTER', tipo: 'Oficina' }, { user: 'fiu', pass: '1234', empresa: "Lava Jato Maximu's", tipo: 'Limpeza' }, { user: 'taty', pass: '1234', empresa: 'AGSN', tipo: 'Oficina' }]));
-            if (!localStorage.getItem(DB.permissoes)) localStorage.setItem(DB.permissoes, JSON.stringify(PERMISSOES_PADRAO));
-            popularSeletorFornecedores(); popularSeletorVeiculos();
-            carregarPermissoes();
+            ['p-filter-date', 'forn-filter-date', 'mon-filter-date', 'hist-filter-date'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = hoje;
+            });
+
+            // Dados de exemplo se vazio
+            if (!localStorage.getItem(DB.progs)) {
+                localStorage.setItem(DB.progs, JSON.stringify([
+                    { nome: 'Paulista', user: 'paulista', pass: '1234', perfil: 'programador', mat: '001', nfc: '' }
+                ]));
+            }
+            if (!localStorage.getItem(DB.forn)) {
+                localStorage.setItem(DB.forn, JSON.stringify([
+                    { nome: 'AGSN' }, { nome: 'MEGA CENTER' }, { nome: "Lava Jato Maximu's" }
+                ]));
+            }
+            if (!localStorage.getItem(DB.fornUsers)) {
+                localStorage.setItem(DB.fornUsers, JSON.stringify([
+                    { user: 'rodolfo', pass: '1234', empresa: 'MEGA CENTER', tipo: 'Oficina' },
+                    { user: 'fiu', pass: '1234', empresa: "Lava Jato Maximu's", tipo: 'Limpeza' },
+                    { user: 'taty', pass: '1234', empresa: 'AGSN', tipo: 'Oficina' }
+                ]));
+            }
+            if (!localStorage.getItem(DB.permissoes)) {
+                localStorage.setItem(DB.permissoes, JSON.stringify(PERMISSOES_PADRAO));
+            }
+
+            // Carrega select de EmailJS salvo
+            const ejsCfg = JSON.parse(localStorage.getItem('l_emailjs_cfg') || '{}');
+            if (ejsCfg.userId) { const el = document.getElementById('cfg-ejs-userid'); if (el) el.value = ejsCfg.userId; }
+            if (ejsCfg.serviceId) { const el = document.getElementById('cfg-ejs-serviceid'); if (el) el.value = ejsCfg.serviceId; }
+            if (ejsCfg.templateId) { const el = document.getElementById('cfg-ejs-templateid'); if (el) el.value = ejsCfg.templateId; }
+
+            popularSeletorFornecedores();
+            popularSeletorVeiculos();
+            toggleFornDiv();
         };
 
+        // ─────────────────────────────────────────────
         // NAVEGAÇÃO
-        function show(id) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); document.body.className = id === 'scr-login' ? 'login-bg' : 'app-bg'; }
-        function handleLogout() { currentUser = null; tempFotos = []; tempEvidencias = []; abastecimentoFoto = null; show('scr-login'); document.getElementById('user').value = ''; document.getElementById('pass').value = ''; }
-        function switchTab(id, e) { document.querySelectorAll('.admin-content').forEach(a => a.classList.add('hidden')); const area = document.getElementById('area-' + id); if (area) area.classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); if (e && e.target) e.target.classList.add('tab-active'); if (id === 'monitor') carregarProgAdmin(); if (id === 'forn') renderListaForn(); if (id === 'colab') renderAdminList('colab'); if (id === 'veic') renderAdminList('veic'); if (id === 'history') renderHistorico(); if (id === 'orcamentos') renderOrcamentosAdmin(); if (id === 'manutencao') carregarManutencoes(); if (id === 'combustivel') carregarAbastecimentos(); if (id === 'emails') carregarEmails(); if (id === 'auditoria') carregarAuditoria(); if (id === 'permissoes') carregarPermissoes(); if (id === 'config') atualizarDashboard(); }
+        // ─────────────────────────────────────────────
+        function show(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden');
+            document.body.className = (id === 'scr-login') ? 'login-bg' : 'app-bg';
+        }
 
+        function showSuccess(msg) {
+            document.getElementById('success-msg').textContent = msg || 'ENVIADO COM SUCESSO!';
+            document.getElementById('success-overlay').style.display = 'flex';
+            setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 2000);
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            tempFotos = [];
+            tempEvidencias = [];
+            abastecimentoFoto = null;
+            show('scr-login');
+            document.getElementById('user').value = '';
+            document.getElementById('pass').value = '';
+        }
+
+        function switchTab(id, e) {
+            document.querySelectorAll('.admin-content').forEach(a => a.classList.add('hidden'));
+            const area = document.getElementById('area-' + id);
+            if (area) area.classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+            if (e && e.target) e.target.classList.add('tab-active');
+
+            // Carregar dados da aba
+            const loaders = {
+                monitor: carregarProgAdmin,
+                history: () => { popularFiltroFornHistorico(); renderHistorico(); },
+                forn: renderListaForn,
+                colab: renderListaColab,
+                veic: renderListaVeic,
+                manutencao: carregarManutencoes,
+                orcamentos: renderOrcamentosAdmin,
+                combustivel: carregarAbastecimentos,
+                emails: carregarEmails,
+                auditoria: carregarAuditoria,
+                permissoes: renderPermissoes,
+                config: () => { }
+            };
+            if (loaders[id]) loaders[id]();
+        }
+
+        // ─────────────────────────────────────────────
         // LOGIN
+        // ─────────────────────────────────────────────
         function handleLogin() {
             const u = DOMPurify.sanitize(document.getElementById('user').value.trim().toUpperCase());
             const p = document.getElementById('pass').value.trim();
-            if (!u || !p) return alert('Preencha todos os campos!');
-            if (u === 'ADMIN' && p === 'Luc45t1@go') { currentUser = { nome: 'Administrador', role: 'admin' }; show('scr-admin'); atualizarDashboard(); carregarProgAdmin(); carregarPermissoes(); return; }
-            const progs = JSON.parse(localStorage.getItem(DB.progs) || '[]'); const prog = progs.find(x => x.user.toUpperCase() === u && x.pass === p);
-            if (prog) { currentUser = { ...prog, role: 'programador' }; show('scr-programador'); carregarProgGeral(); return; }
-            const fornUsers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]'); const forn = fornUsers.find(x => x.user.toUpperCase() === u && x.pass === p);
-            if (forn) { currentUser = { ...forn, role: 'fornecedor' }; document.getElementById('forn-name-screen').innerText = forn.empresa; show('scr-fornecedor'); carregarServicosForn(forn); carregarAlertasRevisaoFornecedor(); return; }
-            alert('Acesso Negado.');
+            if (!u || !p) { alert('Preencha todos os campos!'); return; }
+
+            // ADMIN
+            if (u === 'ADMIN' && p === 'Luc45t1@go') {
+                currentUser = { nome: 'Administrador', role: 'admin' };
+                document.getElementById('admin-user-label').textContent = 'Bem-vindo, Administrador';
+                show('scr-admin');
+                atualizarDashboard();
+                carregarProgAdmin();
+                renderPermissoes();
+                registrarAuditoria('Login: ADMIN');
+                return;
+            }
+
+            // PROGRAMADORES / SUPERVISORES / MOTORISTAS
+            const progs = JSON.parse(localStorage.getItem(DB.progs) || '[]');
+            const prog = progs.find(x => x.user.toUpperCase() === u && x.pass === p);
+            if (prog) {
+                currentUser = { ...prog, role: prog.perfil || 'programador' };
+                registrarAuditoria('Login: ' + prog.nome + ' (' + currentUser.role + ')');
+
+                if (currentUser.role === 'programador') {
+                    document.getElementById('prog-user-label').textContent = 'Usuário: ' + prog.nome;
+                    show('scr-programador');
+                    popularSeletorVeiculos();
+                    popularSeletorFornecedores();
+                    carregarProgGeral();
+                    return;
+                }
+
+                // Supervisor / Motorista → acessa admin com permissões filtradas
+                document.getElementById('admin-user-label').textContent = 'Bem-vindo, ' + prog.nome + ' (' + currentUser.role + ')';
+                show('scr-admin');
+                aplicarPermissoesAdmin(currentUser.role);
+                atualizarDashboard();
+                carregarProgAdmin();
+                return;
+            }
+
+            // FORNECEDORES
+            const fornUsers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]');
+            const forn = fornUsers.find(x => x.user.toUpperCase() === u && x.pass === p);
+            if (forn) {
+                currentUser = { ...forn, role: 'fornecedor' };
+                document.getElementById('forn-name-screen').innerText = '🏢 ' + forn.empresa;
+                show('scr-fornecedor');
+                carregarServicosForn();
+                carregarAlertasRevisaoFornecedor();
+                registrarAuditoria('Login Fornecedor: ' + forn.empresa);
+                return;
+            }
+
+            alert('❌ Acesso Negado. Usuário ou senha incorretos.');
         }
 
+        // Aplica permissões nas tabs do admin
+        function aplicarPermissoesAdmin(role) {
+            const permissoes = JSON.parse(localStorage.getItem(DB.permissoes) || JSON.stringify(PERMISSOES_PADRAO));
+            const perm = permissoes[role] || {};
+            const tabs = document.getElementById('admin-tabs');
+            if (!tabs) return;
+            Array.from(tabs.children).forEach(btn => {
+                const match = btn.getAttribute('onclick')?.match(/'([^']+)'/);
+                if (match) {
+                    const tabId = match[1];
+                    btn.style.display = perm[tabId] ? '' : 'none';
+                }
+            });
+            // Ativa a primeira tab visível
+            const firstVisible = Array.from(tabs.children).find(b => b.style.display !== 'none');
+            if (firstVisible) firstVisible.click();
+        }
+
+        // ─────────────────────────────────────────────
         // DASHBOARD
+        // ─────────────────────────────────────────────
         function atualizarDashboard() {
             const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+            const manut = JSON.parse(localStorage.getItem(DB.manutencao) || '[]');
+            const comb = JSON.parse(localStorage.getItem(DB.combustivel) || '[]');
             const hoje = new Date().toISOString().split('T')[0];
+            const mesAtual = hoje.slice(0, 7);
+
             const hojeList = list.filter(i => i.data === hoje && i.status_flow !== 'CANCELADO');
-            document.getElementById('met-total-hoje').textContent = [...new Set(hojeList.map(i => i.placa))].length;
+            const placasHoje = [...new Set(hojeList.map(i => i.placa))];
+
+            const gastoMes = comb
+                .filter(c => c.data && c.data.startsWith(mesAtual))
+                .reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+
+            document.getElementById('met-total-hoje').textContent = placasHoje.length;
             document.getElementById('met-concluidos').textContent = hojeList.filter(i => i.status_flow === 'CONCLUIDO').length;
+            document.getElementById('met-pendentes').textContent = hojeList.filter(i => i.status_flow === 'PENDENTE').length;
+            document.getElementById('met-gasto-mes').textContent = 'R$' + gastoMes.toFixed(0);
+            document.getElementById('met-frota').textContent = veics.length;
+            document.getElementById('met-manut').textContent = manut.filter(m => m.status === 'PENDENTE').length;
+
+            verificarAlertasGarantia(list);
         }
 
-        // PROGRAMADOR
-        function toggleFornDiv() { document.getElementById('p-forn-div').style.display = document.getElementById('p-tipo-op').value === 'RETORNO' ? 'none' : 'block'; }
-        function popularSeletorVeiculos() { const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');['p-placa', 'm-veiculo', 'ab-veiculo'].forEach(id => { const sel = document.getElementById(id); if (!sel) return; sel.innerHTML = '<option value="">— Selecione —</option>' + veics.map(v => `<option value="${v.placa}">${v.placa} - ${v.tipo || 'Operacional'}</option>`).join(''); }); }
-        function popularSeletorFornecedores() { const forns = JSON.parse(localStorage.getItem(DB.forn) || '[]'); const sel = document.getElementById('p-fornecedor-select'); if (!sel) return; sel.innerHTML = forns.map(f => `<option value="${f.nome}">${f.nome}</option>`).join(''); }
-        function atualizarSetor() { const sel = document.getElementById('p-placa'); const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]'); const veic = veics.find(v => v.placa === sel.value); const display = document.getElementById('p-setor-display'); if (veic) { document.getElementById('p-setor-label').innerText = veic.tipo; display.style.display = 'block'; } else display.style.display = 'none'; }
+        // ─────────────────────────────────────────────
+        // ALERTAS DE GARANTIA / REVISÃO
+        // ─────────────────────────────────────────────
+        function verificarAlertasGarantia(list) {
+            const cont = document.getElementById('alertas-garantia');
+            if (!cont) return;
+            const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+            const manut = JSON.parse(localStorage.getItem(DB.manutencao) || '[]');
+            let html = '';
 
-        function handleNewUpload(input) {
-            const files = input.files;
-            for (let i = 0; i < files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = (function (file) { return function (e) { tempFotos.push(e.target.result); renderNewPreviews(); }; })(files[i]);
-                reader.readAsDataURL(files[i]);
+            // Revisões próximas (pendentes)
+            const urgentes = manut.filter(m => m.status === 'PENDENTE' && m.urgencia === 'critico');
+            urgentes.forEach(m => {
+                html += `<div class="alert-card alert-danger">🚨 <b>CRÍTICO:</b> ${m.placa} — ${m.descricao} (KM: ${m.km_programada || '—'} | Até: ${m.data_limite || '—'})</div>`;
+            });
+            const urgentes2 = manut.filter(m => m.status === 'PENDENTE' && m.urgencia === 'urgente');
+            urgentes2.forEach(m => {
+                html += `<div class="alert-card">⚠️ <b>URGENTE:</b> ${m.placa} — ${m.descricao}</div>`;
+            });
+
+            // Veículos parados há mais de 2 dias
+            const hoje = new Date();
+            veics.forEach(v => {
+                const ultSaida = list.filter(i => i.placa === v.placa && i.tipo_op === 'SAÍDA').sort((a, b) => b.id - a.id)[0];
+                if (ultSaida) {
+                    const dias = Math.floor((hoje - new Date(ultSaida.data)) / 86400000);
+                    if (dias >= 2 && ultSaida.status_flow !== 'CONCLUIDO') {
+                        html += `<div class="alert-card alert-info">ℹ️ <b>${v.placa}</b> em campo há ${dias} dias sem retorno registrado.</div>`;
+                    }
+                }
+            });
+
+            cont.innerHTML = html;
+        }
+
+        // ─────────────────────────────────────────────
+        // MONITOR ADMIN
+        // ─────────────────────────────────────────────
+        function carregarProgAdmin() {
+            let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const dt = document.getElementById('mon-filter-date')?.value || '';
+            const placa = (document.getElementById('mon-filter-placa')?.value || '').toUpperCase().trim();
+            const status = document.getElementById('mon-filter-status')?.value || '';
+            const setor = document.getElementById('mon-filter-setor')?.value || '';
+
+            if (dt) list = list.filter(i => i.data === dt);
+            if (placa) list = list.filter(i => (i.placa || '').includes(placa));
+            if (status) list = list.filter(i => i.status_flow === status);
+            if (setor) list = list.filter(i => i.setor === setor);
+
+            list = [...list].reverse();
+            const cont = document.getElementById('list-prog-admin');
+            if (!list.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento encontrado.</p>'; return; }
+
+            cont.innerHTML = list.map((s, idx) => {
+                const globalIdx = JSON.parse(localStorage.getItem(DB.prog) || '[]').findIndex(x => x.id === s.id);
+                const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)', 'CANCELADO': 'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
+                const setorClass = s.setor ? `setor-${s.setor}` : '';
+                const cancelClass = s.status_flow === 'CANCELADO' ? 'cancelado' : '';
+                return `
+      <div class="prog-item ${cancelClass} status-${(s.status_flow || '').replace(' ', '-')}">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+          <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
+          <b style="font-size:14px;">${s.placa}</b>
+          ${s.setor ? `<span class="setor-badge ${setorClass}">${s.setor}</span>` : ''}
+          <span style="color:var(--gray);font-size:10px;margin-left:auto;">${s.timestamp || s.data}</span>
+        </div>
+        <div style="font-size:11px;color:#cbd5e1;">
+          ${s.tipo_op || ''} → <b>${s.fornecedor || '—'}</b>
+          ${s.km ? ` | KM: ${s.km}` : ''}
+          ${s.programador ? ` | Por: ${s.programador}` : ''}
+        </div>
+        ${s.obs ? `<div style="font-size:10px;color:var(--gray);margin-top:4px;">📝 ${s.obs}</div>` : ''}
+        <div class="card-acoes">
+          <button class="btn-info btn-sm" onclick="abrirDetalheServico(${globalIdx})">🔍 Detalhes</button>
+          <button class="btn-pdf btn-sm" onclick="gerarPDF(${globalIdx})">📄 PDF</button>
+          ${s.status_flow !== 'CANCELADO' ? `<button class="btn-cancel btn-sm" onclick="cancelarServico(${globalIdx})">🚫 Cancelar</button>` : ''}
+        </div>
+      </div>`;
+            }).join('');
+
+            atualizarDashboard();
+        }
+
+        // ─────────────────────────────────────────────
+        // DETALHE DO SERVIÇO (ADMIN)
+        // ─────────────────────────────────────────────
+        function abrirDetalheServico(idx) {
+            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const s = list[idx];
+            if (!s) return;
+            servicoDetalheIdx = idx;
+
+            document.getElementById('srv-det-titulo').textContent = `🔍 ${s.placa} — ${s.tipo_op}`;
+
+            // Busca revisão vinculada
+            const manut = JSON.parse(localStorage.getItem(DB.manutencao) || '[]');
+            const revisao = manut.find(m => m.placa === s.placa && m.status === 'PENDENTE');
+
+            document.getElementById('srv-det-body').innerHTML = `
+    <table>
+      <tr><th>Placa</th><td><b>${s.placa}</b></td></tr>
+      <tr><th>Setor</th><td>${s.setor || '—'}</td></tr>
+      <tr><th>Operação</th><td>${s.tipo_op}</td></tr>
+      <tr><th>Destino</th><td>${s.fornecedor || '—'}</td></tr>
+      <tr><th>KM</th><td>${s.km || '—'}</td></tr>
+      <tr><th>Status</th><td>${s.status_flow}</td></tr>
+      <tr><th>Programador</th><td>${s.programador || '—'}</td></tr>
+      <tr><th>Data/Hora</th><td>${s.timestamp || s.data}</td></tr>
+      ${s.obs ? `<tr><th>Obs.</th><td>${s.obs}</td></tr>` : ''}
+      ${s.rating ? `<tr><th>Avaliação</th><td>${'★'.repeat(s.rating)}${'☆'.repeat(5 - s.rating)}</td></tr>` : ''}
+      ${s.obs_status ? `<tr><th>Obs. Serviço</th><td>${s.obs_status}</td></tr>` : ''}
+    </table>`;
+
+            // Fotos
+            const fotosCont = document.getElementById('srv-det-fotos');
+            fotosCont.innerHTML = (s.fotos || []).map(f =>
+                `<div class="photo-card"><img src="${f}" class="thumb" onclick="verFotoGrande('${f}')">
+     <div class="timestamp-overlay">${s.timestamp || s.data}</div></div>`
+            ).join('');
+
+            // Revisão vinculada
+            const revCont = document.getElementById('srv-det-revisao');
+            if (revisao) {
+                revCont.innerHTML = `<div class="revisao-inline">🔧 <b>Revisão pendente para este veículo:</b><br>${revisao.descricao} — KM: ${revisao.km_programada || '—'} | Até: ${revisao.data_limite || '—'}
+    <br><button class="btn-success btn-sm" onclick="concluirManutencao('${s.placa}')">✅ Marcar como Concluída</button></div>`;
+            } else { revCont.innerHTML = ''; }
+
+            // Ações
+            document.getElementById('srv-det-acoes').innerHTML = s.status_flow !== 'CANCELADO' ? `
+    <div class="btn-row">
+      <button class="btn-pdf btn-sm" onclick="gerarPDF(${idx})">📄 Gerar PDF</button>
+      <button class="btn-cancel btn-sm" onclick="cancelarServico(${idx});fecharDetalheServico()">🚫 Cancelar</button>
+    </div>` : '';
+
+            show('scr-servico-detalhe');
+        }
+
+        function fecharDetalheServico() {
+            show('scr-admin');
+            carregarProgAdmin();
+        }
+
+        function cancelarServico(idx) {
+            if (!confirm('Confirmar cancelamento deste serviço?')) return;
+            let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            if (!list[idx]) return;
+            list[idx].status_flow = 'CANCELADO';
+            list[idx].cancelado_em = new Date().toLocaleString('pt-BR');
+            localStorage.setItem(DB.prog, JSON.stringify(list));
+            registrarAuditoria('Cancelamento: ' + list[idx].placa + ' — ' + list[idx].tipo_op);
+            carregarProgAdmin();
+        }
+
+        function concluirManutencao(placa) {
+            let manut = JSON.parse(localStorage.getItem(DB.manutencao) || '[]');
+            const idx = manut.findIndex(m => m.placa === placa && m.status === 'PENDENTE');
+            if (idx >= 0) {
+                manut[idx].status = 'CONCLUIDO';
+                manut[idx].concluido_em = new Date().toLocaleString('pt-BR');
+                localStorage.setItem(DB.manutencao, JSON.stringify(manut));
+                registrarAuditoria('Manutenção concluída: ' + placa);
+                alert('✅ Manutenção marcada como concluída!');
+                abrirDetalheServico(servicoDetalheIdx);
             }
         }
-        function renderNewPreviews() {
-            const cont = document.getElementById('p-preview-fotos');
-            if (!cont) return;
-            cont.innerHTML = tempFotos.map((src, idx) => `<div class="photo-card"><img src="${src}" class="thumb" onclick="verFotoGrande('${src}')"><button class="del-btn" onclick="tempFotos.splice(${idx},1); renderNewPreviews()">✕</button></div>`).join('');
+
+        // ─────────────────────────────────────────────
+        // HISTÓRICO
+        // ─────────────────────────────────────────────
+        function popularFiltroFornHistorico() {
+            const sel = document.getElementById('hist-filter-forn');
+            if (!sel) return;
+            const forns = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+            sel.innerHTML = '<option value="">Todos fornecedores</option>' +
+                forns.map(f => `<option value="${f.nome}">${f.nome}</option>`).join('');
         }
-        function lancarProgramacao() {
-            const placa = document.getElementById('p-placa').value;
-            if (!placa) return alert('Selecione um veículo!');
-            const tipo = document.getElementById('p-tipo-op').value;
-            const fornecedor = tipo === 'RETORNO' ? 'PÁTIO' : document.getElementById('p-fornecedor-select').value;
+
+        function renderHistorico() {
             let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            list.push({ id: Date.now(), data: new Date().toISOString().split('T')[0], timestamp: new Date().toLocaleString('pt-BR'), placa, setor: document.getElementById('p-setor-label')?.innerText || '', km: document.getElementById('p-km').value, fornecedor, obs: DOMPurify.sanitize(document.getElementById('p-obs').value), fotos: [...tempFotos], programador: currentUser?.nome || 'Sistema', status_flow: tipo === 'RETORNO' ? 'CONCLUIDO' : 'PENDENTE', tipo_op: tipo, cancelled: false });
-            localStorage.setItem(DB.prog, JSON.stringify(list));
-            document.getElementById('success-overlay').style.display = 'flex';
-            setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 2000);
-            tempFotos = []; document.getElementById('p-placa').value = ''; document.getElementById('p-km').value = ''; document.getElementById('p-obs').value = ''; renderNewPreviews(); carregarProgGeral();
-        }
-        function carregarProgGeral() {
-            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
-            const dt = document.getElementById('p-filter-date').value;
-            const filtrados = list.filter(i => i.data === dt).reverse();
-            const cont = document.getElementById('list-prog-geral');
-            if (!filtrados.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum lançamento nesta data.</p>'; return; }
-            cont.innerHTML = filtrados.map(i => { const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[i.status_flow] || 'var(--gray)'; return `<div class="prog-item"><span class="status-badge" style="background:${statusColor}">${i.status_flow}</span><b>${i.placa}</b> — ${i.tipo_op}<br><small>${i.fornecedor} | KM:${i.km || '—'} | ${i.timestamp}</small></div>`; }).join('');
-        }
+            const dt = document.getElementById('hist-filter-date')?.value || '';
+            const placa = (document.getElementById('hist-filter-placa')?.value || '').toUpperCase().trim();
+            const forn = document.getElementById('hist-filter-forn')?.value || '';
 
-        // FORNECEDOR
-        function carregarServicosForn(user) { const dt = document.getElementById('forn-filter-date').value; const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const meus = list.filter(s => s.data === dt && s.status_flow !== 'CANCELADO' && s.fornecedor === user.empresa); const cont = document.getElementById('list-forn-servicos'); if (!meus.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum serviço para hoje.</p>'; return; } cont.innerHTML = meus.map(s => { const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[s.status_flow] || 'var(--gray)'; return `<div class="prog-item"><span class="status-badge" style="background:${statusColor}">${s.status_flow}</span><b>${s.placa}</b> — ${s.tipo_op || ''}<br><small>KM:${s.km || '—'} | ${s.timestamp}</small></div>`; }).join(''); }
-        function carregarAlertasRevisaoFornecedor() { const cont = document.getElementById('forn-alertas-revisao'); if (cont) cont.innerHTML = ''; }
+            if (dt) list = list.filter(x => x.data === dt);
+            if (placa) list = list.filter(x => (x.placa || '').includes(placa));
+            if (forn) list = list.filter(x => x.fornecedor === forn);
 
-        // MODAL STATUS
-        function abrirModalStatus(idx, novoStatus) { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); if (list[idx]?.status_flow === 'CANCELADO') { alert('Registro cancelado.'); return; } statusPendente = { idx, novoStatus, fotos: [], rating: 0 }; document.getElementById('modal-status-titulo').innerText = novoStatus === 'EM EXECUÇÃO' ? '📸 INICIAR SERVIÇO' : '📸 FINALIZAR SERVIÇO'; document.getElementById('status-foto-preview').innerHTML = ''; document.getElementById('btn-confirmar-status').classList.add('hidden'); show('scr-modal-status'); }
-        function handleStatusFotos(input) { const files = input.files; for (let i = 0; i < files.length; i++) { const reader = new FileReader(); reader.onload = (function (file) { return function (e) { statusPendente.fotos.push(e.target.result); renderStatusPreviews(); }; })(files[i]); reader.readAsDataURL(files[i]); } }
-        function renderStatusPreviews() { const cont = document.getElementById('status-foto-preview'); if (!cont) return; cont.innerHTML = statusPendente.fotos.map((f, i) => `<div class="photo-card"><img src="${f}" class="thumb" onclick="verFotoGrande('${f}')"><button class="del-btn" onclick="statusPendente.fotos.splice(${i},1);renderStatusPreviews()">✕</button></div>`).join(''); document.getElementById('btn-confirmar-status').classList.toggle('hidden', statusPendente.fotos.length === 0); }
-        function setRating(val) { statusPendente.rating = val; document.querySelectorAll('#rating-stars span').forEach((s, i) => { if (i < val) { s.classList.add('active'); s.textContent = '★'; } else { s.classList.remove('active'); s.textContent = '☆'; } }); }
-        function confirmarAlteracaoStatus() { if (!statusPendente.fotos.length) return alert('Tire pelo menos uma foto!'); let list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const item = list[statusPendente.idx]; if (!item || item.status_flow === 'CANCELADO') { alert('Registro cancelado.'); fecharModalStatus(); return; } item.status_flow = statusPendente.novoStatus; if (!item.fotos) item.fotos = []; item.fotos.push(...statusPendente.fotos); localStorage.setItem(DB.prog, JSON.stringify(list)); document.getElementById('success-overlay').style.display = 'flex'; setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 1500); fecharModalStatus(); carregarServicosForn(currentUser); }
-        function fecharModalStatus() { show('scr-fornecedor'); statusPendente = { idx: null, novoStatus: null, fotos: [], rating: 0 }; }
+            const cont = document.getElementById('list-history-admin');
+            if (!list.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;">Nenhum registro encontrado.</p>'; return; }
 
-        // ABASTECIMENTO
-        function handleAbastecimentoFoto(input) { if (!input.files[0]) return; const reader = new FileReader(); reader.onload = function (e) { abastecimentoFoto = e.target.result; document.getElementById('ab-preview-foto').innerHTML = `<div class="photo-card"><img src="${e.target.result}" class="thumb"><button class="del-btn" onclick="abastecimentoFoto=null; document.getElementById('ab-preview-foto').innerHTML='';">✕</button></div>`; }; reader.readAsDataURL(input.files[0]); }
-        function salvarAbastecimento() { const placa = document.getElementById('ab-veiculo').value, litros = document.getElementById('ab-litros').value, valor = document.getElementById('ab-valor').value, km = document.getElementById('ab-km').value; if (!placa || !litros || !valor || !km) return alert('Preencha todos os campos!'); let list = JSON.parse(localStorage.getItem(DB.combustivel) || '[]'); list.push({ id: Date.now(), data: new Date().toISOString().split('T')[0], placa, litros: parseFloat(litros), valor: parseFloat(valor), km: parseInt(km), comprovante: abastecimentoFoto }); localStorage.setItem(DB.combustivel, JSON.stringify(list)); abastecimentoFoto = null; document.getElementById('ab-litros').value = ''; document.getElementById('ab-valor').value = ''; document.getElementById('ab-km').value = ''; document.getElementById('ab-preview-foto').innerHTML = ''; carregarAbastecimentos(); alert('Registrado!'); }
-        function carregarAbastecimentos() { const list = JSON.parse(localStorage.getItem(DB.combustivel) || '[]'); const cont = document.getElementById('list-abastecimentos'); if (!cont) return; cont.innerHTML = list.length ? [...list].reverse().map(a => `<div class="prog-item"><b>${a.placa}</b> — ${a.litros}L | R$${a.valor.toFixed(2)} | KM:${a.km}${a.comprovante ? ` <span onclick="verFotoGrande('${a.comprovante}')" style="color:var(--info); cursor:pointer;">📎 Ver</span>` : ''}</div>`).join('') : '<p style="color:var(--gray);">Nenhum abastecimento.</p>'; }
-
-        // PERMISSÕES
-        function carregarPermissoes() {
-            const permissoes = JSON.parse(localStorage.getItem(DB.permissoes) || JSON.stringify(PERMISSOES_PADRAO));
-            const grid = document.getElementById('permissoes-grid'); if (!grid) return;
-            const perfis = ['admin', 'programador', 'supervisor', 'motorista'];
-            const telas = ['monitor', 'history', 'forn', 'colab', 'veic', 'manutencao', 'orcamentos', 'combustivel', 'emails', 'auditoria', 'permissoes', 'config', 'programacao', 'fornecedor'];
-            const nomes = { monitor: 'Monitor', history: 'Histórico', forn: 'Fornecedores', colab: 'Equipe', veic: 'Frota', manutencao: 'Manutenções', orcamentos: 'Orçamentos', combustivel: 'Combustível', emails: 'E-mails', auditoria: 'Auditoria', permissoes: 'Aba Mestre', config: 'Backup', programacao: 'Tela Programação', fornecedor: 'Tela Fornecedor' };
+            // Agrupar por placa: parear SAÍDA com RETORNO do mesmo dia
+            const placas = [...new Set(list.map(s => s.placa))];
             let html = '';
-            perfis.forEach(perfil => {
-                html += `<div class="permissao-card"><h4 style="color:var(--primary); text-transform:uppercase; margin-bottom:10px;">${perfil}</h4>`;
-                telas.forEach(tela => { html += `<label><input type="checkbox" ${permissoes[perfil]?.[tela] ? 'checked' : ''} onchange="togglePermissao('${perfil}','${tela}',this.checked)"> ${nomes[tela] || tela}</label>`; });
-                html += `</div>`;
+
+            placas.forEach(p => {
+                const doPlaca = list.filter(s => s.placa === p);
+                // Separar por data
+                const datas = [...new Set(doPlaca.map(s => s.data))];
+                datas.forEach(d => {
+                    const doDia = doPlaca.filter(s => s.data === d);
+                    const saidas = doDia.filter(s => s.tipo_op === 'SAÍDA').sort((a, b) => a.id - b.id);
+                    const retornos = doDia.filter(s => s.tipo_op === 'RETORNO').sort((a, b) => a.id - b.id);
+                    const max = Math.max(saidas.length, retornos.length, 1);
+
+                    for (let i = 0; i < max; i++) {
+                        const saida = saidas[i];
+                        const retorno = retornos[i];
+
+                        const cardSaida = saida ? `
+          <div style="flex:1;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:10px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span class="status-badge" style="background:${saida.status_flow === 'CONCLUIDO' ? 'var(--success)' : 'var(--warning)'};">${saida.status_flow}</span>
+              <b style="color:var(--warning);">↗ SAÍDA</b>
+            </div>
+            <div style="font-size:11px;"><b>${saida.placa}</b>${saida.setor ? ` <span class="setor-badge setor-${saida.setor}">${saida.setor}</span>` : ''}</div>
+            <div style="font-size:10px;color:var(--gray);">→ ${saida.fornecedor || '—'}</div>
+            <div style="font-size:10px;color:var(--gray);">KM: ${saida.km || '—'} | ${saida.timestamp || saida.data}</div>
+            <div style="font-size:10px;color:var(--gray);">Por: ${saida.programador || '—'}</div>
+            ${saida.rating ? `<div style="color:#fbbf24;font-size:11px;">${'★'.repeat(saida.rating)}${'☆'.repeat(5 - saida.rating)}</div>` : ''}
+          </div>` : `<div style="flex:1;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:center;color:var(--gray);font-size:11px;">Sem saída registrada</div>`;
+
+                        const cardRetorno = retorno ? `
+          <div style="flex:1;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:10px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span class="status-badge" style="background:var(--success);">${retorno.status_flow}</span>
+              <b style="color:var(--success);">↙ RETORNO</b>
+            </div>
+            <div style="font-size:11px;"><b>${retorno.placa}</b>${retorno.setor ? ` <span class="setor-badge setor-${retorno.setor}">${retorno.setor}</span>` : ''}</div>
+            <div style="font-size:10px;color:var(--gray);">← ${retorno.fornecedor || 'PÁTIO'}</div>
+            <div style="font-size:10px;color:var(--gray);">KM: ${retorno.km || '—'} | ${retorno.timestamp || retorno.data}</div>
+            <div style="font-size:10px;color:var(--gray);">Por: ${retorno.programador || '—'}</div>
+            ${retorno.rating ? `<div style="color:#fbbf24;font-size:11px;">${'★'.repeat(retorno.rating)}${'☆'.repeat(5 - retorno.rating)}</div>` : ''}
+          </div>` : `<div style="flex:1;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:center;color:var(--gray);font-size:11px;">Sem retorno registrado</div>`;
+
+                        html += `<div style="display:flex;gap:8px;margin-bottom:10px;">${cardSaida}${cardRetorno}</div>`;
+                    }
+                });
             });
-            grid.innerHTML = html;
+
+            cont.innerHTML = html || '<p style="color:var(--gray);padding:15px;">Nenhum registro encontrado.</p>';
         }
-        function togglePermissao(perfil, tela, checked) { const permissoes = JSON.parse(localStorage.getItem(DB.permissoes) || JSON.stringify(PERMISSOES_PADRAO)); if (!permissoes[perfil]) permissoes[perfil] = {}; permissoes[perfil][tela] = checked; localStorage.setItem(DB.permissoes, JSON.stringify(permissoes)); }
-        function salvarPermissoes() { alert('Permissões salvas com sucesso!'); }
-        function aplicarPermissoesSupervisor() { const tabs = document.getElementById('admin-tabs'); if (tabs) Array.from(tabs.children).forEach(btn => { const tab = btn.getAttribute('onclick')?.match(/'(.*?)'/)?.[1]; if (tab && !['monitor', 'history', 'veic', 'emails'].includes(tab)) btn.style.display = 'none'; }); }
-        function aplicarPermissoesMotorista() { const tabs = document.getElementById('admin-tabs'); if (tabs) Array.from(tabs.children).forEach(btn => { const tab = btn.getAttribute('onclick')?.match(/'(.*?)'/)?.[1]; if (tab && tab !== 'monitor') btn.style.display = 'none'; }); }
 
-        // ADMIN
-        function carregarProgAdmin() { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const cont = document.getElementById('list-prog-admin'); if (!list.length) { cont.innerHTML = '<p style="color:var(--gray); padding:15px;">Nenhum lançamento.</p>'; return; } cont.innerHTML = [...list].reverse().map(s => { const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[s.status_flow] || 'var(--gray)'; return `<div class="prog-item"><span class="status-badge" style="background:${statusColor}">${s.status_flow}</span><b>${s.placa}</b> — ${s.tipo_op || ''} → ${s.fornecedor || ''}<br><small>${s.timestamp || s.data}</small></div>`; }).join(''); }
-        function renderHistorico() { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const concluidos = list.filter(x => x.status_flow === 'CONCLUIDO').reverse(); document.getElementById('list-history-admin').innerHTML = concluidos.length ? concluidos.map(s => `<div class="prog-item status-CONCLUIDO"><b>${s.placa}</b> — ${s.fornecedor}<br><small>${s.timestamp || s.data}</small></div>`).join('') : '<p style="color:var(--gray);">Nenhum serviço concluído.</p>'; }
+        // ─────────────────────────────────────────────
+        // FORNECEDORES (LISTA ADMIN)
+        // ─────────────────────────────────────────────
+        function renderListaForn() {
+            const items = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+            const users = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]');
+            const cont = document.getElementById('list-forn');
+            if (!cont) return;
+            if (!items.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum fornecedor cadastrado.</p>'; return; }
+            cont.innerHTML = items.map((it, idx) => {
+                const user = users.find(u => u.empresa === it.nome);
+                return `<div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <b>${it.nome}</b>
+        ${user ? `<br><small style="color:var(--gray);">Login: ${user.user} | Tipo: ${user.tipo}</small>` : '<br><small style="color:var(--warning);">Sem login cadastrado</small>'}
+      </div>
+      <button class="btn-danger btn-sm" onclick="excluirFornecedor(${idx})">✕</button>
+    </div>`;
+            }).join('');
+        }
 
-        // CRUD
-        function renderAdminList(key) { const items = JSON.parse(localStorage.getItem(DB[key]) || '[]'); const cont = document.getElementById('list-' + key); if (!cont) return; cont.innerHTML = items.length ? items.map((it, idx) => `<div class="prog-item" style="display:flex; justify-content:space-between;"><span>${it.nome || it.placa || it.mat || it.email || '—'}</span><button class="btn-danger btn-sm" onclick="excluirItem('${key}',${idx})">✕</button></div>`).join('') : '<p style="color:var(--gray);">Nenhum cadastro.</p>'; }
-        function excluirItem(key, idx) { if (!confirm('Remover este item?')) return; let list = JSON.parse(localStorage.getItem(DB[key]) || '[]'); list.splice(idx, 1); localStorage.setItem(DB[key], JSON.stringify(list)); renderAdminList(key); if (key === 'veic') popularSeletorVeiculos(); }
-        function renderListaForn() { renderAdminList('forn'); }
-        function salvarNovoFornecedor() { const nome = document.getElementById('f-nome').value.trim(), user = document.getElementById('f-user').value.trim(), pass = document.getElementById('f-pass').value.trim(), tipo = document.getElementById('f-tipo').value; if (!nome) return alert('Informe o nome da empresa!'); let forn = JSON.parse(localStorage.getItem(DB.forn) || '[]'); forn.push({ nome }); localStorage.setItem(DB.forn, JSON.stringify(forn)); if (user && pass) { let fusers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]'); fusers.push({ user, pass, empresa: nome, tipo }); localStorage.setItem(DB.fornUsers, JSON.stringify(fusers)); } document.getElementById('f-nome').value = ''; document.getElementById('f-user').value = ''; document.getElementById('f-pass').value = ''; popularSeletorFornecedores(); renderListaForn(); alert('Fornecedor cadastrado!'); }
-        function salvarColab() { const nome = document.getElementById('c-nome').value.trim(), mat = document.getElementById('c-mat').value.trim(), nfc = document.getElementById('c-nfc').value.trim(), perfil = document.getElementById('c-perfil').value; if (!nome || !mat) return alert('Preencha Nome e Matrícula!'); let list = JSON.parse(localStorage.getItem(DB.colab) || '[]'); list.push({ nome, mat, nfc, perfil }); localStorage.setItem(DB.colab, JSON.stringify(list)); document.getElementById('c-nome').value = ''; document.getElementById('c-mat').value = ''; document.getElementById('c-nfc').value = ''; renderAdminList('colab'); alert('Colaborador cadastrado!'); }
+        function excluirFornecedor(idx) {
+            if (!confirm('Remover este fornecedor?')) return;
+            let forn = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+            const nome = forn[idx]?.nome;
+            forn.splice(idx, 1);
+            localStorage.setItem(DB.forn, JSON.stringify(forn));
+            if (nome) {
+                let fusers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]');
+                fusers = fusers.filter(u => u.empresa !== nome);
+                localStorage.setItem(DB.fornUsers, JSON.stringify(fusers));
+            }
+            popularSeletorFornecedores();
+            renderListaForn();
+        }
+
+        function salvarNovoFornecedor() {
+            const nome = document.getElementById('f-nome').value.trim();
+            const user = document.getElementById('f-user').value.trim();
+            const pass = document.getElementById('f-pass').value.trim();
+            const tipo = document.getElementById('f-tipo').value;
+            if (!nome) { alert('Informe o nome da empresa!'); return; }
+
+            let forn = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+            if (forn.some(f => f.nome === nome)) { alert('Fornecedor já cadastrado!'); return; }
+            forn.push({ nome, tipo });
+            localStorage.setItem(DB.forn, JSON.stringify(forn));
+
+            if (user && pass) {
+                let fusers = JSON.parse(localStorage.getItem(DB.fornUsers) || '[]');
+                fusers.push({ user, pass, empresa: nome, tipo });
+                localStorage.setItem(DB.fornUsers, JSON.stringify(fusers));
+            }
+
+            document.getElementById('f-nome').value = '';
+            document.getElementById('f-user').value = '';
+            document.getElementById('f-pass').value = '';
+            popularSeletorFornecedores();
+            renderListaForn();
+            registrarAuditoria('Fornecedor cadastrado: ' + nome);
+            alert('✅ Fornecedor cadastrado!');
+        }
+
+        // ─────────────────────────────────────────────
+        // EQUIPE / COLABORADORES
+        // ─────────────────────────────────────────────
+        function salvarColab() {
+            const nome = document.getElementById('c-nome').value.trim();
+            const mat = document.getElementById('c-mat').value.trim();
+            const user = document.getElementById('c-user').value.trim();
+            const pass = document.getElementById('c-pass').value.trim();
+            const nfc = document.getElementById('c-nfc').value.trim();
+            const perfil = document.getElementById('c-perfil').value;
+
+            if (!nome || !mat || !user || !pass) { alert('Preencha Nome, Matrícula, Login e Senha!'); return; }
+
+            let colab = JSON.parse(localStorage.getItem(DB.colab) || '[]');
+            let progs = JSON.parse(localStorage.getItem(DB.progs) || '[]');
+
+            if (progs.some(p => p.user.toUpperCase() === user.toUpperCase())) { alert('Login já em uso!'); return; }
+
+            colab.push({ nome, mat, nfc, perfil, user, data: new Date().toISOString() });
+            localStorage.setItem(DB.colab, JSON.stringify(colab));
+
+            progs.push({ nome, user, pass, perfil, mat, nfc });
+            localStorage.setItem(DB.progs, JSON.stringify(progs));
+
+            ['c-nome', 'c-mat', 'c-user', 'c-pass', 'c-nfc'].forEach(id => document.getElementById(id).value = '');
+            renderListaColab();
+            registrarAuditoria('Colaborador cadastrado: ' + nome + ' (' + perfil + ')');
+            alert('✅ Colaborador cadastrado!');
+        }
+
+        function renderListaColab() {
+            const items = JSON.parse(localStorage.getItem(DB.colab) || '[]');
+            const cont = document.getElementById('list-colab');
+            if (!cont) return;
+            if (!items.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum colaborador cadastrado.</p>'; return; }
+            cont.innerHTML = items.map((it, idx) => `
+    <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <b>${it.nome}</b> <small style="color:var(--gray);">#${it.mat}</small>
+        <span class="setor-badge" style="background:rgba(139,92,246,.3);color:#c4b5fd;">${it.perfil}</span>
+        <br><small style="color:var(--gray);">Login: ${it.user}${it.nfc ? ' | NFC: ' + it.nfc : ''}</small>
+      </div>
+      <button class="btn-danger btn-sm" onclick="excluirColab(${idx})">✕</button>
+    </div>`).join('');
+        }
+
+        function excluirColab(idx) {
+            if (!confirm('Remover este colaborador?')) return;
+            let colab = JSON.parse(localStorage.getItem(DB.colab) || '[]');
+            const userDel = colab[idx]?.user;
+            colab.splice(idx, 1);
+            localStorage.setItem(DB.colab, JSON.stringify(colab));
+            if (userDel) {
+                let progs = JSON.parse(localStorage.getItem(DB.progs) || '[]');
+                progs = progs.filter(p => p.user !== userDel);
+                localStorage.setItem(DB.progs, JSON.stringify(progs));
+            }
+            renderListaColab();
+        }
+
+        // ─────────────────────────────────────────────
+        // FROTA / VEÍCULOS
+        // ─────────────────────────────────────────────
         function salvarVeiculo() {
             const placa = document.getElementById('v-placa').value.toUpperCase().trim();
             const modelo = document.getElementById('v-modelo').value.trim();
             const ano = document.getElementById('v-ano').value;
+            const kmAtual = document.getElementById('v-km-atual').value;
             const kmRev = document.getElementById('v-km-revisao').value;
             const tipo = document.getElementById('v-tipo').value;
-            if (!placa) return alert('Informe a placa do veículo!');
+            if (!placa) { alert('Informe a placa do veículo!'); return; }
             let list = JSON.parse(localStorage.getItem(DB.veic) || '[]');
-            if (list.some(v => v.placa === placa)) return alert('Placa já cadastrada!');
-            list.push({ placa, modelo, ano: parseInt(ano) || 0, km_proxima_revisao: kmRev || null, tipo });
+            if (list.some(v => v.placa === placa)) { alert('Placa já cadastrada!'); return; }
+            list.push({ placa, modelo, ano: parseInt(ano) || 0, km_atual: parseInt(kmAtual) || 0, km_proxima_revisao: kmRev || null, tipo });
             localStorage.setItem(DB.veic, JSON.stringify(list));
-            document.getElementById('v-placa').value = ''; document.getElementById('v-modelo').value = ''; document.getElementById('v-ano').value = ''; document.getElementById('v-km-revisao').value = '';
-            renderAdminList('veic'); popularSeletorVeiculos();
-            alert('Veículo cadastrado com sucesso!');
+            ['v-placa', 'v-modelo', 'v-ano', 'v-km-atual', 'v-km-revisao'].forEach(id => document.getElementById(id).value = '');
+            renderListaVeic();
+            popularSeletorVeiculos();
+            registrarAuditoria('Veículo cadastrado: ' + placa);
+            alert('✅ Veículo cadastrado!');
         }
-        function salvarManutencao() { const placa = document.getElementById('m-veiculo').value, desc = document.getElementById('m-descricao').value, km = document.getElementById('m-km-programada').value, data = document.getElementById('m-data-limite').value; if (!placa || !desc) return alert('Preencha os campos!'); let list = JSON.parse(localStorage.getItem(DB.manutencao) || '[]'); list.push({ id: Date.now(), placa, descricao: desc, km_programada: km, data_limite: data, status: 'PENDENTE' }); localStorage.setItem(DB.manutencao, JSON.stringify(list)); document.getElementById('m-descricao').value = ''; document.getElementById('m-km-programada').value = ''; document.getElementById('m-data-limite').value = ''; carregarManutencoes(); alert('Revisão programada!'); }
-        function carregarManutencoes() { const list = JSON.parse(localStorage.getItem(DB.manutencao) || '[]'); const cont = document.getElementById('list-manutencoes'); if (!cont) return; cont.innerHTML = list.length ? list.map((m, i) => `<div class="prog-item"><b>${m.placa}</b> — ${m.descricao}<button class="btn-danger btn-sm" onclick="excluirItem('manutencao',${i})" style="float:right;">✕</button></div>`).join('') : '<p style="color:var(--gray);">Nenhuma revisão programada.</p>'; }
-        function adicionarEmail() { const email = document.getElementById('email-destinatario').value.trim(), nome = document.getElementById('email-nome').value.trim(); if (!email) return alert('Informe o e-mail!'); let emails = JSON.parse(localStorage.getItem(DB.emails) || '[]'); emails.push({ email, nome, data: new Date().toISOString() }); localStorage.setItem(DB.emails, JSON.stringify(emails)); document.getElementById('email-destinatario').value = ''; document.getElementById('email-nome').value = ''; carregarEmails(); alert('E-mail cadastrado!'); }
-        function carregarEmails() { renderAdminList('emails'); }
-        function carregarAuditoria() { const logs = JSON.parse(localStorage.getItem(DB.auditoria) || '[]').reverse().slice(0, 50); const cont = document.getElementById('list-auditoria'); if (!cont) return; cont.innerHTML = logs.length ? logs.map(l => `<div class="prog-item" style="font-size:10px;">${l.data} - ${l.acao}</div>`).join('') : '<p style="color:var(--gray);">Nenhuma atividade registrada.</p>'; }
 
-        // ORÇAMENTOS
-        function addItem() { const c = document.getElementById('orc-itens'); const d = document.createElement('div'); d.style.cssText = 'display:flex; gap:5px; margin-bottom:8px;'; d.innerHTML = '<input type="text" placeholder="Item" style="flex:2;"><input type="number" class="v-item" placeholder="R$" style="flex:1;" oninput="calcTotal()">'; c.appendChild(d); }
-        function calcTotal() { let t = 0; document.querySelectorAll('.v-item').forEach(i => t += Number(i.value) || 0); document.getElementById('total-orc').textContent = t.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
-        function handleEvidencia(input, tipo) { const files = input.files; for (let i = 0; i < files.length; i++) { const reader = new FileReader(); reader.onload = (function (file) { return function (e) { tempEvidencias.push({ tipo, nome: file.name, data: e.target.result, mime: file.type }); renderEvidencias(); }; })(files[i]); reader.readAsDataURL(files[i]); } }
-        function renderEvidencias() { const cont = document.getElementById('ev-preview'); if (!cont) return; cont.innerHTML = tempEvidencias.map((ev, i) => `<div class="ev-card">${ev.mime.startsWith('image/') ? `<img src="${ev.data}" onclick="verFotoGrande('${ev.data}')">` : '📎 ' + ev.nome}<button class="del-btn" onclick="tempEvidencias.splice(${i},1);renderEvidencias()">✕</button></div>`).join(''); }
-        function enviarOrcamento() {
-            const placa = document.getElementById('orc-placa').value.toUpperCase(); if (!placa) return alert('Informe a placa!');
-            const itens = []; document.querySelectorAll('#orc-itens > div').forEach(row => { const inputs = row.querySelectorAll('input'); itens.push({ desc: inputs[0]?.value || '', valor: Number(inputs[1]?.value) || 0 }); });
-            const total = itens.reduce((s, i) => s + i.valor, 0);
-            let orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
-            orcs.push({ id: Date.now(), timestamp: new Date().toLocaleString('pt-BR'), empresa: currentUser?.empresa || '—', placa, descricao: document.getElementById('orc-desc').value, itens, total, evidencias: [...tempEvidencias], status: 'PENDENTE' });
-            localStorage.setItem(DB.orc, JSON.stringify(orcs));
-            tempEvidencias = []; document.getElementById('orc-placa').value = ''; document.getElementById('orc-desc').value = '';
-            document.getElementById('orc-itens').innerHTML = '<div style="display:flex; gap:5px;"><input type="text" placeholder="Item" style="flex:2;"><input type="number" class="v-item" placeholder="R$" style="flex:1;" oninput="calcTotal()"></div>';
-            document.getElementById('total-orc').textContent = '0,00'; renderEvidencias();
-            document.getElementById('success-overlay').style.display = 'flex'; setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; show('scr-fornecedor'); }, 2000);
+        function renderListaVeic() {
+            const items = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+            const cont = document.getElementById('list-veic');
+            if (!cont) return;
+            if (!items.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum veículo cadastrado.</p>'; return; }
+            cont.innerHTML = items.map((v, idx) => `
+    <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <b>${v.placa}</b> <span class="setor-badge setor-${v.tipo}">${v.tipo}</span>
+        <br><small style="color:var(--gray);">${v.modelo || '—'} ${v.ano ? '· ' + v.ano : ''} | KM Atual: ${v.km_atual || '—'} | Próx. Rev.: ${v.km_proxima_revisao || '—'}</small>
+      </div>
+      <button class="btn-danger btn-sm" onclick="excluirVeiculo(${idx})">✕</button>
+    </div>`).join('');
         }
-        function abrirOrcamentosEnviados() { orcDetalheOrigem = 'fornecedor'; const empresa = currentUser?.empresa || ''; const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]').filter(o => o.empresa === empresa).reverse(); document.getElementById('list-orc-enviados').innerHTML = orcs.length ? orcs.map(o => `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrc(${JSON.parse(localStorage.getItem(DB.orc) || '[]').findIndex(x => x.id === o.id)})"><b>${o.placa}</b> — R$ ${o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}<br>${o.status}</div>`).join('') : '<p style="color:var(--gray);">Nenhum orçamento enviado.</p>'; show('scr-orc-enviados'); }
+
+        function excluirVeiculo(idx) {
+            if (!confirm('Remover este veículo?')) return;
+            let list = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+            list.splice(idx, 1);
+            localStorage.setItem(DB.veic, JSON.stringify(list));
+            renderListaVeic();
+            popularSeletorVeiculos();
+        }
+
+        function popularSeletorVeiculos() {
+            const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+            ['p-placa', 'm-veiculo', 'ab-veiculo'].forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                sel.innerHTML = '<option value="">— Selecione —</option>' +
+                    veics.map(v => `<option value="${v.placa}">${v.placa}${v.modelo ? ' - ' + v.modelo : ''} (${v.tipo})</option>`).join('');
+            });
+        }
+
+        // ─────────────────────────────────────────────
+        // MANUTENÇÕES
+        // ─────────────────────────────────────────────
+        function salvarManutencao() {
+            const placa = document.getElementById('m-veiculo').value;
+            const desc = document.getElementById('m-descricao').value.trim();
+            const km = document.getElementById('m-km-programada').value;
+            const data = document.getElementById('m-data-limite').value;
+            const urg = document.getElementById('m-urgencia').value;
+            if (!placa || !desc) { alert('Preencha veículo e descrição!'); return; }
+            let list = JSON.parse(localStorage.getItem(DB.manutencao) || '[]');
+            list.push({ id: Date.now(), placa, descricao: desc, km_programada: km, data_limite: data, urgencia: urg, status: 'PENDENTE', criado_em: new Date().toLocaleString('pt-BR') });
+            localStorage.setItem(DB.manutencao, JSON.stringify(list));
+            ['m-descricao', 'm-km-programada', 'm-data-limite'].forEach(id => document.getElementById(id).value = '');
+            carregarManutencoes();
+            registrarAuditoria('Revisão programada: ' + placa + ' — ' + desc);
+            alert('✅ Revisão programada!');
+        }
+
+        function carregarManutencoes() {
+            const list = JSON.parse(localStorage.getItem(DB.manutencao) || '[]');
+            const cont = document.getElementById('list-manutencoes');
+            if (!cont) return;
+            if (!list.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhuma revisão programada.</p>'; return; }
+            cont.innerHTML = list.map((m, i) => {
+                const urgColor = { critico: 'var(--danger)', urgente: 'var(--warning)', normal: 'var(--info)' }[m.urgencia] || 'var(--gray)';
+                const concluido = m.status === 'CONCLUIDO';
+                return `<div class="prog-item" style="border-left-color:${urgColor};${concluido ? 'opacity:.5' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <span class="status-badge" style="background:${concluido ? 'var(--success)' : 'rgba(245,158,11,.3)'};color:${concluido ? '#fff' : 'var(--warning)'};">${m.status}</span>
+          <b>${m.placa}</b> — ${m.descricao}
+          <br><small style="color:var(--gray);">KM: ${m.km_programada || '—'} | Até: ${m.data_limite || '—'} | ${m.urgencia || 'normal'}</small>
+          ${m.concluido_em ? `<br><small style="color:var(--success);">✅ Concluído: ${m.concluido_em}</small>` : ''}
+        </div>
+        <div style="display:flex;gap:4px;">
+          ${!concluido ? `<button class="btn-success btn-sm" onclick="concluirManutItem(${i})">✅</button>` : ''}
+          <button class="btn-danger btn-sm" onclick="excluirManut(${i})">✕</button>
+        </div>
+      </div>
+    </div>`;
+            }).join('');
+        }
+
+        function concluirManutItem(idx) {
+            let list = JSON.parse(localStorage.getItem(DB.manutencao) || '[]');
+            list[idx].status = 'CONCLUIDO';
+            list[idx].concluido_em = new Date().toLocaleString('pt-BR');
+            localStorage.setItem(DB.manutencao, JSON.stringify(list));
+            carregarManutencoes();
+            atualizarDashboard();
+        }
+
+        function excluirManut(idx) {
+            if (!confirm('Remover esta revisão?')) return;
+            let list = JSON.parse(localStorage.getItem(DB.manutencao) || '[]');
+            list.splice(idx, 1);
+            localStorage.setItem(DB.manutencao, JSON.stringify(list));
+            carregarManutencoes();
+        }
+
+        // ─────────────────────────────────────────────
+        // PROGRAMADOR: LANÇAMENTOS
+        // ─────────────────────────────────────────────
+        function toggleFornDiv() {
+            const tipo = document.getElementById('p-tipo-op')?.value;
+            const div = document.getElementById('p-forn-div');
+            if (div) div.style.display = tipo === 'RETORNO' ? 'none' : 'block';
+        }
+
+        function popularSeletorFornecedores() {
+            const forns = JSON.parse(localStorage.getItem(DB.forn) || '[]');
+            const sel = document.getElementById('p-fornecedor-select');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">— Selecione o destino —</option>' +
+                forns.map(f => `<option value="${f.nome}">${f.nome}</option>`).join('');
+        }
+
+        function atualizarSetor() {
+            const sel = document.getElementById('p-placa');
+            const veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+            const veic = veics.find(v => v.placa === sel?.value);
+            const display = document.getElementById('p-setor-display');
+            if (veic) {
+                document.getElementById('p-setor-label').innerText = veic.tipo || 'Operacional';
+                display.style.display = 'block';
+
+                // Alerta de revisão
+                const manut = JSON.parse(localStorage.getItem(DB.manutencao) || '[]');
+                const rev = manut.find(m => m.placa === veic.placa && m.status === 'PENDENTE');
+                const alerta = document.getElementById('p-revisao-alerta');
+                if (alerta) alerta.textContent = rev ? ' ⚠️ REVISÃO PENDENTE!' : '';
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        function handleNewUpload(input) {
+            const files = input.files;
+            const now = new Date().toLocaleString('pt-BR');
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = (function () {
+                    return function (e) {
+                        tempFotos.push({ data: e.target.result, ts: now });
+                        renderNewPreviews();
+                    };
+                })();
+                reader.readAsDataURL(files[i]);
+            }
+            input.value = ''; // permite re-selecionar mesma foto
+        }
+
+        function renderNewPreviews() {
+            const cont = document.getElementById('p-preview-fotos');
+            if (!cont) return;
+            cont.innerHTML = tempFotos.map((f, idx) => {
+                const src = typeof f === 'string' ? f : f.data;
+                const ts = typeof f === 'object' ? f.ts : '';
+                return `<div class="photo-card">
+      <img src="${src}" class="thumb" onclick="verFotoGrande('${src}')">
+      <div class="timestamp-overlay">📅 ${ts}</div>
+      <button class="del-btn" onclick="tempFotos.splice(${idx},1);renderNewPreviews()">✕</button>
+    </div>`;
+            }).join('');
+        }
+
+        function lancarProgramacao() {
+            const placa = document.getElementById('p-placa').value;
+            if (!placa) { alert('Selecione um veículo!'); return; }
+            const tipo = document.getElementById('p-tipo-op').value;
+            const km = document.getElementById('p-km').value;
+            const obs = DOMPurify.sanitize(document.getElementById('p-obs').value);
+            const fornecedor = tipo === 'RETORNO' ? 'PÁTIO' : (document.getElementById('p-fornecedor-select').value || '—');
+            const setor = document.getElementById('p-setor-label')?.innerText || '';
+
+            let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const fotos = tempFotos.map(f => typeof f === 'string' ? f : f.data);
+
+            list.push({
+                id: Date.now(),
+                data: new Date().toISOString().split('T')[0],
+                timestamp: new Date().toLocaleString('pt-BR'),
+                placa, setor, km, fornecedor, obs, fotos,
+                programador: currentUser?.nome || 'Sistema',
+                status_flow: tipo === 'RETORNO' ? 'CONCLUIDO' : 'PENDENTE',
+                tipo_op: tipo,
+                rating: 0
+            });
+            localStorage.setItem(DB.prog, JSON.stringify(list));
+
+            // Atualiza KM do veículo
+            if (km) {
+                let veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+                const vi = veics.findIndex(v => v.placa === placa);
+                if (vi >= 0) { veics[vi].km_atual = parseInt(km); localStorage.setItem(DB.veic, JSON.stringify(veics)); }
+            }
+
+            registrarAuditoria(`Lançamento: ${tipo} ${placa} → ${fornecedor} | Por: ${currentUser?.nome}`);
+            showSuccess('LANÇAMENTO ENVIADO!');
+            tempFotos = [];
+            document.getElementById('p-placa').value = '';
+            document.getElementById('p-km').value = '';
+            document.getElementById('p-obs').value = '';
+            document.getElementById('p-setor-display').style.display = 'none';
+            renderNewPreviews();
+            carregarProgGeral();
+        }
+
+        function carregarProgGeral() {
+            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const dt = document.getElementById('p-filter-date')?.value || '';
+            const filtrados = list.filter(i => i.data === dt).reverse();
+            const cont = document.getElementById('list-prog-geral');
+            if (!filtrados.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento nesta data.</p>'; return; }
+            cont.innerHTML = filtrados.map(s => {
+                const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)', 'CANCELADO': 'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
+                return `<div class="prog-item ${s.status_flow === 'CANCELADO' ? 'cancelado' : ''}">
+      <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
+      <b>${s.placa}</b> — ${s.tipo_op}
+      ${s.setor ? `<span class="setor-badge setor-${s.setor}">${s.setor}</span>` : ''}
+      <br><small style="color:var(--gray);">${s.fornecedor} | KM: ${s.km || '—'} | ${s.timestamp}</small>
+      ${s.rating ? `<br><small style="color:#fbbf24;">${'★'.repeat(s.rating)}${'☆'.repeat(5 - s.rating)}</small>` : ''}
+    </div>`;
+            }).join('');
+        }
+
+        // ─────────────────────────────────────────────
+        // FORNECEDOR: SERVIÇOS DO DIA
+        // ─────────────────────────────────────────────
+        function carregarServicosForn() {
+            const user = currentUser;
+            if (!user) return;
+            const dt = document.getElementById('forn-filter-date')?.value || new Date().toISOString().split('T')[0];
+            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const meus = list.filter(s => s.data === dt && s.status_flow !== 'CANCELADO' && s.fornecedor === user.empresa);
+            const cont = document.getElementById('list-forn-servicos');
+            if (!meus.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum serviço para esta data.</p>'; return; }
+
+            cont.innerHTML = meus.map(s => {
+                const globalIdx = list.findIndex(x => x.id === s.id);
+                const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[s.status_flow] || 'var(--gray)';
+                const podeConcluir = s.status_flow === 'EM EXECUÇÃO';
+                const podeIniciar = s.status_flow === 'PENDENTE';
+                return `<div class="prog-item">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+        <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
+        <b>${s.placa}</b>
+        ${s.setor ? `<span class="setor-badge setor-${s.setor}">${s.setor}</span>` : ''}
+      </div>
+      <small style="color:#cbd5e1;">${s.tipo_op || ''} | KM: ${s.km || '—'} | ${s.timestamp}</small>
+      ${s.obs ? `<br><small style="color:var(--gray);">📝 ${s.obs}</small>` : ''}
+      <div class="card-acoes">
+        ${podeIniciar ? `<button class="btn-warning btn-sm" onclick="abrirModalStatus(${globalIdx},'EM EXECUÇÃO')">▶ INICIAR</button>` : ''}
+        ${podeConcluir ? `<button class="btn-success btn-sm" onclick="abrirModalStatus(${globalIdx},'CONCLUIDO')">✅ CONCLUIR</button>` : ''}
+      </div>
+    </div>`;
+            }).join('');
+        }
+
+        function carregarAlertasRevisaoFornecedor() {
+            const cont = document.getElementById('forn-alertas-revisao');
+            if (!cont) return;
+            const manut = JSON.parse(localStorage.getItem(DB.manutencao) || '[]');
+            const urgentes = manut.filter(m => m.status === 'PENDENTE' && m.urgencia === 'critico');
+            cont.innerHTML = urgentes.map(m =>
+                `<div class="alert-card alert-danger">🚨 REVISÃO CRÍTICA: <b>${m.placa}</b> — ${m.descricao}</div>`
+            ).join('');
+        }
+
+        // ─────────────────────────────────────────────
+        // MODAL STATUS (FORNECEDOR)
+        // ─────────────────────────────────────────────
+        function abrirModalStatus(idx, novoStatus) {
+            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            if (list[idx]?.status_flow === 'CANCELADO') { alert('Registro cancelado.'); return; }
+            statusPendente = { idx, novoStatus, fotos: [], rating: 0 };
+            document.getElementById('modal-status-titulo').innerText = novoStatus === 'EM EXECUÇÃO' ? '▶ INICIAR SERVIÇO' : '✅ FINALIZAR SERVIÇO';
+            document.getElementById('status-foto-preview').innerHTML = '';
+            document.getElementById('status-obs').value = '';
+            document.getElementById('btn-confirmar-status').classList.add('hidden');
+            // Mostra avaliação só ao concluir
+            document.getElementById('rating-area').classList.toggle('hidden', novoStatus !== 'CONCLUIDO');
+            // Reset stars
+            document.querySelectorAll('#rating-stars span').forEach(s => { s.classList.remove('active'); s.textContent = '☆'; });
+            show('scr-modal-status');
+        }
+
+        function handleStatusFotos(input) {
+            const files = input.files;
+            const now = new Date().toLocaleString('pt-BR');
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = (function () {
+                    return function (e) {
+                        statusPendente.fotos.push({ data: e.target.result, ts: now });
+                        renderStatusPreviews();
+                    };
+                })();
+                reader.readAsDataURL(files[i]);
+            }
+            input.value = '';
+        }
+
+        function renderStatusPreviews() {
+            const cont = document.getElementById('status-foto-preview');
+            if (!cont) return;
+            cont.innerHTML = statusPendente.fotos.map((f, i) => {
+                const src = typeof f === 'object' ? f.data : f;
+                const ts = typeof f === 'object' ? f.ts : '';
+                return `<div class="photo-card">
+      <img src="${src}" class="thumb" onclick="verFotoGrande('${src}')">
+      <div class="timestamp-overlay">📅 ${ts}</div>
+      <button class="del-btn" onclick="statusPendente.fotos.splice(${i},1);renderStatusPreviews()">✕</button>
+    </div>`;
+            }).join('');
+            document.getElementById('btn-confirmar-status').classList.toggle('hidden', statusPendente.fotos.length === 0);
+        }
+
+        function setRating(val) {
+            statusPendente.rating = val;
+            document.querySelectorAll('#rating-stars span').forEach((s, i) => {
+                s.classList.toggle('active', i < val);
+                s.textContent = i < val ? '★' : '☆';
+            });
+        }
+
+        function confirmarAlteracaoStatus() {
+            if (!statusPendente.fotos.length) { alert('Tire pelo menos uma foto!'); return; }
+            let list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const item = list[statusPendente.idx];
+            if (!item || item.status_flow === 'CANCELADO') { alert('Registro cancelado.'); fecharModalStatus(); return; }
+
+            item.status_flow = statusPendente.novoStatus;
+            item.rating = statusPendente.rating;
+            item.obs_status = DOMPurify.sanitize(document.getElementById('status-obs').value);
+            if (!item.fotos) item.fotos = [];
+            item.fotos.push(...statusPendente.fotos.map(f => typeof f === 'object' ? f.data : f));
+            localStorage.setItem(DB.prog, JSON.stringify(list));
+
+            // Salva avaliação separada
+            if (statusPendente.rating > 0) {
+                let avals = JSON.parse(localStorage.getItem(DB.avaliacoes) || '[]');
+                avals.push({ id_prog: item.id, placa: item.placa, fornecedor: item.fornecedor, rating: statusPendente.rating, data: new Date().toISOString() });
+                localStorage.setItem(DB.avaliacoes, JSON.stringify(avals));
+            }
+
+            registrarAuditoria(`Status: ${item.placa} → ${statusPendente.novoStatus} | ${currentUser?.empresa}`);
+            showSuccess(statusPendente.novoStatus === 'CONCLUIDO' ? 'SERVIÇO CONCLUÍDO!' : 'SERVIÇO INICIADO!');
+            fecharModalStatus();
+        }
+
+        function fecharModalStatus() {
+            show('scr-fornecedor');
+            carregarServicosForn();
+            statusPendente = { idx: null, novoStatus: null, fotos: [], rating: 0 };
+        }
+
+        // ─────────────────────────────────────────────
+        // ABASTECIMENTO
+        // ─────────────────────────────────────────────
+        function handleAbastecimentoFoto(input) {
+            if (!input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                abastecimentoFoto = e.target.result;
+                document.getElementById('ab-preview-foto').innerHTML =
+                    `<div class="photo-card"><img src="${e.target.result}" class="thumb" onclick="verFotoGrande('${e.target.result}')">
+       <button class="del-btn" onclick="abastecimentoFoto=null;document.getElementById('ab-preview-foto').innerHTML=''">✕</button></div>`;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        function salvarAbastecimento() {
+            const placa = document.getElementById('ab-veiculo').value;
+            const litros = document.getElementById('ab-litros').value;
+            const valor = document.getElementById('ab-valor').value;
+            const km = document.getElementById('ab-km').value;
+            if (!placa || !litros || !valor || !km) { alert('Preencha todos os campos!'); return; }
+
+            let list = JSON.parse(localStorage.getItem(DB.combustivel) || '[]');
+            list.push({ id: Date.now(), data: new Date().toISOString().split('T')[0], timestamp: new Date().toLocaleString('pt-BR'), placa, litros: parseFloat(litros), valor: parseFloat(valor), km: parseInt(km), comprovante: abastecimentoFoto });
+            localStorage.setItem(DB.combustivel, JSON.stringify(list));
+
+            // Atualiza KM do veículo
+            let veics = JSON.parse(localStorage.getItem(DB.veic) || '[]');
+            const vi = veics.findIndex(v => v.placa === placa);
+            if (vi >= 0) { veics[vi].km_atual = parseInt(km); localStorage.setItem(DB.veic, JSON.stringify(veics)); }
+
+            abastecimentoFoto = null;
+            ['ab-litros', 'ab-valor', 'ab-km'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('ab-preview-foto').innerHTML = '';
+            registrarAuditoria(`Abastecimento: ${placa} | ${litros}L | R$${valor}`);
+            carregarAbastecimentos();
+            atualizarDashboard();
+            alert('✅ Abastecimento registrado!');
+        }
+
+        function carregarAbastecimentos() {
+            // Inicializa input[month] com mês atual se vazio
+            const mesInput = document.getElementById('ab-filter-mes');
+            if (mesInput && !mesInput.value) {
+                mesInput.value = new Date().toISOString().slice(0, 7);
+            }
+            const mesFiltro = mesInput?.value || new Date().toISOString().slice(0, 7);
+
+            const list = JSON.parse(localStorage.getItem(DB.combustivel) || '[]');
+            const cont = document.getElementById('list-abastecimentos');
+            if (!cont) return;
+
+            // Filtrar pelo mês selecionado
+            const mesList = list.filter(c => c.data?.startsWith(mesFiltro));
+            const totalLitros = mesList.reduce((s, c) => s + (parseFloat(c.litros) || 0), 0);
+            const totalValor = mesList.reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+
+            const resumo = document.getElementById('resumo-combustivel');
+            if (resumo) {
+                const [ano, mes] = mesFiltro.split('-');
+                const nomeMes = new Date(parseInt(ano), parseInt(mes) - 1).toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+                resumo.innerHTML = `⛽ <b>${nomeMes}:</b> ${totalLitros.toFixed(1)}L | <b style="color:var(--success);">R$ ${totalValor.toFixed(2)}</b> | ${mesList.length} abastecimento(s)`;
+            }
+
+            if (!mesList.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum abastecimento neste mês.</p>'; return; }
+            cont.innerHTML = [...mesList].reverse().map((a) => `
+    <div class="prog-item">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <b>${a.placa}</b> — <span style="color:var(--success);">${a.litros}L | R$ ${parseFloat(a.valor).toFixed(2)}</span>
+          <br><small style="color:var(--gray);">KM: ${a.km} | ${a.timestamp || a.data}</small>
+          ${a.comprovante ? `<br><span onclick="verFotoGrande('${a.comprovante}')" style="color:var(--info);cursor:pointer;font-size:11px;">📎 Ver comprovante</span>` : ''}
+        </div>
+        <div style="text-align:right;font-size:11px;color:var(--gray);">
+          R$/L: ${a.litros > 0 ? (parseFloat(a.valor) / parseFloat(a.litros)).toFixed(2) : '—'}
+        </div>
+      </div>
+    </div>`).join('');
+        }
+
+        // ─────────────────────────────────────────────
+        // E-MAILS
+        // ─────────────────────────────────────────────
+        function adicionarEmail() {
+            const email = document.getElementById('email-destinatario').value.trim();
+            const nome = document.getElementById('email-nome').value.trim();
+            if (!email) { alert('Informe o e-mail!'); return; }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('E-mail inválido!'); return; }
+            let emails = JSON.parse(localStorage.getItem(DB.emails) || '[]');
+            if (emails.some(e => e.email === email)) { alert('E-mail já cadastrado!'); return; }
+            emails.push({ email, nome, data: new Date().toISOString() });
+            localStorage.setItem(DB.emails, JSON.stringify(emails));
+            document.getElementById('email-destinatario').value = '';
+            document.getElementById('email-nome').value = '';
+            carregarEmails();
+            alert('✅ E-mail cadastrado!');
+        }
+
+        function carregarEmails() {
+            const items = JSON.parse(localStorage.getItem(DB.emails) || '[]');
+            const cont = document.getElementById('list-emails');
+            if (!cont) return;
+            if (!items.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum e-mail cadastrado.</p>'; return; }
+            cont.innerHTML = items.map((it, idx) => `
+    <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
+      <div><b>${it.nome || '—'}</b><br><small style="color:var(--gray);">${it.email}</small></div>
+      <button class="btn-danger btn-sm" onclick="excluirEmail(${idx})">✕</button>
+    </div>`).join('');
+        }
+
+        function excluirEmail(idx) {
+            if (!confirm('Remover este e-mail?')) return;
+            let emails = JSON.parse(localStorage.getItem(DB.emails) || '[]');
+            emails.splice(idx, 1);
+            localStorage.setItem(DB.emails, JSON.stringify(emails));
+            carregarEmails();
+        }
+
+        // ─────────────────────────────────────────────
+        // AUDITORIA
+        // ─────────────────────────────────────────────
+        function registrarAuditoria(acao) {
+            let logs = JSON.parse(localStorage.getItem(DB.auditoria) || '[]');
+            logs.push({ data: new Date().toLocaleString('pt-BR'), acao, user: currentUser?.nome || '—' });
+            if (logs.length > 500) logs = logs.slice(-500);
+            localStorage.setItem(DB.auditoria, JSON.stringify(logs));
+        }
+
+        function carregarAuditoria() {
+            const logs = JSON.parse(localStorage.getItem(DB.auditoria) || '[]').reverse().slice(0, 100);
+            const cont = document.getElementById('list-auditoria');
+            if (!cont) return;
+            cont.innerHTML = logs.length ? logs.map(l =>
+                `<div class="prog-item" style="font-size:10px;padding:8px 12px;">
+      <b>${l.user || '—'}</b> — ${l.acao}
+      <br><small style="color:var(--gray);">${l.data}</small>
+    </div>`).join('') : '<p style="color:var(--gray);">Nenhuma atividade registrada.</p>';
+        }
+
+        function limparAuditoria() {
+            if (!confirm('Limpar todo o histórico de auditoria?')) return;
+            localStorage.setItem(DB.auditoria, '[]');
+            carregarAuditoria();
+        }
+
+        // ─────────────────────────────────────────────
+        // PERMISSÕES
+        // ─────────────────────────────────────────────
+        function renderPermissoes() {
+            const permissoes = JSON.parse(localStorage.getItem(DB.permissoes) || JSON.stringify(PERMISSOES_PADRAO));
+            const grid = document.getElementById('permissoes-grid');
+            if (!grid) return;
+            const perfis = ['admin', 'programador', 'supervisor', 'motorista'];
+            let html = '';
+            perfis.forEach(perfil => {
+                html += `<div class="permissao-card"><h4>${perfil}</h4>`;
+                Object.entries(NOMES_TABS).forEach(([tela, nome]) => {
+                    html += `<label><input type="checkbox" ${permissoes[perfil]?.[tela] ? 'checked' : ''} onchange="togglePermissao('${perfil}','${tela}',this.checked)"> ${nome}</label>`;
+                });
+                html += '</div>';
+            });
+            grid.innerHTML = html;
+        }
+
+        function togglePermissao(perfil, tela, checked) {
+            const permissoes = JSON.parse(localStorage.getItem(DB.permissoes) || JSON.stringify(PERMISSOES_PADRAO));
+            if (!permissoes[perfil]) permissoes[perfil] = {};
+            permissoes[perfil][tela] = checked;
+            localStorage.setItem(DB.permissoes, JSON.stringify(permissoes));
+        }
+
+        function salvarPermissoes() {
+            registrarAuditoria('Permissões atualizadas');
+            alert('✅ Permissões salvas com sucesso!');
+        }
+
+        // ─────────────────────────────────────────────
+        // ORÇAMENTOS
+        // ─────────────────────────────────────────────
+        function addItem() {
+            const c = document.getElementById('orc-itens');
+            const d = document.createElement('div');
+            d.style.cssText = 'display:flex;gap:5px;margin-bottom:8px;';
+            d.innerHTML = '<input type="text" placeholder="Descrição do item" style="flex:2;margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;" oninput="calcTotal()">';
+            c.appendChild(d);
+        }
+
+        function calcTotal() {
+            let t = 0;
+            document.querySelectorAll('.v-item').forEach(i => t += Number(i.value) || 0);
+            document.getElementById('total-orc').textContent = t.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+
+        function handleEvidencia(input, tipo) {
+            const files = input.files;
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = (function (file) {
+                    return function (e) {
+                        tempEvidencias.push({ tipo, nome: file.name, data: e.target.result, mime: file.type });
+                        renderEvidencias();
+                    };
+                })(files[i]);
+                reader.readAsDataURL(files[i]);
+            }
+            input.value = '';
+        }
+
+        function renderEvidencias() {
+            const cont = document.getElementById('ev-preview');
+            if (!cont) return;
+            cont.innerHTML = tempEvidencias.map((ev, i) => {
+                const content = ev.mime?.startsWith('image/')
+                    ? `<img src="${ev.data}" onclick="verFotoGrande('${ev.data}')">`
+                    : ev.mime?.startsWith('video/')
+                        ? `<video src="${ev.data}" controls style="width:100%;height:100%;object-fit:cover;"></video>`
+                        : `<div class="ev-label">📎<span style="padding:4px;text-align:center;">${ev.nome}</span></div>`;
+                return `<div class="ev-card">${content}<button class="del-btn" onclick="tempEvidencias.splice(${i},1);renderEvidencias()">✕</button></div>`;
+            }).join('');
+        }
+
+        function enviarOrcamento() {
+            const placa = document.getElementById('orc-placa').value.toUpperCase().trim();
+            if (!placa) { alert('Informe a placa do veículo!'); return; }
+            const desc = document.getElementById('orc-desc').value.trim();
+            const itens = [];
+            document.querySelectorAll('#orc-itens > div').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const d = inputs[0]?.value?.trim();
+                if (d) itens.push({ desc: d, valor: Number(inputs[1]?.value) || 0 });
+            });
+            if (!itens.length) { alert('Adicione pelo menos um item!'); return; }
+            const total = itens.reduce((s, i) => s + i.valor, 0);
+
+            let orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
+            orcs.push({
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('pt-BR'),
+                data: new Date().toISOString().split('T')[0],
+                empresa: currentUser?.empresa || '—',
+                placa, descricao: desc, itens, total,
+                evidencias: [...tempEvidencias],
+                status: 'PENDENTE'
+            });
+            localStorage.setItem(DB.orc, JSON.stringify(orcs));
+            tempEvidencias = [];
+
+            // Reset form
+            document.getElementById('orc-placa').value = '';
+            document.getElementById('orc-desc').value = '';
+            document.getElementById('orc-itens').innerHTML = '<div style="display:flex;gap:5px;margin-bottom:8px;"><input type="text" placeholder="Descrição do item" style="flex:2;margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;" oninput="calcTotal()"></div>';
+            document.getElementById('total-orc').textContent = '0,00';
+            renderEvidencias();
+            registrarAuditoria(`Orçamento enviado: ${placa} | R$${total.toFixed(2)} | ${currentUser?.empresa}`);
+            showSuccess('ORÇAMENTO ENVIADO!');
+            setTimeout(() => show('scr-fornecedor'), 2000);
+        }
+
+        function abrirOrcamentosEnviados() {
+            orcDetalheOrigem = 'fornecedor';
+            telaAnteriorOrc = 'scr-orc-enviados';
+            const empresa = currentUser?.empresa || '';
+            const allOrcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
+            const orcs = allOrcs.filter(o => o.empresa === empresa).reverse();
+            document.getElementById('list-orc-enviados').innerHTML = orcs.length
+                ? orcs.map(o => {
+                    const idx = allOrcs.findIndex(x => x.id === o.id);
+                    const cls = o.status.toLowerCase();
+                    return `<div class="orc-card ${cls}" onclick="abrirDetalheOrcForn(${idx})">
+          <b>${o.placa}</b> — R$ ${o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          <span class="status-badge" style="float:right;background:${o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : 'rgba(245,158,11,.3)'};">${o.status}</span>
+          <br><small style="color:var(--gray);">${o.empresa} | ${o.timestamp}</small>
+        </div>`;
+                }).join('')
+                : '<p style="color:var(--gray);">Nenhum orçamento enviado.</p>';
+            show('scr-orc-enviados');
+        }
+
+        function renderOrcamentosAdmin() {
+            let orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
+            const status = document.getElementById('orc-filter-status')?.value || '';
+            const placa = (document.getElementById('orc-filter-placa')?.value || '').toUpperCase().trim();
+            if (status) orcs = orcs.filter(o => o.status === status);
+            if (placa) orcs = orcs.filter(o => (o.placa || '').includes(placa));
+            orcs = [...orcs].reverse();
+            const allOrcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
+            const cont = document.getElementById('list-orcamentos-admin');
+            if (!orcs.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum orçamento encontrado.</p>'; return; }
+            cont.innerHTML = orcs.map(o => {
+                const idx = allOrcs.findIndex(x => x.id === o.id);
+                const corStatus = o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : 'rgba(245,158,11,.3)';
+                return `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrc(${idx})">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <b>${o.placa}</b> — <span style="color:var(--success);font-weight:bold;">R$ ${o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+          <br><small style="color:var(--gray);">${o.empresa} | ${o.timestamp}</small>
+        </div>
+        <span class="status-badge" style="background:${corStatus};color:#fff;">${o.status}</span>
+      </div>
+    </div>`;
+            }).join('');
+        }
+
         function abrirDetalheOrc(idx) {
-            const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]'); const o = orcs[idx]; if (!o) return;
-            orcAtual = o; // guarda para envio de e-mail
-            document.getElementById('orc-det-titulo').innerText = `ORÇAMENTO — ${o.placa}`;
-            document.getElementById('orc-det-body').innerHTML = `<p>${o.empresa} | ${o.timestamp}</p><table>${o.itens.map(it => `<tr><td>${it.desc}</td><td>R$ ${it.valor.toFixed(2)}</td></tr>`).join('')}<tr><td><b>TOTAL</b></td><td><b>R$ ${o.total.toFixed(2)}</b></td></tr></table>`;
-            document.getElementById('orc-det-acoes').innerHTML = orcDetalheOrigem === 'admin' && o.status === 'PENDENTE' ? `<button class="btn-success" onclick="mudarStatusOrc(${idx},'APROVADO')">✓ APROVAR</button><button class="btn-danger" onclick="mudarStatusOrc(${idx},'REJEITADO')">✕ REJEITAR</button>` : `<p>Status: ${o.status}</p>`;
+            telaAnteriorOrc = 'scr-admin';
+            orcDetalheOrigem = 'admin';
+            _abrirDetalheOrcComum(idx);
+        }
+
+        function abrirDetalheOrcForn(idx) {
+            telaAnteriorOrc = 'scr-orc-enviados';
+            orcDetalheOrigem = 'fornecedor';
+            _abrirDetalheOrcComum(idx);
+        }
+
+        function _abrirDetalheOrcComum(idx) {
+            const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
+            const o = orcs[idx];
+            if (!o) return;
+            orcAtual = { ...o, _idx: idx };
+
+            document.getElementById('orc-det-titulo').textContent = `ORÇAMENTO — ${o.placa}`;
+            document.getElementById('orc-det-body').innerHTML = `
+    <table>
+      <tr><th>Empresa</th><td>${o.empresa}</td></tr>
+      <tr><th>Placa</th><td><b>${o.placa}</b></td></tr>
+      <tr><th>Data</th><td>${o.timestamp}</td></tr>
+      <tr><th>Descrição</th><td>${o.descricao || '—'}</td></tr>
+      <tr><th colspan="2" style="padding-top:8px;color:var(--gray);">ITENS</th></tr>
+      ${o.itens.map(it => `<tr><td>${it.desc}</td><td style="color:var(--success);">R$ ${it.valor.toFixed(2)}</td></tr>`).join('')}
+      <tr><td><b>TOTAL</b></td><td><b style="color:var(--success);font-size:14px;">R$ ${o.total.toFixed(2)}</b></td></tr>
+    </table>`;
+
+            // Evidências — imagens com zoom, PDFs com link de download, vídeos com player
+            const evCont = document.getElementById('orc-det-evidencias');
+            evCont.innerHTML = (o.evidencias || []).map((ev, ei) => {
+                if (!ev || !ev.data) return '';
+                if (ev.mime?.startsWith('image/')) {
+                    return `<div class="ev-card" onclick="verFotoGrande('${ev.data}')"><img src="${ev.data}"></div>`;
+                }
+                if (ev.mime?.startsWith('video/')) {
+                    return `<div class="ev-card"><video src="${ev.data}" controls style="width:100%;height:100%;object-fit:cover;"></video></div>`;
+                }
+                // PDF ou doc — link de download
+                return `<div class="ev-card" onclick="abrirDocEvidencia('${ev.data}','${ev.mime || 'application/octet-stream'}','${ev.nome || 'arquivo'}')" style="cursor:pointer;">
+      <div class="ev-label">📄<span style="font-size:9px;padding:4px;word-break:break-all;">${ev.nome || 'Documento'}</span><span style="font-size:10px;color:var(--info);">Clique para abrir</span></div>
+    </div>`;
+            }).join('');
+
+            // Ações — APROVAR/REJEITAR só para admin e status PENDENTE
+            const acoesCont = document.getElementById('orc-det-acoes');
+            if (orcDetalheOrigem === 'admin' && o.status === 'PENDENTE') {
+                acoesCont.innerHTML = `
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn-success btn-flex" onclick="mudarStatusOrc(${idx},'APROVADO')">✅ APROVAR</button>
+        <button class="btn-danger btn-flex" onclick="mudarStatusOrc(${idx},'REJEITADO')">❌ REJEITAR</button>
+      </div>`;
+            } else {
+                const cor = o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : 'var(--warning)';
+                acoesCont.innerHTML = `<p style="font-size:13px;margin:10px 0;font-weight:bold;color:${cor};">Status: ${o.status}</p>`;
+            }
+
+            // Botões de e-mail/PDF só para admin
+            document.getElementById('orc-email-actions').style.display = orcDetalheOrigem === 'admin' ? 'block' : 'none';
+
             show('scr-orc-detalhe');
         }
-        function mudarStatusOrc(idx, s) { let o = JSON.parse(localStorage.getItem(DB.orc) || '[]'); o[idx].status = s; localStorage.setItem(DB.orc, JSON.stringify(o)); renderOrcamentosAdmin(); abrirDetalheOrc(idx); }
-        function fecharDetalheOrc() { if (orcDetalheOrigem === 'admin') { show('scr-admin'); renderOrcamentosAdmin(); } else { show('scr-orc-enviados'); abrirOrcamentosEnviados(); } }
-        function renderOrcamentosAdmin() { const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]').reverse(); document.getElementById('list-orcamentos-admin').innerHTML = orcs.length ? orcs.map(o => `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrc(${JSON.parse(localStorage.getItem(DB.orc) || '[]').findIndex(x => x.id === o.id)})"><b>${o.placa}</b> — R$ ${o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}<br>${o.empresa} | ${o.status}</div>`).join('') : '<p style="color:var(--gray);">Nenhum orçamento recebido.</p>'; }
 
-        // ENVIO DE E‑MAIL
+        function mudarStatusOrc(idx, s) {
+            let orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
+            orcs[idx].status = s;
+            orcs[idx].atualizado_em = new Date().toLocaleString('pt-BR');
+            localStorage.setItem(DB.orc, JSON.stringify(orcs));
+            registrarAuditoria(`Orçamento ${s}: ${orcs[idx].placa} | R$${orcs[idx].total}`);
+            orcAtual = { ...orcs[idx], _idx: idx };
+            // Recarrega o detalhe na mesma tela
+            _abrirDetalheOrcComum(idx);
+        }
+
+        function fecharDetalheOrc() {
+            orcAtual = null;
+            if (telaAnteriorOrc === 'scr-admin') {
+                show('scr-admin'); renderOrcamentosAdmin();
+            } else if (telaAnteriorOrc === 'scr-orc-enviados') {
+                // re-abre lista sem recriar do zero
+                const empresa = currentUser?.empresa || '';
+                const allOrcs = JSON.parse(localStorage.getItem(DB.orc) || '[]');
+                const orcs = allOrcs.filter(o => o.empresa === empresa).reverse();
+                document.getElementById('list-orc-enviados').innerHTML = orcs.length
+                    ? orcs.map(o => {
+                        const idx = allOrcs.findIndex(x => x.id === o.id);
+                        return `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrcForn(${idx})">
+            <b>${o.placa}</b> — R$ ${o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            <span class="status-badge" style="float:right;background:${o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : 'rgba(245,158,11,.3)'};">${o.status}</span>
+            <br><small style="color:var(--gray);">${o.empresa} | ${o.timestamp}</small>
+          </div>`;
+                    }).join('')
+                    : '<p style="color:var(--gray);">Nenhum orçamento enviado.</p>';
+                show('scr-orc-enviados');
+            } else {
+                show(telaAnteriorOrc);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // ENVIO DE E-MAIL (EMAILJS)
+        // ─────────────────────────────────────────────
         function enviarOrcamentoPorEmail() {
-            if (!orcAtual) return alert('Nenhum orçamento carregado.');
-            const email = prompt('Digite o e‑mail do destinatário:');
+            if (!orcAtual) { alert('Nenhum orçamento carregado.'); return; }
+            const cfg = JSON.parse(localStorage.getItem('l_emailjs_cfg') || '{}');
+            if (!cfg.serviceId || !cfg.templateId) {
+                alert('Configure o EmailJS primeiro na aba ⚙️ Config!');
+                return;
+            }
+            const email = prompt('Digite o e-mail do destinatário:');
             if (!email) return;
 
-            const itensHtml = orcAtual.itens.map(it => `<li>${it.desc} - R$ ${it.valor.toFixed(2)}</li>`).join('');
-
-            emailjs.send('SEU_SERVICE_ID', 'SEU_TEMPLATE_ID', { // <-- substitua pelos seus IDs
+            emailjs.send(cfg.serviceId, cfg.templateId, {
                 to_email: email,
                 placa: orcAtual.placa,
                 empresa: orcAtual.empresa,
                 data: orcAtual.timestamp,
                 total: orcAtual.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                itens: itensHtml,
-                descricao: orcAtual.descricao
+                itens: orcAtual.itens.map(it => `• ${it.desc}: R$ ${it.valor.toFixed(2)}`).join('\n'),
+                descricao: orcAtual.descricao || '—',
+                status: orcAtual.status
             }).then(() => {
-                alert('E‑mail enviado com sucesso! ✅');
-            }).catch((error) => {
-                alert('Erro ao enviar e‑mail: ' + JSON.stringify(error));
+                registrarAuditoria(`E-mail orçamento enviado para ${email} | ${orcAtual.placa}`);
+                alert('✅ E-mail enviado com sucesso!');
+            }).catch(err => {
+                alert('❌ Erro ao enviar e-mail: ' + JSON.stringify(err));
             });
         }
 
-        // PDF
-        async function gerarPDF(idx) { const list = JSON.parse(localStorage.getItem(DB.prog) || '[]'); const item = list[idx]; if (!item) return; document.getElementById('pdf-titulo').innerText = `RELATÓRIO — ${item.tipo_op}`; document.getElementById('pdf-data-geracao').innerText = `Gerado em: ${new Date().toLocaleString('pt-BR')}`; document.getElementById('pdf-body').innerHTML = `<table><tr><td>Placa</td><td>${item.placa}</td></tr><tr><td>KM</td><td>${item.km || '—'}</td></tr><tr><td>Fornecedor</td><td>${item.fornecedor || '—'}</td></tr><tr><td>Status</td><td>${item.status_flow}</td></tr></table>`; document.getElementById('pdf-photos').innerHTML = (item.fotos || []).map(f => `<img src="${f}" style="width:100%;">`).join(''); try { const canvas = await html2canvas(document.getElementById('pdf-template'), { scale: 2, useCORS: true }); const doc = new jspdf.jsPDF('p', 'mm', 'a4'); doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, doc.internal.pageSize.getWidth(), (canvas.height * doc.internal.pageSize.getWidth()) / canvas.width); doc.save(`Lokamig_${item.placa}_${item.data}.pdf`); } catch (e) { alert('Erro ao gerar PDF: ' + e.message); } }
-        function gerarRelatorioFinanceiro() { alert('Funcionalidade em desenvolvimento.'); }
+        function salvarConfigEmailJS() {
+            const cfg = {
+                userId: document.getElementById('cfg-ejs-userid').value.trim(),
+                serviceId: document.getElementById('cfg-ejs-serviceid').value.trim(),
+                templateId: document.getElementById('cfg-ejs-templateid').value.trim()
+            };
+            if (!cfg.userId || !cfg.serviceId || !cfg.templateId) { alert('Preencha todos os campos EmailJS!'); return; }
+            localStorage.setItem('l_emailjs_cfg', JSON.stringify(cfg));
+            emailjs.init(cfg.userId);
+            alert('✅ Configuração EmailJS salva!');
+        }
 
+        // ─────────────────────────────────────────────
+        // PDF — HELPER: montar cabeçalho com logo
+        // ─────────────────────────────────────────────
+        function montarCabecalhoPDF(titulo, subtitulo) {
+            document.getElementById('pdf-titulo').innerText = titulo;
+            document.getElementById('pdf-data-geracao').innerText = subtitulo || `Gerado em: ${new Date().toLocaleString('pt-BR')} | v5.0`;
+            // A logo já está no #pdf-template via <img id="pdf-logo">
+            const logo = document.getElementById('pdf-logo');
+            if (logo) { logo.style.display = 'block'; logo.src = LOGO_URL; }
+        }
+
+        async function renderizarEBaixarPDF(nomeArquivo) {
+            try {
+                const canvas = await html2canvas(document.getElementById('pdf-template'), { scale: 2, useCORS: true, allowTaint: true });
+                const { jsPDF } = jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const W = doc.internal.pageSize.getWidth();
+                const H = doc.internal.pageSize.getHeight();
+                const imgH = (canvas.height * W) / canvas.width;
+
+                if (imgH <= H) {
+                    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, W, imgH);
+                } else {
+                    let y = 0;
+                    while (y < canvas.height) {
+                        const sliceH = Math.min(canvas.height - y, Math.floor((H * canvas.width) / W));
+                        const sc = document.createElement('canvas');
+                        sc.width = canvas.width; sc.height = sliceH;
+                        sc.getContext('2d').drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+                        if (y > 0) doc.addPage();
+                        doc.addImage(sc.toDataURL('image/png'), 'PNG', 0, 0, W, (sliceH * W) / canvas.width);
+                        y += sliceH;
+                    }
+                }
+                doc.save(nomeArquivo);
+            } catch (e) { alert('Erro ao gerar PDF: ' + e.message); }
+        }
+
+        // ─────────────────────────────────────────────
+        // PDF — SERVIÇO
+        // ─────────────────────────────────────────────
+        async function gerarPDF(idx) {
+            const list = JSON.parse(localStorage.getItem(DB.prog) || '[]');
+            const item = list[idx];
+            if (!item) return;
+
+            montarCabecalhoPDF(`RELATÓRIO DE SERVIÇO — ${item.tipo_op}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | v5.0`);
+            document.getElementById('pdf-body').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;">Campo</th><th style="padding:8px;text-align:left;">Valor</th></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Placa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.placa}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Setor</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.setor || '—'}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Operação</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.tipo_op}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Destino</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.fornecedor || '—'}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>KM</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.km || '—'}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Status</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.status_flow}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Programador</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.programador || '—'}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Data/Hora</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.timestamp || item.data}</td></tr>
+      ${item.obs ? `<tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Observações</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.obs}</td></tr>` : ''}
+      ${item.rating ? `<tr><td style="padding:8px;"><b>Avaliação</b></td><td style="padding:8px;">${'★'.repeat(item.rating)}${'☆'.repeat(5 - item.rating)}</td></tr>` : ''}
+    </table>`;
+
+            // Fotos com timestamp
+            document.getElementById('pdf-photos').innerHTML = (item.fotos || []).slice(0, 4).map(f =>
+                `<div style="position:relative;break-inside:avoid;">
+      <img src="${f}" style="width:100%;border-radius:8px;border:1px solid #ddd;">
+      <div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.7);color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;">${item.timestamp || item.data}</div>
+    </div>`
+            ).join('');
+
+            await renderizarEBaixarPDF(`Lokamig_${item.placa}_${item.data}.pdf`);
+            registrarAuditoria(`PDF gerado: ${item.placa} ${item.data}`);
+        }
+
+        // ─────────────────────────────────────────────
+        // PDF — ORÇAMENTO
+        // ─────────────────────────────────────────────
+        async function gerarPDFOrcamento() {
+            if (!orcAtual) return;
+            const o = orcAtual;
+
+            montarCabecalhoPDF(`ORÇAMENTO — ${o.placa}`, `Gerado em: ${new Date().toLocaleString('pt-BR')}`);
+            document.getElementById('pdf-body').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;" colspan="2">Informações do Orçamento</th></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Empresa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.empresa}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Placa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.placa}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Data</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.timestamp}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Descrição</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.descricao || '—'}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Status</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.status}</td></tr>
+      <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;">Item</th><th style="padding:8px;text-align:left;">Valor</th></tr>
+      ${o.itens.map(it => `<tr><td style="padding:8px;border-bottom:1px solid #eee;">${it.desc}</td><td style="padding:8px;border-bottom:1px solid #eee;">R$ ${it.valor.toFixed(2)}</td></tr>`).join('')}
+      <tr style="background:#e8f5e9;font-weight:bold;"><td style="padding:8px;">TOTAL</td><td style="padding:8px;color:#2e7d32;">R$ ${o.total.toFixed(2)}</td></tr>
+    </table>`;
+
+            const fotos = (o.evidencias || []).filter(ev => ev.mime?.startsWith('image/')).slice(0, 4);
+            document.getElementById('pdf-photos').innerHTML = fotos.map(ev =>
+                `<img src="${ev.data}" style="width:100%;border-radius:8px;border:1px solid #ddd;">`
+            ).join('');
+
+            await renderizarEBaixarPDF(`Orcamento_${o.placa}_${o.data || ''}.pdf`);
+        }
+
+        // ─────────────────────────────────────────────
+        // PDF — RELATÓRIO FINANCEIRO
+        // ─────────────────────────────────────────────
+        async function gerarRelatorioFinanceiro() {
+            const comb = JSON.parse(localStorage.getItem(DB.combustivel) || '[]');
+            const orcs = JSON.parse(localStorage.getItem(DB.orc) || '[]').filter(o => o.status === 'APROVADO');
+            const totalComb = comb.reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+            const totalOrcs = orcs.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
+
+            montarCabecalhoPDF('RELATÓRIO FINANCEIRO GERAL');
+            document.getElementById('pdf-body').innerHTML = `
+    <h3 style="color:#d1122a;margin-bottom:10px;">Resumo Financeiro</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
+      <tr style="background:#f5f5f5;"><th style="padding:8px;">Categoria</th><th style="padding:8px;">Valor</th></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;">⛽ Combustível Total</td><td style="padding:8px;border-bottom:1px solid #eee;color:#1a5276;font-weight:bold;">R$ ${totalComb.toFixed(2)}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid #eee;">🔧 Orçamentos Aprovados</td><td style="padding:8px;border-bottom:1px solid #eee;color:#1a5276;font-weight:bold;">R$ ${totalOrcs.toFixed(2)}</td></tr>
+      <tr style="background:#e8f5e9;font-weight:bold;"><td style="padding:8px;">TOTAL GERAL</td><td style="padding:8px;color:#1e8449;">R$ ${(totalComb + totalOrcs).toFixed(2)}</td></tr>
+    </table>
+    <h4 style="margin-bottom:8px;">Últimos 20 Abastecimentos</h4>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+      <tr style="background:#f5f5f5;"><th style="padding:6px;">Data</th><th>Placa</th><th>Litros</th><th>Valor</th><th>KM</th></tr>
+      ${comb.slice(-20).map(c => `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${c.data}</td><td>${c.placa}</td><td>${parseFloat(c.litros).toFixed(1)}L</td><td>R$ ${parseFloat(c.valor).toFixed(2)}</td><td>${c.km}</td></tr>`).join('')}
+    </table>`;
+            document.getElementById('pdf-photos').innerHTML = '';
+
+            await renderizarEBaixarPDF(`Relatorio_Financeiro_${new Date().toISOString().split('T')[0]}.pdf`);
+        }
+
+        // ─────────────────────────────────────────────
+        // PDF — ABASTECIMENTOS DO MÊS
+        // ─────────────────────────────────────────────
+        async function gerarPDFAbastecimentosMes() {
+            const mesInput = document.getElementById('ab-filter-mes');
+            const mesFiltro = mesInput?.value || new Date().toISOString().slice(0, 7);
+            const [ano, mes] = mesFiltro.split('-');
+            const nomeMes = new Date(parseInt(ano), parseInt(mes) - 1).toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+
+            const list = JSON.parse(localStorage.getItem(DB.combustivel) || '[]');
+            const mesList = list.filter(c => c.data?.startsWith(mesFiltro));
+            const totalLitros = mesList.reduce((s, c) => s + (parseFloat(c.litros) || 0), 0);
+            const totalValor = mesList.reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+
+            // Agrupar por placa
+            const porPlaca = {};
+            mesList.forEach(a => {
+                if (!porPlaca[a.placa]) porPlaca[a.placa] = { litros: 0, valor: 0, count: 0 };
+                porPlaca[a.placa].litros += parseFloat(a.litros) || 0;
+                porPlaca[a.placa].valor += parseFloat(a.valor) || 0;
+                porPlaca[a.placa].count++;
+            });
+
+            montarCabecalhoPDF(`RELATÓRIO DE COMBUSTÍVEL — ${nomeMes.toUpperCase()}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | Lokamig v5.0`);
+            document.getElementById('pdf-body').innerHTML = `
+    <div style="background:#fef9e7;border:1px solid #f39c12;border-radius:8px;padding:12px;margin-bottom:16px;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr><td style="padding:4px;"><b>Total de Litros:</b></td><td style="padding:4px;font-weight:bold;color:#1a5276;">${totalLitros.toFixed(1)}L</td></tr>
+        <tr><td style="padding:4px;"><b>Total em Valor:</b></td><td style="padding:4px;font-weight:bold;color:#1e8449;">R$ ${totalValor.toFixed(2)}</td></tr>
+        <tr><td style="padding:4px;"><b>Abastecimentos:</b></td><td style="padding:4px;">${mesList.length}</td></tr>
+        <tr><td style="padding:4px;"><b>Preço médio/L:</b></td><td style="padding:4px;">${totalLitros > 0 ? 'R$ ' + (totalValor / totalLitros).toFixed(3) : '—'}</td></tr>
+      </table>
+    </div>
+    <h4 style="margin-bottom:8px;color:#d1122a;">Por Veículo</h4>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
+      <tr style="background:#f5f5f5;"><th style="padding:7px;text-align:left;">Placa</th><th style="padding:7px;">Litros</th><th style="padding:7px;">Valor</th><th style="padding:7px;">Abast.</th><th style="padding:7px;">R$/L méd.</th></tr>
+      ${Object.entries(porPlaca).map(([placa, v]) => `<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>${placa}</b></td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros.toFixed(1)}L</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:#1e8449;">R$ ${v.valor.toFixed(2)}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.count}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros > 0 ? 'R$ ' + (v.valor / v.litros).toFixed(3) : '—'}</td></tr>`).join('')}
+    </table>
+    <h4 style="margin-bottom:8px;color:#d1122a;">Detalhamento Completo</h4>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+      <tr style="background:#f5f5f5;"><th style="padding:6px;text-align:left;">Data/Hora</th><th style="padding:6px;">Placa</th><th style="padding:6px;">Litros</th><th style="padding:6px;">Valor</th><th style="padding:6px;">KM</th><th style="padding:6px;">R$/L</th></tr>
+      ${mesList.map(a => `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${a.timestamp || a.data}</td><td style="padding:5px;border-bottom:1px solid #eee;">${a.placa}</td><td style="padding:5px;border-bottom:1px solid #eee;text-align:center;">${parseFloat(a.litros).toFixed(1)}L</td><td style="padding:5px;border-bottom:1px solid #eee;text-align:center;">R$ ${parseFloat(a.valor).toFixed(2)}</td><td style="padding:5px;border-bottom:1px solid #eee;text-align:center;">${a.km}</td><td style="padding:5px;border-bottom:1px solid #eee;text-align:center;">${parseFloat(a.litros) > 0 ? 'R$ ' + (parseFloat(a.valor) / parseFloat(a.litros)).toFixed(3) : '—'}</td></tr>`).join('')}
+    </table>`;
+            document.getElementById('pdf-photos').innerHTML = '';
+
+            await renderizarEBaixarPDF(`Combustivel_${mesFiltro}.pdf`);
+            registrarAuditoria(`PDF Combustível gerado: ${nomeMes}`);
+        }
+
+        // ─────────────────────────────────────────────
+        // ABRIR DOCUMENTO (PDF/DOC) — EVIDÊNCIA
+        // ─────────────────────────────────────────────
+        function abrirDocEvidencia(dataUrl, mime, nome) {
+            try {
+                const byteString = atob(dataUrl.split(',')[1]);
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+                const blob = new Blob([ab], { type: mime });
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+            } catch (e) {
+                alert('Não foi possível abrir o arquivo: ' + e.message);
+            }
+        }
+        function exportarDados() {
+            const data = {};
+            Object.entries(DB).forEach(([key, dbKey]) => {
+                data[dbKey] = localStorage.getItem(dbKey);
+            });
+            data['l_emailjs_cfg'] = localStorage.getItem('l_emailjs_cfg');
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `lokamig_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            registrarAuditoria('Backup exportado');
+        }
+
+        function importarDados(input) {
+            if (!input.files[0]) return;
+            if (!confirm('Isso substituirá TODOS os dados atuais. Continuar?')) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    Object.entries(data).forEach(([key, val]) => {
+                        if (val !== null && val !== undefined) localStorage.setItem(key, val);
+                    });
+                    alert('✅ Backup restaurado com sucesso! Recarregando...');
+                    location.reload();
+                } catch (err) { alert('❌ Arquivo de backup inválido!'); }
+            };
+            reader.readAsText(input.files[0]);
+        }
+
+        function resetarSistema() {
+            if (!confirm('⚠️ ATENÇÃO: Isso apagará TODOS os dados permanentemente!\n\nDigite CONFIRMAR para prosseguir.')) return;
+            const conf = prompt('Digite CONFIRMAR para apagar tudo:');
+            if (conf !== 'CONFIRMAR') { alert('Operação cancelada.'); return; }
+            Object.values(DB).forEach(key => localStorage.removeItem(key));
+            localStorage.removeItem('l_emailjs_cfg');
+            alert('✅ Sistema resetado. Recarregando...');
+            location.reload();
+        }
+
+        // ─────────────────────────────────────────────
         // UTILITÁRIOS
-        function verFotoGrande(src) { document.getElementById('full-img').src = src; document.getElementById('img-viewer').style.display = 'flex'; }
-        function exportarDados() { const data = {}; Object.values(DB).forEach(k => { data[k] = localStorage.getItem(k); }); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' })); a.download = `backup_${new Date().toISOString().split('T')[0]}.json`; a.click(); }
+        // ─────────────────────────────────────────────
+        function verFotoGrande(src) {
+            document.getElementById('full-img').src = src;
+            document.getElementById('img-viewer').style.display = 'flex';
+        }
 
-        toggleFornDiv();
     </script>
 </body>
 
