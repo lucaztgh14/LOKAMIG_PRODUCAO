@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOKAMIG | GestÃ£o Operacional v6.0</title>
+    <title>LOKAMIG | Gestão Operacional v6.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -202,7 +202,7 @@
             pointer-events: none;
         }
         .status-PENDENTE { border-left-color: var(--warning); }
-        .status-EM-EXECUÃ‡ÃƒO { border-left-color: #ef4444; }
+        .status-EM-EXECUÇÃO { border-left-color: #ef4444; }
         .status-CONCLUIDO { border-left-color: var(--success); }
         .status-badge { padding: 3px 8px; border-radius: 6px; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: inline-block; }
         .setor-badge { display: inline-block; font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 4px; margin-left: 5px; }
@@ -312,7 +312,7 @@
 
 <!-- OVERLAYS GLOBAIS -->
 <div id="success-overlay">
-    <div class="check-v">âœ“</div>
+    <div class="check-v">✓</div>
     <h2 style="color:white;letter-spacing:2px;" id="success-msg">ENVIADO COM SUCESSO!</h2>
 </div>
 <div id="img-viewer" onclick="this.style.display='none'">
@@ -322,7 +322,7 @@
     <div class="spinner"></div>
     <p style="color:var(--gray);font-size:12px;" id="loading-msg">Carregando...</p>
 </div>
-<div class="sync-pending" id="sync-pending">â³ Dados offline aguardando sync...</div>
+<div class="sync-pending" id="sync-pending">⏳ Dados offline aguardando sync...</div>
 
 <!-- PDF TEMPLATE -->
 <div id="pdf-template" style="position:fixed;left:-9999px;width:800px;background:#fff;color:#000;padding:40px;font-family:Arial;">
@@ -337,64 +337,64 @@
     <div id="pdf-photos" style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px;"></div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- TELA 1: LOGIN -->
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <section id="scr-login" style="display:flex;justify-content:center;align-items:center;width:100%;min-height:100vh;">
     <div class="login-box">
         <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg" alt="LOKAMIG" class="login-logo" onerror="this.style.display='none'">
         <h1>LOKAMIG</h1>
-        <div class="subtitle">GestÃ£o Operacional Â· v6.0 Â· Realtime</div>
-        <input type="text" id="user" placeholder="UsuÃ¡rio" autocomplete="off" onkeydown="if(event.key==='Enter') document.getElementById('pass').focus()">
+        <div class="subtitle">Gestão Operacional · v6.0 · Realtime</div>
+        <input type="text" id="user" placeholder="Usuário" autocomplete="off" onkeydown="if(event.key==='Enter') document.getElementById('pass').focus()">
         <input type="password" id="pass" placeholder="Senha" onkeydown="if(event.key==='Enter') handleLogin()">
-        <button onclick="handleLogin()">ðŸ” Acessar Sistema</button>
-        <div class="footer-text">Plataforma integrada de logÃ­stica e frotas Â· v6.0 Supabase</div>
+        <button onclick="handleLogin()">🔐 Acessar Sistema</button>
+        <div class="footer-text">Plataforma integrada de logística e frotas · v6.0 Supabase</div>
     </div>
 </section>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-<!-- TELA 2: ADMINISTRAÃ‡ÃƒO -->
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TELA 2: ADMINISTRAÇÃO -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <section id="scr-admin" class="container hidden">
-    <h1>ðŸ“Š ADMINISTRAÃ‡ÃƒO <span class="realtime-badge"><span class="realtime-dot"></span>LIVE</span></h1>
+    <h1>📊 ADMINISTRAÇÃO <span class="realtime-badge"><span class="realtime-dot"></span>LIVE</span></h1>
     <div class="sub" id="admin-user-label">Bem-vindo, Administrador</div>
     <div class="dashboard-grid">
-        <div class="metric-card"><div class="metric-icon">ðŸš—</div><span class="metric-value" id="met-total-hoje">0</span><span class="metric-label">ServiÃ§os Hoje</span></div>
-        <div class="metric-card"><div class="metric-icon">âœ…</div><span class="metric-value" id="met-concluidos">0</span><span class="metric-label">ConcluÃ­dos</span></div>
-        <div class="metric-card"><div class="metric-icon">â±ï¸</div><span class="metric-value" id="met-pendentes">0</span><span class="metric-label">Pendentes</span></div>
-        <div class="metric-card"><div class="metric-icon">ðŸ’°</div><span class="metric-value" id="met-gasto-mes">R$0</span><span class="metric-label">CombustÃ­vel/MÃªs</span></div>
-        <div class="metric-card"><div class="metric-icon">ðŸš›</div><span class="metric-value" id="met-frota">0</span><span class="metric-label">VeÃ­culos Ativos</span></div>
-        <div class="metric-card"><div class="metric-icon">âš ï¸</div><span class="metric-value" id="met-manut">0</span><span class="metric-label">ManutenÃ§Ãµes</span></div>
+        <div class="metric-card"><div class="metric-icon">🚗</div><span class="metric-value" id="met-total-hoje">0</span><span class="metric-label">Serviços Hoje</span></div>
+        <div class="metric-card"><div class="metric-icon">✅</div><span class="metric-value" id="met-concluidos">0</span><span class="metric-label">Concluídos</span></div>
+        <div class="metric-card"><div class="metric-icon">⏱️</div><span class="metric-value" id="met-pendentes">0</span><span class="metric-label">Pendentes</span></div>
+        <div class="metric-card"><div class="metric-icon">💰</div><span class="metric-value" id="met-gasto-mes">R$0</span><span class="metric-label">Combustível/Mês</span></div>
+        <div class="metric-card"><div class="metric-icon">🚛</div><span class="metric-value" id="met-frota">0</span><span class="metric-label">Veículos Ativos</span></div>
+        <div class="metric-card"><div class="metric-icon">⚠️</div><span class="metric-value" id="met-manut">0</span><span class="metric-label">Manutenções</span></div>
     </div>
     <div class="tabs-wrapper">
-        <button class="tab-scroll-btn" onclick="scrollTabs(-120)">â—€</button>
+        <button class="tab-scroll-btn" onclick="scrollTabs(-120)">◀</button>
         <div class="tabs" id="admin-tabs">
-            <button class="tab-btn tab-active" onclick="switchTab('monitor',event)">ðŸ“¡ Monitor</button>
-            <button class="tab-btn" onclick="switchTab('history',event)">ðŸ“‹ HistÃ³rico</button>
-            <button class="tab-btn" onclick="switchTab('forn',event)">ðŸ¢ Fornecedores</button>
-            <button class="tab-btn" onclick="switchTab('colab',event)">ðŸ‘¥ Equipe</button>
-            <button class="tab-btn" onclick="switchTab('veic',event)">ðŸš› Frota</button>
-            <button class="tab-btn" onclick="switchTab('manutencao',event)">ðŸ”§ ManutenÃ§Ãµes</button>
-            <button class="tab-btn" onclick="switchTab('orcamentos',event)">ðŸ’° OrÃ§amentos</button>
-            <button class="tab-btn" onclick="switchTab('combustivel',event)">â›½ CombustÃ­vel</button>
-            <button class="tab-btn" onclick="switchTab('emails',event)">ðŸ“§ E-mails</button>
-            <button class="tab-btn" onclick="switchTab('auditoria',event)">ðŸ“ Auditoria</button>
-            <button class="tab-btn" onclick="switchTab('permissoes',event)">ðŸ” Aba Mestre</button>
-            <button class="tab-btn" onclick="switchTab('config',event)">âš™ï¸ Config</button>
+            <button class="tab-btn tab-active" onclick="switchTab('monitor',event)">📡 Monitor</button>
+            <button class="tab-btn" onclick="switchTab('history',event)">📋 Histórico</button>
+            <button class="tab-btn" onclick="switchTab('forn',event)">🏢 Fornecedores</button>
+            <button class="tab-btn" onclick="switchTab('colab',event)">👥 Equipe</button>
+            <button class="tab-btn" onclick="switchTab('veic',event)">🚛 Frota</button>
+            <button class="tab-btn" onclick="switchTab('manutencao',event)">🔧 Manutenções</button>
+            <button class="tab-btn" onclick="switchTab('orcamentos',event)">💰 Orçamentos</button>
+            <button class="tab-btn" onclick="switchTab('combustivel',event)">⛽ Combustível</button>
+            <button class="tab-btn" onclick="switchTab('emails',event)">📧 E-mails</button>
+            <button class="tab-btn" onclick="switchTab('auditoria',event)">📝 Auditoria</button>
+            <button class="tab-btn" onclick="switchTab('permissoes',event)">🔐 Aba Mestre</button>
+            <button class="tab-btn" onclick="switchTab('config',event)">⚙️ Config</button>
         </div>
-        <button class="tab-scroll-btn" onclick="scrollTabs(120)">â–¶</button>
+        <button class="tab-scroll-btn" onclick="scrollTabs(120)">▶</button>
     </div>
 
     <!-- MONITOR -->
     <div id="area-monitor" class="admin-content">
         <div class="search-bar">
             <input type="date" id="mon-filter-date" onchange="carregarProgAdmin()">
-            <input type="text" id="mon-filter-placa" placeholder="ðŸ” Placa" oninput="carregarProgAdmin()">
+            <input type="text" id="mon-filter-placa" placeholder="🔍 Placa" oninput="carregarProgAdmin()">
             <select id="mon-filter-status" onchange="carregarProgAdmin()">
                 <option value="">Todos os status</option>
                 <option value="PENDENTE">Pendente</option>
-                <option value="EM EXECUÃ‡ÃƒO">Em ExecuÃ§Ã£o</option>
-                <option value="CONCLUIDO">ConcluÃ­do</option>
+                <option value="EM EXECUÇÃO">Em Execução</option>
+                <option value="CONCLUIDO">Concluído</option>
                 <option value="CANCELADO">Cancelado</option>
             </select>
             <select id="mon-filter-setor" onchange="carregarProgAdmin()">
@@ -408,12 +408,12 @@
         <div id="list-prog-admin"></div>
     </div>
 
-    <!-- HISTÃ“RICO -->
+    <!-- HISTÓRICO -->
     <div id="area-history" class="admin-content hidden">
-        <h3 style="margin-bottom:12px;">ðŸ“‹ HistÃ³rico de ServiÃ§os</h3>
+        <h3 style="margin-bottom:12px;">📋 Histórico de Serviços</h3>
         <div class="search-bar">
             <input type="date" id="hist-filter-date" onchange="renderHistorico()">
-            <input type="text" id="hist-filter-placa" placeholder="ðŸ” Placa" oninput="renderHistorico()">
+            <input type="text" id="hist-filter-placa" placeholder="🔍 Placa" oninput="renderHistorico()">
             <select id="hist-filter-forn" onchange="renderHistorico()"><option value="">Todos fornecedores</option></select>
         </div>
         <div id="list-history-admin"></div>
@@ -422,17 +422,17 @@
     <!-- FORNECEDORES -->
     <div id="area-forn" class="admin-content hidden">
         <div class="form-section">
-            <h4 style="margin-bottom:10px;color:var(--info);">âž• Novo Fornecedor</h4>
+            <h4 style="margin-bottom:10px;color:var(--info);">➕ Novo Fornecedor</h4>
             <input type="text" id="f-nome" placeholder="Nome da empresa">
             <input type="text" id="f-user" placeholder="Login de acesso">
             <input type="password" id="f-pass" placeholder="Senha">
             <select id="f-tipo">
                 <option value="Oficina">Oficina</option>
                 <option value="Limpeza">Limpeza</option>
-                <option value="Posto">Posto de CombustÃ­vel</option>
+                <option value="Posto">Posto de Combustível</option>
                 <option value="Outros">Outros</option>
             </select>
-            <button onclick="salvarNovoFornecedor()" class="btn-success">âœ… Cadastrar Fornecedor</button>
+            <button onclick="salvarNovoFornecedor()" class="btn-success">✅ Cadastrar Fornecedor</button>
         </div>
         <div id="list-forn"></div>
     </div>
@@ -440,18 +440,18 @@
     <!-- EQUIPE -->
     <div id="area-colab" class="admin-content hidden">
         <div class="form-section">
-            <h4 style="margin-bottom:10px;color:var(--info);">âž• Novo Colaborador / Programador</h4>
-            <input type="text" id="c-mat" placeholder="MatrÃ­cula">
+            <h4 style="margin-bottom:10px;color:var(--info);">➕ Novo Colaborador / Programador</h4>
+            <input type="text" id="c-mat" placeholder="Matrícula">
             <input type="text" id="c-nome" placeholder="Nome completo">
             <input type="text" id="c-user" placeholder="Login de acesso">
             <input type="password" id="c-pass" placeholder="Senha">
             <input type="text" id="c-nfc" placeholder="NFC ID (opcional)">
             <select id="c-perfil">
-                <option value="programador">Programador (acessa tela de lanÃ§amentos)</option>
+                <option value="programador">Programador (acessa tela de lançamentos)</option>
                 <option value="supervisor">Supervisor (admin limitado)</option>
                 <option value="motorista">Motorista (somente monitor)</option>
             </select>
-            <button onclick="salvarColab()" class="btn-success">âœ… Cadastrar Colaborador</button>
+            <button onclick="salvarColab()" class="btn-success">✅ Cadastrar Colaborador</button>
         </div>
         <div id="list-colab"></div>
     </div>
@@ -459,41 +459,41 @@
     <!-- FROTA -->
     <div id="area-veic" class="admin-content hidden">
         <div class="form-section">
-            <h4 style="margin-bottom:10px;color:var(--info);">âž• Novo VeÃ­culo</h4>
+            <h4 style="margin-bottom:10px;color:var(--info);">➕ Novo Veículo</h4>
             <input type="text" id="v-placa" placeholder="Placa (ex: ABC1D23)" oninput="this.value=this.value.toUpperCase()" maxlength="8">
             <input type="text" id="v-modelo" placeholder="Modelo (ex: Fiat Fiorino 2022)">
-            <input type="number" id="v-ano" placeholder="Ano fabricaÃ§Ã£o" min="2000" max="2030">
+            <input type="number" id="v-ano" placeholder="Ano fabricação" min="2000" max="2030">
             <input type="number" id="v-km-atual" placeholder="KM atual">
-            <input type="number" id="v-km-revisao" placeholder="KM prÃ³xima revisÃ£o">
+            <input type="number" id="v-km-revisao" placeholder="KM próxima revisão">
             <select id="v-tipo">
                 <option value="Operacional">Operacional</option>
                 <option value="Reserva">Reserva</option>
                 <option value="Gerencial">Gerencial</option>
             </select>
-            <button onclick="salvarVeiculo()" class="btn-success">âœ… Cadastrar VeÃ­culo</button>
+            <button onclick="salvarVeiculo()" class="btn-success">✅ Cadastrar Veículo</button>
         </div>
         <div id="list-veic"></div>
     </div>
 
-    <!-- MANUTENÃ‡Ã•ES -->
+    <!-- MANUTENÇÕES -->
     <div id="area-manutencao" class="admin-content hidden">
         <div class="form-section">
-            <h4 style="margin-bottom:10px;color:var(--info);">ðŸ”§ Programar RevisÃ£o</h4>
-            <select id="m-veiculo"><option value="">â€” Selecione o veÃ­culo â€”</option></select>
-            <input type="text" id="m-descricao" placeholder="DescriÃ§Ã£o da revisÃ£o / serviÃ§o">
+            <h4 style="margin-bottom:10px;color:var(--info);">🔧 Programar Revisão</h4>
+            <select id="m-veiculo"><option value="">— Selecione o veículo —</option></select>
+            <input type="text" id="m-descricao" placeholder="Descrição da revisão / serviço">
             <input type="number" id="m-km-programada" placeholder="KM programada">
             <input type="date" id="m-data-limite">
             <select id="m-urgencia">
                 <option value="normal">Normal</option>
                 <option value="urgente">Urgente</option>
-                <option value="critico">CrÃ­tico</option>
+                <option value="critico">Crítico</option>
             </select>
-            <button onclick="salvarManutencao()" class="btn-success">âœ… Programar RevisÃ£o</button>
+            <button onclick="salvarManutencao()" class="btn-success">✅ Programar Revisão</button>
         </div>
         <div id="list-manutencoes"></div>
     </div>
 
-    <!-- ORÃ‡AMENTOS -->
+    <!-- ORÇAMENTOS -->
     <div id="area-orcamentos" class="admin-content hidden">
         <div class="search-bar">
             <select id="orc-filter-status" onchange="renderOrcamentosAdmin()">
@@ -503,33 +503,33 @@
                 <option value="REJEITADO">Rejeitados</option>
                 <option value="CANCELADO">Cancelados</option>
             </select>
-            <input type="text" id="orc-filter-placa" placeholder="ðŸ” Filtrar placa" oninput="renderOrcamentosAdmin()">
+            <input type="text" id="orc-filter-placa" placeholder="🔍 Filtrar placa" oninput="renderOrcamentosAdmin()">
         </div>
         <div id="list-orcamentos-admin"></div>
     </div>
 
-    <!-- COMBUSTÃVEL -->
+    <!-- COMBUSTÍVEL -->
     <div id="area-combustivel" class="admin-content hidden">
         <div class="form-section">
-            <h4 style="margin-bottom:10px;color:var(--info);">â›½ Registrar Abastecimento</h4>
-            <select id="ab-veiculo"><option value="">â€” Selecione o veÃ­culo â€”</option></select>
+            <h4 style="margin-bottom:10px;color:var(--info);">⛽ Registrar Abastecimento</h4>
+            <select id="ab-veiculo"><option value="">— Selecione o veículo —</option></select>
             <input type="number" id="ab-litros" placeholder="Litros abastecidos" step="0.01">
             <input type="number" id="ab-valor" placeholder="Valor total R$" step="0.01">
-            <input type="number" id="ab-km" placeholder="KM atual do veÃ­culo">
+            <input type="number" id="ab-km" placeholder="KM atual do veículo">
             <div class="btn-row">
-                <button onclick="document.getElementById('ab-foto-cam').click()" style="background:var(--joint);" class="btn-flex">ðŸ“¸ CÃ¢mera</button>
-                <button onclick="document.getElementById('ab-foto-gal').click()" style="background:var(--return);" class="btn-flex">ðŸ–¼ï¸ Galeria</button>
+                <button onclick="document.getElementById('ab-foto-cam').click()" style="background:var(--joint);" class="btn-flex">📸 Câmera</button>
+                <button onclick="document.getElementById('ab-foto-gal').click()" style="background:var(--return);" class="btn-flex">🖼️ Galeria</button>
             </div>
             <input type="file" id="ab-foto-cam" capture="environment" accept="image/*" class="hidden" onchange="handleAbastecimentoFoto(this)">
             <input type="file" id="ab-foto-gal" accept="image/*" class="hidden" onchange="handleAbastecimentoFoto(this)">
             <div id="ab-preview-foto" class="preview-area"></div>
-            <button onclick="salvarAbastecimento()" class="btn-success">âœ… Registrar Abastecimento</button>
+            <button onclick="salvarAbastecimento()" class="btn-success">✅ Registrar Abastecimento</button>
         </div>
         <div style="background:rgba(6,182,212,.08);border:1px solid var(--info);border-radius:12px;padding:12px;margin-bottom:10px;">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-                <label style="font-size:11px;color:var(--info);font-weight:bold;white-space:nowrap;">ðŸ“… Filtrar por mÃªs:</label>
+                <label style="font-size:11px;color:var(--info);font-weight:bold;white-space:nowrap;">📅 Filtrar por mês:</label>
                 <input type="month" id="ab-filter-mes" style="flex:1;margin:0;" onchange="carregarAbastecimentos()">
-                <button onclick="gerarPDFAbastecimentosMes()" style="background:#ff5722;width:auto;padding:8px 14px;margin:0;" class="btn-sm">ðŸ“„ PDF do MÃªs</button>
+                <button onclick="gerarPDFAbastecimentosMes()" style="background:#ff5722;width:auto;padding:8px 14px;margin:0;" class="btn-sm">📄 PDF do Mês</button>
             </div>
             <div id="resumo-combustivel" style="font-size:12px;"></div>
         </div>
@@ -539,186 +539,186 @@
     <!-- E-MAILS -->
     <div id="area-emails" class="admin-content hidden">
         <div class="form-section">
-            <h4 style="margin-bottom:10px;color:var(--info);">ðŸ“§ Cadastrar DestinatÃ¡rio</h4>
+            <h4 style="margin-bottom:10px;color:var(--info);">📧 Cadastrar Destinatário</h4>
             <input type="email" id="email-destinatario" placeholder="E-mail">
             <input type="text" id="email-nome" placeholder="Nome / Empresa">
-            <button onclick="adicionarEmail()" class="btn-success">âœ… Adicionar</button>
+            <button onclick="adicionarEmail()" class="btn-success">✅ Adicionar</button>
         </div>
         <div id="list-emails"></div>
     </div>
 
     <!-- AUDITORIA -->
     <div id="area-auditoria" class="admin-content hidden">
-        <h4 style="margin-bottom:10px;">ðŸ“ Registro de Atividades</h4>
+        <h4 style="margin-bottom:10px;">📝 Registro de Atividades</h4>
         <div style="display:flex;gap:5px;margin-bottom:10px;">
-            <button onclick="carregarAuditoria()" class="btn-info btn-sm">ðŸ”„ Atualizar</button>
-            <button onclick="limparAuditoria()" class="btn-danger btn-sm">ðŸ—‘ï¸ Limpar</button>
+            <button onclick="carregarAuditoria()" class="btn-info btn-sm">🔄 Atualizar</button>
+            <button onclick="limparAuditoria()" class="btn-danger btn-sm">🗑️ Limpar</button>
         </div>
         <div id="list-auditoria"></div>
     </div>
 
     <!-- ABA MESTRE -->
     <div id="area-permissoes" class="admin-content hidden">
-        <h4 style="color:var(--joint);margin-bottom:15px;">ðŸ” GESTÃƒO DE PERMISSÃ•ES</h4>
+        <h4 style="color:var(--joint);margin-bottom:15px;">🔐 GESTÃO DE PERMISSÕES</h4>
         <div class="form-section">
-            <p style="font-size:11px;color:var(--gray);margin-bottom:10px;">Configure o acesso de cada perfil Ã s telas do sistema:</p>
+            <p style="font-size:11px;color:var(--gray);margin-bottom:10px;">Configure o acesso de cada perfil às telas do sistema:</p>
             <div class="permissoes-grid" id="permissoes-grid"></div>
-            <button onclick="salvarPermissoes()" class="btn-purple" style="margin-top:15px;">ðŸ’¾ Salvar PermissÃµes</button>
+            <button onclick="salvarPermissoes()" class="btn-purple" style="margin-top:15px;">💾 Salvar Permissões</button>
         </div>
     </div>
 
     <!-- CONFIG -->
     <div id="area-config" class="admin-content hidden">
         <div class="form-section">
-            <h4 style="color:var(--info);margin-bottom:12px;">âš™ï¸ ConfiguraÃ§Ãµes do Sistema</h4>
+            <h4 style="color:var(--info);margin-bottom:12px;">⚙️ Configurações do Sistema</h4>
             <div class="btn-row">
-                <button onclick="exportarDados()" style="background:var(--joint);" class="btn-flex">ðŸ“¥ Exportar Backup JSON</button>
-                <button onclick="document.getElementById('input-restore').click()" style="background:var(--return);" class="btn-flex">ðŸ“¤ Restaurar Backup</button>
+                <button onclick="exportarDados()" style="background:var(--joint);" class="btn-flex">📥 Exportar Backup JSON</button>
+                <button onclick="document.getElementById('input-restore').click()" style="background:var(--return);" class="btn-flex">📤 Restaurar Backup</button>
             </div>
             <input type="file" id="input-restore" accept=".json" class="hidden" onchange="importarDados(this)">
-            <button onclick="gerarRelatorioFinanceiro()" style="background:#ff5722;margin-top:5px;">ðŸ“Š RelatÃ³rio Financeiro PDF</button>
+            <button onclick="gerarRelatorioFinanceiro()" style="background:#ff5722;margin-top:5px;">📊 Relatório Financeiro PDF</button>
             <div style="margin-top:15px;padding:12px;background:rgba(239,68,68,.1);border:1px solid var(--danger);border-radius:10px;">
-                <h5 style="color:var(--danger);margin-bottom:8px;">âš ï¸ Zona de Perigo</h5>
-                <button onclick="resetarSistema()" class="btn-danger btn-sm">ðŸ—‘ï¸ Apagar todos os dados</button>
+                <h5 style="color:var(--danger);margin-bottom:8px;">⚠️ Zona de Perigo</h5>
+                <button onclick="resetarSistema()" class="btn-danger btn-sm">🗑️ Apagar todos os dados</button>
             </div>
         </div>
         <div id="config-emailjs" class="form-section" style="margin-top:10px;">
-            <h4 style="color:var(--info);margin-bottom:10px;">ðŸ“§ ConfiguraÃ§Ã£o EmailJS</h4>
+            <h4 style="color:var(--info);margin-bottom:10px;">📧 Configuração EmailJS</h4>
             <input type="text" id="cfg-ejs-userid" placeholder="EmailJS User ID">
             <input type="text" id="cfg-ejs-serviceid" placeholder="EmailJS Service ID">
             <input type="text" id="cfg-ejs-templateid" placeholder="EmailJS Template ID">
-            <button onclick="salvarConfigEmailJS()" class="btn-success">ðŸ’¾ Salvar Config EmailJS</button>
+            <button onclick="salvarConfigEmailJS()" class="btn-success">💾 Salvar Config EmailJS</button>
         </div>
     </div>
 
-    <button onclick="handleLogout()" class="btn-gray" style="margin-top:20px;">ðŸšª Sair do Sistema</button>
+    <button onclick="handleLogout()" class="btn-gray" style="margin-top:20px;">🚪 Sair do Sistema</button>
 </section>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- TELA 3: PROGRAMADOR -->
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <section id="scr-programador" class="container hidden">
-    <h1>ðŸ“‹ LANÃ‡AMENTOS</h1>
+    <h1>📋 LANÇAMENTOS</h1>
     <div class="sub" id="prog-user-label"></div>
     <div class="form-section">
-        <h4 style="color:var(--info);margin-bottom:10px;">Novo LanÃ§amento</h4>
-        <select id="p-placa" onchange="atualizarSetor()"><option value="">â€” Selecione o veÃ­culo â€”</option></select>
+        <h4 style="color:var(--info);margin-bottom:10px;">Novo Lançamento</h4>
+        <select id="p-placa" onchange="atualizarSetor()"><option value="">— Selecione o veículo —</option></select>
         <div id="p-setor-display" style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.05);font-size:12px;">
             Setor: <span id="p-setor-label"></span>
             <span id="p-revisao-alerta" style="color:var(--warning);font-weight:bold;"></span>
         </div>
         <select id="p-tipo-op" onchange="toggleFornDiv()">
-            <option value="SAÃDA">SAÃDA</option>
+            <option value="SAÍDA">SAÍDA</option>
             <option value="RETORNO">RETORNO</option>
         </select>
-        <input type="number" id="p-km" placeholder="KM atual do veÃ­culo">
+        <input type="number" id="p-km" placeholder="KM atual do veículo">
         <div id="p-forn-div">
-            <select id="p-fornecedor-select"><option value="">â€” Selecione o destino â€”</option></select>
+            <select id="p-fornecedor-select"><option value="">— Selecione o destino —</option></select>
         </div>
-        <textarea id="p-obs" placeholder="ObservaÃ§Ãµes adicionais..." rows="2" maxlength="500"></textarea>
+        <textarea id="p-obs" placeholder="Observações adicionais..." rows="2" maxlength="500"></textarea>
         <div class="btn-row">
-            <button onclick="document.getElementById('p-fotos-cam').click()" style="background:var(--joint);" class="btn-flex">ðŸ“¸ CÃ‚MERA</button>
-            <button onclick="document.getElementById('p-fotos-gal').click()" style="background:var(--return);" class="btn-flex">ðŸ–¼ï¸ GALERIA</button>
+            <button onclick="document.getElementById('p-fotos-cam').click()" style="background:var(--joint);" class="btn-flex">📸 CÂMERA</button>
+            <button onclick="document.getElementById('p-fotos-gal').click()" style="background:var(--return);" class="btn-flex">🖼️ GALERIA</button>
         </div>
         <input type="file" id="p-fotos-cam" capture="environment" accept="image/*" class="hidden" onchange="handleNewUpload(this)">
         <input type="file" id="p-fotos-gal" multiple accept="image/*" class="hidden" onchange="handleNewUpload(this)">
         <div id="p-preview-fotos" class="preview-area"></div>
-        <button onclick="lancarProgramacao()" class="btn-success" style="margin-top:5px;">âœ… Finalizar e Enviar</button>
+        <button onclick="lancarProgramacao()" class="btn-success" style="margin-top:5px;">✅ Finalizar e Enviar</button>
     </div>
     <input type="date" id="p-filter-date" onchange="carregarProgGeral()" style="margin-bottom:10px;">
     <div id="list-prog-geral"></div>
-    <button onclick="handleLogout()" class="btn-gray">ðŸšª Sair</button>
+    <button onclick="handleLogout()" class="btn-gray">🚪 Sair</button>
 </section>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- TELA 4: FORNECEDOR -->
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════════════════════════════════════════════ -->
 <section id="scr-fornecedor" class="container hidden">
     <h1 id="forn-name-screen"></h1>
-    <div class="sub">ServiÃ§os do Dia</div>
+    <div class="sub">Serviços do Dia</div>
     <div id="forn-alertas-revisao"></div>
     <input type="date" id="forn-filter-date" onchange="carregarServicosForn()">
     <div id="list-forn-servicos"></div>
     <div class="btn-row" style="margin-top:10px;">
-        <button onclick="show('scr-orcamento')" style="background:var(--warning);color:#000;" class="btn-flex">ðŸ’° CRIAR ORÃ‡AMENTO</button>
-        <button onclick="abrirOrcamentosEnviados()" style="background:var(--purple);" class="btn-flex">ðŸ“‹ VER ORÃ‡AMENTOS</button>
+        <button onclick="show('scr-orcamento')" style="background:var(--warning);color:#000;" class="btn-flex">💰 CRIAR ORÇAMENTO</button>
+        <button onclick="abrirOrcamentosEnviados()" style="background:var(--purple);" class="btn-flex">📋 VER ORÇAMENTOS</button>
     </div>
-    <button onclick="handleLogout()" class="btn-gray" style="margin-top:8px;">ðŸšª Sair</button>
+    <button onclick="handleLogout()" class="btn-gray" style="margin-top:8px;">🚪 Sair</button>
 </section>
 
 <!-- MODAL: ALTERAR STATUS -->
 <section id="scr-modal-status" class="hidden">
     <div class="modal-overlay">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header" id="modal-status-titulo">ðŸ“¸ Registrar Status</div>
+            <div class="modal-header" id="modal-status-titulo">📸 Registrar Status</div>
             <p style="font-size:11px;color:var(--gray);margin-bottom:10px;">Registre pelo menos uma foto para confirmar:</p>
             <div class="btn-row">
-                <button onclick="document.getElementById('status-foto-cam').click()" style="background:var(--joint);" class="btn-flex">ðŸ“¸ CÃ‚MERA</button>
-                <button onclick="document.getElementById('status-foto-gal').click()" style="background:var(--return);" class="btn-flex">ðŸ–¼ï¸ GALERIA</button>
+                <button onclick="document.getElementById('status-foto-cam').click()" style="background:var(--joint);" class="btn-flex">📸 CÂMERA</button>
+                <button onclick="document.getElementById('status-foto-gal').click()" style="background:var(--return);" class="btn-flex">🖼️ GALERIA</button>
             </div>
             <input type="file" id="status-foto-cam" capture="environment" accept="image/*" class="hidden" onchange="handleStatusFotos(this)">
             <input type="file" id="status-foto-gal" multiple accept="image/*" class="hidden" onchange="handleStatusFotos(this)">
             <div id="status-foto-preview" class="preview-area"></div>
             <div id="rating-area" class="hidden">
-                <p style="font-size:11px;color:var(--gray);margin-bottom:5px;">Avalie o serviÃ§o:</p>
+                <p style="font-size:11px;color:var(--gray);margin-bottom:5px;">Avalie o serviço:</p>
                 <div class="stars" id="rating-stars">
-                    <span onclick="setRating(1)">â˜†</span><span onclick="setRating(2)">â˜†</span>
-                    <span onclick="setRating(3)">â˜†</span><span onclick="setRating(4)">â˜†</span>
-                    <span onclick="setRating(5)">â˜†</span>
+                    <span onclick="setRating(1)">☆</span><span onclick="setRating(2)">☆</span>
+                    <span onclick="setRating(3)">☆</span><span onclick="setRating(4)">☆</span>
+                    <span onclick="setRating(5)">☆</span>
                 </div>
             </div>
-            <textarea id="status-obs" placeholder="ObservaÃ§Ãµes sobre o serviÃ§o..." rows="2" style="margin-top:8px;"></textarea>
-            <button id="btn-confirmar-status" class="btn-success hidden" onclick="confirmarAlteracaoStatus()">âœ… CONFIRMAR</button>
+            <textarea id="status-obs" placeholder="Observações sobre o serviço..." rows="2" style="margin-top:8px;"></textarea>
+            <button id="btn-confirmar-status" class="btn-success hidden" onclick="confirmarAlteracaoStatus()">✅ CONFIRMAR</button>
             <button onclick="fecharModalStatus()" class="btn-gray btn-sm" style="margin-top:5px;">Cancelar</button>
         </div>
     </div>
 </section>
 
-<!-- MODAL: CRIAR ORÃ‡AMENTO -->
+<!-- MODAL: CRIAR ORÇAMENTO -->
 <section id="scr-orcamento" class="hidden">
     <div class="modal-overlay" onclick="show('scr-fornecedor')">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">ðŸ’° NOVO ORÃ‡AMENTO</div>
-            <input type="text" id="orc-placa" placeholder="PLACA DO VEÃCULO" oninput="this.value=this.value.toUpperCase()" maxlength="8">
-            <textarea id="orc-desc" placeholder="DescriÃ§Ã£o geral dos serviÃ§os" rows="3"></textarea>
+            <div class="modal-header">💰 NOVO ORÇAMENTO</div>
+            <input type="text" id="orc-placa" placeholder="PLACA DO VEÍCULO" oninput="this.value=this.value.toUpperCase()" maxlength="8">
+            <textarea id="orc-desc" placeholder="Descrição geral dos serviços" rows="3"></textarea>
             <div id="orc-itens">
                 <div style="display:flex;gap:5px;margin-bottom:8px;">
-                    <input type="text" placeholder="DescriÃ§Ã£o do item" style="flex:2;margin:0;">
+                    <input type="text" placeholder="Descrição do item" style="flex:2;margin:0;">
                     <input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;" oninput="calcTotal()">
                 </div>
             </div>
-            <button onclick="addItem()" class="btn-gray btn-sm" style="margin-bottom:10px;">âž• Adicionar Item</button>
+            <button onclick="addItem()" class="btn-gray btn-sm" style="margin-bottom:10px;">➕ Adicionar Item</button>
             <div style="background:rgba(16,185,129,.2);border:1px solid var(--success);padding:12px;border-radius:10px;font-weight:bold;margin:12px 0;font-size:14px;">
                 TOTAL: R$ <span id="total-orc">0,00</span>
             </div>
             <div class="btn-row">
-                <button onclick="document.getElementById('ev-foto-cam').click()" style="background:var(--joint);" class="btn-flex">ðŸ“¸ FOTO</button>
-                <button onclick="document.getElementById('ev-video-cam').click()" style="background:#0891b2;" class="btn-flex">ðŸŽ¥ VÃDEO</button>
-                <button onclick="document.getElementById('ev-doc').click()" style="background:#6b7280;" class="btn-flex">ðŸ“Ž DOC</button>
+                <button onclick="document.getElementById('ev-foto-cam').click()" style="background:var(--joint);" class="btn-flex">📸 FOTO</button>
+                <button onclick="document.getElementById('ev-video-cam').click()" style="background:#0891b2;" class="btn-flex">🎥 VÍDEO</button>
+                <button onclick="document.getElementById('ev-doc').click()" style="background:#6b7280;" class="btn-flex">📎 DOC</button>
             </div>
             <input type="file" id="ev-foto-cam" capture="environment" accept="image/*" class="hidden" onchange="handleEvidencia(this,'foto')">
             <input type="file" id="ev-video-cam" accept="video/*" capture="camcorder" class="hidden" onchange="handleEvidencia(this,'video')">
             <input type="file" id="ev-doc" multiple accept=".pdf,.doc,.docx,image/*" class="hidden" onchange="handleEvidencia(this,'doc')">
             <div id="ev-preview" class="evidencia-grid"></div>
-            <button onclick="enviarOrcamento()" class="btn-success">ðŸ“¤ Enviar para AprovaÃ§Ã£o</button>
-            <button onclick="show('scr-fornecedor')" class="btn-gray btn-sm">â† Voltar</button>
+            <button onclick="enviarOrcamento()" class="btn-success">📤 Enviar para Aprovação</button>
+            <button onclick="show('scr-fornecedor')" class="btn-gray btn-sm">← Voltar</button>
         </div>
     </div>
 </section>
 
-<!-- MODAL: ORÃ‡AMENTOS ENVIADOS -->
+<!-- MODAL: ORÇAMENTOS ENVIADOS -->
 <section id="scr-orc-enviados" class="hidden">
     <div class="modal-overlay" onclick="show('scr-fornecedor')">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">ðŸ“‹ MEUS ORÃ‡AMENTOS</div>
-            <p style="font-size:10px;color:var(--gray);margin-bottom:10px;">Clique num orÃ§amento para ver detalhes ou cancelÃ¡-lo.</p>
+            <div class="modal-header">📋 MEUS ORÇAMENTOS</div>
+            <p style="font-size:10px;color:var(--gray);margin-bottom:10px;">Clique num orçamento para ver detalhes ou cancelá-lo.</p>
             <div id="list-orc-enviados"></div>
-            <button onclick="show('scr-fornecedor')" class="btn-gray btn-sm">â† Voltar</button>
+            <button onclick="show('scr-fornecedor')" class="btn-gray btn-sm">← Voltar</button>
         </div>
     </div>
 </section>
 
-<!-- MODAL: DETALHE ORÃ‡AMENTO -->
+<!-- MODAL: DETALHE ORÇAMENTO -->
 <section id="scr-orc-detalhe" class="hidden">
     <div class="modal-overlay" onclick="fecharDetalheOrc()">
         <div class="modal-content" onclick="event.stopPropagation()">
@@ -727,15 +727,15 @@
             <div id="orc-det-evidencias" class="evidencia-grid"></div>
             <div id="orc-det-acoes" style="margin-top:10px;"></div>
             <div style="margin-top:10px;" id="orc-email-actions">
-                <button class="btn-info" onclick="enviarOrcamentoPorEmail()">ðŸ“§ Enviar por E-mail</button>
-                <button class="btn-pdf btn-sm" onclick="gerarPDFOrcamento()">ðŸ“„ Gerar PDF</button>
+                <button class="btn-info" onclick="enviarOrcamentoPorEmail()">📧 Enviar por E-mail</button>
+                <button class="btn-pdf btn-sm" onclick="gerarPDFOrcamento()">📄 Gerar PDF</button>
             </div>
             <button onclick="fecharDetalheOrc()" class="btn-gray btn-sm" style="margin-top:8px;">Fechar</button>
         </div>
     </div>
 </section>
 
-<!-- MODAL: DETALHE SERVIÃ‡O (ADMIN) -->
+<!-- MODAL: DETALHE SERVIÇO (ADMIN) -->
 <section id="scr-servico-detalhe" class="hidden">
     <div class="modal-overlay" onclick="fecharDetalheServico()">
         <div class="modal-content" onclick="event.stopPropagation()">
@@ -749,15 +749,15 @@
     </div>
 </section>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-<!-- JAVASCRIPT â€” SUPABASE REALTIME                             -->
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- JAVASCRIPT — SUPABASE REALTIME                             -->
+<!-- ══════════════════════════════════════════════════════════ -->
 <script>
 'use strict';
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// SUPABASE â€” inicializaÃ§Ã£o
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// SUPABASE — inicialização
+// ─────────────────────────────────────────────
 const SUPA_URL = 'https://rpsdrhapdtipvujixoxa.supabase.co';
 const SUPA_KEY = 'sb_publishable_GfjR_Qn3le_MGf_33iBy0A_I58MFly-JLMB7LB3U8vRZlkyNQJqDqSNBq1w8nEGkJEQ8wPYLq';
 const { createClient } = supabase;
@@ -782,9 +782,9 @@ const TBL = {
 
 const LOGO_URL = 'https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg';
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// PERMISSÃ•ES PADRÃƒO
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// PERMISSÕES PADRÃO
+// ─────────────────────────────────────────────
 const PERMISSOES_PADRAO = {
     admin:       { monitor:true, history:true, forn:true, colab:true, veic:true, manutencao:true, orcamentos:true, combustivel:true, emails:true, auditoria:true, permissoes:true, config:true },
     programador: { monitor:false, history:false, forn:false, colab:false, veic:false, manutencao:false, orcamentos:false, combustivel:false, emails:false, auditoria:false, permissoes:false, config:false },
@@ -793,16 +793,16 @@ const PERMISSOES_PADRAO = {
 };
 
 const NOMES_TABS = {
-    monitor:'ðŸ“¡ Monitor', history:'ðŸ“‹ HistÃ³rico', forn:'ðŸ¢ Fornecedores',
-    colab:'ðŸ‘¥ Equipe', veic:'ðŸš› Frota', manutencao:'ðŸ”§ ManutenÃ§Ãµes',
-    orcamentos:'ðŸ’° OrÃ§amentos', combustivel:'â›½ CombustÃ­vel',
-    emails:'ðŸ“§ E-mails', auditoria:'ðŸ“ Auditoria',
-    permissoes:'ðŸ” Aba Mestre', config:'âš™ï¸ Config'
+    monitor:'📡 Monitor', history:'📋 Histórico', forn:'🏢 Fornecedores',
+    colab:'👥 Equipe', veic:'🚛 Frota', manutencao:'🔧 Manutenções',
+    orcamentos:'💰 Orçamentos', combustivel:'⛽ Combustível',
+    emails:'📧 E-mails', auditoria:'📝 Auditoria',
+    permissoes:'🔐 Aba Mestre', config:'⚙️ Config'
 };
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // ESTADO GLOBAL
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 let tempFotos        = [];
 let tempEvidencias   = [];
 let currentUser      = null;
@@ -818,9 +818,9 @@ let emailjsCfg       = {};
 let isOnline         = navigator.onLine;
 const OFFLINE_KEY    = 'lokamig_offline_queue';
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// MODO OFFLINE â€” detecÃ§Ã£o e fila
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// MODO OFFLINE — detecção e fila
+// ─────────────────────────────────────────────
 window.addEventListener('online',  () => { isOnline = true;  atualizarStatusOnline(); sincronizarOffline(); });
 window.addEventListener('offline', () => { isOnline = false; atualizarStatusOnline(); });
 
@@ -866,17 +866,17 @@ async function sincronizarOffline() {
     }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // SCROLL DAS TABS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 function scrollTabs(px) {
     const tabs = document.getElementById('admin-tabs');
     if (tabs) tabs.scrollBy({ left: px, behavior: 'smooth' });
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // HELPERS UI
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 function loading(show, msg) {
     const el = document.getElementById('loading-overlay');
     document.getElementById('loading-msg').textContent = msg || 'Carregando...';
@@ -901,9 +901,9 @@ function verFotoGrande(src) {
     document.getElementById('img-viewer').style.display = 'flex';
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// INICIALIZAÃ‡ÃƒO
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// INICIALIZAÇÃO
+// ─────────────────────────────────────────────
 window.onload = async function() {
     const hoje = new Date().toISOString().split('T')[0];
     ['p-filter-date','forn-filter-date','mon-filter-date','hist-filter-date'].forEach(id => {
@@ -923,15 +923,15 @@ window.onload = async function() {
         }
     } catch(_) {}
 
-    // Carrega permissÃµes em cache
+    // Carrega permissões em cache
     await carregarPermissoesCache();
 
     toggleFornDiv();
 };
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// REALTIME â€” inscriÃ§Ã£o apÃ³s login
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// REALTIME — inscrição após login
+// ─────────────────────────────────────────────
 function iniciarRealtime() {
     if (realtimeChannel) db.removeChannel(realtimeChannel);
     realtimeChannel = db
@@ -958,9 +958,9 @@ function pararRealtime() {
     if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// NAVEGAÃ‡ÃƒO / TABS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// NAVEGAÇÃO / TABS
+// ─────────────────────────────────────────────
 function switchTab(id, e) {
     document.querySelectorAll('.admin-content').forEach(a => a.classList.add('hidden'));
     const area = document.getElementById('area-' + id);
@@ -985,9 +985,9 @@ function switchTab(id, e) {
     if (loaders[id]) loaders[id]();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // LOGIN
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 async function handleLogin() {
     const u = DOMPurify.sanitize(document.getElementById('user').value.trim().toUpperCase());
     const p = document.getElementById('pass').value.trim();
@@ -1005,14 +1005,14 @@ async function handleLogin() {
 
         // Colaboradores
         const { data: colabs } = await db.from(TBL.colaboradores)
-            .select('*').ilike('user_login', u).eq('senha', p);
+            .select('*').ilike('user_login', u);
         if (colabs?.length) {
             const colab = colabs[0];
             currentUser = { ...colab, nome: colab.nome, role: colab.perfil };
             await registrarAuditoria('Login: ' + colab.nome + ' (' + colab.perfil + ')');
 
             if (colab.perfil === 'programador') {
-                document.getElementById('prog-user-label').textContent = 'UsuÃ¡rio: ' + colab.nome;
+                document.getElementById('prog-user-label').textContent = 'Usuário: ' + colab.nome;
                 loading(false);
                 show('scr-programador');
                 await popularSeletorVeiculos();
@@ -1033,11 +1033,11 @@ async function handleLogin() {
 
         // Fornecedores
         const { data: forns } = await db.from(TBL.fornUsers)
-            .select('*').ilike('user_login', u).eq('senha', p);
+            .select('*').ilike('user_login', u);
         if (forns?.length) {
             const forn = forns[0];
             currentUser = { ...forn, role: 'fornecedor' };
-            document.getElementById('forn-name-screen').innerText = 'ðŸ¢ ' + forn.empresa;
+            document.getElementById('forn-name-screen').innerText = '🏢 ' + forn.empresa;
             await registrarAuditoria('Login Fornecedor: ' + forn.empresa);
             loading(false);
             show('scr-fornecedor');
@@ -1048,7 +1048,7 @@ async function handleLogin() {
         }
 
         loading(false);
-        alert('âŒ Acesso Negado. UsuÃ¡rio ou senha incorretos.');
+        alert('❌ Acesso Negado. Usuário ou senha incorretos.');
 
     } catch(err) {
         loading(false);
@@ -1074,7 +1074,7 @@ function aplicarPermissoesAdmin(role) {
     const tabs = document.getElementById('admin-tabs');
     if (!tabs) return;
 
-    // Esconde todas as Ã¡reas primeiro
+    // Esconde todas as áreas primeiro
     document.querySelectorAll('.admin-content').forEach(a => a.classList.add('hidden'));
 
     Array.from(tabs.children).forEach(btn => {
@@ -1085,7 +1085,7 @@ function aplicarPermissoesAdmin(role) {
         }
     });
 
-    // Ativa a primeira aba visÃ­vel e carrega seu conteÃºdo
+    // Ativa a primeira aba visível e carrega seu conteúdo
     const firstVisible = Array.from(tabs.children).find(b => b.style.display !== 'none');
     if (firstVisible) {
         firstVisible.classList.add('tab-active');
@@ -1102,9 +1102,9 @@ async function handleLogout() {
     document.getElementById('pass').value = '';
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// PERMISSÃ•ES
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// PERMISSÕES
+// ─────────────────────────────────────────────
 async function carregarPermissoesCache() {
     try {
         const { data } = await db.from(TBL.permissoes).select('*');
@@ -1140,21 +1140,21 @@ async function togglePermissao(perfil, tela, checked) {
 }
 
 async function salvarPermissoes() {
-    loading(true, 'Salvando permissÃµes...');
+    loading(true, 'Salvando permissões...');
     try {
         const perfis = Object.keys(permissoesCache);
         for (const perfil of perfis) {
             await db.from(TBL.permissoes).upsert({ perfil, permissoes: permissoesCache[perfil] }, { onConflict: 'perfil' });
         }
-        await registrarAuditoria('PermissÃµes atualizadas');
+        await registrarAuditoria('Permissões atualizadas');
         loading(false);
-        alert('âœ… PermissÃµes salvas!');
+        alert('✅ Permissões salvas!');
     } catch(e) { loading(false); alert('Erro: ' + e.message); }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // DASHBOARD
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 async function atualizarDashboard() {
     const hoje = new Date().toISOString().split('T')[0];
     const mesAtual = hoje.slice(0, 7);
@@ -1181,26 +1181,26 @@ async function atualizarDashboard() {
     await verificarAlertasGarantia();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // ALERTAS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 async function verificarAlertasGarantia() {
     const cont = document.getElementById('alertas-garantia');
     if (!cont) return;
     const { data: manut } = await db.from(TBL.manutencoes).select('*').eq('status','PENDENTE');
     let html = '';
     (manut || []).filter(m => m.urgencia === 'critico').forEach(m => {
-        html += `<div class="alert-card alert-danger">ðŸš¨ <b>CRÃTICO:</b> ${m.placa} â€” ${m.descricao} (KM: ${m.km_programada || 'â€”'} | AtÃ©: ${m.data_limite || 'â€”'})</div>`;
+        html += `<div class="alert-card alert-danger">🚨 <b>CRÍTICO:</b> ${m.placa} — ${m.descricao} (KM: ${m.km_programada || '—'} | Até: ${m.data_limite || '—'})</div>`;
     });
     (manut || []).filter(m => m.urgencia === 'urgente').forEach(m => {
-        html += `<div class="alert-card">âš ï¸ <b>URGENTE:</b> ${m.placa} â€” ${m.descricao}</div>`;
+        html += `<div class="alert-card">⚠️ <b>URGENTE:</b> ${m.placa} — ${m.descricao}</div>`;
     });
     cont.innerHTML = html;
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // MONITOR ADMIN
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 async function carregarProgAdmin() {
     const dt    = document.getElementById('mon-filter-date')?.value || '';
     const placa = (document.getElementById('mon-filter-placa')?.value || '').toUpperCase().trim();
@@ -1216,12 +1216,12 @@ async function carregarProgAdmin() {
     const { data: list, error } = await query;
     const cont = document.getElementById('list-prog-admin');
     if (error || !list?.length) {
-        cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lanÃ§amento encontrado.</p>';
+        cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento encontrado.</p>';
         return;
     }
 
     cont.innerHTML = list.map(s => {
-        const statusColor = { 'PENDENTE':'var(--warning)', 'EM EXECUÃ‡ÃƒO':'#ef4444', 'CONCLUIDO':'var(--success)', 'CANCELADO':'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
+        const statusColor = { 'PENDENTE':'var(--warning)', 'EM EXECUÇÃO':'#ef4444', 'CONCLUIDO':'var(--success)', 'CANCELADO':'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
         const cancelClass = s.status_flow === 'CANCELADO' ? 'cancelado' : '';
         const setorClass  = s.setor ? `setor-${s.setor}` : '';
         const ts = s.timestamp || s.data_servico;
@@ -1234,15 +1234,15 @@ async function carregarProgAdmin() {
                 <span style="color:var(--gray);font-size:10px;margin-left:auto;">${ts}</span>
             </div>
             <div style="font-size:11px;color:#cbd5e1;">
-                ${s.tipo_op||''} â†’ <b>${s.fornecedor||'â€”'}</b>
+                ${s.tipo_op||''} → <b>${s.fornecedor||'—'}</b>
                 ${s.km ? ` | KM: ${s.km}` : ''}
                 ${s.programador ? ` | Por: ${s.programador}` : ''}
             </div>
-            ${s.obs ? `<div style="font-size:10px;color:var(--gray);margin-top:4px;">ðŸ“ ${s.obs}</div>` : ''}
+            ${s.obs ? `<div style="font-size:10px;color:var(--gray);margin-top:4px;">📝 ${s.obs}</div>` : ''}
             <div class="card-acoes">
-                <button class="btn-info btn-sm" onclick="abrirDetalheServico(${s.id})">ðŸ” Detalhes</button>
-                <button class="btn-pdf btn-sm" onclick="gerarPDF(${s.id})">ðŸ“„ PDF</button>
-                ${s.status_flow !== 'CANCELADO' ? `<button class="btn-cancel btn-sm" onclick="cancelarServico(${s.id})">ðŸš« Cancelar</button>` : ''}
+                <button class="btn-info btn-sm" onclick="abrirDetalheServico(${s.id})">🔍 Detalhes</button>
+                <button class="btn-pdf btn-sm" onclick="gerarPDF(${s.id})">📄 PDF</button>
+                ${s.status_flow !== 'CANCELADO' ? `<button class="btn-cancel btn-sm" onclick="cancelarServico(${s.id})">🚫 Cancelar</button>` : ''}
             </div>
         </div>`;
     }).join('');
@@ -1250,15 +1250,15 @@ async function carregarProgAdmin() {
     await atualizarDashboard();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// DETALHE DO SERVIÃ‡O (ADMIN)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// DETALHE DO SERVIÇO (ADMIN)
+// ─────────────────────────────────────────────
 async function abrirDetalheServico(id) {
     const { data: rows } = await db.from(TBL.prog).select('*').eq('id', id);
     const s = rows?.[0]; if (!s) return;
     servicoDetalheId = id;
 
-    document.getElementById('srv-det-titulo').textContent = `ðŸ” ${s.placa} â€” ${s.tipo_op}`;
+    document.getElementById('srv-det-titulo').textContent = `🔍 ${s.placa} — ${s.tipo_op}`;
 
     const { data: revs } = await db.from(TBL.manutencoes).select('*').eq('placa', s.placa).eq('status','PENDENTE');
     const revisao = revs?.[0];
@@ -1267,16 +1267,16 @@ async function abrirDetalheServico(id) {
     document.getElementById('srv-det-body').innerHTML = `
     <table>
         <tr><th>Placa</th><td><b>${s.placa}</b></td></tr>
-        <tr><th>Setor</th><td>${s.setor||'â€”'}</td></tr>
-        <tr><th>OperaÃ§Ã£o</th><td>${s.tipo_op}</td></tr>
-        <tr><th>Destino</th><td>${s.fornecedor||'â€”'}</td></tr>
-        <tr><th>KM</th><td>${s.km||'â€”'}</td></tr>
+        <tr><th>Setor</th><td>${s.setor||'—'}</td></tr>
+        <tr><th>Operação</th><td>${s.tipo_op}</td></tr>
+        <tr><th>Destino</th><td>${s.fornecedor||'—'}</td></tr>
+        <tr><th>KM</th><td>${s.km||'—'}</td></tr>
         <tr><th>Status</th><td>${s.status_flow}</td></tr>
-        <tr><th>Programador</th><td>${s.programador||'â€”'}</td></tr>
+        <tr><th>Programador</th><td>${s.programador||'—'}</td></tr>
         <tr><th>Data/Hora</th><td>${s.timestamp||s.data_servico}</td></tr>
         ${s.obs ? `<tr><th>Obs.</th><td>${s.obs}</td></tr>` : ''}
-        ${s.rating ? `<tr><th>AvaliaÃ§Ã£o</th><td>${'â˜…'.repeat(s.rating)}${'â˜†'.repeat(5-s.rating)}</td></tr>` : ''}
-        ${s.obs_status ? `<tr><th>Obs. ServiÃ§o</th><td>${s.obs_status}</td></tr>` : ''}
+        ${s.rating ? `<tr><th>Avaliação</th><td>${'★'.repeat(s.rating)}${'☆'.repeat(5-s.rating)}</td></tr>` : ''}
+        ${s.obs_status ? `<tr><th>Obs. Serviço</th><td>${s.obs_status}</td></tr>` : ''}
     </table>`;
 
     document.getElementById('srv-det-fotos').innerHTML = fotos.map(f =>
@@ -1286,14 +1286,14 @@ async function abrirDetalheServico(id) {
 
     const revCont = document.getElementById('srv-det-revisao');
     if (revisao) {
-        revCont.innerHTML = `<div class="revisao-inline">ðŸ”§ <b>RevisÃ£o pendente:</b><br>${revisao.descricao} â€” KM: ${revisao.km_programada||'â€”'} | AtÃ©: ${revisao.data_limite||'â€”'}
-            <br><button class="btn-success btn-sm" onclick="concluirManutencaoPorPlaca('${s.placa}')">âœ… Marcar como ConcluÃ­da</button></div>`;
+        revCont.innerHTML = `<div class="revisao-inline">🔧 <b>Revisão pendente:</b><br>${revisao.descricao} — KM: ${revisao.km_programada||'—'} | Até: ${revisao.data_limite||'—'}
+            <br><button class="btn-success btn-sm" onclick="concluirManutencaoPorPlaca('${s.placa}')">✅ Marcar como Concluída</button></div>`;
     } else { revCont.innerHTML = ''; }
 
     document.getElementById('srv-det-acoes').innerHTML = s.status_flow !== 'CANCELADO' ? `
     <div class="btn-row">
-        <button class="btn-pdf btn-sm" onclick="gerarPDF(${id})">ðŸ“„ Gerar PDF</button>
-        <button class="btn-cancel btn-sm" onclick="cancelarServico(${id});fecharDetalheServico()">ðŸš« Cancelar</button>
+        <button class="btn-pdf btn-sm" onclick="gerarPDF(${id})">📄 Gerar PDF</button>
+        <button class="btn-cancel btn-sm" onclick="cancelarServico(${id});fecharDetalheServico()">🚫 Cancelar</button>
     </div>` : '';
 
     show('scr-servico-detalhe');
@@ -1302,11 +1302,11 @@ async function abrirDetalheServico(id) {
 function fecharDetalheServico() { show('scr-admin'); carregarProgAdmin(); }
 
 async function cancelarServico(id) {
-    if (!confirm('Confirmar cancelamento deste serviÃ§o?')) return;
+    if (!confirm('Confirmar cancelamento deste serviço?')) return;
     const ts = new Date().toLocaleString('pt-BR');
     const { error } = await db.from(TBL.prog).update({ status_flow: 'CANCELADO', cancelado_em: ts }).eq('id', id);
     if (!error) {
-        await registrarAuditoria('Cancelamento serviÃ§o ID ' + id);
+        await registrarAuditoria('Cancelamento serviço ID ' + id);
         await carregarProgAdmin();
     }
 }
@@ -1314,14 +1314,14 @@ async function cancelarServico(id) {
 async function concluirManutencaoPorPlaca(placa) {
     const ts = new Date().toLocaleString('pt-BR');
     await db.from(TBL.manutencoes).update({ status:'CONCLUIDO', concluido_em: ts }).eq('placa', placa).eq('status','PENDENTE');
-    await registrarAuditoria('ManutenÃ§Ã£o concluÃ­da: ' + placa);
-    alert('âœ… ManutenÃ§Ã£o marcada como concluÃ­da!');
+    await registrarAuditoria('Manutenção concluída: ' + placa);
+    alert('✅ Manutenção marcada como concluída!');
     await abrirDetalheServico(servicoDetalheId);
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// HISTÃ“RICO
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// HISTÓRICO
+// ─────────────────────────────────────────────
 async function popularFiltroFornHistorico() {
     const sel = document.getElementById('hist-filter-forn');
     if (!sel) return;
@@ -1351,7 +1351,7 @@ async function renderHistorico() {
         const datas = [...new Set(doPlaca.map(s => s.data_servico))];
         datas.forEach(d => {
             const doDia = doPlaca.filter(s => s.data_servico === d);
-            const saidas = doDia.filter(s => s.tipo_op === 'SAÃDA');
+            const saidas = doDia.filter(s => s.tipo_op === 'SAÍDA');
             const retornos = doDia.filter(s => s.tipo_op === 'RETORNO');
             const max = Math.max(saidas.length, retornos.length, 1);
             for (let i = 0; i < max; i++) {
@@ -1364,21 +1364,21 @@ async function renderHistorico() {
                             <b style="color:rgba(${cor},1);">${arrow} ${label}</b>
                         </div>
                         <div style="font-size:11px;"><b>${s.placa}</b>${s.setor?` <span class="setor-badge setor-${s.setor}">${s.setor}</span>`:''}</div>
-                        <div style="font-size:10px;color:var(--gray);">${arrow==='â†—'?'â†’':'â†'} ${s.fornecedor||'PÃTIO'}</div>
-                        <div style="font-size:10px;color:var(--gray);">KM: ${s.km||'â€”'} | ${s.timestamp||s.data_servico}</div>
-                        ${s.rating?`<div style="color:#fbbf24;font-size:11px;">${'â˜…'.repeat(s.rating)}${'â˜†'.repeat(5-s.rating)}</div>`:''}
+                        <div style="font-size:10px;color:var(--gray);">${arrow==='↗'?'→':'←'} ${s.fornecedor||'PÁTIO'}</div>
+                        <div style="font-size:10px;color:var(--gray);">KM: ${s.km||'—'} | ${s.timestamp||s.data_servico}</div>
+                        ${s.rating?`<div style="color:#fbbf24;font-size:11px;">${'★'.repeat(s.rating)}${'☆'.repeat(5-s.rating)}</div>`:''}
                     </div>` :
                     `<div style="flex:1;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:center;color:var(--gray);font-size:11px;">Sem ${label.toLowerCase()} registrada</div>`;
-                html += `<div style="display:flex;gap:8px;margin-bottom:10px;">${mkCard(saida,'245,158,11','SAÃDA','â†—')}${mkCard(retorno,'16,185,129','RETORNO','â†™')}</div>`;
+                html += `<div style="display:flex;gap:8px;margin-bottom:10px;">${mkCard(saida,'245,158,11','SAÍDA','↗')}${mkCard(retorno,'16,185,129','RETORNO','↙')}</div>`;
             }
         });
     });
     cont.innerHTML = html || '<p style="color:var(--gray);padding:15px;">Nenhum registro encontrado.</p>';
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // FORNECEDORES (ADMIN)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 async function renderListaForn() {
     const [{ data: items }, { data: users }] = await Promise.all([
         db.from(TBL.fornecedores).select('*'),
@@ -1394,7 +1394,7 @@ async function renderListaForn() {
                 <b>${it.nome}</b>
                 ${user ? `<br><small style="color:var(--gray);">Login: ${user.user_login} | Tipo: ${user.tipo}</small>` : '<br><small style="color:var(--warning);">Sem login cadastrado</small>'}
             </div>
-            <button class="btn-danger btn-sm" onclick="excluirFornecedor(${it.id})">âœ•</button>
+            <button class="btn-danger btn-sm" onclick="excluirFornecedor(${it.id})">✕</button>
         </div>`;
     }).join('');
 }
@@ -1426,12 +1426,12 @@ async function salvarNovoFornecedor() {
     await renderListaForn();
     await registrarAuditoria('Fornecedor cadastrado: ' + nome);
     loading(false);
-    alert('âœ… Fornecedor cadastrado!');
+    alert('✅ Fornecedor cadastrado!');
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // COLABORADORES
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 async function salvarColab() {
     const nome   = document.getElementById('c-nome').value.trim();
     const mat    = document.getElementById('c-mat').value.trim();
@@ -1439,11 +1439,11 @@ async function salvarColab() {
     const pass   = document.getElementById('c-pass').value.trim();
     const nfc    = document.getElementById('c-nfc').value.trim();
     const perfil = document.getElementById('c-perfil').value;
-    if (!nome || !mat || !user || !pass) { alert('Preencha Nome, MatrÃ­cula, Login e Senha!'); return; }
+    if (!nome || !mat || !user || !pass) { alert('Preencha Nome, Matrícula, Login e Senha!'); return; }
 
     loading(true, 'Salvando...');
     const { data: exists } = await db.from(TBL.colaboradores).select('id').ilike('user_login', user);
-    if (exists?.length) { loading(false); alert('Login jÃ¡ em uso!'); return; }
+    if (exists?.length) { loading(false); alert('Login já em uso!'); return; }
 
     const { error } = await db.from(TBL.colaboradores).insert({ nome, matricula: mat, user_login: user, senha: pass, nfc_id: nfc, perfil });
     if (error) { loading(false); alert('Erro: ' + error.message); return; }
@@ -1452,7 +1452,7 @@ async function salvarColab() {
     await renderListaColab();
     await registrarAuditoria('Colaborador cadastrado: ' + nome + ' (' + perfil + ')');
     loading(false);
-    alert('âœ… Colaborador cadastrado!');
+    alert('✅ Colaborador cadastrado!');
 }
 
 async function renderListaColab() {
@@ -1467,7 +1467,7 @@ async function renderListaColab() {
                 <span class="setor-badge" style="background:rgba(139,92,246,.3);color:#c4b5fd;">${it.perfil}</span>
                 <br><small style="color:var(--gray);">Login: ${it.user_login}${it.nfc_id?' | NFC: '+it.nfc_id:''}</small>
             </div>
-            <button class="btn-danger btn-sm" onclick="excluirColab(${it.id})">âœ•</button>
+            <button class="btn-danger btn-sm" onclick="excluirColab(${it.id})">✕</button>
         </div>`).join('');
 }
 
@@ -1477,9 +1477,9 @@ async function excluirColab(id) {
     await renderListaColab();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// FROTA / VEÃCULOS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// FROTA / VEÍCULOS
+// ─────────────────────────────────────────────
 async function salvarVeiculo() {
     const placa   = document.getElementById('v-placa').value.toUpperCase().trim();
     const modelo  = document.getElementById('v-modelo').value.trim();
@@ -1487,37 +1487,37 @@ async function salvarVeiculo() {
     const kmAtual = parseInt(document.getElementById('v-km-atual').value) || 0;
     const kmRev   = document.getElementById('v-km-revisao').value || null;
     const tipo    = document.getElementById('v-tipo').value;
-    if (!placa) { alert('Informe a placa do veÃ­culo!'); return; }
+    if (!placa) { alert('Informe a placa do veículo!'); return; }
 
     loading(true, 'Salvando...');
     const { error } = await db.from(TBL.veiculos).insert({ placa, modelo, ano, km_atual: kmAtual, km_proxima_revisao: kmRev, tipo });
-    if (error) { loading(false); alert('Erro: ' + error.message + (error.code==='23505'?' (Placa jÃ¡ cadastrada)':'')); return; }
+    if (error) { loading(false); alert('Erro: ' + error.message + (error.code==='23505'?' (Placa já cadastrada)':'')); return; }
 
     ['v-placa','v-modelo','v-ano','v-km-atual','v-km-revisao'].forEach(id => document.getElementById(id).value='');
     await renderListaVeic();
     await popularSeletorVeiculos();
-    await registrarAuditoria('VeÃ­culo cadastrado: ' + placa);
+    await registrarAuditoria('Veículo cadastrado: ' + placa);
     loading(false);
-    alert('âœ… VeÃ­culo cadastrado!');
+    alert('✅ Veículo cadastrado!');
 }
 
 async function renderListaVeic() {
     const { data: items } = await db.from(TBL.veiculos).select('*').order('placa');
     const cont = document.getElementById('list-veic');
     if (!cont) return;
-    if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum veÃ­culo cadastrado.</p>'; return; }
+    if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum veículo cadastrado.</p>'; return; }
     cont.innerHTML = items.map(v => `
         <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
             <div>
                 <b>${v.placa}</b> <span class="setor-badge setor-${v.tipo}">${v.tipo}</span>
-                <br><small style="color:var(--gray);">${v.modelo||'â€”'} ${v.ano?'Â· '+v.ano:''} | KM Atual: ${v.km_atual||'â€”'} | PrÃ³x. Rev.: ${v.km_proxima_revisao||'â€”'}</small>
+                <br><small style="color:var(--gray);">${v.modelo||'—'} ${v.ano?'· '+v.ano:''} | KM Atual: ${v.km_atual||'—'} | Próx. Rev.: ${v.km_proxima_revisao||'—'}</small>
             </div>
-            <button class="btn-danger btn-sm" onclick="excluirVeiculo(${v.id})">âœ•</button>
+            <button class="btn-danger btn-sm" onclick="excluirVeiculo(${v.id})">✕</button>
         </div>`).join('');
 }
 
 async function excluirVeiculo(id) {
-    if (!confirm('Remover este veÃ­culo?')) return;
+    if (!confirm('Remover este veículo?')) return;
     await db.from(TBL.veiculos).delete().eq('id', id);
     await renderListaVeic();
     await popularSeletorVeiculos();
@@ -1528,21 +1528,21 @@ async function popularSeletorVeiculos() {
     ['p-placa','m-veiculo','ab-veiculo'].forEach(id => {
         const sel = document.getElementById(id);
         if (!sel) return;
-        sel.innerHTML = '<option value="">â€” Selecione â€”</option>' +
+        sel.innerHTML = '<option value="">— Selecione —</option>' +
             (veics||[]).map(v => `<option value="${v.placa}">${v.placa}${v.modelo?' - '+v.modelo:''} (${v.tipo})</option>`).join('');
     });
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// MANUTENÃ‡Ã•ES
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// MANUTENÇÕES
+// ─────────────────────────────────────────────
 async function salvarManutencao() {
     const placa = document.getElementById('m-veiculo').value;
     const desc  = document.getElementById('m-descricao').value.trim();
     const km    = document.getElementById('m-km-programada').value || null;
     const data  = document.getElementById('m-data-limite').value || null;
     const urg   = document.getElementById('m-urgencia').value;
-    if (!placa || !desc) { alert('Preencha veÃ­culo e descriÃ§Ã£o!'); return; }
+    if (!placa || !desc) { alert('Preencha veículo e descrição!'); return; }
 
     loading(true, 'Salvando...');
     const { error } = await db.from(TBL.manutencoes).insert({ placa, descricao: desc, km_programada: km ? parseInt(km) : null, data_limite: data, urgencia: urg, status: 'PENDENTE' });
@@ -1550,16 +1550,16 @@ async function salvarManutencao() {
 
     ['m-descricao','m-km-programada','m-data-limite'].forEach(id => document.getElementById(id).value='');
     await carregarManutencoes();
-    await registrarAuditoria('RevisÃ£o programada: ' + placa + ' â€” ' + desc);
+    await registrarAuditoria('Revisão programada: ' + placa + ' — ' + desc);
     loading(false);
-    alert('âœ… RevisÃ£o programada!');
+    alert('✅ Revisão programada!');
 }
 
 async function carregarManutencoes() {
     const { data: list } = await db.from(TBL.manutencoes).select('*').order('id', { ascending: false });
     const cont = document.getElementById('list-manutencoes');
     if (!cont) return;
-    if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhuma revisÃ£o programada.</p>'; return; }
+    if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhuma revisão programada.</p>'; return; }
     cont.innerHTML = list.map(m => {
         const urgColor = { critico:'var(--danger)', urgente:'var(--warning)', normal:'var(--info)' }[m.urgencia] || 'var(--gray)';
         const concluido = m.status === 'CONCLUIDO';
@@ -1567,13 +1567,13 @@ async function carregarManutencoes() {
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div>
                     <span class="status-badge" style="background:${concluido?'var(--success)':'rgba(245,158,11,.3)'};color:${concluido?'#fff':'var(--warning)'};">${m.status}</span>
-                    <b>${m.placa}</b> â€” ${m.descricao}
-                    <br><small style="color:var(--gray);">KM: ${m.km_programada||'â€”'} | AtÃ©: ${m.data_limite||'â€”'} | ${m.urgencia||'normal'}</small>
-                    ${m.concluido_em ? `<br><small style="color:var(--success);">âœ… ConcluÃ­do: ${m.concluido_em}</small>` : ''}
+                    <b>${m.placa}</b> — ${m.descricao}
+                    <br><small style="color:var(--gray);">KM: ${m.km_programada||'—'} | Até: ${m.data_limite||'—'} | ${m.urgencia||'normal'}</small>
+                    ${m.concluido_em ? `<br><small style="color:var(--success);">✅ Concluído: ${m.concluido_em}</small>` : ''}
                 </div>
                 <div style="display:flex;gap:4px;">
-                    ${!concluido ? `<button class="btn-success btn-sm" onclick="concluirManutItem(${m.id})">âœ…</button>` : ''}
-                    <button class="btn-danger btn-sm" onclick="excluirManut(${m.id})">âœ•</button>
+                    ${!concluido ? `<button class="btn-success btn-sm" onclick="concluirManutItem(${m.id})">✅</button>` : ''}
+                    <button class="btn-danger btn-sm" onclick="excluirManut(${m.id})">✕</button>
                 </div>
             </div>
         </div>`;
@@ -1588,14 +1588,14 @@ async function concluirManutItem(id) {
 }
 
 async function excluirManut(id) {
-    if (!confirm('Remover esta revisÃ£o?')) return;
+    if (!confirm('Remover esta revisão?')) return;
     await db.from(TBL.manutencoes).delete().eq('id', id);
     await carregarManutencoes();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// PROGRAMADOR: LANÃ‡AMENTOS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// PROGRAMADOR: LANÇAMENTOS
+// ─────────────────────────────────────────────
 function toggleFornDiv() {
     const tipo = document.getElementById('p-tipo-op')?.value;
     const div  = document.getElementById('p-forn-div');
@@ -1606,7 +1606,7 @@ async function popularSeletorFornecedores() {
     const { data: forns } = await db.from(TBL.fornecedores).select('nome').order('nome');
     const sel = document.getElementById('p-fornecedor-select');
     if (!sel) return;
-    sel.innerHTML = '<option value="">â€” Selecione o destino â€”</option>' +
+    sel.innerHTML = '<option value="">— Selecione o destino —</option>' +
         (forns||[]).map(f => `<option value="${f.nome}">${f.nome}</option>`).join('');
 }
 
@@ -1621,7 +1621,7 @@ async function atualizarSetor() {
         display.style.display = 'block';
         const { data: revs } = await db.from(TBL.manutencoes).select('id').eq('placa', placa).eq('status','PENDENTE');
         const alerta = document.getElementById('p-revisao-alerta');
-        if (alerta) alerta.textContent = revs?.length ? ' âš ï¸ REVISÃƒO PENDENTE!' : '';
+        if (alerta) alerta.textContent = revs?.length ? ' ⚠️ REVISÃO PENDENTE!' : '';
     } else {
         display.style.display = 'none';
     }
@@ -1646,19 +1646,19 @@ function renderNewPreviews() {
         const ts  = typeof f === 'object' ? f.ts : '';
         return `<div class="photo-card">
             <img src="${src}" class="thumb" onclick="verFotoGrande('${src}')">
-            <div class="timestamp-overlay">ðŸ“… ${ts}</div>
-            <button class="del-btn" onclick="tempFotos.splice(${idx},1);renderNewPreviews()">âœ•</button>
+            <div class="timestamp-overlay">📅 ${ts}</div>
+            <button class="del-btn" onclick="tempFotos.splice(${idx},1);renderNewPreviews()">✕</button>
         </div>`;
     }).join('');
 }
 
 async function lancarProgramacao() {
     const placa = document.getElementById('p-placa').value;
-    if (!placa) { alert('Selecione um veÃ­culo!'); return; }
+    if (!placa) { alert('Selecione um veículo!'); return; }
     const tipo       = document.getElementById('p-tipo-op').value;
     const km         = document.getElementById('p-km').value || null;
     const obs        = DOMPurify.sanitize(document.getElementById('p-obs').value);
-    const fornecedor = tipo === 'RETORNO' ? 'PÃTIO' : (document.getElementById('p-fornecedor-select').value || 'â€”');
+    const fornecedor = tipo === 'RETORNO' ? 'PÁTIO' : (document.getElementById('p-fornecedor-select').value || '—');
     const setor      = document.getElementById('p-setor-label')?.innerText || '';
     const fotos      = tempFotos.map(f => typeof f === 'string' ? f : f.data);
     const ts         = new Date().toLocaleString('pt-BR');
@@ -1676,7 +1676,7 @@ async function lancarProgramacao() {
 
     if (!isOnline) {
         enfileirarOffline(TBL.prog, payload);
-        // Salva localmente para exibiÃ§Ã£o imediata
+        // Salva localmente para exibição imediata
         const local = JSON.parse(localStorage.getItem('lokamig_prog_local') || '[]');
         local.push({ ...payload, id: Date.now(), _offline: true });
         localStorage.setItem('lokamig_prog_local', JSON.stringify(local));
@@ -1686,9 +1686,9 @@ async function lancarProgramacao() {
         const { error } = await db.from(TBL.prog).insert(payload);
         if (error) { loading(false); alert('Erro: ' + error.message); return; }
         if (km) await db.from(TBL.veiculos).update({ km_atual: parseInt(km) }).eq('placa', placa);
-        await registrarAuditoria(`LanÃ§amento: ${tipo} ${placa} â†’ ${fornecedor} | Por: ${currentUser?.nome}`);
+        await registrarAuditoria(`Lançamento: ${tipo} ${placa} → ${fornecedor} | Por: ${currentUser?.nome}`);
         loading(false);
-        showSuccess('LANÃ‡AMENTO ENVIADO!');
+        showSuccess('LANÇAMENTO ENVIADO!');
     }
 
     tempFotos = [];
@@ -1704,35 +1704,35 @@ async function carregarProgGeral() {
     const dt = document.getElementById('p-filter-date')?.value || '';
     const { data: list } = await db.from(TBL.prog).select('*').eq('data_servico', dt).order('id', { ascending: false });
     const cont = document.getElementById('list-prog-geral');
-    if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lanÃ§amento nesta data.</p>'; return; }
+    if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento nesta data.</p>'; return; }
     cont.innerHTML = list.map(s => {
-        const statusColor = { 'PENDENTE':'var(--warning)', 'EM EXECUÃ‡ÃƒO':'#ef4444', 'CONCLUIDO':'var(--success)', 'CANCELADO':'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
+        const statusColor = { 'PENDENTE':'var(--warning)', 'EM EXECUÇÃO':'#ef4444', 'CONCLUIDO':'var(--success)', 'CANCELADO':'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
         const podeCancelar = s.status_flow !== 'CANCELADO' && s.status_flow !== 'CONCLUIDO';
         return `<div class="prog-item ${s.status_flow==='CANCELADO'?'cancelado':''}">
             <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
-            <b>${s.placa}</b> â€” ${s.tipo_op}
+            <b>${s.placa}</b> — ${s.tipo_op}
             ${s.setor?`<span class="setor-badge setor-${s.setor}">${s.setor}</span>`:''}
-            <br><small style="color:var(--gray);">${s.fornecedor} | KM: ${s.km||'â€”'} | ${s.timestamp}</small>
-            ${s.rating?`<br><small style="color:#fbbf24;">${'â˜…'.repeat(s.rating)}${'â˜†'.repeat(5-s.rating)}</small>`:''}
-            ${podeCancelar ? `<div class="card-acoes"><button class="btn-cancel btn-sm" onclick="cancelarServicoProg(${s.id})">ðŸš« Cancelar</button></div>` : ''}
+            <br><small style="color:var(--gray);">${s.fornecedor} | KM: ${s.km||'—'} | ${s.timestamp}</small>
+            ${s.rating?`<br><small style="color:#fbbf24;">${'★'.repeat(s.rating)}${'☆'.repeat(5-s.rating)}</small>`:''}
+            ${podeCancelar ? `<div class="card-acoes"><button class="btn-cancel btn-sm" onclick="cancelarServicoProg(${s.id})">🚫 Cancelar</button></div>` : ''}
         </div>`;
     }).join('');
 }
 
 async function cancelarServicoProg(id) {
-    if (!confirm('Cancelar este serviÃ§o? O fornecedor serÃ¡ notificado.')) return;
+    if (!confirm('Cancelar este serviço? O fornecedor será notificado.')) return;
     const ts = new Date().toLocaleString('pt-BR');
     const { error } = await db.from(TBL.prog).update({ status_flow: 'CANCELADO', cancelado_em: ts, cancelado_por: currentUser?.nome }).eq('id', id);
     if (!error) {
         await registrarAuditoria(`Cancelamento pelo programador ${currentUser?.nome}: ID ${id}`);
-        showSuccess('SERVIÃ‡O CANCELADO!');
+        showSuccess('SERVIÇO CANCELADO!');
         await carregarProgGeral();
     } else { alert('Erro: ' + error.message); }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// FORNECEDOR: SERVIÃ‡OS DO DIA
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// FORNECEDOR: SERVIÇOS DO DIA
+// ─────────────────────────────────────────────
 async function carregarServicosForn() {
     if (!currentUser) return;
     const dt = document.getElementById('forn-filter-date')?.value || new Date().toISOString().split('T')[0];
@@ -1741,23 +1741,23 @@ async function carregarServicosForn() {
         .select('*').eq('data_servico', dt).eq('fornecedor', currentUser.empresa).neq('status_flow','CANCELADO');
 
     const cont = document.getElementById('list-forn-servicos');
-    if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum serviÃ§o para esta data.</p>'; return; }
+    if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum serviço para esta data.</p>'; return; }
 
     cont.innerHTML = list.map(s => {
-        const statusColor = { 'PENDENTE':'var(--warning)', 'EM EXECUÃ‡ÃƒO':'#ef4444', 'CONCLUIDO':'var(--success)' }[s.status_flow] || 'var(--gray)';
+        const statusColor = { 'PENDENTE':'var(--warning)', 'EM EXECUÇÃO':'#ef4444', 'CONCLUIDO':'var(--success)' }[s.status_flow] || 'var(--gray)';
         const podeIniciar  = s.status_flow === 'PENDENTE';
-        const podeConcluir = s.status_flow === 'EM EXECUÃ‡ÃƒO';
+        const podeConcluir = s.status_flow === 'EM EXECUÇÃO';
         return `<div class="prog-item">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
                 <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
                 <b>${s.placa}</b>
                 ${s.setor?`<span class="setor-badge setor-${s.setor}">${s.setor}</span>`:''}
             </div>
-            <small style="color:#cbd5e1;">${s.tipo_op||''} | KM: ${s.km||'â€”'} | ${s.timestamp}</small>
-            ${s.obs?`<br><small style="color:var(--gray);">ðŸ“ ${s.obs}</small>`:''}
+            <small style="color:#cbd5e1;">${s.tipo_op||''} | KM: ${s.km||'—'} | ${s.timestamp}</small>
+            ${s.obs?`<br><small style="color:var(--gray);">📝 ${s.obs}</small>`:''}
             <div class="card-acoes">
-                ${podeIniciar  ? `<button class="btn-warning btn-sm" onclick="abrirModalStatus(${s.id},'EM EXECUÃ‡ÃƒO')">â–¶ INICIAR</button>` : ''}
-                ${podeConcluir ? `<button class="btn-success btn-sm" onclick="abrirModalStatus(${s.id},'CONCLUIDO')">âœ… CONCLUIR</button>` : ''}
+                ${podeIniciar  ? `<button class="btn-warning btn-sm" onclick="abrirModalStatus(${s.id},'EM EXECUÇÃO')">▶ INICIAR</button>` : ''}
+                ${podeConcluir ? `<button class="btn-success btn-sm" onclick="abrirModalStatus(${s.id},'CONCLUIDO')">✅ CONCLUIR</button>` : ''}
             </div>
         </div>`;
     }).join('');
@@ -1768,21 +1768,21 @@ async function carregarAlertasRevisaoFornecedor() {
     if (!cont) return;
     const { data: manut } = await db.from(TBL.manutencoes).select('placa,descricao').eq('status','PENDENTE').eq('urgencia','critico');
     cont.innerHTML = (manut||[]).map(m =>
-        `<div class="alert-card alert-danger">ðŸš¨ REVISÃƒO CRÃTICA: <b>${m.placa}</b> â€” ${m.descricao}</div>`
+        `<div class="alert-card alert-danger">🚨 REVISÃO CRÍTICA: <b>${m.placa}</b> — ${m.descricao}</div>`
     ).join('');
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // MODAL STATUS (FORNECEDOR)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 function abrirModalStatus(id, novoStatus) {
     statusPendente = { id, novoStatus, fotos: [], rating: 0 };
-    document.getElementById('modal-status-titulo').innerText = novoStatus === 'EM EXECUÃ‡ÃƒO' ? 'â–¶ INICIAR SERVIÃ‡O' : 'âœ… FINALIZAR SERVIÃ‡O';
+    document.getElementById('modal-status-titulo').innerText = novoStatus === 'EM EXECUÇÃO' ? '▶ INICIAR SERVIÇO' : '✅ FINALIZAR SERVIÇO';
     document.getElementById('status-foto-preview').innerHTML = '';
     document.getElementById('status-obs').value = '';
     document.getElementById('btn-confirmar-status').classList.add('hidden');
     document.getElementById('rating-area').classList.toggle('hidden', novoStatus !== 'CONCLUIDO');
-    document.querySelectorAll('#rating-stars span').forEach(s => { s.classList.remove('active'); s.textContent='â˜†'; });
+    document.querySelectorAll('#rating-stars span').forEach(s => { s.classList.remove('active'); s.textContent='☆'; });
     show('scr-modal-status');
 }
 
@@ -1804,8 +1804,8 @@ function renderStatusPreviews() {
         const ts  = typeof f === 'object' ? f.ts : '';
         return `<div class="photo-card">
             <img src="${src}" class="thumb" onclick="verFotoGrande('${src}')">
-            <div class="timestamp-overlay">ðŸ“… ${ts}</div>
-            <button class="del-btn" onclick="statusPendente.fotos.splice(${i},1);renderStatusPreviews()">âœ•</button>
+            <div class="timestamp-overlay">📅 ${ts}</div>
+            <button class="del-btn" onclick="statusPendente.fotos.splice(${i},1);renderStatusPreviews()">✕</button>
         </div>`;
     }).join('');
     document.getElementById('btn-confirmar-status').classList.toggle('hidden', statusPendente.fotos.length === 0);
@@ -1815,7 +1815,7 @@ function setRating(val) {
     statusPendente.rating = val;
     document.querySelectorAll('#rating-stars span').forEach((s, i) => {
         s.classList.toggle('active', i < val);
-        s.textContent = i < val ? 'â˜…' : 'â˜†';
+        s.textContent = i < val ? '★' : '☆';
     });
 }
 
@@ -1846,9 +1846,9 @@ async function confirmarAlteracaoStatus() {
         });
     }
 
-    await registrarAuditoria(`Status: ID ${statusPendente.id} â†’ ${statusPendente.novoStatus} | ${currentUser?.empresa}`);
+    await registrarAuditoria(`Status: ID ${statusPendente.id} → ${statusPendente.novoStatus} | ${currentUser?.empresa}`);
     loading(false);
-    showSuccess(statusPendente.novoStatus === 'CONCLUIDO' ? 'SERVIÃ‡O CONCLUÃDO!' : 'SERVIÃ‡O INICIADO!');
+    showSuccess(statusPendente.novoStatus === 'CONCLUIDO' ? 'SERVIÇO CONCLUÍDO!' : 'SERVIÇO INICIADO!');
     fecharModalStatus();
 }
 
@@ -1858,9 +1858,9 @@ async function fecharModalStatus() {
     statusPendente = { id: null, novoStatus: null, fotos: [], rating: 0 };
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // ABASTECIMENTO
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 function handleAbastecimentoFoto(input) {
     if (!input.files[0]) return;
     const reader = new FileReader();
@@ -1868,7 +1868,7 @@ function handleAbastecimentoFoto(input) {
         abastecimentoFoto = e.target.result;
         document.getElementById('ab-preview-foto').innerHTML =
             `<div class="photo-card"><img src="${e.target.result}" class="thumb" onclick="verFotoGrande('${e.target.result}')">
-             <button class="del-btn" onclick="abastecimentoFoto=null;document.getElementById('ab-preview-foto').innerHTML=''">âœ•</button></div>`;
+             <button class="del-btn" onclick="abastecimentoFoto=null;document.getElementById('ab-preview-foto').innerHTML=''">✕</button></div>`;
     };
     reader.readAsDataURL(input.files[0]);
 }
@@ -1901,7 +1901,7 @@ async function salvarAbastecimento() {
     await carregarAbastecimentos();
     await atualizarDashboard();
     loading(false);
-    alert('âœ… Abastecimento registrado!');
+    alert('✅ Abastecimento registrado!');
 }
 
 async function carregarAbastecimentos() {
@@ -1920,44 +1920,44 @@ async function carregarAbastecimentos() {
 
     const nomeMes = new Date(parseInt(ano), parseInt(mes)-1).toLocaleString('pt-BR', { month:'long', year:'numeric' });
     const resumo = document.getElementById('resumo-combustivel');
-    if (resumo) resumo.innerHTML = `â›½ <b>${nomeMes}:</b> ${totalLitros.toFixed(1)}L | <b style="color:var(--success);">R$ ${totalValor.toFixed(2)}</b> | ${(mesList||[]).length} abastecimento(s)`;
+    if (resumo) resumo.innerHTML = `⛽ <b>${nomeMes}:</b> ${totalLitros.toFixed(1)}L | <b style="color:var(--success);">R$ ${totalValor.toFixed(2)}</b> | ${(mesList||[]).length} abastecimento(s)`;
 
     const cont = document.getElementById('list-abastecimentos');
     if (!cont) return;
-    if (!mesList?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum abastecimento neste mÃªs.</p>'; return; }
+    if (!mesList?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum abastecimento neste mês.</p>'; return; }
     cont.innerHTML = mesList.map(a => `
         <div class="prog-item">
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div>
-                    <b>${a.placa}</b> â€” <span style="color:var(--success);">${a.litros}L | R$ ${parseFloat(a.valor).toFixed(2)}</span>
+                    <b>${a.placa}</b> — <span style="color:var(--success);">${a.litros}L | R$ ${parseFloat(a.valor).toFixed(2)}</span>
                     <br><small style="color:var(--gray);">KM: ${a.km} | ${a.timestamp||a.data_abast}</small>
-                    ${a.comprovante ? `<br><span onclick="verFotoGrande('${a.comprovante}')" style="color:var(--info);cursor:pointer;font-size:11px;">ðŸ“Ž Ver comprovante</span>` : ''}
+                    ${a.comprovante ? `<br><span onclick="verFotoGrande('${a.comprovante}')" style="color:var(--info);cursor:pointer;font-size:11px;">📎 Ver comprovante</span>` : ''}
                 </div>
                 <div style="text-align:right;font-size:11px;color:var(--gray);">
-                    R$/L: ${a.litros>0?(parseFloat(a.valor)/parseFloat(a.litros)).toFixed(2):'â€”'}
+                    R$/L: ${a.litros>0?(parseFloat(a.valor)/parseFloat(a.litros)).toFixed(2):'—'}
                 </div>
             </div>
         </div>`).join('');
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // E-MAILS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 async function adicionarEmail() {
     const email = document.getElementById('email-destinatario').value.trim();
     const nome  = document.getElementById('email-nome').value.trim();
     if (!email) { alert('Informe o e-mail!'); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('E-mail invÃ¡lido!'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('E-mail inválido!'); return; }
 
     loading(true, 'Salvando...');
     const { error } = await db.from(TBL.emails).insert({ email, nome });
-    if (error) { loading(false); alert(error.code==='23505'?'E-mail jÃ¡ cadastrado!':'Erro: '+error.message); return; }
+    if (error) { loading(false); alert(error.code==='23505'?'E-mail já cadastrado!':'Erro: '+error.message); return; }
 
     document.getElementById('email-destinatario').value='';
     document.getElementById('email-nome').value='';
     await carregarEmails();
     loading(false);
-    alert('âœ… E-mail cadastrado!');
+    alert('✅ E-mail cadastrado!');
 }
 
 async function carregarEmails() {
@@ -1967,8 +1967,8 @@ async function carregarEmails() {
     if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum e-mail cadastrado.</p>'; return; }
     cont.innerHTML = items.map(it => `
         <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
-            <div><b>${it.nome||'â€”'}</b><br><small style="color:var(--gray);">${it.email}</small></div>
-            <button class="btn-danger btn-sm" onclick="excluirEmail(${it.id})">âœ•</button>
+            <div><b>${it.nome||'—'}</b><br><small style="color:var(--gray);">${it.email}</small></div>
+            <button class="btn-danger btn-sm" onclick="excluirEmail(${it.id})">✕</button>
         </div>`).join('');
 }
 
@@ -1978,15 +1978,15 @@ async function excluirEmail(id) {
     await carregarEmails();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // AUDITORIA
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 async function registrarAuditoria(acao) {
     try {
         await db.from(TBL.auditoria).insert({
             data_hora: new Date().toLocaleString('pt-BR'),
             acao,
-            usuario: currentUser?.nome || 'â€”'
+            usuario: currentUser?.nome || '—'
         });
     } catch(_) {}
 }
@@ -1997,25 +1997,25 @@ async function carregarAuditoria() {
     if (!cont) return;
     cont.innerHTML = (logs||[]).length ? logs.map(l =>
         `<div class="prog-item" style="font-size:10px;padding:8px 12px;">
-            <b>${l.usuario||'â€”'}</b> â€” ${l.acao}
+            <b>${l.usuario||'—'}</b> — ${l.acao}
             <br><small style="color:var(--gray);">${l.data_hora}</small>
         </div>`).join('') : '<p style="color:var(--gray);">Nenhuma atividade registrada.</p>';
 }
 
 async function limparAuditoria() {
-    if (!confirm('Limpar todo o histÃ³rico de auditoria?')) return;
+    if (!confirm('Limpar todo o histórico de auditoria?')) return;
     await db.from(TBL.auditoria).delete().gte('id', 0);
     await carregarAuditoria();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// ORÃ‡AMENTOS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// ORÇAMENTOS
+// ─────────────────────────────────────────────
 function addItem() {
     const c = document.getElementById('orc-itens');
     const d = document.createElement('div');
     d.style.cssText = 'display:flex;gap:5px;margin-bottom:8px;';
-    d.innerHTML = '<input type="text" placeholder="DescriÃ§Ã£o do item" style="flex:2;margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;" oninput="calcTotal()">';
+    d.innerHTML = '<input type="text" placeholder="Descrição do item" style="flex:2;margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;" oninput="calcTotal()">';
     c.appendChild(d);
 }
 
@@ -2044,14 +2044,14 @@ function renderEvidencias() {
             ? `<img src="${ev.data}" onclick="verFotoGrande('${ev.data}')">`
             : ev.mime?.startsWith('video/')
                 ? `<video src="${ev.data}" controls style="width:100%;height:100%;object-fit:cover;"></video>`
-                : `<div class="ev-label">ðŸ“Ž<span style="padding:4px;text-align:center;">${ev.nome}</span></div>`;
-        return `<div class="ev-card">${content}<button class="del-btn" onclick="tempEvidencias.splice(${i},1);renderEvidencias()">âœ•</button></div>`;
+                : `<div class="ev-label">📎<span style="padding:4px;text-align:center;">${ev.nome}</span></div>`;
+        return `<div class="ev-card">${content}<button class="del-btn" onclick="tempEvidencias.splice(${i},1);renderEvidencias()">✕</button></div>`;
     }).join('');
 }
 
 async function enviarOrcamento() {
     const placa = document.getElementById('orc-placa').value.toUpperCase().trim();
-    if (!placa) { alert('Informe a placa do veÃ­culo!'); return; }
+    if (!placa) { alert('Informe a placa do veículo!'); return; }
     const desc = document.getElementById('orc-desc').value.trim();
     const itens = [];
     document.querySelectorAll('#orc-itens > div').forEach(row => {
@@ -2062,11 +2062,11 @@ async function enviarOrcamento() {
     if (!itens.length) { alert('Adicione pelo menos um item!'); return; }
     const total = itens.reduce((s, i) => s + i.valor, 0);
 
-    loading(true, 'Enviando orÃ§amento...');
+    loading(true, 'Enviando orçamento...');
     const { error } = await db.from(TBL.orcamentos).insert({
         timestamp: new Date().toLocaleString('pt-BR'),
         data_orc: new Date().toISOString().split('T')[0],
-        empresa: currentUser?.empresa || 'â€”',
+        empresa: currentUser?.empresa || '—',
         placa, descricao: desc, itens, total,
         evidencias: [...tempEvidencias],
         status: 'PENDENTE'
@@ -2076,12 +2076,12 @@ async function enviarOrcamento() {
     tempEvidencias = [];
     document.getElementById('orc-placa').value = '';
     document.getElementById('orc-desc').value = '';
-    document.getElementById('orc-itens').innerHTML = '<div style="display:flex;gap:5px;margin-bottom:8px;"><input type="text" placeholder="DescriÃ§Ã£o do item" style="flex:2;margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;" oninput="calcTotal()"></div>';
+    document.getElementById('orc-itens').innerHTML = '<div style="display:flex;gap:5px;margin-bottom:8px;"><input type="text" placeholder="Descrição do item" style="flex:2;margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;" oninput="calcTotal()"></div>';
     document.getElementById('total-orc').textContent = '0,00';
     renderEvidencias();
-    await registrarAuditoria(`OrÃ§amento enviado: ${placa} | R$${total.toFixed(2)} | ${currentUser?.empresa}`);
+    await registrarAuditoria(`Orçamento enviado: ${placa} | R$${total.toFixed(2)} | ${currentUser?.empresa}`);
     loading(false);
-    showSuccess('ORÃ‡AMENTO ENVIADO!');
+    showSuccess('ORÇAMENTO ENVIADO!');
     setTimeout(() => show('scr-fornecedor'), 2000);
 }
 
@@ -2093,11 +2093,11 @@ async function abrirOrcamentosEnviados() {
 
     document.getElementById('list-orc-enviados').innerHTML = (orcs||[]).length
         ? orcs.map(o => `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrcForn(${o.id})">
-            <b>${o.placa}</b> â€” R$ ${o.total.toLocaleString('pt-BR',{minimumFractionDigits:2})}
+            <b>${o.placa}</b> — R$ ${o.total.toLocaleString('pt-BR',{minimumFractionDigits:2})}
             <span class="status-badge" style="float:right;background:${o.status==='APROVADO'?'var(--success)':o.status==='REJEITADO'?'var(--danger)':o.status==='CANCELADO'?'var(--cancelled)':'rgba(245,158,11,.3)'};">${o.status}</span>
             <br><small style="color:var(--gray);">${o.empresa} | ${o.timestamp}</small>
         </div>`).join('')
-        : '<p style="color:var(--gray);">Nenhum orÃ§amento enviado.</p>';
+        : '<p style="color:var(--gray);">Nenhum orçamento enviado.</p>';
     show('scr-orc-enviados');
 }
 
@@ -2111,13 +2111,13 @@ async function renderOrcamentosAdmin() {
 
     const { data: orcs } = await q;
     const cont = document.getElementById('list-orcamentos-admin');
-    if (!orcs?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum orÃ§amento encontrado.</p>'; return; }
+    if (!orcs?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum orçamento encontrado.</p>'; return; }
     cont.innerHTML = orcs.map(o => {
         const cor = o.status==='APROVADO'?'var(--success)':o.status==='REJEITADO'?'var(--danger)':o.status==='CANCELADO'?'var(--cancelled)':'rgba(245,158,11,.3)';
         return `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrc(${o.id})">
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div>
-                    <b>${o.placa}</b> â€” <span style="color:var(--success);font-weight:bold;">R$ ${o.total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+                    <b>${o.placa}</b> — <span style="color:var(--success);font-weight:bold;">R$ ${o.total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
                     <br><small style="color:var(--gray);">${o.empresa} | ${o.timestamp}</small>
                 </div>
                 <span class="status-badge" style="background:${cor};color:#fff;">${o.status}</span>
@@ -2143,13 +2143,13 @@ async function _abrirDetalheOrcComum(id) {
     const o = rows?.[0]; if (!o) return;
     orcAtual = { ...o };
 
-    document.getElementById('orc-det-titulo').textContent = `ORÃ‡AMENTO â€” ${o.placa}`;
+    document.getElementById('orc-det-titulo').textContent = `ORÇAMENTO — ${o.placa}`;
     document.getElementById('orc-det-body').innerHTML = `
     <table>
         <tr><th>Empresa</th><td>${o.empresa}</td></tr>
         <tr><th>Placa</th><td><b>${o.placa}</b></td></tr>
         <tr><th>Data</th><td>${o.timestamp}</td></tr>
-        <tr><th>DescriÃ§Ã£o</th><td>${o.descricao||'â€”'}</td></tr>
+        <tr><th>Descrição</th><td>${o.descricao||'—'}</td></tr>
         <tr><th colspan="2" style="padding-top:8px;color:var(--gray);">ITENS</th></tr>
         ${(o.itens||[]).map(it => `<tr><td>${it.desc}</td><td style="color:var(--success);">R$ ${it.valor.toFixed(2)}</td></tr>`).join('')}
         <tr><td><b>TOTAL</b></td><td><b style="color:var(--success);font-size:14px;">R$ ${o.total.toFixed(2)}</b></td></tr>
@@ -2161,19 +2161,19 @@ async function _abrirDetalheOrcComum(id) {
         if (ev.mime?.startsWith('image/')) return `<div class="ev-card" onclick="verFotoGrande('${ev.data}')"><img src="${ev.data}"></div>`;
         if (ev.mime?.startsWith('video/')) return `<div class="ev-card"><video src="${ev.data}" controls style="width:100%;height:100%;object-fit:cover;"></video></div>`;
         return `<div class="ev-card" onclick="abrirDocEvidencia('${ev.data}','${ev.mime||'application/octet-stream'}','${ev.nome||'arquivo'}')" style="cursor:pointer;">
-            <div class="ev-label">ðŸ“„<span style="font-size:9px;padding:4px;word-break:break-all;">${ev.nome||'Documento'}</span><span style="font-size:10px;color:var(--info);">Clique para abrir</span></div>
+            <div class="ev-label">📄<span style="font-size:9px;padding:4px;word-break:break-all;">${ev.nome||'Documento'}</span><span style="font-size:10px;color:var(--info);">Clique para abrir</span></div>
         </div>`;
     }).join('');
 
     const acoesCont = document.getElementById('orc-det-acoes');
     if (orcDetalheOrigem === 'admin' && o.status === 'PENDENTE') {
         acoesCont.innerHTML = `<div class="btn-row" style="margin-top:10px;">
-            <button class="btn-success btn-flex" onclick="mudarStatusOrc(${id},'APROVADO')">âœ… APROVAR</button>
-            <button class="btn-danger btn-flex" onclick="mudarStatusOrc(${id},'REJEITADO')">âŒ REJEITAR</button>
+            <button class="btn-success btn-flex" onclick="mudarStatusOrc(${id},'APROVADO')">✅ APROVAR</button>
+            <button class="btn-danger btn-flex" onclick="mudarStatusOrc(${id},'REJEITADO')">❌ REJEITAR</button>
         </div>`;
     } else if (orcDetalheOrigem === 'fornecedor' && o.status === 'PENDENTE') {
         acoesCont.innerHTML = `<div class="btn-row" style="margin-top:10px;">
-            <button class="btn-cancel btn-flex" onclick="fornCancelarOrcamento(${id})">ðŸš« CANCELAR ORÃ‡AMENTO</button>
+            <button class="btn-cancel btn-flex" onclick="fornCancelarOrcamento(${id})">🚫 CANCELAR ORÇAMENTO</button>
         </div>`;
     } else {
         const cor = o.status==='APROVADO'?'var(--success)':o.status==='REJEITADO'?'var(--danger)':o.status==='CANCELADO'?'var(--cancelled)':'var(--warning)';
@@ -2188,19 +2188,19 @@ async function mudarStatusOrc(id, s) {
     loading(true, 'Atualizando...');
     const ts = new Date().toLocaleString('pt-BR');
     await db.from(TBL.orcamentos).update({ status: s, atualizado_em: ts }).eq('id', id);
-    await registrarAuditoria(`OrÃ§amento ${s}: ID ${id}`);
+    await registrarAuditoria(`Orçamento ${s}: ID ${id}`);
     loading(false);
     await _abrirDetalheOrcComum(id);
 }
 
 async function fornCancelarOrcamento(id) {
-    if (!confirm('Cancelar este orÃ§amento? Esta aÃ§Ã£o ficarÃ¡ registrada para o administrador.')) return;
+    if (!confirm('Cancelar este orçamento? Esta ação ficará registrada para o administrador.')) return;
     loading(true, 'Cancelando...');
     const ts = new Date().toLocaleString('pt-BR');
     await db.from(TBL.orcamentos).update({ status: 'CANCELADO', atualizado_em: ts, cancelado_por: currentUser?.empresa }).eq('id', id);
-    await registrarAuditoria(`OrÃ§amento CANCELADO pelo fornecedor ${currentUser?.empresa}: ID ${id}`);
+    await registrarAuditoria(`Orçamento CANCELADO pelo fornecedor ${currentUser?.empresa}: ID ${id}`);
     loading(false);
-    showSuccess('ORÃ‡AMENTO CANCELADO!');
+    showSuccess('ORÇAMENTO CANCELADO!');
     await fecharDetalheOrc();
 }
 
@@ -2215,9 +2215,9 @@ async function fecharDetalheOrc() {
     }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // CONFIG EmailJS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 async function salvarConfigEmailJS() {
     const cfg = {
         userId:     document.getElementById('cfg-ejs-userid').value.trim(),
@@ -2231,13 +2231,13 @@ async function salvarConfigEmailJS() {
     emailjsCfg = cfg;
     emailjs.init(cfg.userId);
     loading(false);
-    alert('âœ… ConfiguraÃ§Ã£o EmailJS salva!');
+    alert('✅ Configuração EmailJS salva!');
 }
 
 function enviarOrcamentoPorEmail() {
-    if (!orcAtual) { alert('Nenhum orÃ§amento carregado.'); return; }
-    if (!emailjsCfg.serviceId || !emailjsCfg.templateId) { alert('Configure o EmailJS primeiro na aba âš™ï¸ Config!'); return; }
-    const email = prompt('Digite o e-mail do destinatÃ¡rio:');
+    if (!orcAtual) { alert('Nenhum orçamento carregado.'); return; }
+    if (!emailjsCfg.serviceId || !emailjsCfg.templateId) { alert('Configure o EmailJS primeiro na aba ⚙️ Config!'); return; }
+    const email = prompt('Digite o e-mail do destinatário:');
     if (!email) return;
     emailjs.send(emailjsCfg.serviceId, emailjsCfg.templateId, {
         to_email: email,
@@ -2245,18 +2245,18 @@ function enviarOrcamentoPorEmail() {
         empresa: orcAtual.empresa,
         data: orcAtual.timestamp,
         total: orcAtual.total.toLocaleString('pt-BR',{minimumFractionDigits:2}),
-        itens: (orcAtual.itens||[]).map(it => `â€¢ ${it.desc}: R$ ${it.valor.toFixed(2)}`).join('\n'),
-        descricao: orcAtual.descricao||'â€”',
+        itens: (orcAtual.itens||[]).map(it => `• ${it.desc}: R$ ${it.valor.toFixed(2)}`).join('\n'),
+        descricao: orcAtual.descricao||'—',
         status: orcAtual.status
     }).then(async () => {
-        await registrarAuditoria(`E-mail orÃ§amento enviado para ${email} | ${orcAtual.placa}`);
-        alert('âœ… E-mail enviado com sucesso!');
-    }).catch(err => alert('âŒ Erro ao enviar e-mail: ' + JSON.stringify(err)));
+        await registrarAuditoria(`E-mail orçamento enviado para ${email} | ${orcAtual.placa}`);
+        alert('✅ E-mail enviado com sucesso!');
+    }).catch(err => alert('❌ Erro ao enviar e-mail: ' + JSON.stringify(err)));
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // BACKUP / RESTORE
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 async function exportarDados() {
     loading(true, 'Exportando dados...');
     const tabelas = Object.values(TBL);
@@ -2276,7 +2276,7 @@ async function exportarDados() {
 
 function importarDados(input) {
     if (!input.files[0]) return;
-    if (!confirm('Isso substituirÃ¡ TODOS os dados atuais. Continuar?')) return;
+    if (!confirm('Isso substituirá TODOS os dados atuais. Continuar?')) return;
     const reader = new FileReader();
     reader.onload = async e => {
         try {
@@ -2289,23 +2289,23 @@ function importarDados(input) {
                 }
             }
             loading(false);
-            alert('âœ… Backup restaurado! Recarregando...');
+            alert('✅ Backup restaurado! Recarregando...');
             location.reload();
-        } catch(err) { loading(false); alert('âŒ Arquivo de backup invÃ¡lido!'); }
+        } catch(err) { loading(false); alert('❌ Arquivo de backup inválido!'); }
     };
     reader.readAsText(input.files[0]);
 }
 
 async function resetarSistema() {
-    if (!confirm('âš ï¸ ATENÃ‡ÃƒO: Isso apagarÃ¡ TODOS os dados permanentemente!\n\nDigite CONFIRMAR para prosseguir.')) return;
+    if (!confirm('⚠️ ATENÇÃO: Isso apagará TODOS os dados permanentemente!\n\nDigite CONFIRMAR para prosseguir.')) return;
     const conf = prompt('Digite CONFIRMAR para apagar tudo:');
-    if (conf !== 'CONFIRMAR') { alert('OperaÃ§Ã£o cancelada.'); return; }
+    if (conf !== 'CONFIRMAR') { alert('Operação cancelada.'); return; }
     loading(true, 'Apagando dados...');
     for (const tbl of Object.values(TBL)) {
         await db.from(tbl).delete().gte('id', 0);
     }
     loading(false);
-    alert('âœ… Sistema resetado. Recarregando...');
+    alert('✅ Sistema resetado. Recarregando...');
     location.reload();
 }
 
@@ -2317,16 +2317,16 @@ async function gerarRelatorioFinanceiro() {
     const totalComb = (comb||[]).reduce((s,c) => s + (parseFloat(c.valor)||0), 0);
     const totalOrcs = (orcs||[]).reduce((s,o) => s + (parseFloat(o.total)||0), 0);
 
-    montarCabecalhoPDF('RELATÃ“RIO FINANCEIRO GERAL');
+    montarCabecalhoPDF('RELATÓRIO FINANCEIRO GERAL');
     document.getElementById('pdf-body').innerHTML = `
     <h3 style="color:#d1122a;margin-bottom:10px;">Resumo Financeiro</h3>
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
         <tr style="background:#f5f5f5;"><th style="padding:8px;">Categoria</th><th style="padding:8px;">Valor</th></tr>
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;">â›½ CombustÃ­vel Total</td><td style="padding:8px;border-bottom:1px solid #eee;color:#1a5276;font-weight:bold;">R$ ${totalComb.toFixed(2)}</td></tr>
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;">ðŸ”§ OrÃ§amentos Aprovados</td><td style="padding:8px;border-bottom:1px solid #eee;color:#1a5276;font-weight:bold;">R$ ${totalOrcs.toFixed(2)}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;">⛽ Combustível Total</td><td style="padding:8px;border-bottom:1px solid #eee;color:#1a5276;font-weight:bold;">R$ ${totalComb.toFixed(2)}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;">🔧 Orçamentos Aprovados</td><td style="padding:8px;border-bottom:1px solid #eee;color:#1a5276;font-weight:bold;">R$ ${totalOrcs.toFixed(2)}</td></tr>
         <tr style="background:#e8f5e9;font-weight:bold;"><td style="padding:8px;">TOTAL GERAL</td><td style="padding:8px;color:#1e8449;">R$ ${(totalComb+totalOrcs).toFixed(2)}</td></tr>
     </table>
-    <h4 style="margin-bottom:8px;">Ãšltimos 20 Abastecimentos</h4>
+    <h4 style="margin-bottom:8px;">Últimos 20 Abastecimentos</h4>
     <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <tr style="background:#f5f5f5;"><th style="padding:6px;">Data</th><th>Placa</th><th>Litros</th><th>Valor</th><th>KM</th></tr>
         ${(comb||[]).slice(-20).map(c => `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${c.data_abast}</td><td>${c.placa}</td><td>${parseFloat(c.litros).toFixed(1)}L</td><td>R$ ${parseFloat(c.valor).toFixed(2)}</td><td>${c.km}</td></tr>`).join('')}
@@ -2335,16 +2335,16 @@ async function gerarRelatorioFinanceiro() {
     await renderizarEBaixarPDF(`Relatorio_Financeiro_${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// PDF â€” Helpers
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// PDF — Helpers
+// ─────────────────────────────────────────────
 function montarCabecalhoPDF(titulo, subtitulo) {
     document.getElementById('pdf-titulo').innerText = titulo;
     document.getElementById('pdf-data-geracao').innerText = subtitulo || `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.0`;
     const logo = document.getElementById('pdf-logo');
     if (logo) {
         logo.style.display = 'block';
-        // ForÃ§a reload da logo com cache-busting para garantir que html2canvas a capture
+        // Força reload da logo com cache-busting para garantir que html2canvas a capture
         logo.crossOrigin = 'anonymous';
         logo.src = 'https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg?t=' + Date.now();
     }
@@ -2356,7 +2356,7 @@ function aguardarLogo() {
         if (!logo || logo.complete) { resolve(); return; }
         logo.onload = () => resolve();
         logo.onerror = () => resolve(); // continua mesmo sem logo
-        setTimeout(resolve, 3000); // timeout de seguranÃ§a
+        setTimeout(resolve, 3000); // timeout de segurança
     });
 }
 
@@ -2402,20 +2402,20 @@ async function gerarPDF(id) {
     const { data: rows } = await db.from(TBL.prog).select('*').eq('id', id);
     const item = rows?.[0]; if (!item) return;
 
-    montarCabecalhoPDF(`RELATÃ“RIO DE SERVIÃ‡O â€” ${item.tipo_op}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.0`);
+    montarCabecalhoPDF(`RELATÓRIO DE SERVIÇO — ${item.tipo_op}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.0`);
     document.getElementById('pdf-body').innerHTML = `
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;">Campo</th><th style="padding:8px;text-align:left;">Valor</th></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Placa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.placa}</td></tr>
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Setor</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.setor||'â€”'}</td></tr>
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>OperaÃ§Ã£o</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.tipo_op}</td></tr>
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Destino</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.fornecedor||'â€”'}</td></tr>
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>KM</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.km||'â€”'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Setor</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.setor||'—'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Operação</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.tipo_op}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Destino</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.fornecedor||'—'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>KM</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.km||'—'}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Status</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.status_flow}</td></tr>
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Programador</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.programador||'â€”'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Programador</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.programador||'—'}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Data/Hora</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.timestamp||item.data_servico}</td></tr>
-        ${item.obs ? `<tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>ObservaÃ§Ãµes</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.obs}</td></tr>` : ''}
-        ${item.rating ? `<tr><td style="padding:8px;"><b>AvaliaÃ§Ã£o</b></td><td style="padding:8px;">${'â˜…'.repeat(item.rating)}${'â˜†'.repeat(5-item.rating)}</td></tr>` : ''}
+        ${item.obs ? `<tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Observações</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.obs}</td></tr>` : ''}
+        ${item.rating ? `<tr><td style="padding:8px;"><b>Avaliação</b></td><td style="padding:8px;">${'★'.repeat(item.rating)}${'☆'.repeat(5-item.rating)}</td></tr>` : ''}
     </table>`;
     document.getElementById('pdf-photos').innerHTML = (item.fotos||[]).slice(0,4).map(f =>
         `<div style="position:relative;break-inside:avoid;">
@@ -2430,10 +2430,10 @@ async function gerarPDF(id) {
 async function gerarPDFOrcamento() {
     if (!orcAtual) return;
     const o = orcAtual;
-    montarCabecalhoPDF(`ORÃ‡AMENTO â€” ${o.placa}`, `Gerado em: ${new Date().toLocaleString('pt-BR')}`);
+    montarCabecalhoPDF(`ORÇAMENTO — ${o.placa}`, `Gerado em: ${new Date().toLocaleString('pt-BR')}`);
     document.getElementById('pdf-body').innerHTML = `
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;" colspan="2">InformaÃ§Ãµes do OrÃ§amento</th></tr>
+        <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;" colspan="2">Informações do Orçamento</th></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Empresa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.empresa}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Placa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.placa}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Data</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.timestamp}</td></tr>
@@ -2468,29 +2468,29 @@ async function gerarPDFAbastecimentosMes() {
         porPlaca[a.placa].count++;
     });
 
-    montarCabecalhoPDF(`RELATÃ“RIO DE COMBUSTÃVEL â€” ${nomeMes.toUpperCase()}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | Lokamig v6.0`);
+    montarCabecalhoPDF(`RELATÓRIO DE COMBUSTÍVEL — ${nomeMes.toUpperCase()}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | Lokamig v6.0`);
     document.getElementById('pdf-body').innerHTML = `
     <div style="background:#fef9e7;border:1px solid #f39c12;border-radius:8px;padding:12px;margin-bottom:16px;">
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
             <tr><td style="padding:4px;"><b>Total de Litros:</b></td><td style="padding:4px;font-weight:bold;color:#1a5276;">${totalLitros.toFixed(1)}L</td></tr>
             <tr><td style="padding:4px;"><b>Total em Valor:</b></td><td style="padding:4px;font-weight:bold;color:#1e8449;">R$ ${totalValor.toFixed(2)}</td></tr>
             <tr><td style="padding:4px;"><b>Abastecimentos:</b></td><td style="padding:4px;">${(mesList||[]).length}</td></tr>
-            <tr><td style="padding:4px;"><b>PreÃ§o mÃ©dio/L:</b></td><td style="padding:4px;">${totalLitros>0?'R$ '+(totalValor/totalLitros).toFixed(3):'â€”'}</td></tr>
+            <tr><td style="padding:4px;"><b>Preço médio/L:</b></td><td style="padding:4px;">${totalLitros>0?'R$ '+(totalValor/totalLitros).toFixed(3):'—'}</td></tr>
         </table>
     </div>
-    <h4 style="margin-bottom:8px;color:#d1122a;">Por VeÃ­culo</h4>
+    <h4 style="margin-bottom:8px;color:#d1122a;">Por Veículo</h4>
     <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
-        <tr style="background:#f5f5f5;"><th style="padding:7px;text-align:left;">Placa</th><th style="padding:7px;">Litros</th><th style="padding:7px;">Valor</th><th style="padding:7px;">Abast.</th><th style="padding:7px;">R$/L mÃ©d.</th></tr>
-        ${Object.entries(porPlaca).map(([placa,v]) => `<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>${placa}</b></td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros.toFixed(1)}L</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:#1e8449;">R$ ${v.valor.toFixed(2)}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.count}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros>0?'R$ '+(v.valor/v.litros).toFixed(3):'â€”'}</td></tr>`).join('')}
+        <tr style="background:#f5f5f5;"><th style="padding:7px;text-align:left;">Placa</th><th style="padding:7px;">Litros</th><th style="padding:7px;">Valor</th><th style="padding:7px;">Abast.</th><th style="padding:7px;">R$/L méd.</th></tr>
+        ${Object.entries(porPlaca).map(([placa,v]) => `<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>${placa}</b></td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros.toFixed(1)}L</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:#1e8449;">R$ ${v.valor.toFixed(2)}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.count}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros>0?'R$ '+(v.valor/v.litros).toFixed(3):'—'}</td></tr>`).join('')}
     </table>
     <h4 style="margin-bottom:8px;color:#d1122a;">Detalhamento Completo</h4>
     <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <tr style="background:#f5f5f5;"><th style="padding:6px;text-align:left;">Data/Hora</th><th>Placa</th><th>Litros</th><th>Valor</th><th>KM</th><th>R$/L</th></tr>
-        ${(mesList||[]).map(a => `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${a.timestamp||a.data_abast}</td><td>${a.placa}</td><td style="text-align:center;">${parseFloat(a.litros).toFixed(1)}L</td><td style="text-align:center;">R$ ${parseFloat(a.valor).toFixed(2)}</td><td style="text-align:center;">${a.km}</td><td style="text-align:center;">${parseFloat(a.litros)>0?'R$ '+(parseFloat(a.valor)/parseFloat(a.litros)).toFixed(3):'â€”'}</td></tr>`).join('')}
+        ${(mesList||[]).map(a => `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${a.timestamp||a.data_abast}</td><td>${a.placa}</td><td style="text-align:center;">${parseFloat(a.litros).toFixed(1)}L</td><td style="text-align:center;">R$ ${parseFloat(a.valor).toFixed(2)}</td><td style="text-align:center;">${a.km}</td><td style="text-align:center;">${parseFloat(a.litros)>0?'R$ '+(parseFloat(a.valor)/parseFloat(a.litros)).toFixed(3):'—'}</td></tr>`).join('')}
     </table>`;
     document.getElementById('pdf-photos').innerHTML = '';
     await renderizarEBaixarPDF(`Combustivel_${mesFiltro}.pdf`);
-    await registrarAuditoria(`PDF CombustÃ­vel gerado: ${nomeMes}`);
+    await registrarAuditoria(`PDF Combustível gerado: ${nomeMes}`);
 }
 
 function abrirDocEvidencia(dataUrl, mime, nome) {
@@ -2506,7 +2506,7 @@ function abrirDocEvidencia(dataUrl, mime, nome) {
             const url = URL.createObjectURL(blob);
             const win = window.open(url, '_blank');
             if (!win) {
-                // Popup bloqueado â€” faz download
+                // Popup bloqueado — faz download
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = nome || 'documento.pdf';
@@ -2524,7 +2524,7 @@ function abrirDocEvidencia(dataUrl, mime, nome) {
     } catch(e) {
         // Fallback: tenta abrir dataUrl direto
         try { window.open(dataUrl, '_blank'); }
-        catch(e2) { alert('NÃ£o foi possÃ­vel abrir o arquivo: ' + e2.message); }
+        catch(e2) { alert('Não foi possível abrir o arquivo: ' + e2.message); }
     }
 }
 </script>
