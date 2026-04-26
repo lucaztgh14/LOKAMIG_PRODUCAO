@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOKAMIG | Gestão Operacional v6.0</title>
+    <title>LOKAMIG | Gestão Operacional v6.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1024,12 +1024,12 @@
             <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg" alt="LOKAMIG"
                 class="login-logo" onerror="this.style.display='none'">
             <h1>LOKAMIG</h1>
-            <div class="subtitle">Gestão Operacional · v6.0 · Realtime</div>
+            <div class="subtitle">Gestão Operacional · v6.1 · Realtime</div>
             <input type="text" id="user" placeholder="Usuário" autocomplete="off"
                 onkeydown="if(event.key==='Enter') document.getElementById('pass').focus()">
             <input type="password" id="pass" placeholder="Senha" onkeydown="if(event.key==='Enter') handleLogin()">
             <button onclick="handleLogin()">🔐 Acessar Sistema</button>
-            <div class="footer-text">Plataforma integrada de logística e frotas · v6.0 Supabase</div>
+            <div class="footer-text">Plataforma integrada de logística e frotas · v6.1 Supabase</div>
         </div>
     </section>
 
@@ -3093,7 +3093,7 @@
         // ─────────────────────────────────────────────
         function montarCabecalhoPDF(titulo, subtitulo) {
             document.getElementById('pdf-titulo').innerText = titulo;
-            document.getElementById('pdf-data-geracao').innerText = subtitulo || `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.0`;
+            document.getElementById('pdf-data-geracao').innerText = subtitulo || `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.1`;
             const logo = document.getElementById('pdf-logo');
             if (logo) {
                 logo.style.display = 'block';
@@ -3155,7 +3155,7 @@
             const { data: rows } = await db.from(TBL.prog).select('*').eq('id', id);
             const item = rows?.[0]; if (!item) return;
 
-            montarCabecalhoPDF(`RELATÓRIO DE SERVIÇO — ${item.tipo_op}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.0`);
+            montarCabecalhoPDF(`RELATÓRIO DE SERVIÇO — ${item.tipo_op}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.1`);
             document.getElementById('pdf-body').innerHTML = `
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;">Campo</th><th style="padding:8px;text-align:left;">Valor</th></tr>
@@ -3221,7 +3221,7 @@
                 porPlaca[a.placa].count++;
             });
 
-            montarCabecalhoPDF(`RELATÓRIO DE COMBUSTÍVEL — ${nomeMes.toUpperCase()}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | Lokamig v6.0`);
+            montarCabecalhoPDF(`RELATÓRIO DE COMBUSTÍVEL — ${nomeMes.toUpperCase()}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | Lokamig v6.1`);
             document.getElementById('pdf-body').innerHTML = `
     <div style="background:#fef9e7;border:1px solid #f39c12;border-radius:8px;padding:12px;margin-bottom:16px;">
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
