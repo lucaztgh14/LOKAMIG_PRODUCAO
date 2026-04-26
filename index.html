@@ -1,0 +1,3286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LOKAMIG | Gestão Operacional v6.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #d1122a;
+            --primary-dark: #a00d20;
+            --bg: #0f172a;
+            --text: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #94a3b8;
+            --joint: #8b5cf6;
+            --return: #3b82f6;
+            --gerencial: #f97316;
+            --info: #06b6d4;
+            --cancelled: #6b7280;
+            --purple: #7c3aed;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        body.login-bg {
+            background: radial-gradient(circle at top left, rgba(209, 18, 42, .3) 0%, transparent 50%),
+                radial-gradient(circle at bottom right, rgba(16, 185, 129, .2) 0%, transparent 50%),
+                linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background-size: cover;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body.app-bg {
+            background: linear-gradient(rgba(15, 23, 42, .95), rgba(15, 23, 42, .95)),
+                url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .container {
+            background: rgba(30, 41, 59, .7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, .15);
+            border-radius: 24px;
+            padding: 20px;
+            width: 100%;
+            max-width: 960px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, .7);
+            text-align: center;
+            margin: 10px auto;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .login-box {
+            background: rgba(15, 23, 42, .85);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid rgba(255, 255, 255, .2);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, .6);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(209, 18, 42, .15) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .login-logo {
+            width: 160px;
+            height: auto;
+            margin: 0 auto 20px;
+            display: block;
+            filter: drop-shadow(0 0 25px rgba(209, 18, 42, .8));
+        }
+
+        .login-box h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .login-box .subtitle {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-box input {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .2);
+            border-radius: 14px;
+            padding: 14px 20px;
+            color: #fff;
+            font-size: 15px;
+            margin-bottom: 16px;
+            transition: all .3s;
+            width: 100%;
+            outline: none;
+        }
+
+        .login-box input:focus {
+            border-color: var(--primary);
+            background: rgba(209, 18, 42, .1);
+            box-shadow: 0 0 15px rgba(209, 18, 42, .3);
+        }
+
+        .login-box button {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 14px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all .3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .login-box button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(209, 18, 42, .4);
+        }
+
+        .login-box .footer-text {
+            margin-top: 20px;
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: var(--primary);
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .sub {
+            font-size: 11px;
+            color: var(--gray);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, .15);
+            background: rgba(15, 23, 42, .9);
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: .3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(209, 18, 42, .4);
+        }
+
+        select option {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 11px;
+            transition: .3s;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        button:hover {
+            opacity: .9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: scale(.98);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #000;
+        }
+
+        .btn-gray {
+            background: #475569;
+        }
+
+        .btn-info {
+            background: var(--info);
+            width: auto;
+            padding: 8px 14px;
+        }
+
+        .btn-pdf {
+            background: #ff5722;
+            width: auto;
+            padding: 8px 14px;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            width: auto;
+            padding: 8px 14px;
+        }
+
+        .btn-cancel {
+            background: var(--cancelled);
+            width: auto;
+            padding: 8px 14px;
+        }
+
+        .btn-purple {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 10px;
+            width: auto;
+        }
+
+        .btn-flex {
+            flex: 1;
+            margin: 0 !important;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, .08);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .metric-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            color: var(--gray);
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .prog-item {
+            background: rgba(255, 255, 255, .06);
+            padding: 14px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            border-left: 5px solid var(--warning);
+            font-size: 12px;
+            text-align: left;
+            position: relative;
+            transition: .3s;
+        }
+
+        .prog-item:hover {
+            background: rgba(255, 255, 255, .1);
+        }
+
+        .prog-item.cancelado {
+            border-left-color: var(--cancelled);
+            opacity: .6;
+        }
+
+        .prog-item.cancelado::after {
+            content: 'CANCELADO';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 24px;
+            font-weight: 900;
+            color: rgba(239, 68, 68, .4);
+            pointer-events: none;
+        }
+
+        .status-PENDENTE {
+            border-left-color: var(--warning);
+        }
+
+        .status-EM-EXECUÇÃO {
+            border-left-color: #ef4444;
+        }
+
+        .status-CONCLUIDO {
+            border-left-color: var(--success);
+        }
+
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+
+        .setor-badge {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
+
+        .setor-Operacional {
+            background: #1e40af;
+            color: #bfdbfe;
+        }
+
+        .setor-Reserva {
+            background: #065f46;
+            color: #a7f3d0;
+        }
+
+        .setor-Gerencial {
+            background: #7c2d12;
+            color: #fed7aa;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            background: rgba(30, 41, 59, .8);
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            color: #fff;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 9px;
+            transition: .3s;
+            margin-bottom: 0;
+        }
+
+        .tab-active {
+            background: var(--primary);
+            font-weight: bold;
+        }
+
+        .preview-area {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .photo-card {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .del-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--danger);
+            color: #fff;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 12px;
+            border: 2px solid #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            padding: 0;
+            margin: 0;
+            min-width: unset;
+        }
+
+        .timestamp-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .9));
+            color: #fff;
+            padding: 12px 6px 4px;
+            font-size: 8px;
+            text-align: left;
+            line-height: 1.4;
+            pointer-events: none;
+        }
+
+        .form-section {
+            background: rgba(0, 0, 0, .3);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .alert-card {
+            background: rgba(245, 158, 11, .15);
+            border: 1px solid var(--warning);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 11px;
+            text-align: left;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, .15);
+            border-color: var(--danger);
+        }
+
+        .alert-info {
+            background: rgba(6, 182, 212, .15);
+            border-color: var(--info);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, .15);
+            border-color: var(--success);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, .9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 10px;
+        }
+
+        .modal-content {
+            background: rgba(30, 41, 59, .98);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            padding: 20px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .revisao-inline {
+            background: rgba(139, 92, 246, .1);
+            border: 1px solid var(--joint);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 11px;
+        }
+
+        .permissoes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .permissao-card {
+            background: rgba(255, 255, 255, .05);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .permissao-card h4 {
+            font-size: 12px;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .permissao-card label {
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        .permissao-card input[type=checkbox] {
+            width: auto;
+            margin: 0;
+        }
+
+        #img-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, .95);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        #img-viewer img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+        }
+
+        #success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, .98);
+            z-index: 5000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .check-v {
+            width: 80px;
+            height: 80px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            color: white;
+            margin-bottom: 20px;
+            animation: pop .4s cubic-bezier(.175, .885, .32, 1.275);
+        }
+
+        @keyframes pop {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, .97);
+            z-index: 6000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(209, 18, 42, .2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .orc-card {
+            background: rgba(255, 255, 255, .06);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 5px solid var(--warning);
+            font-size: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .orc-card:hover {
+            background: rgba(255, 255, 255, .1);
+        }
+
+        .orc-card.aprovado {
+            border-left-color: var(--success);
+        }
+
+        .orc-card.rejeitado {
+            border-left-color: var(--danger);
+        }
+
+        .orc-card.pendente {
+            border-left-color: var(--warning);
+        }
+
+        .evidencia-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .ev-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            aspect-ratio: 1;
+            cursor: pointer;
+        }
+
+        .ev-card img,
+        .ev-card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .ev-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 10px;
+            color: var(--gray);
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stars {
+            font-size: 28px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .stars span {
+            color: var(--gray);
+            transition: .2s;
+        }
+
+        .stars span.active {
+            color: #fbbf24;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+
+        table td,
+        table th {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            text-align: left;
+        }
+
+        table th {
+            color: var(--gray);
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        #pdf-template {
+            position: fixed;
+            left: -9999px;
+            width: 800px;
+            background: #fff;
+            color: #000;
+            padding: 40px;
+            font-family: Arial;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-row button {
+            flex: 1;
+            margin: 0;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar input,
+        .search-bar select {
+            flex: 1;
+            margin: 0;
+        }
+
+        .card-acoes {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .card-acoes button {
+            flex: 1;
+            margin: 0;
+            padding: 6px 8px;
+            font-size: 9px;
+        }
+
+        .realtime-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 9px;
+            color: var(--success);
+            background: rgba(16, 185, 129, .1);
+            border: 1px solid rgba(16, 185, 129, .3);
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+        }
+
+        .realtime-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .3;
+            }
+        }
+
+        .offline-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 9px;
+            color: var(--warning);
+            background: rgba(245, 158, 11, .1);
+            border: 1px solid rgba(245, 158, 11, .3);
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+        }
+
+        .tabs-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 15px;
+        }
+
+        .tabs-wrapper .tabs {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .tab-scroll-btn {
+            background: rgba(30, 41, 59, .9);
+            border: 1px solid rgba(255, 255, 255, .15);
+            color: #fff;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            margin: 0;
+            width: auto;
+            min-width: 32px;
+            flex-shrink: 0;
+            transition: .2s;
+        }
+
+        .tab-scroll-btn:hover {
+            background: var(--primary);
+        }
+
+        .orc-card.cancelado {
+            border-left-color: var(--cancelled);
+            opacity: .7;
+        }
+
+        .sync-pending {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(245, 158, 11, .9);
+            color: #000;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 999;
+            display: none;
+        }
+
+        @media(max-width:480px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .preview-area {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .evidencia-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .permissoes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="login-bg">
+
+    <!-- OVERLAYS GLOBAIS -->
+    <div id="success-overlay">
+        <div class="check-v">✓</div>
+        <h2 style="color:white;letter-spacing:2px;" id="success-msg">ENVIADO COM SUCESSO!</h2>
+    </div>
+    <div id="img-viewer" onclick="this.style.display='none'">
+        <img src="" id="full-img" alt="">
+    </div>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p style="color:var(--gray);font-size:12px;" id="loading-msg">Carregando...</p>
+    </div>
+    <div class="sync-pending" id="sync-pending">⏳ Dados offline aguardando sync...</div>
+
+    <!-- PDF TEMPLATE -->
+    <div id="pdf-template"
+        style="position:fixed;left:-9999px;width:800px;background:#fff;color:#000;padding:40px;font-family:Arial;">
+        <div
+            style="display:flex;justify-content:space-between;border-bottom:4px solid #d1122a;padding-bottom:15px;margin-bottom:20px;">
+            <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg"
+                style="width:180px;mix-blend-mode:multiply;" id="pdf-logo" onerror="this.style.display='none'">
+            <div>
+                <h2 id="pdf-titulo" style="color:#d1122a;"></h2>
+                <p id="pdf-data-geracao" style="font-size:12px;color:#666;"></p>
+            </div>
+        </div>
+        <div id="pdf-body"></div>
+        <div id="pdf-photos" style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px;"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TELA 1: LOGIN -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section id="scr-login" style="display:flex;justify-content:center;align-items:center;width:100%;min-height:100vh;">
+        <div class="login-box">
+            <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg" alt="LOKAMIG"
+                class="login-logo" onerror="this.style.display='none'">
+            <h1>LOKAMIG</h1>
+            <div class="subtitle">Gestão Operacional · v6.0 · Realtime</div>
+            <input type="text" id="user" placeholder="Usuário" autocomplete="off"
+                onkeydown="if(event.key==='Enter') document.getElementById('pass').focus()">
+            <input type="password" id="pass" placeholder="Senha" onkeydown="if(event.key==='Enter') handleLogin()">
+            <button onclick="handleLogin()">🔐 Acessar Sistema</button>
+            <div class="footer-text">Plataforma integrada de logística e frotas · v6.0 Supabase</div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TELA 2: ADMINISTRAÇÃO -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section id="scr-admin" class="container hidden">
+        <h1>📊 ADMINISTRAÇÃO <span class="realtime-badge"><span class="realtime-dot"></span>LIVE</span></h1>
+        <div class="sub" id="admin-user-label">Bem-vindo, Administrador</div>
+        <div class="dashboard-grid">
+            <div class="metric-card">
+                <div class="metric-icon">🚗</div><span class="metric-value" id="met-total-hoje">0</span><span
+                    class="metric-label">Serviços Hoje</span>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">✅</div><span class="metric-value" id="met-concluidos">0</span><span
+                    class="metric-label">Concluídos</span>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">⏱️</div><span class="metric-value" id="met-pendentes">0</span><span
+                    class="metric-label">Pendentes</span>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">💰</div><span class="metric-value" id="met-gasto-mes">R$0</span><span
+                    class="metric-label">Combustível/Mês</span>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">🚛</div><span class="metric-value" id="met-frota">0</span><span
+                    class="metric-label">Veículos Ativos</span>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">⚠️</div><span class="metric-value" id="met-manut">0</span><span
+                    class="metric-label">Manutenções</span>
+            </div>
+        </div>
+        <div class="tabs-wrapper">
+            <button class="tab-scroll-btn" onclick="scrollTabs(-120)">◀</button>
+            <div class="tabs" id="admin-tabs">
+                <button class="tab-btn tab-active" onclick="switchTab('monitor',event)">📡 Monitor</button>
+                <button class="tab-btn" onclick="switchTab('history',event)">📋 Histórico</button>
+                <button class="tab-btn" onclick="switchTab('forn',event)">🏢 Fornecedores</button>
+                <button class="tab-btn" onclick="switchTab('colab',event)">👥 Equipe</button>
+                <button class="tab-btn" onclick="switchTab('veic',event)">🚛 Frota</button>
+                <button class="tab-btn" onclick="switchTab('manutencao',event)">🔧 Manutenções</button>
+                <button class="tab-btn" onclick="switchTab('orcamentos',event)">💰 Orçamentos</button>
+                <button class="tab-btn" onclick="switchTab('combustivel',event)">⛽ Combustível</button>
+                <button class="tab-btn" onclick="switchTab('emails',event)">📧 E-mails</button>
+                <button class="tab-btn" onclick="switchTab('auditoria',event)">📝 Auditoria</button>
+                <button class="tab-btn" onclick="switchTab('permissoes',event)">🔐 Aba Mestre</button>
+                <button class="tab-btn" onclick="switchTab('config',event)">⚙️ Config</button>
+            </div>
+            <button class="tab-scroll-btn" onclick="scrollTabs(120)">▶</button>
+        </div>
+
+        <!-- MONITOR -->
+        <div id="area-monitor" class="admin-content">
+            <div class="search-bar">
+                <input type="date" id="mon-filter-date" onchange="carregarProgAdmin()">
+                <input type="text" id="mon-filter-placa" placeholder="🔍 Placa" oninput="carregarProgAdmin()">
+                <select id="mon-filter-status" onchange="carregarProgAdmin()">
+                    <option value="">Todos os status</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="EM EXECUÇÃO">Em Execução</option>
+                    <option value="CONCLUIDO">Concluído</option>
+                    <option value="CANCELADO">Cancelado</option>
+                </select>
+                <select id="mon-filter-setor" onchange="carregarProgAdmin()">
+                    <option value="">Todos os setores</option>
+                    <option value="Operacional">Operacional</option>
+                    <option value="Reserva">Reserva</option>
+                    <option value="Gerencial">Gerencial</option>
+                </select>
+            </div>
+            <div id="alertas-garantia"></div>
+            <div id="list-prog-admin"></div>
+        </div>
+
+        <!-- HISTÓRICO -->
+        <div id="area-history" class="admin-content hidden">
+            <h3 style="margin-bottom:12px;">📋 Histórico de Serviços</h3>
+            <div class="search-bar">
+                <input type="date" id="hist-filter-date" onchange="renderHistorico()">
+                <input type="text" id="hist-filter-placa" placeholder="🔍 Placa" oninput="renderHistorico()">
+                <select id="hist-filter-forn" onchange="renderHistorico()">
+                    <option value="">Todos fornecedores</option>
+                </select>
+            </div>
+            <div id="list-history-admin"></div>
+        </div>
+
+        <!-- FORNECEDORES -->
+        <div id="area-forn" class="admin-content hidden">
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">➕ Novo Fornecedor</h4>
+                <input type="text" id="f-nome" placeholder="Nome da empresa">
+                <input type="text" id="f-user" placeholder="Login de acesso">
+                <input type="password" id="f-pass" placeholder="Senha">
+                <select id="f-tipo">
+                    <option value="Oficina">Oficina</option>
+                    <option value="Limpeza">Limpeza</option>
+                    <option value="Posto">Posto de Combustível</option>
+                    <option value="Outros">Outros</option>
+                </select>
+                <button onclick="salvarNovoFornecedor()" class="btn-success">✅ Cadastrar Fornecedor</button>
+            </div>
+            <div id="list-forn"></div>
+        </div>
+
+        <!-- EQUIPE -->
+        <div id="area-colab" class="admin-content hidden">
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">➕ Novo Colaborador / Programador</h4>
+                <input type="text" id="c-mat" placeholder="Matrícula">
+                <input type="text" id="c-nome" placeholder="Nome completo">
+                <input type="text" id="c-user" placeholder="Login de acesso">
+                <input type="password" id="c-pass" placeholder="Senha">
+                <input type="text" id="c-nfc" placeholder="NFC ID (opcional)">
+                <select id="c-perfil">
+                    <option value="programador">Programador (acessa tela de lançamentos)</option>
+                    <option value="supervisor">Supervisor (admin limitado)</option>
+                    <option value="motorista">Motorista (somente monitor)</option>
+                </select>
+                <button onclick="salvarColab()" class="btn-success">✅ Cadastrar Colaborador</button>
+            </div>
+            <div id="list-colab"></div>
+        </div>
+
+        <!-- FROTA -->
+        <div id="area-veic" class="admin-content hidden">
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">➕ Novo Veículo</h4>
+                <input type="text" id="v-placa" placeholder="Placa (ex: ABC1D23)"
+                    oninput="this.value=this.value.toUpperCase()" maxlength="8">
+                <input type="text" id="v-modelo" placeholder="Modelo (ex: Fiat Fiorino 2022)">
+                <input type="number" id="v-ano" placeholder="Ano fabricação" min="2000" max="2030">
+                <input type="number" id="v-km-atual" placeholder="KM atual">
+                <input type="number" id="v-km-revisao" placeholder="KM próxima revisão">
+                <select id="v-tipo">
+                    <option value="Operacional">Operacional</option>
+                    <option value="Reserva">Reserva</option>
+                    <option value="Gerencial">Gerencial</option>
+                </select>
+                <button onclick="salvarVeiculo()" class="btn-success">✅ Cadastrar Veículo</button>
+            </div>
+            <div id="list-veic"></div>
+        </div>
+
+        <!-- MANUTENÇÕES -->
+        <div id="area-manutencao" class="admin-content hidden">
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">🔧 Programar Revisão</h4>
+                <select id="m-veiculo">
+                    <option value="">— Selecione o veículo —</option>
+                </select>
+                <input type="text" id="m-descricao" placeholder="Descrição da revisão / serviço">
+                <input type="number" id="m-km-programada" placeholder="KM programada">
+                <input type="date" id="m-data-limite">
+                <select id="m-urgencia">
+                    <option value="normal">Normal</option>
+                    <option value="urgente">Urgente</option>
+                    <option value="critico">Crítico</option>
+                </select>
+                <button onclick="salvarManutencao()" class="btn-success">✅ Programar Revisão</button>
+            </div>
+            <div id="list-manutencoes"></div>
+        </div>
+
+        <!-- ORÇAMENTOS -->
+        <div id="area-orcamentos" class="admin-content hidden">
+            <div class="search-bar">
+                <select id="orc-filter-status" onchange="renderOrcamentosAdmin()">
+                    <option value="">Todos</option>
+                    <option value="PENDENTE">Pendentes</option>
+                    <option value="APROVADO">Aprovados</option>
+                    <option value="REJEITADO">Rejeitados</option>
+                    <option value="CANCELADO">Cancelados</option>
+                </select>
+                <input type="text" id="orc-filter-placa" placeholder="🔍 Filtrar placa"
+                    oninput="renderOrcamentosAdmin()">
+            </div>
+            <div id="list-orcamentos-admin"></div>
+        </div>
+
+        <!-- COMBUSTÍVEL -->
+        <div id="area-combustivel" class="admin-content hidden">
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">⛽ Registrar Abastecimento</h4>
+                <select id="ab-veiculo">
+                    <option value="">— Selecione o veículo —</option>
+                </select>
+                <input type="number" id="ab-litros" placeholder="Litros abastecidos" step="0.01">
+                <input type="number" id="ab-valor" placeholder="Valor total R$" step="0.01">
+                <input type="number" id="ab-km" placeholder="KM atual do veículo">
+                <div class="btn-row">
+                    <button onclick="document.getElementById('ab-foto-cam').click()" style="background:var(--joint);"
+                        class="btn-flex">📸 Câmera</button>
+                    <button onclick="document.getElementById('ab-foto-gal').click()" style="background:var(--return);"
+                        class="btn-flex">🖼️ Galeria</button>
+                </div>
+                <input type="file" id="ab-foto-cam" capture="environment" accept="image/*" class="hidden"
+                    onchange="handleAbastecimentoFoto(this)">
+                <input type="file" id="ab-foto-gal" accept="image/*" class="hidden"
+                    onchange="handleAbastecimentoFoto(this)">
+                <div id="ab-preview-foto" class="preview-area"></div>
+                <button onclick="salvarAbastecimento()" class="btn-success">✅ Registrar Abastecimento</button>
+            </div>
+            <div
+                style="background:rgba(6,182,212,.08);border:1px solid var(--info);border-radius:12px;padding:12px;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                    <label style="font-size:11px;color:var(--info);font-weight:bold;white-space:nowrap;">📅 Filtrar por
+                        mês:</label>
+                    <input type="month" id="ab-filter-mes" style="flex:1;margin:0;" onchange="carregarAbastecimentos()">
+                    <button onclick="gerarPDFAbastecimentosMes()"
+                        style="background:#ff5722;width:auto;padding:8px 14px;margin:0;" class="btn-sm">📄 PDF do
+                        Mês</button>
+                </div>
+                <div id="resumo-combustivel" style="font-size:12px;"></div>
+            </div>
+            <div id="list-abastecimentos"></div>
+        </div>
+
+        <!-- E-MAILS -->
+        <div id="area-emails" class="admin-content hidden">
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">📧 Cadastrar Destinatário</h4>
+                <input type="email" id="email-destinatario" placeholder="E-mail">
+                <input type="text" id="email-nome" placeholder="Nome / Empresa">
+                <button onclick="adicionarEmail()" class="btn-success">✅ Adicionar</button>
+            </div>
+            <div id="list-emails"></div>
+        </div>
+
+        <!-- AUDITORIA -->
+        <div id="area-auditoria" class="admin-content hidden">
+            <h4 style="margin-bottom:10px;">📝 Registro de Atividades</h4>
+            <div style="display:flex;gap:5px;margin-bottom:10px;">
+                <button onclick="carregarAuditoria()" class="btn-info btn-sm">🔄 Atualizar</button>
+                <button onclick="limparAuditoria()" class="btn-danger btn-sm">🗑️ Limpar</button>
+            </div>
+            <div id="list-auditoria"></div>
+        </div>
+
+        <!-- ABA MESTRE -->
+        <div id="area-permissoes" class="admin-content hidden">
+            <h4 style="color:var(--joint);margin-bottom:15px;">🔐 GESTÃO DE PERMISSÕES</h4>
+            <div class="form-section">
+                <p style="font-size:11px;color:var(--gray);margin-bottom:10px;">Configure o acesso de cada perfil às
+                    telas do sistema:</p>
+                <div class="permissoes-grid" id="permissoes-grid"></div>
+                <button onclick="salvarPermissoes()" class="btn-purple" style="margin-top:15px;">💾 Salvar
+                    Permissões</button>
+            </div>
+        </div>
+
+        <!-- CONFIG -->
+        <div id="area-config" class="admin-content hidden">
+            <div class="form-section">
+                <h4 style="color:var(--info);margin-bottom:12px;">⚙️ Configurações do Sistema</h4>
+                <div class="btn-row">
+                    <button onclick="exportarDados()" style="background:var(--joint);" class="btn-flex">📥 Exportar
+                        Backup JSON</button>
+                    <button onclick="document.getElementById('input-restore').click()" style="background:var(--return);"
+                        class="btn-flex">📤 Restaurar Backup</button>
+                </div>
+                <input type="file" id="input-restore" accept=".json" class="hidden" onchange="importarDados(this)">
+                <button onclick="gerarRelatorioFinanceiro()" style="background:#ff5722;margin-top:5px;">📊 Relatório
+                    Financeiro PDF</button>
+                <div
+                    style="margin-top:15px;padding:12px;background:rgba(239,68,68,.1);border:1px solid var(--danger);border-radius:10px;">
+                    <h5 style="color:var(--danger);margin-bottom:8px;">⚠️ Zona de Perigo</h5>
+                    <button onclick="resetarSistema()" class="btn-danger btn-sm">🗑️ Apagar todos os dados</button>
+                </div>
+            </div>
+            <div id="config-emailjs" class="form-section" style="margin-top:10px;">
+                <h4 style="color:var(--info);margin-bottom:10px;">📧 Configuração EmailJS</h4>
+                <input type="text" id="cfg-ejs-userid" placeholder="EmailJS User ID">
+                <input type="text" id="cfg-ejs-serviceid" placeholder="EmailJS Service ID">
+                <input type="text" id="cfg-ejs-templateid" placeholder="EmailJS Template ID">
+                <button onclick="salvarConfigEmailJS()" class="btn-success">💾 Salvar Config EmailJS</button>
+            </div>
+        </div>
+
+        <button onclick="handleLogout()" class="btn-gray" style="margin-top:20px;">🚪 Sair do Sistema</button>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TELA 3: PROGRAMADOR -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section id="scr-programador" class="container hidden">
+        <h1>📋 LANÇAMENTOS</h1>
+        <div class="sub" id="prog-user-label"></div>
+        <div class="form-section">
+            <h4 style="color:var(--info);margin-bottom:10px;">Novo Lançamento</h4>
+            <select id="p-placa" onchange="atualizarSetor()">
+                <option value="">— Selecione o veículo —</option>
+            </select>
+            <div id="p-setor-display"
+                style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.05);font-size:12px;">
+                Setor: <span id="p-setor-label"></span>
+                <span id="p-revisao-alerta" style="color:var(--warning);font-weight:bold;"></span>
+            </div>
+            <select id="p-tipo-op" onchange="toggleFornDiv()">
+                <option value="SAÍDA">SAÍDA</option>
+                <option value="RETORNO">RETORNO</option>
+            </select>
+            <input type="number" id="p-km" placeholder="KM atual do veículo">
+            <div id="p-forn-div">
+                <select id="p-fornecedor-select">
+                    <option value="">— Selecione o destino —</option>
+                </select>
+            </div>
+            <textarea id="p-obs" placeholder="Observações adicionais..." rows="2" maxlength="500"></textarea>
+            <div class="btn-row">
+                <button onclick="document.getElementById('p-fotos-cam').click()" style="background:var(--joint);"
+                    class="btn-flex">📸 CÂMERA</button>
+                <button onclick="document.getElementById('p-fotos-gal').click()" style="background:var(--return);"
+                    class="btn-flex">🖼️ GALERIA</button>
+            </div>
+            <input type="file" id="p-fotos-cam" capture="environment" accept="image/*" class="hidden"
+                onchange="handleNewUpload(this)">
+            <input type="file" id="p-fotos-gal" multiple accept="image/*" class="hidden"
+                onchange="handleNewUpload(this)">
+            <div id="p-preview-fotos" class="preview-area"></div>
+            <button onclick="lancarProgramacao()" class="btn-success" style="margin-top:5px;">✅ Finalizar e
+                Enviar</button>
+        </div>
+        <input type="date" id="p-filter-date" onchange="carregarProgGeral()" style="margin-bottom:10px;">
+        <div id="list-prog-geral"></div>
+        <button onclick="handleLogout()" class="btn-gray">🚪 Sair</button>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TELA 4: FORNECEDOR -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section id="scr-fornecedor" class="container hidden">
+        <h1 id="forn-name-screen"></h1>
+        <div class="sub">Serviços do Dia</div>
+        <div id="forn-alertas-revisao"></div>
+        <input type="date" id="forn-filter-date" onchange="carregarServicosForn()">
+        <div id="list-forn-servicos"></div>
+        <div class="btn-row" style="margin-top:10px;">
+            <button onclick="show('scr-orcamento')" style="background:var(--warning);color:#000;" class="btn-flex">💰
+                CRIAR ORÇAMENTO</button>
+            <button onclick="abrirOrcamentosEnviados()" style="background:var(--purple);" class="btn-flex">📋 VER
+                ORÇAMENTOS</button>
+        </div>
+        <button onclick="handleLogout()" class="btn-gray" style="margin-top:8px;">🚪 Sair</button>
+    </section>
+
+    <!-- MODAL: ALTERAR STATUS -->
+    <section id="scr-modal-status" class="hidden">
+        <div class="modal-overlay">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header" id="modal-status-titulo">📸 Registrar Status</div>
+                <p style="font-size:11px;color:var(--gray);margin-bottom:10px;">Registre pelo menos uma foto para
+                    confirmar:</p>
+                <div class="btn-row">
+                    <button onclick="document.getElementById('status-foto-cam').click()"
+                        style="background:var(--joint);" class="btn-flex">📸 CÂMERA</button>
+                    <button onclick="document.getElementById('status-foto-gal').click()"
+                        style="background:var(--return);" class="btn-flex">🖼️ GALERIA</button>
+                </div>
+                <input type="file" id="status-foto-cam" capture="environment" accept="image/*" class="hidden"
+                    onchange="handleStatusFotos(this)">
+                <input type="file" id="status-foto-gal" multiple accept="image/*" class="hidden"
+                    onchange="handleStatusFotos(this)">
+                <div id="status-foto-preview" class="preview-area"></div>
+                <div id="rating-area" class="hidden">
+                    <p style="font-size:11px;color:var(--gray);margin-bottom:5px;">Avalie o serviço:</p>
+                    <div class="stars" id="rating-stars">
+                        <span onclick="setRating(1)">☆</span><span onclick="setRating(2)">☆</span>
+                        <span onclick="setRating(3)">☆</span><span onclick="setRating(4)">☆</span>
+                        <span onclick="setRating(5)">☆</span>
+                    </div>
+                </div>
+                <textarea id="status-obs" placeholder="Observações sobre o serviço..." rows="2"
+                    style="margin-top:8px;"></textarea>
+                <button id="btn-confirmar-status" class="btn-success hidden" onclick="confirmarAlteracaoStatus()">✅
+                    CONFIRMAR</button>
+                <button onclick="fecharModalStatus()" class="btn-gray btn-sm" style="margin-top:5px;">Cancelar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL: CRIAR ORÇAMENTO -->
+    <section id="scr-orcamento" class="hidden">
+        <div class="modal-overlay" onclick="show('scr-fornecedor')">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">💰 NOVO ORÇAMENTO</div>
+                <input type="text" id="orc-placa" placeholder="PLACA DO VEÍCULO"
+                    oninput="this.value=this.value.toUpperCase()" maxlength="8">
+                <textarea id="orc-desc" placeholder="Descrição geral dos serviços" rows="3"></textarea>
+                <div id="orc-itens">
+                    <div style="display:flex;gap:5px;margin-bottom:8px;">
+                        <input type="text" placeholder="Descrição do item" style="flex:2;margin:0;">
+                        <input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;"
+                            oninput="calcTotal()">
+                    </div>
+                </div>
+                <button onclick="addItem()" class="btn-gray btn-sm" style="margin-bottom:10px;">➕ Adicionar
+                    Item</button>
+                <div
+                    style="background:rgba(16,185,129,.2);border:1px solid var(--success);padding:12px;border-radius:10px;font-weight:bold;margin:12px 0;font-size:14px;">
+                    TOTAL: R$ <span id="total-orc">0,00</span>
+                </div>
+                <div class="btn-row">
+                    <button onclick="document.getElementById('ev-foto-cam').click()" style="background:var(--joint);"
+                        class="btn-flex">📸 FOTO</button>
+                    <button onclick="document.getElementById('ev-video-cam').click()" style="background:#0891b2;"
+                        class="btn-flex">🎥 VÍDEO</button>
+                    <button onclick="document.getElementById('ev-doc').click()" style="background:#6b7280;"
+                        class="btn-flex">📎 DOC</button>
+                </div>
+                <input type="file" id="ev-foto-cam" capture="environment" accept="image/*" class="hidden"
+                    onchange="handleEvidencia(this,'foto')">
+                <input type="file" id="ev-video-cam" accept="video/*" capture="camcorder" class="hidden"
+                    onchange="handleEvidencia(this,'video')">
+                <input type="file" id="ev-doc" multiple accept=".pdf,.doc,.docx,image/*" class="hidden"
+                    onchange="handleEvidencia(this,'doc')">
+                <div id="ev-preview" class="evidencia-grid"></div>
+                <button onclick="enviarOrcamento()" class="btn-success">📤 Enviar para Aprovação</button>
+                <button onclick="show('scr-fornecedor')" class="btn-gray btn-sm">← Voltar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL: ORÇAMENTOS ENVIADOS -->
+    <section id="scr-orc-enviados" class="hidden">
+        <div class="modal-overlay" onclick="show('scr-fornecedor')">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">📋 MEUS ORÇAMENTOS</div>
+                <p style="font-size:10px;color:var(--gray);margin-bottom:10px;">Clique num orçamento para ver detalhes
+                    ou cancelá-lo.</p>
+                <div id="list-orc-enviados"></div>
+                <button onclick="show('scr-fornecedor')" class="btn-gray btn-sm">← Voltar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL: DETALHE ORÇAMENTO -->
+    <section id="scr-orc-detalhe" class="hidden">
+        <div class="modal-overlay" onclick="fecharDetalheOrc()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header" id="orc-det-titulo"></div>
+                <div id="orc-det-body"></div>
+                <div id="orc-det-evidencias" class="evidencia-grid"></div>
+                <div id="orc-det-acoes" style="margin-top:10px;"></div>
+                <div style="margin-top:10px;" id="orc-email-actions">
+                    <button class="btn-info" onclick="enviarOrcamentoPorEmail()">📧 Enviar por E-mail</button>
+                    <button class="btn-pdf btn-sm" onclick="gerarPDFOrcamento()">📄 Gerar PDF</button>
+                </div>
+                <button onclick="fecharDetalheOrc()" class="btn-gray btn-sm" style="margin-top:8px;">Fechar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL: DETALHE SERVIÇO (ADMIN) -->
+    <section id="scr-servico-detalhe" class="hidden">
+        <div class="modal-overlay" onclick="fecharDetalheServico()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header" id="srv-det-titulo"></div>
+                <div id="srv-det-body"></div>
+                <div id="srv-det-fotos" class="preview-area" style="margin-top:10px;"></div>
+                <div id="srv-det-revisao"></div>
+                <div id="srv-det-acoes" style="margin-top:12px;"></div>
+                <button onclick="fecharDetalheServico()" class="btn-gray btn-sm" style="margin-top:8px;">Fechar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- JAVASCRIPT — SUPABASE REALTIME                             -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <script>
+        'use strict';
+
+        // ─────────────────────────────────────────────
+        // SUPABASE — inicialização
+        // ─────────────────────────────────────────────
+        const SUPA_URL = 'https://rpsdrhapdtipvujixoxa.supabase.co';
+        const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2RyaGFwZHRpcHZ1aml4b3hhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NDEzMTIsImV4cCI6MjA5MjUxNzMxMn0.ny3a-wvnnYDtcsJYdljRLFmwmLAqzFp89mduepxSVY4';
+        const { createClient } = supabase;
+        const db = createClient(SUPA_URL, SUPA_KEY);
+
+        // Nomes das tabelas (igual ao banco criado)
+        const TBL = {
+            prog: 'prog',
+            veiculos: 'veiculos',
+            fornecedores: 'fornecedores',
+            fornUsers: 'forn_users',
+            colaboradores: 'colaboradores',
+            manutencoes: 'manutencoes',
+            orcamentos: 'orcamentos',
+            combustivel: 'combustivel',
+            avaliacoes: 'avaliacoes',
+            emails: 'emails_dest',
+            auditoria: 'auditoria',
+            permissoes: 'permissoes',
+            config: 'config_sistema'
+        };
+
+        const LOGO_URL = 'https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg';
+
+        // ─────────────────────────────────────────────
+        // PERMISSÕES PADRÃO
+        // ─────────────────────────────────────────────
+        const PERMISSOES_PADRAO = {
+            admin: { monitor: true, history: true, forn: true, colab: true, veic: true, manutencao: true, orcamentos: true, combustivel: true, emails: true, auditoria: true, permissoes: true, config: true },
+            programador: { monitor: false, history: false, forn: false, colab: false, veic: false, manutencao: false, orcamentos: false, combustivel: false, emails: false, auditoria: false, permissoes: false, config: false },
+            supervisor: { monitor: true, history: true, forn: false, colab: false, veic: true, manutencao: true, orcamentos: true, combustivel: false, emails: true, auditoria: false, permissoes: false, config: false },
+            motorista: { monitor: true, history: false, forn: false, colab: false, veic: false, manutencao: false, orcamentos: false, combustivel: false, emails: false, auditoria: false, permissoes: false, config: false }
+        };
+
+        const NOMES_TABS = {
+            monitor: '📡 Monitor', history: '📋 Histórico', forn: '🏢 Fornecedores',
+            colab: '👥 Equipe', veic: '🚛 Frota', manutencao: '🔧 Manutenções',
+            orcamentos: '💰 Orçamentos', combustivel: '⛽ Combustível',
+            emails: '📧 E-mails', auditoria: '📝 Auditoria',
+            permissoes: '🔐 Aba Mestre', config: '⚙️ Config'
+        };
+
+        // ─────────────────────────────────────────────
+        // ESTADO GLOBAL
+        // ─────────────────────────────────────────────
+        let tempFotos = [];
+        let tempEvidencias = [];
+        let currentUser = null;
+        let abastecimentoFoto = null;
+        let statusPendente = { id: null, novoStatus: null, fotos: [], rating: 0 };
+        let orcDetalheOrigem = 'admin';
+        let orcAtual = null;
+        let servicoDetalheId = null;
+        let telaAnteriorOrc = 'scr-admin';
+        let realtimeChannel = null;
+        let permissoesCache = null;
+        let emailjsCfg = {};
+        let isOnline = navigator.onLine;
+        const OFFLINE_KEY = 'lokamig_offline_queue';
+
+        // ─────────────────────────────────────────────
+        // MODO OFFLINE — detecção e fila
+        // ─────────────────────────────────────────────
+        window.addEventListener('online', () => { isOnline = true; atualizarStatusOnline(); sincronizarOffline(); });
+        window.addEventListener('offline', () => { isOnline = false; atualizarStatusOnline(); });
+
+        function atualizarStatusOnline() {
+            const badge = document.querySelector('.realtime-badge');
+            const sp = document.getElementById('sync-pending');
+            if (!isOnline) {
+                if (badge) badge.innerHTML = '<span style="width:6px;height:6px;background:var(--warning);border-radius:50%;display:inline-block;"></span> OFFLINE';
+                if (badge) badge.style.color = 'var(--warning)';
+                const q = JSON.parse(localStorage.getItem(OFFLINE_KEY) || '[]');
+                if (sp) sp.style.display = q.length ? 'block' : 'none';
+            } else {
+                if (badge) badge.innerHTML = '<span class="realtime-dot"></span> LIVE';
+                if (badge) badge.style.color = 'var(--success)';
+                if (sp) sp.style.display = 'none';
+            }
+        }
+
+        function enfileirarOffline(tabela, dados) {
+            const q = JSON.parse(localStorage.getItem(OFFLINE_KEY) || '[]');
+            q.push({ tabela, dados, ts: new Date().toISOString() });
+            localStorage.setItem(OFFLINE_KEY, JSON.stringify(q));
+            const sp = document.getElementById('sync-pending');
+            if (sp) sp.style.display = 'block';
+        }
+
+        async function sincronizarOffline() {
+            const q = JSON.parse(localStorage.getItem(OFFLINE_KEY) || '[]');
+            if (!q.length) return;
+            let erros = 0;
+            const novaFila = [];
+            for (const item of q) {
+                try {
+                    const { error } = await db.from(item.tabela).insert(item.dados);
+                    if (error) { novaFila.push(item); erros++; }
+                } catch (_) { novaFila.push(item); erros++; }
+            }
+            localStorage.setItem(OFFLINE_KEY, JSON.stringify(novaFila));
+            if (novaFila.length === 0) {
+                showSuccess('DADOS OFFLINE SINCRONIZADOS!');
+                await carregarProgGeral();
+                await carregarProgAdmin();
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // SCROLL DAS TABS
+        // ─────────────────────────────────────────────
+        function scrollTabs(px) {
+            const tabs = document.getElementById('admin-tabs');
+            if (tabs) tabs.scrollBy({ left: px, behavior: 'smooth' });
+        }
+
+        // ─────────────────────────────────────────────
+        // HELPERS UI
+        // ─────────────────────────────────────────────
+        function loading(show, msg) {
+            const el = document.getElementById('loading-overlay');
+            document.getElementById('loading-msg').textContent = msg || 'Carregando...';
+            el.style.display = show ? 'flex' : 'none';
+        }
+
+        function show(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden');
+            document.body.className = (id === 'scr-login') ? 'login-bg' : 'app-bg';
+        }
+
+        function showSuccess(msg) {
+            document.getElementById('success-msg').textContent = msg || 'ENVIADO COM SUCESSO!';
+            document.getElementById('success-overlay').style.display = 'flex';
+            setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 2000);
+        }
+
+        function verFotoGrande(src) {
+            document.getElementById('full-img').src = src;
+            document.getElementById('img-viewer').style.display = 'flex';
+        }
+
+        // ─────────────────────────────────────────────
+        // INICIALIZAÇÃO
+        // ─────────────────────────────────────────────
+        window.onload = async function () {
+            const hoje = new Date().toISOString().split('T')[0];
+            ['p-filter-date', 'forn-filter-date', 'mon-filter-date', 'hist-filter-date'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = hoje;
+            });
+
+            // Carrega config EmailJS do Supabase
+            try {
+                const { data } = await db.from(TBL.config).select('valor').eq('chave', 'emailjs').single();
+                if (data?.valor) {
+                    emailjsCfg = data.valor;
+                    if (emailjsCfg.userId) emailjs.init(emailjsCfg.userId);
+                    const ids = ['cfg-ejs-userid', 'cfg-ejs-serviceid', 'cfg-ejs-templateid'];
+                    const keys = ['userId', 'serviceId', 'templateId'];
+                    ids.forEach((id, i) => { const el = document.getElementById(id); if (el && emailjsCfg[keys[i]]) el.value = emailjsCfg[keys[i]]; });
+                }
+            } catch (_) { }
+
+            // Carrega permissões em cache
+            await carregarPermissoesCache();
+
+            toggleFornDiv();
+        };
+
+        // ─────────────────────────────────────────────
+        // REALTIME — inscrição após login
+        // ─────────────────────────────────────────────
+        function iniciarRealtime() {
+            if (realtimeChannel) db.removeChannel(realtimeChannel);
+            realtimeChannel = db
+                .channel('lokamig-realtime')
+                .on('postgres_changes', { event: '*', schema: 'public', table: TBL.prog }, () => {
+                    carregarProgAdmin();
+                    atualizarDashboard();
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: TBL.orcamentos }, () => {
+                    if (!document.getElementById('area-orcamentos').classList.contains('hidden')) renderOrcamentosAdmin();
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: TBL.manutencoes }, () => {
+                    if (!document.getElementById('area-manutencao').classList.contains('hidden')) carregarManutencoes();
+                    atualizarDashboard();
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: TBL.combustivel }, () => {
+                    if (!document.getElementById('area-combustivel').classList.contains('hidden')) carregarAbastecimentos();
+                    atualizarDashboard();
+                })
+                .subscribe();
+        }
+
+        function pararRealtime() {
+            if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
+        }
+
+        // ─────────────────────────────────────────────
+        // NAVEGAÇÃO / TABS
+        // ─────────────────────────────────────────────
+        function switchTab(id, e) {
+            document.querySelectorAll('.admin-content').forEach(a => a.classList.add('hidden'));
+            const area = document.getElementById('area-' + id);
+            if (area) area.classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+            if (e?.target) e.target.classList.add('tab-active');
+
+            const loaders = {
+                monitor: carregarProgAdmin,
+                history: () => { popularFiltroFornHistorico(); renderHistorico(); },
+                forn: renderListaForn,
+                colab: renderListaColab,
+                veic: renderListaVeic,
+                manutencao: carregarManutencoes,
+                orcamentos: renderOrcamentosAdmin,
+                combustivel: carregarAbastecimentos,
+                emails: carregarEmails,
+                auditoria: carregarAuditoria,
+                permissoes: renderPermissoes,
+                config: () => { }
+            };
+            if (loaders[id]) loaders[id]();
+        }
+
+        // ─────────────────────────────────────────────
+        // LOGIN
+        // ─────────────────────────────────────────────
+        async function handleLogin() {
+            const u = DOMPurify.sanitize(document.getElementById('user').value.trim().toUpperCase());
+            const p = document.getElementById('pass').value.trim();
+            if (!u || !p) { alert('Preencha todos os campos!'); return; }
+
+            loading(true, 'Autenticando...');
+
+            try {
+                // ADMIN hardcoded
+                if (u === 'ADMIN' && p === 'Luc45t1@go') {
+                    currentUser = { nome: 'Administrador', role: 'admin' };
+                    await _entrarAdmin();
+                    return;
+                }
+
+                // Colaboradores
+                const { data: colabs, error: colabErr } = await db.from(TBL.colaboradores)
+                    .select('*').ilike('user_login', u);
+                if (colabs?.length) {
+                    const colab = colabs.find(c => c.senha === p);
+                    if (!colab) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.'); return; }
+                    currentUser = { ...colab, nome: colab.nome, role: colab.perfil };
+                    await registrarAuditoria('Login: ' + colab.nome + ' (' + colab.perfil + ')');
+
+                    if (colab.perfil === 'programador') {
+                        document.getElementById('prog-user-label').textContent = 'Usuário: ' + colab.nome;
+                        loading(false);
+                        show('scr-programador');
+                        await popularSeletorVeiculos();
+                        await popularSeletorFornecedores();
+                        await carregarProgGeral();
+                        iniciarRealtime();
+                        return;
+                    }
+
+                    document.getElementById('admin-user-label').textContent = 'Bem-vindo, ' + colab.nome + ' (' + colab.perfil + ')';
+                    loading(false);
+                    show('scr-admin');
+                    aplicarPermissoesAdmin(colab.perfil);
+                    await Promise.all([atualizarDashboard(), carregarProgAdmin()]);
+                    iniciarRealtime();
+                    return;
+                }
+
+                // Fornecedores
+                const { data: forns } = await db.from(TBL.fornUsers)
+                    .select('*').ilike('user_login', u);
+                if (forns?.length) {
+                    const forn = forns.find(f => f.senha === p);
+                    if (!forn) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.'); return; }
+                    currentUser = { ...forn, role: 'fornecedor' };
+                    document.getElementById('forn-name-screen').innerText = '🏢 ' + forn.empresa;
+                    await registrarAuditoria('Login Fornecedor: ' + forn.empresa);
+                    loading(false);
+                    show('scr-fornecedor');
+                    await carregarServicosForn();
+                    await carregarAlertasRevisaoFornecedor();
+                    iniciarRealtime();
+                    return;
+                }
+
+                loading(false);
+                alert('❌ Acesso Negado. Usuário ou senha incorretos.');
+
+            } catch (err) {
+                loading(false);
+                alert('Erro ao conectar: ' + err.message);
+            }
+        }
+
+        async function _entrarAdmin() {
+            document.getElementById('admin-user-label').textContent = 'Bem-vindo, Administrador';
+            loading(false);
+            show('scr-admin');
+            await Promise.all([
+                atualizarDashboard(),
+                carregarProgAdmin(),
+                renderPermissoes()
+            ]);
+            await registrarAuditoria('Login: ADMIN');
+            iniciarRealtime();
+        }
+
+        function aplicarPermissoesAdmin(role) {
+            const perm = permissoesCache?.[role] || {};
+            const tabs = document.getElementById('admin-tabs');
+            if (!tabs) return;
+
+            // Esconde todas as áreas primeiro
+            document.querySelectorAll('.admin-content').forEach(a => a.classList.add('hidden'));
+
+            Array.from(tabs.children).forEach(btn => {
+                const match = btn.getAttribute('onclick')?.match(/'([^']+)'/);
+                if (match) {
+                    const visivel = perm[match[1]] === true;
+                    btn.style.display = visivel ? '' : 'none';
+                }
+            });
+
+            // Ativa a primeira aba visível e carrega seu conteúdo
+            const firstVisible = Array.from(tabs.children).find(b => b.style.display !== 'none');
+            if (firstVisible) {
+                firstVisible.classList.add('tab-active');
+                firstVisible.click();
+            }
+        }
+
+        async function handleLogout() {
+            pararRealtime();
+            currentUser = null;
+            tempFotos = []; tempEvidencias = []; abastecimentoFoto = null;
+            show('scr-login');
+            document.getElementById('user').value = '';
+            document.getElementById('pass').value = '';
+        }
+
+        // ─────────────────────────────────────────────
+        // PERMISSÕES
+        // ─────────────────────────────────────────────
+        async function carregarPermissoesCache() {
+            try {
+                const { data } = await db.from(TBL.permissoes).select('*');
+                if (data?.length) {
+                    permissoesCache = {};
+                    data.forEach(row => { permissoesCache[row.perfil] = row.permissoes; });
+                } else {
+                    permissoesCache = PERMISSOES_PADRAO;
+                }
+            } catch (_) { permissoesCache = PERMISSOES_PADRAO; }
+        }
+
+        async function renderPermissoes() {
+            await carregarPermissoesCache();
+            const grid = document.getElementById('permissoes-grid');
+            if (!grid) return;
+            const perfis = ['admin', 'programador', 'supervisor', 'motorista'];
+            let html = '';
+            perfis.forEach(perfil => {
+                const p = permissoesCache?.[perfil] || {};
+                html += `<div class="permissao-card"><h4>${perfil}</h4>`;
+                Object.entries(NOMES_TABS).forEach(([tela, nome]) => {
+                    html += `<label><input type="checkbox" ${p[tela] ? 'checked' : ''} onchange="togglePermissao('${perfil}','${tela}',this.checked)"> ${nome}</label>`;
+                });
+                html += '</div>';
+            });
+            grid.innerHTML = html;
+        }
+
+        async function togglePermissao(perfil, tela, checked) {
+            if (!permissoesCache[perfil]) permissoesCache[perfil] = {};
+            permissoesCache[perfil][tela] = checked;
+        }
+
+        async function salvarPermissoes() {
+            loading(true, 'Salvando permissões...');
+            try {
+                const perfis = Object.keys(permissoesCache);
+                for (const perfil of perfis) {
+                    await db.from(TBL.permissoes).upsert({ perfil, permissoes: permissoesCache[perfil] }, { onConflict: 'perfil' });
+                }
+                await registrarAuditoria('Permissões atualizadas');
+                loading(false);
+                alert('✅ Permissões salvas!');
+            } catch (e) { loading(false); alert('Erro: ' + e.message); }
+        }
+
+        // ─────────────────────────────────────────────
+        // DASHBOARD
+        // ─────────────────────────────────────────────
+        async function atualizarDashboard() {
+            const hoje = new Date().toISOString().split('T')[0];
+            const mesAtual = hoje.slice(0, 7);
+
+            const [{ data: progHoje }, { data: veics }, { data: manut }, { data: comb }] = await Promise.all([
+                db.from(TBL.prog).select('status_flow,placa').eq('data_servico', hoje),
+                db.from(TBL.veiculos).select('id'),
+                db.from(TBL.manutencoes).select('status').eq('status', 'PENDENTE'),
+                db.from(TBL.combustivel).select('valor').gte('data_abast', mesAtual + '-01')
+            ]);
+
+            const lista = progHoje || [];
+            const naoCancelados = lista.filter(i => i.status_flow !== 'CANCELADO');
+            const placasHoje = [...new Set(naoCancelados.map(i => i.placa))];
+            const gastoMes = (comb || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+
+            document.getElementById('met-total-hoje').textContent = placasHoje.length;
+            document.getElementById('met-concluidos').textContent = lista.filter(i => i.status_flow === 'CONCLUIDO').length;
+            document.getElementById('met-pendentes').textContent = lista.filter(i => i.status_flow === 'PENDENTE').length;
+            document.getElementById('met-gasto-mes').textContent = 'R$' + gastoMes.toFixed(0);
+            document.getElementById('met-frota').textContent = (veics || []).length;
+            document.getElementById('met-manut').textContent = (manut || []).length;
+
+            await verificarAlertasGarantia();
+        }
+
+        // ─────────────────────────────────────────────
+        // ALERTAS
+        // ─────────────────────────────────────────────
+        async function verificarAlertasGarantia() {
+            const cont = document.getElementById('alertas-garantia');
+            if (!cont) return;
+            const { data: manut } = await db.from(TBL.manutencoes).select('*').eq('status', 'PENDENTE');
+            let html = '';
+            (manut || []).filter(m => m.urgencia === 'critico').forEach(m => {
+                html += `<div class="alert-card alert-danger">🚨 <b>CRÍTICO:</b> ${m.placa} — ${m.descricao} (KM: ${m.km_programada || '—'} | Até: ${m.data_limite || '—'})</div>`;
+            });
+            (manut || []).filter(m => m.urgencia === 'urgente').forEach(m => {
+                html += `<div class="alert-card">⚠️ <b>URGENTE:</b> ${m.placa} — ${m.descricao}</div>`;
+            });
+            cont.innerHTML = html;
+        }
+
+        // ─────────────────────────────────────────────
+        // MONITOR ADMIN
+        // ─────────────────────────────────────────────
+        async function carregarProgAdmin() {
+            const dt = document.getElementById('mon-filter-date')?.value || '';
+            const placa = (document.getElementById('mon-filter-placa')?.value || '').toUpperCase().trim();
+            const status = document.getElementById('mon-filter-status')?.value || '';
+            const setor = document.getElementById('mon-filter-setor')?.value || '';
+
+            let query = db.from(TBL.prog).select('*').order('id', { ascending: false });
+            if (dt) query = query.eq('data_servico', dt);
+            if (placa) query = query.ilike('placa', `%${placa}%`);
+            if (status) query = query.eq('status_flow', status);
+            if (setor) query = query.eq('setor', setor);
+
+            const { data: list, error } = await query;
+            const cont = document.getElementById('list-prog-admin');
+            if (error || !list?.length) {
+                cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento encontrado.</p>';
+                return;
+            }
+
+            cont.innerHTML = list.map(s => {
+                const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)', 'CANCELADO': 'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
+                const cancelClass = s.status_flow === 'CANCELADO' ? 'cancelado' : '';
+                const setorClass = s.setor ? `setor-${s.setor}` : '';
+                const ts = s.timestamp || s.data_servico;
+                return `
+        <div class="prog-item ${cancelClass} status-${(s.status_flow || '').replace(' ', '-')}">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
+                <b style="font-size:14px;">${s.placa}</b>
+                ${s.setor ? `<span class="setor-badge ${setorClass}">${s.setor}</span>` : ''}
+                <span style="color:var(--gray);font-size:10px;margin-left:auto;">${ts}</span>
+            </div>
+            <div style="font-size:11px;color:#cbd5e1;">
+                ${s.tipo_op || ''} → <b>${s.fornecedor || '—'}</b>
+                ${s.km ? ` | KM: ${s.km}` : ''}
+                ${s.programador ? ` | Por: ${s.programador}` : ''}
+            </div>
+            ${s.obs ? `<div style="font-size:10px;color:var(--gray);margin-top:4px;">📝 ${s.obs}</div>` : ''}
+            <div class="card-acoes">
+                <button class="btn-info btn-sm" onclick="abrirDetalheServico(${s.id})">🔍 Detalhes</button>
+                <button class="btn-pdf btn-sm" onclick="gerarPDF(${s.id})">📄 PDF</button>
+                ${s.status_flow !== 'CANCELADO' ? `<button class="btn-cancel btn-sm" onclick="cancelarServico(${s.id})">🚫 Cancelar</button>` : ''}
+            </div>
+        </div>`;
+            }).join('');
+
+            await atualizarDashboard();
+        }
+
+        // ─────────────────────────────────────────────
+        // DETALHE DO SERVIÇO (ADMIN)
+        // ─────────────────────────────────────────────
+        async function abrirDetalheServico(id) {
+            const { data: rows } = await db.from(TBL.prog).select('*').eq('id', id);
+            const s = rows?.[0]; if (!s) return;
+            servicoDetalheId = id;
+
+            document.getElementById('srv-det-titulo').textContent = `🔍 ${s.placa} — ${s.tipo_op}`;
+
+            const { data: revs } = await db.from(TBL.manutencoes).select('*').eq('placa', s.placa).eq('status', 'PENDENTE');
+            const revisao = revs?.[0];
+
+            const fotos = s.fotos || [];
+            document.getElementById('srv-det-body').innerHTML = `
+    <table>
+        <tr><th>Placa</th><td><b>${s.placa}</b></td></tr>
+        <tr><th>Setor</th><td>${s.setor || '—'}</td></tr>
+        <tr><th>Operação</th><td>${s.tipo_op}</td></tr>
+        <tr><th>Destino</th><td>${s.fornecedor || '—'}</td></tr>
+        <tr><th>KM</th><td>${s.km || '—'}</td></tr>
+        <tr><th>Status</th><td>${s.status_flow}</td></tr>
+        <tr><th>Programador</th><td>${s.programador || '—'}</td></tr>
+        <tr><th>Data/Hora</th><td>${s.timestamp || s.data_servico}</td></tr>
+        ${s.obs ? `<tr><th>Obs.</th><td>${s.obs}</td></tr>` : ''}
+        ${s.rating ? `<tr><th>Avaliação</th><td>${'★'.repeat(s.rating)}${'☆'.repeat(5 - s.rating)}</td></tr>` : ''}
+        ${s.obs_status ? `<tr><th>Obs. Serviço</th><td>${s.obs_status}</td></tr>` : ''}
+    </table>`;
+
+            document.getElementById('srv-det-fotos').innerHTML = fotos.map(f =>
+                `<div class="photo-card"><img src="${f}" class="thumb" onclick="verFotoGrande('${f}')">
+         <div class="timestamp-overlay">${s.timestamp || s.data_servico}</div></div>`
+            ).join('');
+
+            const revCont = document.getElementById('srv-det-revisao');
+            if (revisao) {
+                revCont.innerHTML = `<div class="revisao-inline">🔧 <b>Revisão pendente:</b><br>${revisao.descricao} — KM: ${revisao.km_programada || '—'} | Até: ${revisao.data_limite || '—'}
+            <br><button class="btn-success btn-sm" onclick="concluirManutencaoPorPlaca('${s.placa}')">✅ Marcar como Concluída</button></div>`;
+            } else { revCont.innerHTML = ''; }
+
+            document.getElementById('srv-det-acoes').innerHTML = s.status_flow !== 'CANCELADO' ? `
+    <div class="btn-row">
+        <button class="btn-pdf btn-sm" onclick="gerarPDF(${id})">📄 Gerar PDF</button>
+        <button class="btn-cancel btn-sm" onclick="cancelarServico(${id});fecharDetalheServico()">🚫 Cancelar</button>
+    </div>` : '';
+
+            show('scr-servico-detalhe');
+        }
+
+        function fecharDetalheServico() { show('scr-admin'); carregarProgAdmin(); }
+
+        async function cancelarServico(id) {
+            if (!confirm('Confirmar cancelamento deste serviço?')) return;
+            const ts = new Date().toLocaleString('pt-BR');
+            const { error } = await db.from(TBL.prog).update({ status_flow: 'CANCELADO', cancelado_em: ts }).eq('id', id);
+            if (!error) {
+                await registrarAuditoria('Cancelamento serviço ID ' + id);
+                await carregarProgAdmin();
+            }
+        }
+
+        async function concluirManutencaoPorPlaca(placa) {
+            const ts = new Date().toLocaleString('pt-BR');
+            await db.from(TBL.manutencoes).update({ status: 'CONCLUIDO', concluido_em: ts }).eq('placa', placa).eq('status', 'PENDENTE');
+            await registrarAuditoria('Manutenção concluída: ' + placa);
+            alert('✅ Manutenção marcada como concluída!');
+            await abrirDetalheServico(servicoDetalheId);
+        }
+
+        // ─────────────────────────────────────────────
+        // HISTÓRICO
+        // ─────────────────────────────────────────────
+        async function popularFiltroFornHistorico() {
+            const sel = document.getElementById('hist-filter-forn');
+            if (!sel) return;
+            const { data } = await db.from(TBL.fornecedores).select('nome');
+            sel.innerHTML = '<option value="">Todos fornecedores</option>' +
+                (data || []).map(f => `<option value="${f.nome}">${f.nome}</option>`).join('');
+        }
+
+        async function renderHistorico() {
+            const dt = document.getElementById('hist-filter-date')?.value || '';
+            const placa = (document.getElementById('hist-filter-placa')?.value || '').toUpperCase().trim();
+            const forn = document.getElementById('hist-filter-forn')?.value || '';
+
+            let q = db.from(TBL.prog).select('*').order('id');
+            if (dt) q = q.eq('data_servico', dt);
+            if (placa) q = q.ilike('placa', `%${placa}%`);
+            if (forn) q = q.eq('fornecedor', forn);
+
+            const { data: list } = await q;
+            const cont = document.getElementById('list-history-admin');
+            if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;">Nenhum registro encontrado.</p>'; return; }
+
+            const placas = [...new Set(list.map(s => s.placa))];
+            let html = '';
+            placas.forEach(p => {
+                const doPlaca = list.filter(s => s.placa === p);
+                const datas = [...new Set(doPlaca.map(s => s.data_servico))];
+                datas.forEach(d => {
+                    const doDia = doPlaca.filter(s => s.data_servico === d);
+                    const saidas = doDia.filter(s => s.tipo_op === 'SAÍDA');
+                    const retornos = doDia.filter(s => s.tipo_op === 'RETORNO');
+                    const max = Math.max(saidas.length, retornos.length, 1);
+                    for (let i = 0; i < max; i++) {
+                        const saida = saidas[i];
+                        const retorno = retornos[i];
+                        const mkCard = (s, cor, label, arrow) => s ? `
+                    <div style="flex:1;background:rgba(${cor},.08);border:1px solid rgba(${cor},.3);border-radius:10px;padding:10px;">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                            <span class="status-badge" style="background:${s.status_flow === 'CONCLUIDO' ? 'var(--success)' : 'var(--warning)'};">${s.status_flow}</span>
+                            <b style="color:rgba(${cor},1);">${arrow} ${label}</b>
+                        </div>
+                        <div style="font-size:11px;"><b>${s.placa}</b>${s.setor ? ` <span class="setor-badge setor-${s.setor}">${s.setor}</span>` : ''}</div>
+                        <div style="font-size:10px;color:var(--gray);">${arrow === '↗' ? '→' : '←'} ${s.fornecedor || 'PÁTIO'}</div>
+                        <div style="font-size:10px;color:var(--gray);">KM: ${s.km || '—'} | ${s.timestamp || s.data_servico}</div>
+                        ${s.rating ? `<div style="color:#fbbf24;font-size:11px;">${'★'.repeat(s.rating)}${'☆'.repeat(5 - s.rating)}</div>` : ''}
+                    </div>` :
+                            `<div style="flex:1;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:center;color:var(--gray);font-size:11px;">Sem ${label.toLowerCase()} registrada</div>`;
+                        html += `<div style="display:flex;gap:8px;margin-bottom:10px;">${mkCard(saida, '245,158,11', 'SAÍDA', '↗')}${mkCard(retorno, '16,185,129', 'RETORNO', '↙')}</div>`;
+                    }
+                });
+            });
+            cont.innerHTML = html || '<p style="color:var(--gray);padding:15px;">Nenhum registro encontrado.</p>';
+        }
+
+        // ─────────────────────────────────────────────
+        // FORNECEDORES (ADMIN)
+        // ─────────────────────────────────────────────
+        async function renderListaForn() {
+            const [{ data: items }, { data: users }] = await Promise.all([
+                db.from(TBL.fornecedores).select('*'),
+                db.from(TBL.fornUsers).select('*')
+            ]);
+            const cont = document.getElementById('list-forn');
+            if (!cont) return;
+            if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum fornecedor cadastrado.</p>'; return; }
+            cont.innerHTML = items.map(it => {
+                const user = (users || []).find(u => u.empresa === it.nome);
+                return `<div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+                <b>${it.nome}</b>
+                ${user ? `<br><small style="color:var(--gray);">Login: ${user.user_login} | Tipo: ${user.tipo}</small>` : '<br><small style="color:var(--warning);">Sem login cadastrado</small>'}
+            </div>
+            <button class="btn-danger btn-sm" onclick="excluirFornecedor(${it.id})">✕</button>
+        </div>`;
+            }).join('');
+        }
+
+        async function excluirFornecedor(id) {
+            if (!confirm('Remover este fornecedor?')) return;
+            await db.from(TBL.fornecedores).delete().eq('id', id);
+            await renderListaForn();
+            await popularSeletorFornecedores();
+        }
+
+        async function salvarNovoFornecedor() {
+            const nome = document.getElementById('f-nome').value.trim();
+            const user = document.getElementById('f-user').value.trim();
+            const pass = document.getElementById('f-pass').value.trim();
+            const tipo = document.getElementById('f-tipo').value;
+            if (!nome) { alert('Informe o nome da empresa!'); return; }
+
+            loading(true, 'Salvando...');
+            const { error } = await db.from(TBL.fornecedores).insert({ nome, tipo });
+            if (error) { loading(false); alert('Erro: ' + error.message); return; }
+
+            if (user && pass) {
+                await db.from(TBL.fornUsers).insert({ user_login: user, senha: pass, empresa: nome, tipo });
+            }
+
+            ['f-nome', 'f-user', 'f-pass'].forEach(id => document.getElementById(id).value = '');
+            await popularSeletorFornecedores();
+            await renderListaForn();
+            await registrarAuditoria('Fornecedor cadastrado: ' + nome);
+            loading(false);
+            alert('✅ Fornecedor cadastrado!');
+        }
+
+        // ─────────────────────────────────────────────
+        // COLABORADORES
+        // ─────────────────────────────────────────────
+        async function salvarColab() {
+            const nome = document.getElementById('c-nome').value.trim();
+            const mat = document.getElementById('c-mat').value.trim();
+            const user = document.getElementById('c-user').value.trim();
+            const pass = document.getElementById('c-pass').value.trim();
+            const nfc = document.getElementById('c-nfc').value.trim();
+            const perfil = document.getElementById('c-perfil').value;
+            if (!nome || !mat || !user || !pass) { alert('Preencha Nome, Matrícula, Login e Senha!'); return; }
+
+            loading(true, 'Salvando...');
+            const { data: exists } = await db.from(TBL.colaboradores).select('id').ilike('user_login', user);
+            if (exists?.length) { loading(false); alert('Login já em uso!'); return; }
+
+            const { error } = await db.from(TBL.colaboradores).insert({ nome, matricula: mat, user_login: user, senha: pass, nfc_id: nfc, perfil });
+            if (error) { loading(false); alert('Erro: ' + error.message); return; }
+
+            ['c-nome', 'c-mat', 'c-user', 'c-pass', 'c-nfc'].forEach(id => document.getElementById(id).value = '');
+            await renderListaColab();
+            await registrarAuditoria('Colaborador cadastrado: ' + nome + ' (' + perfil + ')');
+            loading(false);
+            alert('✅ Colaborador cadastrado!');
+        }
+
+        async function renderListaColab() {
+            const { data: items } = await db.from(TBL.colaboradores).select('*');
+            const cont = document.getElementById('list-colab');
+            if (!cont) return;
+            if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum colaborador cadastrado.</p>'; return; }
+            cont.innerHTML = items.map(it => `
+        <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+                <b>${it.nome}</b> <small style="color:var(--gray);">#${it.matricula}</small>
+                <span class="setor-badge" style="background:rgba(139,92,246,.3);color:#c4b5fd;">${it.perfil}</span>
+                <br><small style="color:var(--gray);">Login: ${it.user_login}${it.nfc_id ? ' | NFC: ' + it.nfc_id : ''}</small>
+            </div>
+            <button class="btn-danger btn-sm" onclick="excluirColab(${it.id})">✕</button>
+        </div>`).join('');
+        }
+
+        async function excluirColab(id) {
+            if (!confirm('Remover este colaborador?')) return;
+            await db.from(TBL.colaboradores).delete().eq('id', id);
+            await renderListaColab();
+        }
+
+        // ─────────────────────────────────────────────
+        // FROTA / VEÍCULOS
+        // ─────────────────────────────────────────────
+        async function salvarVeiculo() {
+            const placa = document.getElementById('v-placa').value.toUpperCase().trim();
+            const modelo = document.getElementById('v-modelo').value.trim();
+            const ano = parseInt(document.getElementById('v-ano').value) || 0;
+            const kmAtual = parseInt(document.getElementById('v-km-atual').value) || 0;
+            const kmRev = document.getElementById('v-km-revisao').value || null;
+            const tipo = document.getElementById('v-tipo').value;
+            if (!placa) { alert('Informe a placa do veículo!'); return; }
+
+            loading(true, 'Salvando...');
+            const { error } = await db.from(TBL.veiculos).insert({ placa, modelo, ano, km_atual: kmAtual, km_proxima_revisao: kmRev, tipo });
+            if (error) { loading(false); alert('Erro: ' + error.message + (error.code === '23505' ? ' (Placa já cadastrada)' : '')); return; }
+
+            ['v-placa', 'v-modelo', 'v-ano', 'v-km-atual', 'v-km-revisao'].forEach(id => document.getElementById(id).value = '');
+            await renderListaVeic();
+            await popularSeletorVeiculos();
+            await registrarAuditoria('Veículo cadastrado: ' + placa);
+            loading(false);
+            alert('✅ Veículo cadastrado!');
+        }
+
+        async function renderListaVeic() {
+            const { data: items } = await db.from(TBL.veiculos).select('*').order('placa');
+            const cont = document.getElementById('list-veic');
+            if (!cont) return;
+            if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum veículo cadastrado.</p>'; return; }
+            cont.innerHTML = items.map(v => `
+        <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+                <b>${v.placa}</b> <span class="setor-badge setor-${v.tipo}">${v.tipo}</span>
+                <br><small style="color:var(--gray);">${v.modelo || '—'} ${v.ano ? '· ' + v.ano : ''} | KM Atual: ${v.km_atual || '—'} | Próx. Rev.: ${v.km_proxima_revisao || '—'}</small>
+            </div>
+            <button class="btn-danger btn-sm" onclick="excluirVeiculo(${v.id})">✕</button>
+        </div>`).join('');
+        }
+
+        async function excluirVeiculo(id) {
+            if (!confirm('Remover este veículo?')) return;
+            await db.from(TBL.veiculos).delete().eq('id', id);
+            await renderListaVeic();
+            await popularSeletorVeiculos();
+        }
+
+        async function popularSeletorVeiculos() {
+            const { data: veics } = await db.from(TBL.veiculos).select('placa,modelo,tipo').order('placa');
+            ['p-placa', 'm-veiculo', 'ab-veiculo'].forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                sel.innerHTML = '<option value="">— Selecione —</option>' +
+                    (veics || []).map(v => `<option value="${v.placa}">${v.placa}${v.modelo ? ' - ' + v.modelo : ''} (${v.tipo})</option>`).join('');
+            });
+        }
+
+        // ─────────────────────────────────────────────
+        // MANUTENÇÕES
+        // ─────────────────────────────────────────────
+        async function salvarManutencao() {
+            const placa = document.getElementById('m-veiculo').value;
+            const desc = document.getElementById('m-descricao').value.trim();
+            const km = document.getElementById('m-km-programada').value || null;
+            const data = document.getElementById('m-data-limite').value || null;
+            const urg = document.getElementById('m-urgencia').value;
+            if (!placa || !desc) { alert('Preencha veículo e descrição!'); return; }
+
+            loading(true, 'Salvando...');
+            const { error } = await db.from(TBL.manutencoes).insert({ placa, descricao: desc, km_programada: km ? parseInt(km) : null, data_limite: data, urgencia: urg, status: 'PENDENTE' });
+            if (error) { loading(false); alert('Erro: ' + error.message); return; }
+
+            ['m-descricao', 'm-km-programada', 'm-data-limite'].forEach(id => document.getElementById(id).value = '');
+            await carregarManutencoes();
+            await registrarAuditoria('Revisão programada: ' + placa + ' — ' + desc);
+            loading(false);
+            alert('✅ Revisão programada!');
+        }
+
+        async function carregarManutencoes() {
+            const { data: list } = await db.from(TBL.manutencoes).select('*').order('id', { ascending: false });
+            const cont = document.getElementById('list-manutencoes');
+            if (!cont) return;
+            if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhuma revisão programada.</p>'; return; }
+            cont.innerHTML = list.map(m => {
+                const urgColor = { critico: 'var(--danger)', urgente: 'var(--warning)', normal: 'var(--info)' }[m.urgencia] || 'var(--gray)';
+                const concluido = m.status === 'CONCLUIDO';
+                return `<div class="prog-item" style="border-left-color:${urgColor};${concluido ? 'opacity:.5' : ''}">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <span class="status-badge" style="background:${concluido ? 'var(--success)' : 'rgba(245,158,11,.3)'};color:${concluido ? '#fff' : 'var(--warning)'};">${m.status}</span>
+                    <b>${m.placa}</b> — ${m.descricao}
+                    <br><small style="color:var(--gray);">KM: ${m.km_programada || '—'} | Até: ${m.data_limite || '—'} | ${m.urgencia || 'normal'}</small>
+                    ${m.concluido_em ? `<br><small style="color:var(--success);">✅ Concluído: ${m.concluido_em}</small>` : ''}
+                </div>
+                <div style="display:flex;gap:4px;">
+                    ${!concluido ? `<button class="btn-success btn-sm" onclick="concluirManutItem(${m.id})">✅</button>` : ''}
+                    <button class="btn-danger btn-sm" onclick="excluirManut(${m.id})">✕</button>
+                </div>
+            </div>
+        </div>`;
+            }).join('');
+        }
+
+        async function concluirManutItem(id) {
+            const ts = new Date().toLocaleString('pt-BR');
+            await db.from(TBL.manutencoes).update({ status: 'CONCLUIDO', concluido_em: ts }).eq('id', id);
+            await carregarManutencoes();
+            await atualizarDashboard();
+        }
+
+        async function excluirManut(id) {
+            if (!confirm('Remover esta revisão?')) return;
+            await db.from(TBL.manutencoes).delete().eq('id', id);
+            await carregarManutencoes();
+        }
+
+        // ─────────────────────────────────────────────
+        // PROGRAMADOR: LANÇAMENTOS
+        // ─────────────────────────────────────────────
+        function toggleFornDiv() {
+            const tipo = document.getElementById('p-tipo-op')?.value;
+            const div = document.getElementById('p-forn-div');
+            if (div) div.style.display = tipo === 'RETORNO' ? 'none' : 'block';
+        }
+
+        async function popularSeletorFornecedores() {
+            const { data: forns } = await db.from(TBL.fornecedores).select('nome').order('nome');
+            const sel = document.getElementById('p-fornecedor-select');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">— Selecione o destino —</option>' +
+                (forns || []).map(f => `<option value="${f.nome}">${f.nome}</option>`).join('');
+        }
+
+        async function atualizarSetor() {
+            const placa = document.getElementById('p-placa')?.value;
+            if (!placa) { document.getElementById('p-setor-display').style.display = 'none'; return; }
+            const { data: rows } = await db.from(TBL.veiculos).select('tipo,placa').eq('placa', placa);
+            const veic = rows?.[0];
+            const display = document.getElementById('p-setor-display');
+            if (veic) {
+                document.getElementById('p-setor-label').innerText = veic.tipo || 'Operacional';
+                display.style.display = 'block';
+                const { data: revs } = await db.from(TBL.manutencoes).select('id').eq('placa', placa).eq('status', 'PENDENTE');
+                const alerta = document.getElementById('p-revisao-alerta');
+                if (alerta) alerta.textContent = revs?.length ? ' ⚠️ REVISÃO PENDENTE!' : '';
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        function handleNewUpload(input) {
+            const files = input.files;
+            const now = new Date().toLocaleString('pt-BR');
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => { tempFotos.push({ data: e.target.result, ts: now }); renderNewPreviews(); };
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+
+        function renderNewPreviews() {
+            const cont = document.getElementById('p-preview-fotos');
+            if (!cont) return;
+            cont.innerHTML = tempFotos.map((f, idx) => {
+                const src = typeof f === 'string' ? f : f.data;
+                const ts = typeof f === 'object' ? f.ts : '';
+                return `<div class="photo-card">
+            <img src="${src}" class="thumb" onclick="verFotoGrande('${src}')">
+            <div class="timestamp-overlay">📅 ${ts}</div>
+            <button class="del-btn" onclick="tempFotos.splice(${idx},1);renderNewPreviews()">✕</button>
+        </div>`;
+            }).join('');
+        }
+
+        async function lancarProgramacao() {
+            const placa = document.getElementById('p-placa').value;
+            if (!placa) { alert('Selecione um veículo!'); return; }
+            const tipo = document.getElementById('p-tipo-op').value;
+            const km = document.getElementById('p-km').value || null;
+            const obs = DOMPurify.sanitize(document.getElementById('p-obs').value);
+            const fornecedor = tipo === 'RETORNO' ? 'PÁTIO' : (document.getElementById('p-fornecedor-select').value || '—');
+            const setor = document.getElementById('p-setor-label')?.innerText || '';
+            const fotos = tempFotos.map(f => typeof f === 'string' ? f : f.data);
+            const ts = new Date().toLocaleString('pt-BR');
+
+            const payload = {
+                data_servico: new Date().toISOString().split('T')[0],
+                timestamp: ts,
+                placa, setor, km: km ? parseInt(km) : null,
+                fornecedor, obs, fotos,
+                programador: currentUser?.nome || 'Sistema',
+                status_flow: tipo === 'RETORNO' ? 'CONCLUIDO' : 'PENDENTE',
+                tipo_op: tipo,
+                rating: 0
+            };
+
+            if (!isOnline) {
+                enfileirarOffline(TBL.prog, payload);
+                // Salva localmente para exibição imediata
+                const local = JSON.parse(localStorage.getItem('lokamig_prog_local') || '[]');
+                local.push({ ...payload, id: Date.now(), _offline: true });
+                localStorage.setItem('lokamig_prog_local', JSON.stringify(local));
+                showSuccess('SALVO OFFLINE!');
+            } else {
+                loading(true, 'Enviando...');
+                const { error } = await db.from(TBL.prog).insert(payload);
+                if (error) { loading(false); alert('Erro: ' + error.message); return; }
+                if (km) await db.from(TBL.veiculos).update({ km_atual: parseInt(km) }).eq('placa', placa);
+                await registrarAuditoria(`Lançamento: ${tipo} ${placa} → ${fornecedor} | Por: ${currentUser?.nome}`);
+                loading(false);
+                showSuccess('LANÇAMENTO ENVIADO!');
+            }
+
+            tempFotos = [];
+            document.getElementById('p-placa').value = '';
+            document.getElementById('p-km').value = '';
+            document.getElementById('p-obs').value = '';
+            document.getElementById('p-setor-display').style.display = 'none';
+            renderNewPreviews();
+            await carregarProgGeral();
+        }
+
+        async function carregarProgGeral() {
+            const dt = document.getElementById('p-filter-date')?.value || '';
+            const { data: list } = await db.from(TBL.prog).select('*').eq('data_servico', dt).order('id', { ascending: false });
+            const cont = document.getElementById('list-prog-geral');
+            if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento nesta data.</p>'; return; }
+            cont.innerHTML = list.map(s => {
+                const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)', 'CANCELADO': 'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
+                const podeCancelar = s.status_flow !== 'CANCELADO' && s.status_flow !== 'CONCLUIDO';
+                return `<div class="prog-item ${s.status_flow === 'CANCELADO' ? 'cancelado' : ''}">
+            <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
+            <b>${s.placa}</b> — ${s.tipo_op}
+            ${s.setor ? `<span class="setor-badge setor-${s.setor}">${s.setor}</span>` : ''}
+            <br><small style="color:var(--gray);">${s.fornecedor} | KM: ${s.km || '—'} | ${s.timestamp}</small>
+            ${s.rating ? `<br><small style="color:#fbbf24;">${'★'.repeat(s.rating)}${'☆'.repeat(5 - s.rating)}</small>` : ''}
+            ${podeCancelar ? `<div class="card-acoes"><button class="btn-cancel btn-sm" onclick="cancelarServicoProg(${s.id})">🚫 Cancelar</button></div>` : ''}
+        </div>`;
+            }).join('');
+        }
+
+        async function cancelarServicoProg(id) {
+            if (!confirm('Cancelar este serviço? O fornecedor será notificado.')) return;
+            const ts = new Date().toLocaleString('pt-BR');
+            const { error } = await db.from(TBL.prog).update({ status_flow: 'CANCELADO', cancelado_em: ts, cancelado_por: currentUser?.nome }).eq('id', id);
+            if (!error) {
+                await registrarAuditoria(`Cancelamento pelo programador ${currentUser?.nome}: ID ${id}`);
+                showSuccess('SERVIÇO CANCELADO!');
+                await carregarProgGeral();
+            } else { alert('Erro: ' + error.message); }
+        }
+
+        // ─────────────────────────────────────────────
+        // FORNECEDOR: SERVIÇOS DO DIA
+        // ─────────────────────────────────────────────
+        async function carregarServicosForn() {
+            if (!currentUser) return;
+            const dt = document.getElementById('forn-filter-date')?.value || new Date().toISOString().split('T')[0];
+
+            const { data: list } = await db.from(TBL.prog)
+                .select('*').eq('data_servico', dt).eq('fornecedor', currentUser.empresa).neq('status_flow', 'CANCELADO');
+
+            const cont = document.getElementById('list-forn-servicos');
+            if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum serviço para esta data.</p>'; return; }
+
+            cont.innerHTML = list.map(s => {
+                const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[s.status_flow] || 'var(--gray)';
+                const podeIniciar = s.status_flow === 'PENDENTE';
+                const podeConcluir = s.status_flow === 'EM EXECUÇÃO';
+                return `<div class="prog-item">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
+                <b>${s.placa}</b>
+                ${s.setor ? `<span class="setor-badge setor-${s.setor}">${s.setor}</span>` : ''}
+            </div>
+            <small style="color:#cbd5e1;">${s.tipo_op || ''} | KM: ${s.km || '—'} | ${s.timestamp}</small>
+            ${s.obs ? `<br><small style="color:var(--gray);">📝 ${s.obs}</small>` : ''}
+            <div class="card-acoes">
+                ${podeIniciar ? `<button class="btn-warning btn-sm" onclick="abrirModalStatus(${s.id},'EM EXECUÇÃO')">▶ INICIAR</button>` : ''}
+                ${podeConcluir ? `<button class="btn-success btn-sm" onclick="abrirModalStatus(${s.id},'CONCLUIDO')">✅ CONCLUIR</button>` : ''}
+            </div>
+        </div>`;
+            }).join('');
+        }
+
+        async function carregarAlertasRevisaoFornecedor() {
+            const cont = document.getElementById('forn-alertas-revisao');
+            if (!cont) return;
+            const { data: manut } = await db.from(TBL.manutencoes).select('placa,descricao').eq('status', 'PENDENTE').eq('urgencia', 'critico');
+            cont.innerHTML = (manut || []).map(m =>
+                `<div class="alert-card alert-danger">🚨 REVISÃO CRÍTICA: <b>${m.placa}</b> — ${m.descricao}</div>`
+            ).join('');
+        }
+
+        // ─────────────────────────────────────────────
+        // MODAL STATUS (FORNECEDOR)
+        // ─────────────────────────────────────────────
+        function abrirModalStatus(id, novoStatus) {
+            statusPendente = { id, novoStatus, fotos: [], rating: 0 };
+            document.getElementById('modal-status-titulo').innerText = novoStatus === 'EM EXECUÇÃO' ? '▶ INICIAR SERVIÇO' : '✅ FINALIZAR SERVIÇO';
+            document.getElementById('status-foto-preview').innerHTML = '';
+            document.getElementById('status-obs').value = '';
+            document.getElementById('btn-confirmar-status').classList.add('hidden');
+            document.getElementById('rating-area').classList.toggle('hidden', novoStatus !== 'CONCLUIDO');
+            document.querySelectorAll('#rating-stars span').forEach(s => { s.classList.remove('active'); s.textContent = '☆'; });
+            show('scr-modal-status');
+        }
+
+        function handleStatusFotos(input) {
+            const now = new Date().toLocaleString('pt-BR');
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => { statusPendente.fotos.push({ data: e.target.result, ts: now }); renderStatusPreviews(); };
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+
+        function renderStatusPreviews() {
+            const cont = document.getElementById('status-foto-preview');
+            if (!cont) return;
+            cont.innerHTML = statusPendente.fotos.map((f, i) => {
+                const src = typeof f === 'object' ? f.data : f;
+                const ts = typeof f === 'object' ? f.ts : '';
+                return `<div class="photo-card">
+            <img src="${src}" class="thumb" onclick="verFotoGrande('${src}')">
+            <div class="timestamp-overlay">📅 ${ts}</div>
+            <button class="del-btn" onclick="statusPendente.fotos.splice(${i},1);renderStatusPreviews()">✕</button>
+        </div>`;
+            }).join('');
+            document.getElementById('btn-confirmar-status').classList.toggle('hidden', statusPendente.fotos.length === 0);
+        }
+
+        function setRating(val) {
+            statusPendente.rating = val;
+            document.querySelectorAll('#rating-stars span').forEach((s, i) => {
+                s.classList.toggle('active', i < val);
+                s.textContent = i < val ? '★' : '☆';
+            });
+        }
+
+        async function confirmarAlteracaoStatus() {
+            if (!statusPendente.fotos.length) { alert('Tire pelo menos uma foto!'); return; }
+            loading(true, 'Atualizando...');
+
+            const { data: rows } = await db.from(TBL.prog).select('fotos').eq('id', statusPendente.id);
+            const item = rows?.[0];
+            if (!item) { loading(false); fecharModalStatus(); return; }
+
+            const fotosAnteriores = item.fotos || [];
+            const novasFotos = statusPendente.fotos.map(f => typeof f === 'object' ? f.data : f);
+            const obs_status = DOMPurify.sanitize(document.getElementById('status-obs').value);
+
+            await db.from(TBL.prog).update({
+                status_flow: statusPendente.novoStatus,
+                rating: statusPendente.rating,
+                obs_status,
+                fotos: [...fotosAnteriores, ...novasFotos]
+            }).eq('id', statusPendente.id);
+
+            if (statusPendente.rating > 0) {
+                await db.from(TBL.avaliacoes).insert({
+                    id_prog: statusPendente.id,
+                    rating: statusPendente.rating,
+                    data_aval: new Date().toISOString().split('T')[0]
+                });
+            }
+
+            await registrarAuditoria(`Status: ID ${statusPendente.id} → ${statusPendente.novoStatus} | ${currentUser?.empresa}`);
+            loading(false);
+            showSuccess(statusPendente.novoStatus === 'CONCLUIDO' ? 'SERVIÇO CONCLUÍDO!' : 'SERVIÇO INICIADO!');
+            fecharModalStatus();
+        }
+
+        async function fecharModalStatus() {
+            show('scr-fornecedor');
+            await carregarServicosForn();
+            statusPendente = { id: null, novoStatus: null, fotos: [], rating: 0 };
+        }
+
+        // ─────────────────────────────────────────────
+        // ABASTECIMENTO
+        // ─────────────────────────────────────────────
+        function handleAbastecimentoFoto(input) {
+            if (!input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                abastecimentoFoto = e.target.result;
+                document.getElementById('ab-preview-foto').innerHTML =
+                    `<div class="photo-card"><img src="${e.target.result}" class="thumb" onclick="verFotoGrande('${e.target.result}')">
+             <button class="del-btn" onclick="abastecimentoFoto=null;document.getElementById('ab-preview-foto').innerHTML=''">✕</button></div>`;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        async function salvarAbastecimento() {
+            const placa = document.getElementById('ab-veiculo').value;
+            const litros = document.getElementById('ab-litros').value;
+            const valor = document.getElementById('ab-valor').value;
+            const km = document.getElementById('ab-km').value;
+            if (!placa || !litros || !valor || !km) { alert('Preencha todos os campos!'); return; }
+
+            loading(true, 'Salvando...');
+            const { error } = await db.from(TBL.combustivel).insert({
+                data_abast: new Date().toISOString().split('T')[0],
+                timestamp: new Date().toLocaleString('pt-BR'),
+                placa,
+                litros: parseFloat(litros),
+                valor: parseFloat(valor),
+                km: parseInt(km),
+                comprovante: abastecimentoFoto
+            });
+            if (error) { loading(false); alert('Erro: ' + error.message); return; }
+
+            await db.from(TBL.veiculos).update({ km_atual: parseInt(km) }).eq('placa', placa);
+
+            abastecimentoFoto = null;
+            ['ab-litros', 'ab-valor', 'ab-km'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('ab-preview-foto').innerHTML = '';
+            await registrarAuditoria(`Abastecimento: ${placa} | ${litros}L | R$${valor}`);
+            await carregarAbastecimentos();
+            await atualizarDashboard();
+            loading(false);
+            alert('✅ Abastecimento registrado!');
+        }
+
+        async function carregarAbastecimentos() {
+            const mesInput = document.getElementById('ab-filter-mes');
+            if (mesInput && !mesInput.value) mesInput.value = new Date().toISOString().slice(0, 7);
+            const mesFiltro = mesInput?.value || new Date().toISOString().slice(0, 7);
+            const [ano, mes] = mesFiltro.split('-');
+            const dataIni = mesFiltro + '-01';
+            const dataFim = new Date(parseInt(ano), parseInt(mes), 0).toISOString().split('T')[0];
+
+            const { data: mesList } = await db.from(TBL.combustivel).select('*')
+                .gte('data_abast', dataIni).lte('data_abast', dataFim).order('id', { ascending: false });
+
+            const totalLitros = (mesList || []).reduce((s, c) => s + (parseFloat(c.litros) || 0), 0);
+            const totalValor = (mesList || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+
+            const nomeMes = new Date(parseInt(ano), parseInt(mes) - 1).toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+            const resumo = document.getElementById('resumo-combustivel');
+            if (resumo) resumo.innerHTML = `⛽ <b>${nomeMes}:</b> ${totalLitros.toFixed(1)}L | <b style="color:var(--success);">R$ ${totalValor.toFixed(2)}</b> | ${(mesList || []).length} abastecimento(s)`;
+
+            const cont = document.getElementById('list-abastecimentos');
+            if (!cont) return;
+            if (!mesList?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum abastecimento neste mês.</p>'; return; }
+            cont.innerHTML = mesList.map(a => `
+        <div class="prog-item">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <b>${a.placa}</b> — <span style="color:var(--success);">${a.litros}L | R$ ${parseFloat(a.valor).toFixed(2)}</span>
+                    <br><small style="color:var(--gray);">KM: ${a.km} | ${a.timestamp || a.data_abast}</small>
+                    ${a.comprovante ? `<br><span onclick="verFotoGrande('${a.comprovante}')" style="color:var(--info);cursor:pointer;font-size:11px;">📎 Ver comprovante</span>` : ''}
+                </div>
+                <div style="text-align:right;font-size:11px;color:var(--gray);">
+                    R$/L: ${a.litros > 0 ? (parseFloat(a.valor) / parseFloat(a.litros)).toFixed(2) : '—'}
+                </div>
+            </div>
+        </div>`).join('');
+        }
+
+        // ─────────────────────────────────────────────
+        // E-MAILS
+        // ─────────────────────────────────────────────
+        async function adicionarEmail() {
+            const email = document.getElementById('email-destinatario').value.trim();
+            const nome = document.getElementById('email-nome').value.trim();
+            if (!email) { alert('Informe o e-mail!'); return; }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('E-mail inválido!'); return; }
+
+            loading(true, 'Salvando...');
+            const { error } = await db.from(TBL.emails).insert({ email, nome });
+            if (error) { loading(false); alert(error.code === '23505' ? 'E-mail já cadastrado!' : 'Erro: ' + error.message); return; }
+
+            document.getElementById('email-destinatario').value = '';
+            document.getElementById('email-nome').value = '';
+            await carregarEmails();
+            loading(false);
+            alert('✅ E-mail cadastrado!');
+        }
+
+        async function carregarEmails() {
+            const { data: items } = await db.from(TBL.emails).select('*').order('id');
+            const cont = document.getElementById('list-emails');
+            if (!cont) return;
+            if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum e-mail cadastrado.</p>'; return; }
+            cont.innerHTML = items.map(it => `
+        <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
+            <div><b>${it.nome || '—'}</b><br><small style="color:var(--gray);">${it.email}</small></div>
+            <button class="btn-danger btn-sm" onclick="excluirEmail(${it.id})">✕</button>
+        </div>`).join('');
+        }
+
+        async function excluirEmail(id) {
+            if (!confirm('Remover este e-mail?')) return;
+            await db.from(TBL.emails).delete().eq('id', id);
+            await carregarEmails();
+        }
+
+        // ─────────────────────────────────────────────
+        // AUDITORIA
+        // ─────────────────────────────────────────────
+        async function registrarAuditoria(acao) {
+            try {
+                await db.from(TBL.auditoria).insert({
+                    data_hora: new Date().toLocaleString('pt-BR'),
+                    acao,
+                    usuario: currentUser?.nome || '—'
+                });
+            } catch (_) { }
+        }
+
+        async function carregarAuditoria() {
+            const { data: logs } = await db.from(TBL.auditoria).select('*').order('id', { ascending: false }).limit(100);
+            const cont = document.getElementById('list-auditoria');
+            if (!cont) return;
+            cont.innerHTML = (logs || []).length ? logs.map(l =>
+                `<div class="prog-item" style="font-size:10px;padding:8px 12px;">
+            <b>${l.usuario || '—'}</b> — ${l.acao}
+            <br><small style="color:var(--gray);">${l.data_hora}</small>
+        </div>`).join('') : '<p style="color:var(--gray);">Nenhuma atividade registrada.</p>';
+        }
+
+        async function limparAuditoria() {
+            if (!confirm('Limpar todo o histórico de auditoria?')) return;
+            await db.from(TBL.auditoria).delete().gte('id', 0);
+            await carregarAuditoria();
+        }
+
+        // ─────────────────────────────────────────────
+        // ORÇAMENTOS
+        // ─────────────────────────────────────────────
+        function addItem() {
+            const c = document.getElementById('orc-itens');
+            const d = document.createElement('div');
+            d.style.cssText = 'display:flex;gap:5px;margin-bottom:8px;';
+            d.innerHTML = '<input type="text" placeholder="Descrição do item" style="flex:2;margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;" oninput="calcTotal()">';
+            c.appendChild(d);
+        }
+
+        function calcTotal() {
+            let t = 0;
+            document.querySelectorAll('.v-item').forEach(i => t += Number(i.value) || 0);
+            document.getElementById('total-orc').textContent = t.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+
+        function handleEvidencia(input, tipo) {
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (function (f) {
+                    return e => { tempEvidencias.push({ tipo, nome: f.name, data: e.target.result, mime: f.type }); renderEvidencias(); };
+                })(file);
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+
+        function renderEvidencias() {
+            const cont = document.getElementById('ev-preview');
+            if (!cont) return;
+            cont.innerHTML = tempEvidencias.map((ev, i) => {
+                const content = ev.mime?.startsWith('image/')
+                    ? `<img src="${ev.data}" onclick="verFotoGrande('${ev.data}')">`
+                    : ev.mime?.startsWith('video/')
+                        ? `<video src="${ev.data}" controls style="width:100%;height:100%;object-fit:cover;"></video>`
+                        : `<div class="ev-label">📎<span style="padding:4px;text-align:center;">${ev.nome}</span></div>`;
+                return `<div class="ev-card">${content}<button class="del-btn" onclick="tempEvidencias.splice(${i},1);renderEvidencias()">✕</button></div>`;
+            }).join('');
+        }
+
+        async function enviarOrcamento() {
+            const placa = document.getElementById('orc-placa').value.toUpperCase().trim();
+            if (!placa) { alert('Informe a placa do veículo!'); return; }
+            const desc = document.getElementById('orc-desc').value.trim();
+            const itens = [];
+            document.querySelectorAll('#orc-itens > div').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const d = inputs[0]?.value?.trim();
+                if (d) itens.push({ desc: d, valor: Number(inputs[1]?.value) || 0 });
+            });
+            if (!itens.length) { alert('Adicione pelo menos um item!'); return; }
+            const total = itens.reduce((s, i) => s + i.valor, 0);
+
+            loading(true, 'Enviando orçamento...');
+            const { error } = await db.from(TBL.orcamentos).insert({
+                timestamp: new Date().toLocaleString('pt-BR'),
+                data_orc: new Date().toISOString().split('T')[0],
+                empresa: currentUser?.empresa || '—',
+                placa, descricao: desc, itens, total,
+                evidencias: [...tempEvidencias],
+                status: 'PENDENTE'
+            });
+            if (error) { loading(false); alert('Erro: ' + error.message); return; }
+
+            tempEvidencias = [];
+            document.getElementById('orc-placa').value = '';
+            document.getElementById('orc-desc').value = '';
+            document.getElementById('orc-itens').innerHTML = '<div style="display:flex;gap:5px;margin-bottom:8px;"><input type="text" placeholder="Descrição do item" style="flex:2;margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;" oninput="calcTotal()"></div>';
+            document.getElementById('total-orc').textContent = '0,00';
+            renderEvidencias();
+            await registrarAuditoria(`Orçamento enviado: ${placa} | R$${total.toFixed(2)} | ${currentUser?.empresa}`);
+            loading(false);
+            showSuccess('ORÇAMENTO ENVIADO!');
+            setTimeout(() => show('scr-fornecedor'), 2000);
+        }
+
+        async function abrirOrcamentosEnviados() {
+            orcDetalheOrigem = 'fornecedor';
+            telaAnteriorOrc = 'scr-orc-enviados';
+            const empresa = currentUser?.empresa || '';
+            const { data: orcs } = await db.from(TBL.orcamentos).select('*').eq('empresa', empresa).order('id', { ascending: false });
+
+            document.getElementById('list-orc-enviados').innerHTML = (orcs || []).length
+                ? orcs.map(o => `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrcForn(${o.id})">
+            <b>${o.placa}</b> — R$ ${o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            <span class="status-badge" style="float:right;background:${o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : o.status === 'CANCELADO' ? 'var(--cancelled)' : 'rgba(245,158,11,.3)'};">${o.status}</span>
+            <br><small style="color:var(--gray);">${o.empresa} | ${o.timestamp}</small>
+        </div>`).join('')
+                : '<p style="color:var(--gray);">Nenhum orçamento enviado.</p>';
+            show('scr-orc-enviados');
+        }
+
+        async function renderOrcamentosAdmin() {
+            const status = document.getElementById('orc-filter-status')?.value || '';
+            const placa = (document.getElementById('orc-filter-placa')?.value || '').toUpperCase().trim();
+
+            let q = db.from(TBL.orcamentos).select('*').order('id', { ascending: false });
+            if (status) q = q.eq('status', status);
+            if (placa) q = q.ilike('placa', `%${placa}%`);
+
+            const { data: orcs } = await q;
+            const cont = document.getElementById('list-orcamentos-admin');
+            if (!orcs?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum orçamento encontrado.</p>'; return; }
+            cont.innerHTML = orcs.map(o => {
+                const cor = o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : o.status === 'CANCELADO' ? 'var(--cancelled)' : 'rgba(245,158,11,.3)';
+                return `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrc(${o.id})">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <b>${o.placa}</b> — <span style="color:var(--success);font-weight:bold;">R$ ${o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    <br><small style="color:var(--gray);">${o.empresa} | ${o.timestamp}</small>
+                </div>
+                <span class="status-badge" style="background:${cor};color:#fff;">${o.status}</span>
+            </div>
+        </div>`;
+            }).join('');
+        }
+
+        async function abrirDetalheOrc(id) {
+            telaAnteriorOrc = 'scr-admin';
+            orcDetalheOrigem = 'admin';
+            await _abrirDetalheOrcComum(id);
+        }
+
+        async function abrirDetalheOrcForn(id) {
+            telaAnteriorOrc = 'scr-orc-enviados';
+            orcDetalheOrigem = 'fornecedor';
+            await _abrirDetalheOrcComum(id);
+        }
+
+        async function _abrirDetalheOrcComum(id) {
+            const { data: rows } = await db.from(TBL.orcamentos).select('*').eq('id', id);
+            const o = rows?.[0]; if (!o) return;
+            orcAtual = { ...o };
+
+            document.getElementById('orc-det-titulo').textContent = `ORÇAMENTO — ${o.placa}`;
+            document.getElementById('orc-det-body').innerHTML = `
+    <table>
+        <tr><th>Empresa</th><td>${o.empresa}</td></tr>
+        <tr><th>Placa</th><td><b>${o.placa}</b></td></tr>
+        <tr><th>Data</th><td>${o.timestamp}</td></tr>
+        <tr><th>Descrição</th><td>${o.descricao || '—'}</td></tr>
+        <tr><th colspan="2" style="padding-top:8px;color:var(--gray);">ITENS</th></tr>
+        ${(o.itens || []).map(it => `<tr><td>${it.desc}</td><td style="color:var(--success);">R$ ${it.valor.toFixed(2)}</td></tr>`).join('')}
+        <tr><td><b>TOTAL</b></td><td><b style="color:var(--success);font-size:14px;">R$ ${o.total.toFixed(2)}</b></td></tr>
+    </table>`;
+
+            const evCont = document.getElementById('orc-det-evidencias');
+            evCont.innerHTML = (o.evidencias || []).map((ev, ei) => {
+                if (!ev?.data) return '';
+                if (ev.mime?.startsWith('image/')) return `<div class="ev-card" onclick="verFotoGrande('${ev.data}')"><img src="${ev.data}"></div>`;
+                if (ev.mime?.startsWith('video/')) return `<div class="ev-card"><video src="${ev.data}" controls style="width:100%;height:100%;object-fit:cover;"></video></div>`;
+                return `<div class="ev-card" onclick="abrirDocEvidencia('${ev.data}','${ev.mime || 'application/octet-stream'}','${ev.nome || 'arquivo'}')" style="cursor:pointer;">
+            <div class="ev-label">📄<span style="font-size:9px;padding:4px;word-break:break-all;">${ev.nome || 'Documento'}</span><span style="font-size:10px;color:var(--info);">Clique para abrir</span></div>
+        </div>`;
+            }).join('');
+
+            const acoesCont = document.getElementById('orc-det-acoes');
+            if (orcDetalheOrigem === 'admin' && o.status === 'PENDENTE') {
+                acoesCont.innerHTML = `<div class="btn-row" style="margin-top:10px;">
+            <button class="btn-success btn-flex" onclick="mudarStatusOrc(${id},'APROVADO')">✅ APROVAR</button>
+            <button class="btn-danger btn-flex" onclick="mudarStatusOrc(${id},'REJEITADO')">❌ REJEITAR</button>
+        </div>`;
+            } else if (orcDetalheOrigem === 'fornecedor' && o.status === 'PENDENTE') {
+                acoesCont.innerHTML = `<div class="btn-row" style="margin-top:10px;">
+            <button class="btn-cancel btn-flex" onclick="fornCancelarOrcamento(${id})">🚫 CANCELAR ORÇAMENTO</button>
+        </div>`;
+            } else {
+                const cor = o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : o.status === 'CANCELADO' ? 'var(--cancelled)' : 'var(--warning)';
+                acoesCont.innerHTML = `<p style="font-size:13px;margin:10px 0;font-weight:bold;color:${cor};">Status: ${o.status}</p>`;
+            }
+
+            document.getElementById('orc-email-actions').style.display = orcDetalheOrigem === 'admin' ? 'block' : 'none';
+            show('scr-orc-detalhe');
+        }
+
+        async function mudarStatusOrc(id, s) {
+            loading(true, 'Atualizando...');
+            const ts = new Date().toLocaleString('pt-BR');
+            await db.from(TBL.orcamentos).update({ status: s, atualizado_em: ts }).eq('id', id);
+            await registrarAuditoria(`Orçamento ${s}: ID ${id}`);
+            loading(false);
+            await _abrirDetalheOrcComum(id);
+        }
+
+        async function fornCancelarOrcamento(id) {
+            if (!confirm('Cancelar este orçamento? Esta ação ficará registrada para o administrador.')) return;
+            loading(true, 'Cancelando...');
+            const ts = new Date().toLocaleString('pt-BR');
+            await db.from(TBL.orcamentos).update({ status: 'CANCELADO', atualizado_em: ts, cancelado_por: currentUser?.empresa }).eq('id', id);
+            await registrarAuditoria(`Orçamento CANCELADO pelo fornecedor ${currentUser?.empresa}: ID ${id}`);
+            loading(false);
+            showSuccess('ORÇAMENTO CANCELADO!');
+            await fecharDetalheOrc();
+        }
+
+        async function fecharDetalheOrc() {
+            orcAtual = null;
+            if (telaAnteriorOrc === 'scr-admin') {
+                show('scr-admin'); await renderOrcamentosAdmin();
+            } else if (telaAnteriorOrc === 'scr-orc-enviados') {
+                await abrirOrcamentosEnviados();
+            } else {
+                show(telaAnteriorOrc);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        // CONFIG EmailJS
+        // ─────────────────────────────────────────────
+        async function salvarConfigEmailJS() {
+            const cfg = {
+                userId: document.getElementById('cfg-ejs-userid').value.trim(),
+                serviceId: document.getElementById('cfg-ejs-serviceid').value.trim(),
+                templateId: document.getElementById('cfg-ejs-templateid').value.trim()
+            };
+            if (!cfg.userId || !cfg.serviceId || !cfg.templateId) { alert('Preencha todos os campos EmailJS!'); return; }
+
+            loading(true, 'Salvando config...');
+            await db.from(TBL.config).upsert({ chave: 'emailjs', valor: cfg }, { onConflict: 'chave' });
+            emailjsCfg = cfg;
+            emailjs.init(cfg.userId);
+            loading(false);
+            alert('✅ Configuração EmailJS salva!');
+        }
+
+        function enviarOrcamentoPorEmail() {
+            if (!orcAtual) { alert('Nenhum orçamento carregado.'); return; }
+            if (!emailjsCfg.serviceId || !emailjsCfg.templateId) { alert('Configure o EmailJS primeiro na aba ⚙️ Config!'); return; }
+            const email = prompt('Digite o e-mail do destinatário:');
+            if (!email) return;
+            emailjs.send(emailjsCfg.serviceId, emailjsCfg.templateId, {
+                to_email: email,
+                placa: orcAtual.placa,
+                empresa: orcAtual.empresa,
+                data: orcAtual.timestamp,
+                total: orcAtual.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                itens: (orcAtual.itens || []).map(it => `• ${it.desc}: R$ ${it.valor.toFixed(2)}`).join('\n'),
+                descricao: orcAtual.descricao || '—',
+                status: orcAtual.status
+            }).then(async () => {
+                await registrarAuditoria(`E-mail orçamento enviado para ${email} | ${orcAtual.placa}`);
+                alert('✅ E-mail enviado com sucesso!');
+            }).catch(err => alert('❌ Erro ao enviar e-mail: ' + JSON.stringify(err)));
+        }
+
+        // ─────────────────────────────────────────────
+        // BACKUP / RESTORE
+        // ─────────────────────────────────────────────
+        async function exportarDados() {
+            loading(true, 'Exportando dados...');
+            const tabelas = Object.values(TBL);
+            const backup = {};
+            for (const tbl of tabelas) {
+                const { data } = await db.from(tbl).select('*');
+                backup[tbl] = data;
+            }
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `lokamig_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            await registrarAuditoria('Backup exportado');
+            loading(false);
+        }
+
+        function importarDados(input) {
+            if (!input.files[0]) return;
+            if (!confirm('Isso substituirá TODOS os dados atuais. Continuar?')) return;
+            const reader = new FileReader();
+            reader.onload = async e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    loading(true, 'Restaurando backup...');
+                    for (const [tbl, rows] of Object.entries(data)) {
+                        if (Array.isArray(rows) && rows.length) {
+                            await db.from(tbl).delete().gte('id', 0);
+                            await db.from(tbl).insert(rows);
+                        }
+                    }
+                    loading(false);
+                    alert('✅ Backup restaurado! Recarregando...');
+                    location.reload();
+                } catch (err) { loading(false); alert('❌ Arquivo de backup inválido!'); }
+            };
+            reader.readAsText(input.files[0]);
+        }
+
+        async function resetarSistema() {
+            if (!confirm('⚠️ ATENÇÃO: Isso apagará TODOS os dados permanentemente!\n\nDigite CONFIRMAR para prosseguir.')) return;
+            const conf = prompt('Digite CONFIRMAR para apagar tudo:');
+            if (conf !== 'CONFIRMAR') { alert('Operação cancelada.'); return; }
+            loading(true, 'Apagando dados...');
+            for (const tbl of Object.values(TBL)) {
+                await db.from(tbl).delete().gte('id', 0);
+            }
+            loading(false);
+            alert('✅ Sistema resetado. Recarregando...');
+            location.reload();
+        }
+
+        async function gerarRelatorioFinanceiro() {
+            const [{ data: comb }, { data: orcs }] = await Promise.all([
+                db.from(TBL.combustivel).select('*'),
+                db.from(TBL.orcamentos).select('*').eq('status', 'APROVADO')
+            ]);
+            const totalComb = (comb || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+            const totalOrcs = (orcs || []).reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
+
+            montarCabecalhoPDF('RELATÓRIO FINANCEIRO GERAL');
+            document.getElementById('pdf-body').innerHTML = `
+    <h3 style="color:#d1122a;margin-bottom:10px;">Resumo Financeiro</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
+        <tr style="background:#f5f5f5;"><th style="padding:8px;">Categoria</th><th style="padding:8px;">Valor</th></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;">⛽ Combustível Total</td><td style="padding:8px;border-bottom:1px solid #eee;color:#1a5276;font-weight:bold;">R$ ${totalComb.toFixed(2)}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;">🔧 Orçamentos Aprovados</td><td style="padding:8px;border-bottom:1px solid #eee;color:#1a5276;font-weight:bold;">R$ ${totalOrcs.toFixed(2)}</td></tr>
+        <tr style="background:#e8f5e9;font-weight:bold;"><td style="padding:8px;">TOTAL GERAL</td><td style="padding:8px;color:#1e8449;">R$ ${(totalComb + totalOrcs).toFixed(2)}</td></tr>
+    </table>
+    <h4 style="margin-bottom:8px;">Últimos 20 Abastecimentos</h4>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <tr style="background:#f5f5f5;"><th style="padding:6px;">Data</th><th>Placa</th><th>Litros</th><th>Valor</th><th>KM</th></tr>
+        ${(comb || []).slice(-20).map(c => `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${c.data_abast}</td><td>${c.placa}</td><td>${parseFloat(c.litros).toFixed(1)}L</td><td>R$ ${parseFloat(c.valor).toFixed(2)}</td><td>${c.km}</td></tr>`).join('')}
+    </table>`;
+            document.getElementById('pdf-photos').innerHTML = '';
+            await renderizarEBaixarPDF(`Relatorio_Financeiro_${new Date().toISOString().split('T')[0]}.pdf`);
+        }
+
+        // ─────────────────────────────────────────────
+        // PDF — Helpers
+        // ─────────────────────────────────────────────
+        function montarCabecalhoPDF(titulo, subtitulo) {
+            document.getElementById('pdf-titulo').innerText = titulo;
+            document.getElementById('pdf-data-geracao').innerText = subtitulo || `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.0`;
+            const logo = document.getElementById('pdf-logo');
+            if (logo) {
+                logo.style.display = 'block';
+                // Força reload da logo com cache-busting para garantir que html2canvas a capture
+                logo.crossOrigin = 'anonymous';
+                logo.src = 'https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg?t=' + Date.now();
+            }
+        }
+
+        function aguardarLogo() {
+            return new Promise(resolve => {
+                const logo = document.getElementById('pdf-logo');
+                if (!logo || logo.complete) { resolve(); return; }
+                logo.onload = () => resolve();
+                logo.onerror = () => resolve(); // continua mesmo sem logo
+                setTimeout(resolve, 3000); // timeout de segurança
+            });
+        }
+
+        async function renderizarEBaixarPDF(nomeArquivo) {
+            try {
+                // Aguarda a logo carregar antes de capturar
+                await aguardarLogo();
+                // Pequeno delay para garantir render completo
+                await new Promise(r => setTimeout(r, 300));
+
+                const canvas = await html2canvas(document.getElementById('pdf-template'), {
+                    scale: 2, useCORS: true, allowTaint: false,
+                    logging: false,
+                    onclone: (doc) => {
+                        const logo = doc.getElementById('pdf-logo');
+                        if (logo) logo.crossOrigin = 'anonymous';
+                    }
+                });
+                const { jsPDF } = jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const W = doc.internal.pageSize.getWidth();
+                const H = doc.internal.pageSize.getHeight();
+                const imgH = (canvas.height * W) / canvas.width;
+                if (imgH <= H) {
+                    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, W, imgH);
+                } else {
+                    let y = 0;
+                    while (y < canvas.height) {
+                        const sliceH = Math.min(canvas.height - y, Math.floor((H * canvas.width) / W));
+                        const sc = document.createElement('canvas');
+                        sc.width = canvas.width; sc.height = sliceH;
+                        sc.getContext('2d').drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+                        if (y > 0) doc.addPage();
+                        doc.addImage(sc.toDataURL('image/png'), 'PNG', 0, 0, W, (sliceH * W) / canvas.width);
+                        y += sliceH;
+                    }
+                }
+                doc.save(nomeArquivo);
+            } catch (e) { alert('Erro ao gerar PDF: ' + e.message); }
+        }
+
+        async function gerarPDF(id) {
+            const { data: rows } = await db.from(TBL.prog).select('*').eq('id', id);
+            const item = rows?.[0]; if (!item) return;
+
+            montarCabecalhoPDF(`RELATÓRIO DE SERVIÇO — ${item.tipo_op}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.0`);
+            document.getElementById('pdf-body').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;">Campo</th><th style="padding:8px;text-align:left;">Valor</th></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Placa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.placa}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Setor</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.setor || '—'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Operação</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.tipo_op}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Destino</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.fornecedor || '—'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>KM</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.km || '—'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Status</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.status_flow}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Programador</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.programador || '—'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Data/Hora</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.timestamp || item.data_servico}</td></tr>
+        ${item.obs ? `<tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Observações</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.obs}</td></tr>` : ''}
+        ${item.rating ? `<tr><td style="padding:8px;"><b>Avaliação</b></td><td style="padding:8px;">${'★'.repeat(item.rating)}${'☆'.repeat(5 - item.rating)}</td></tr>` : ''}
+    </table>`;
+            document.getElementById('pdf-photos').innerHTML = (item.fotos || []).slice(0, 4).map(f =>
+                `<div style="position:relative;break-inside:avoid;">
+            <img src="${f}" style="width:100%;border-radius:8px;border:1px solid #ddd;">
+            <div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.7);color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;">${item.timestamp || item.data_servico}</div>
+        </div>`
+            ).join('');
+            await renderizarEBaixarPDF(`Lokamig_${item.placa}_${item.data_servico}.pdf`);
+            await registrarAuditoria(`PDF gerado: ${item.placa} ${item.data_servico}`);
+        }
+
+        async function gerarPDFOrcamento() {
+            if (!orcAtual) return;
+            const o = orcAtual;
+            montarCabecalhoPDF(`ORÇAMENTO — ${o.placa}`, `Gerado em: ${new Date().toLocaleString('pt-BR')}`);
+            document.getElementById('pdf-body').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;" colspan="2">Informações do Orçamento</th></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Empresa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.empresa}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Placa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.placa}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Data</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.timestamp}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Status</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.status}</td></tr>
+        <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;">Item</th><th style="padding:8px;text-align:left;">Valor</th></tr>
+        ${(o.itens || []).map(it => `<tr><td style="padding:8px;border-bottom:1px solid #eee;">${it.desc}</td><td style="padding:8px;border-bottom:1px solid #eee;">R$ ${it.valor.toFixed(2)}</td></tr>`).join('')}
+        <tr style="background:#e8f5e9;font-weight:bold;"><td style="padding:8px;">TOTAL</td><td style="padding:8px;color:#2e7d32;">R$ ${o.total.toFixed(2)}</td></tr>
+    </table>`;
+            const fotos = (o.evidencias || []).filter(ev => ev.mime?.startsWith('image/')).slice(0, 4);
+            document.getElementById('pdf-photos').innerHTML = fotos.map(ev =>
+                `<img src="${ev.data}" style="width:100%;border-radius:8px;border:1px solid #ddd;">`
+            ).join('');
+            await renderizarEBaixarPDF(`Orcamento_${o.placa}_${o.data_orc || ''}.pdf`);
+        }
+
+        async function gerarPDFAbastecimentosMes() {
+            const mesInput = document.getElementById('ab-filter-mes');
+            const mesFiltro = mesInput?.value || new Date().toISOString().slice(0, 7);
+            const [ano, mes] = mesFiltro.split('-');
+            const nomeMes = new Date(parseInt(ano), parseInt(mes) - 1).toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+            const dataIni = mesFiltro + '-01';
+            const dataFim = new Date(parseInt(ano), parseInt(mes), 0).toISOString().split('T')[0];
+
+            const { data: mesList } = await db.from(TBL.combustivel).select('*').gte('data_abast', dataIni).lte('data_abast', dataFim);
+            const totalLitros = (mesList || []).reduce((s, c) => s + (parseFloat(c.litros) || 0), 0);
+            const totalValor = (mesList || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+            const porPlaca = {};
+            (mesList || []).forEach(a => {
+                if (!porPlaca[a.placa]) porPlaca[a.placa] = { litros: 0, valor: 0, count: 0 };
+                porPlaca[a.placa].litros += parseFloat(a.litros) || 0;
+                porPlaca[a.placa].valor += parseFloat(a.valor) || 0;
+                porPlaca[a.placa].count++;
+            });
+
+            montarCabecalhoPDF(`RELATÓRIO DE COMBUSTÍVEL — ${nomeMes.toUpperCase()}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | Lokamig v6.0`);
+            document.getElementById('pdf-body').innerHTML = `
+    <div style="background:#fef9e7;border:1px solid #f39c12;border-radius:8px;padding:12px;margin-bottom:16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <tr><td style="padding:4px;"><b>Total de Litros:</b></td><td style="padding:4px;font-weight:bold;color:#1a5276;">${totalLitros.toFixed(1)}L</td></tr>
+            <tr><td style="padding:4px;"><b>Total em Valor:</b></td><td style="padding:4px;font-weight:bold;color:#1e8449;">R$ ${totalValor.toFixed(2)}</td></tr>
+            <tr><td style="padding:4px;"><b>Abastecimentos:</b></td><td style="padding:4px;">${(mesList || []).length}</td></tr>
+            <tr><td style="padding:4px;"><b>Preço médio/L:</b></td><td style="padding:4px;">${totalLitros > 0 ? 'R$ ' + (totalValor / totalLitros).toFixed(3) : '—'}</td></tr>
+        </table>
+    </div>
+    <h4 style="margin-bottom:8px;color:#d1122a;">Por Veículo</h4>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
+        <tr style="background:#f5f5f5;"><th style="padding:7px;text-align:left;">Placa</th><th style="padding:7px;">Litros</th><th style="padding:7px;">Valor</th><th style="padding:7px;">Abast.</th><th style="padding:7px;">R$/L méd.</th></tr>
+        ${Object.entries(porPlaca).map(([placa, v]) => `<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>${placa}</b></td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros.toFixed(1)}L</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:#1e8449;">R$ ${v.valor.toFixed(2)}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.count}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros > 0 ? 'R$ ' + (v.valor / v.litros).toFixed(3) : '—'}</td></tr>`).join('')}
+    </table>
+    <h4 style="margin-bottom:8px;color:#d1122a;">Detalhamento Completo</h4>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <tr style="background:#f5f5f5;"><th style="padding:6px;text-align:left;">Data/Hora</th><th>Placa</th><th>Litros</th><th>Valor</th><th>KM</th><th>R$/L</th></tr>
+        ${(mesList || []).map(a => `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${a.timestamp || a.data_abast}</td><td>${a.placa}</td><td style="text-align:center;">${parseFloat(a.litros).toFixed(1)}L</td><td style="text-align:center;">R$ ${parseFloat(a.valor).toFixed(2)}</td><td style="text-align:center;">${a.km}</td><td style="text-align:center;">${parseFloat(a.litros) > 0 ? 'R$ ' + (parseFloat(a.valor) / parseFloat(a.litros)).toFixed(3) : '—'}</td></tr>`).join('')}
+    </table>`;
+            document.getElementById('pdf-photos').innerHTML = '';
+            await renderizarEBaixarPDF(`Combustivel_${mesFiltro}.pdf`);
+            await registrarAuditoria(`PDF Combustível gerado: ${nomeMes}`);
+        }
+
+        function abrirDocEvidencia(dataUrl, mime, nome) {
+            try {
+                // Tenta abrir direto como URL de dados
+                if (mime === 'application/pdf' || mime?.includes('pdf')) {
+                    // Para PDFs: cria blob e abre em nova aba
+                    const byteString = atob(dataUrl.split(',')[1]);
+                    const ab = new ArrayBuffer(byteString.length);
+                    const ia = new Uint8Array(ab);
+                    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+                    const blob = new Blob([ab], { type: 'application/pdf' });
+                    const url = URL.createObjectURL(blob);
+                    const win = window.open(url, '_blank');
+                    if (!win) {
+                        // Popup bloqueado — faz download
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = nome || 'documento.pdf';
+                        a.click();
+                    }
+                    setTimeout(() => URL.revokeObjectURL(url), 10000);
+                    return;
+                }
+                // Outros docs: download direto
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = nome || 'arquivo';
+                a.target = '_blank';
+                a.click();
+            } catch (e) {
+                // Fallback: tenta abrir dataUrl direto
+                try { window.open(dataUrl, '_blank'); }
+                catch (e2) { alert('Não foi possível abrir o arquivo: ' + e2.message); }
+            }
+        }
+    </script>
+</body>
+
+</html>
