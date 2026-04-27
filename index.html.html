@@ -1587,6 +1587,47 @@
         'use strict';
 
         // ─────────────────────────────────────────────
+        // CLOUDINARY — Upload de fotos na nuvem
+        // ─────────────────────────────────────────────
+        const CLOUDINARY = {
+            cloudName: 'dlaregq2k',
+            uploadPreset: 'lokamig',
+            uploadUrl: 'https://api.cloudinary.com/v1_1/dlaregq2k/image/upload'
+        };
+
+        async function uploadFotoCloudinary(base64Data) {
+            // Converte base64 para blob
+            const res = await fetch(base64Data);
+            const blob = await res.blob();
+            const formData = new FormData();
+            formData.append('file', blob);
+            formData.append('upload_preset', CLOUDINARY.uploadPreset);
+            formData.append('folder', 'lokamig');
+
+            const response = await fetch(CLOUDINARY.uploadUrl, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.secure_url) return data.secure_url;
+            throw new Error('Falha no upload: ' + (data.error?.message || 'Erro desconhecido'));
+        }
+
+        async function uploadFotosCloudinary(fotosArray, onProgress) {
+            const urls = [];
+            for (let i = 0; i < fotosArray.length; i++) {
+                const foto = fotosArray[i];
+                const base64 = typeof foto === 'object' ? foto.data : foto;
+                // Se já é uma URL (já foi enviada), mantém
+                if (base64.startsWith('http')) { urls.push(base64); continue; }
+                if (onProgress) onProgress(i + 1, fotosArray.length);
+                const url = await uploadFotoCloudinary(base64);
+                urls.push(url);
+            }
+            return urls;
+        }
+
+        // ─────────────────────────────────────────────
         // COMPRESSÃO DE FOTOS (reduz ~80% do tamanho)
         // ─────────────────────────────────────────────
         function compressarFoto(file, qualidade = 0.6, maxWidth = 1280) {
@@ -2850,16 +2891,28 @@
             if (statusPendente.novoStatus === 'CONCLUIDO' && !statusPendente.fotos.length) {
                 alert('📸 Tire pelo menos uma foto para concluir o serviço!'); return;
             }
-            loading(true, 'Atualizando...');
+            loading(true, 'Enviando fotos...');
 
             const { data: rows } = await db.from(TBL.prog).select('fotos').eq('id', statusPendente.id);
             const item = rows?.[0];
             if (!item) { loading(false); fecharModalStatus(); return; }
 
             const fotosAnteriores = item.fotos || [];
-            const novasFotos = statusPendente.fotos.map(f => typeof f === 'object' ? f.data : f);
             const obs_status = DOMPurify.sanitize(document.getElementById('status-obs').value);
 
+            // Upload para Cloudinary
+            let novasFotos = [];
+            try {
+                novasFotos = await uploadFotosCloudinary(statusPendente.fotos, (atual, total) => {
+                    loading(true, `Enviando foto ${atual} de ${total}...`);
+                });
+            } catch (e) {
+                // Fallback: salva base64 se Cloudinary falhar
+                console.warn('Cloudinary falhou, salvando base64:', e);
+                novasFotos = statusPendente.fotos.map(f => typeof f === 'object' ? f.data : f);
+            }
+
+            loading(true, 'Salvando...');
             await db.from(TBL.prog).update({
                 status_flow: statusPendente.novoStatus,
                 rating: statusPendente.rating,
@@ -3703,8 +3756,19 @@
                 fotos
             };
 
-            loading(true, 'Enviando checklist...');
+            loading(true, 'Enviando fotos do checklist...');
             try {
+                // Upload fotos para Cloudinary
+                try {
+                    const fotosUrls = await uploadFotosCloudinary(ckFotos, (atual, total) => {
+                        loading(true, `Enviando foto ${atual} de ${total}...`);
+                    });
+                    payload.fotos = fotosUrls;
+                } catch (e) {
+                    console.warn('Cloudinary falhou no checklist:', e);
+                    payload.fotos = ckFotos.map(f => f.data || f);
+                }
+                loading(true, 'Salvando checklist...');
                 const { error } = await db.from(TBL.checklists).insert(payload);
                 if (error) throw error;
                 if (km) await db.from(TBL.veiculos).update({ km_atual: parseInt(km) }).eq('placa', placa);
