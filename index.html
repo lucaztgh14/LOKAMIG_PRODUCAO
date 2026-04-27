@@ -1587,6 +1587,22 @@
         'use strict';
 
         // ─────────────────────────────────────────────
+        // SEGURANÇA — Hash de senha (SHA-256 via Web Crypto)
+        // ─────────────────────────────────────────────
+        async function hashSenha(senha) {
+            const enc = new TextEncoder();
+            const buf = await crypto.subtle.digest('SHA-256', enc.encode(senha));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function verificarSenha(senha, hash) {
+            // Suporta senhas antigas (texto puro) e novas (hash SHA-256)
+            if (!hash) return false;
+            if (hash.length === 64) return (await hashSenha(senha)) === hash; // nova
+            return senha === hash; // legado — texto puro
+        }
+
+        // ─────────────────────────────────────────────
         // SUPABASE — inicialização
         // ─────────────────────────────────────────────
         const SUPA_URL = 'https://rpsdrhapdtipvujixoxa.supabase.co';
@@ -1844,7 +1860,10 @@
                 const { data: colabs, error: colabErr } = await db.from(TBL.colaboradores)
                     .select('*').ilike('user_login', u);
                 if (colabs?.length) {
-                    const colab = colabs.find(c => c.senha === p);
+                    let colab = null;
+                    for (const c of colabs) {
+                        if (await verificarSenha(p, c.senha)) { colab = c; break; }
+                    }
                     if (!colab) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.'); return; }
                     currentUser = { ...colab, nome: colab.nome, role: colab.perfil };
                     await registrarAuditoria('Login: ' + colab.nome + ' (' + colab.perfil + ')');
@@ -1887,7 +1906,10 @@
                 const { data: forns } = await db.from(TBL.fornUsers)
                     .select('*').ilike('user_login', u);
                 if (forns?.length) {
-                    const forn = forns.find(f => f.senha === p);
+                    let forn = null;
+                    for (const f of forns) {
+                        if (await verificarSenha(p, f.senha)) { forn = f; break; }
+                    }
                     if (!forn) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.'); return; }
                     currentUser = { ...forn, role: 'fornecedor' };
                     document.getElementById('forn-name-screen').innerText = '🏢 ' + forn.empresa;
@@ -2299,7 +2321,8 @@
             if (error) { loading(false); alert('Erro: ' + error.message); return; }
 
             if (user && pass) {
-                await db.from(TBL.fornUsers).insert({ user_login: user, senha: pass, empresa: nome, tipo });
+                const senhaHashForn = await hashSenha(pass);
+                await db.from(TBL.fornUsers).insert({ user_login: user, senha: senhaHashForn, empresa: nome, tipo });
             }
 
             ['f-nome', 'f-user', 'f-pass'].forEach(id => document.getElementById(id).value = '');
@@ -2326,7 +2349,8 @@
             const { data: exists } = await db.from(TBL.colaboradores).select('id').ilike('user_login', user);
             if (exists?.length) { loading(false); alert('Login já em uso!'); return; }
 
-            const { error } = await db.from(TBL.colaboradores).insert({ nome, matricula: mat, user_login: user, senha: pass, nfc_id: nfc, perfil });
+            const senhaHash = await hashSenha(pass);
+            const { error } = await db.from(TBL.colaboradores).insert({ nome, matricula: mat, user_login: user, senha: senhaHash, nfc_id: nfc, perfil });
             if (error) { loading(false); alert('Erro: ' + error.message); return; }
 
             ['c-nome', 'c-mat', 'c-user', 'c-pass', 'c-nfc'].forEach(id => document.getElementById(id).value = '');
@@ -3613,6 +3637,7 @@
         async function enviarChecklist() {
             const placa = document.getElementById('ck-placa').value;
             if (!placa) { alert('Selecione um veículo!'); return; }
+            if (ckFotos.length === 0) { alert('📸 Tire pelo menos uma foto do veículo antes de enviar!'); return; }
             const tipo = document.getElementById('ck-tipo').value;
             const km = document.getElementById('ck-km').value || null;
             const obs = DOMPurify.sanitize(document.getElementById('ck-obs').value);
@@ -3712,7 +3737,10 @@
                 <div style="font-size:10px;">✅ ${ck.total_ok}/${ck.total_itens} itens OK</div>
                 ${itensFalhos.length ? `<div style="font-size:10px;color:var(--danger);margin-top:4px;">❌ Pendentes: ${itensFalhos.join(', ')}</div>` : ''}
                 ${ck.obs ? `<div style="font-size:10px;color:var(--gray);margin-top:4px;">📝 ${ck.obs}</div>` : ''}
-                ${(ck.fotos || []).length ? `<div style="margin-top:6px;"><button class="btn-info btn-sm" onclick="verFotosProgCard_ck(${ck.id})">📷 Ver fotos (${ck.fotos.length})</button></div>` : ''}
+                <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+                    ${(ck.fotos || []).length ? `<button class="btn-info btn-sm" onclick="verFotosProgCard_ck(${ck.id})">📷 Fotos (${ck.fotos.length})</button>` : ''}
+                    <button class="btn-pdf btn-sm" onclick="gerarPDFChecklist(${ck.id})">📄 PDF</button>
+                </div>
             </div>`;
         }
 
@@ -3765,6 +3793,56 @@
                     cont.innerHTML = '<p style="color:var(--danger);">Erro: ' + e.message + '</p>';
                 }
             }
+        }
+
+        async function gerarPDFChecklist(id) {
+            const { data: rows } = await db.from(TBL.checklists).select('*').eq('id', id);
+            const ck = rows?.[0]; if (!ck) return;
+
+            const pct = Math.round(((ck.total_ok || 0) / (ck.total_itens || 12)) * 100);
+            const corStatus = pct === 100 ? '#1e8449' : pct >= 70 ? '#d4ac0d' : '#c0392b';
+
+            const itensHTML = CK_ITENS.map(it => {
+                const ok = ck.itens?.[it.id];
+                return `<tr>
+                    <td style="padding:6px 8px;border-bottom:1px solid #eee;">${it.label}</td>
+                    <td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center;font-size:16px;">${ok ? '✅' : '❌'}</td>
+                </tr>`;
+            }).join('');
+
+            montarCabecalhoPDF(
+                `CHECKLIST DE ${ck.tipo_op} — ${ck.placa}`,
+                `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.1`
+            );
+
+            document.getElementById('pdf-body').innerHTML = `
+                <div style="background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:12px;margin-bottom:16px;">
+                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                        <tr><td style="padding:4px;"><b>Veículo:</b></td><td style="padding:4px;">${ck.placa} ${ck.setor ? '— ' + ck.setor : ''}</td></tr>
+                        <tr><td style="padding:4px;"><b>Motorista:</b></td><td style="padding:4px;">${ck.motorista}</td></tr>
+                        <tr><td style="padding:4px;"><b>Data/Hora:</b></td><td style="padding:4px;">${ck.timestamp}</td></tr>
+                        <tr><td style="padding:4px;"><b>KM:</b></td><td style="padding:4px;">${ck.km || '—'}</td></tr>
+                        <tr><td style="padding:4px;"><b>Resultado:</b></td>
+                            <td style="padding:4px;font-weight:bold;color:${corStatus};">${ck.total_ok}/${ck.total_itens} itens OK (${pct}%)</td></tr>
+                        ${ck.obs ? `<tr><td style="padding:4px;"><b>Observações:</b></td><td style="padding:4px;">${ck.obs}</td></tr>` : ''}
+                    </table>
+                </div>
+                <h4 style="color:#d1122a;margin-bottom:8px;">Itens Verificados</h4>
+                <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <tr style="background:#f5f5f5;">
+                        <th style="padding:8px;text-align:left;">Item</th>
+                        <th style="padding:8px;text-align:center;width:80px;">Status</th>
+                    </tr>
+                    ${itensHTML}
+                </table>`;
+
+            const fotos = (ck.fotos || []).slice(0, 4);
+            document.getElementById('pdf-photos').innerHTML = fotos.map(f =>
+                `<img src="${f}" style="width:100%;border-radius:8px;border:1px solid #ddd;">`
+            ).join('');
+
+            await renderizarEBaixarPDF(`Checklist_${ck.placa}_${ck.data_checklist}.pdf`);
+            await registrarAuditoria(`PDF Checklist gerado: ${ck.placa} ${ck.data_checklist}`);
         }
 
         async function verFotosProgCard_ck(id) {
