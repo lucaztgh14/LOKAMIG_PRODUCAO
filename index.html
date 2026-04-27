@@ -1068,6 +1068,22 @@
                 <div class="metric-icon">⚠️</div><span class="metric-value" id="met-manut">0</span><span
                     class="metric-label">Manutenções</span>
             </div>
+            <div class="metric-card" style="cursor:pointer;"
+                onclick="switchTab('checklist',event);document.querySelector('[onclick*=checklist]').classList.add('tab-active')">
+                <div class="metric-icon">🔴</div><span class="metric-value" id="met-ck-alertas">0</span><span
+                    class="metric-label">Alertas Checklist</span>
+            </div>
+        </div>
+        <div id="ck-alertas-banner"></div>
+        <div
+            style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;margin-bottom:15px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <span
+                    style="font-size:12px;font-weight:bold;color:var(--gray);text-transform:uppercase;letter-spacing:1px;">📈
+                    Serviços — Últimos 7 Dias</span>
+                <span style="font-size:10px;color:var(--gray);" id="grafico-legenda"></span>
+            </div>
+            <canvas id="grafico-servicos" height="120" style="width:100%;display:block;"></canvas>
         </div>
         <div class="tabs-wrapper">
             <button class="tab-scroll-btn" onclick="scrollTabs(-120)">◀</button>
@@ -1287,6 +1303,12 @@
                 <input type="text" id="ck-filter-motorista" placeholder="🔍 Filtrar motorista"
                     oninput="carregarChecklistAdmin()">
             </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+                <input type="month" id="ck-filter-mes" style="flex:1;margin:0;" placeholder="Mês para relatório">
+                <button onclick="gerarRelatorioMensalChecklist()"
+                    style="background:#ff5722;width:auto;padding:8px 14px;margin:0;" class="btn-sm">📊 Relatório Mensal
+                    PDF</button>
+            </div>
             <div id="list-checklist-admin"></div>
         </div>
 
@@ -1444,6 +1466,16 @@
             <input type="file" id="ck-foto-gal" multiple accept="image/*" class="hidden" onchange="handleCkFoto(this)">
             <div id="ck-preview-fotos" class="preview-area"></div>
 
+            <!-- Assinatura Digital -->
+            <div style="margin:12px 0;">
+                <p
+                    style="font-size:11px;color:var(--gray);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">
+                    ✍️ Assinatura do Motorista</p>
+                <canvas id="ck-assinatura" width="100%" height="120"
+                    style="width:100%;height:120px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.2);border-radius:10px;touch-action:none;display:block;cursor:crosshair;"></canvas>
+                <button onclick="limparAssinatura()" class="btn-gray btn-sm"
+                    style="margin-top:4px;width:auto;padding:5px 12px;">🗑️ Limpar Assinatura</button>
+            </div>
             <button onclick="enviarChecklist()" class="btn-success" style="margin-top:8px;">✅ Enviar Checklist</button>
         </div>
 
@@ -1832,6 +1864,7 @@
                 emails: carregarEmails,
                 auditoria: carregarAuditoria,
                 checklist: carregarChecklistAdmin,
+                dashboard: () => { atualizarDashboard(); renderGrafico(); },
                 permissoes: renderPermissoes,
                 config: () => { }
             };
@@ -1888,6 +1921,7 @@
                         const hoje = new Date().toISOString().split('T')[0];
                         document.getElementById('ck-hist-date').value = hoje;
                         await carregarHistoricoMotorista();
+                        setTimeout(iniciarAssinatura, 500);
                         iniciarRealtime();
                         return;
                     }
@@ -2054,6 +2088,8 @@
             document.getElementById('met-manut').textContent = (manut || []).length;
 
             await verificarAlertasGarantia();
+            await verificarAlertasChecklist();
+            renderGrafico();
         }
 
         // ─────────────────────────────────────────────
@@ -3638,6 +3674,8 @@
             const placa = document.getElementById('ck-placa').value;
             if (!placa) { alert('Selecione um veículo!'); return; }
             if (ckFotos.length === 0) { alert('📸 Tire pelo menos uma foto do veículo antes de enviar!'); return; }
+            const assinatura = obterAssinaturaBase64();
+            if (!assinatura) { alert('✍️ Assine o checklist antes de enviar!'); return; }
             const tipo = document.getElementById('ck-tipo').value;
             const km = document.getElementById('ck-km').value || null;
             const obs = DOMPurify.sanitize(document.getElementById('ck-obs').value);
@@ -3668,7 +3706,8 @@
                 total_ok: totalOk,
                 total_itens: CK_ITENS.length,
                 obs,
-                fotos
+                fotos,
+                assinatura: assinatura
             };
 
             loading(true, 'Enviando checklist...');
@@ -3687,6 +3726,9 @@
                 ckFotos = [];
                 ckRenderFotos();
                 ckRenderItens();
+                limparAssinatura();
+                _assinaturaCtx = null;
+                setTimeout(iniciarAssinatura, 300);
 
                 showSuccess('CHECKLIST ENVIADO!');
                 await carregarHistoricoMotorista();
@@ -3740,6 +3782,7 @@
                 <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
                     ${(ck.fotos || []).length ? `<button class="btn-info btn-sm" onclick="verFotosProgCard_ck(${ck.id})">📷 Fotos (${ck.fotos.length})</button>` : ''}
                     <button class="btn-pdf btn-sm" onclick="gerarPDFChecklist(${ck.id})">📄 PDF</button>
+                    ${ck.assinatura ? `<button class="btn-gray btn-sm" onclick="verAssinatura('${ck.id}')">✍️ Assinatura</button>` : ''}
                 </div>
             </div>`;
         }
@@ -3837,12 +3880,297 @@
                 </table>`;
 
             const fotos = (ck.fotos || []).slice(0, 4);
-            document.getElementById('pdf-photos').innerHTML = fotos.map(f =>
+            const fotosHtml = fotos.map(f =>
                 `<img src="${f}" style="width:100%;border-radius:8px;border:1px solid #ddd;">`
             ).join('');
+            const assHtml = ck.assinatura
+                ? `<div style="margin-top:20px;border-top:1px solid #eee;padding-top:15px;">
+                    <p style="font-size:11px;color:#666;margin-bottom:8px;"><b>Assinatura do Motorista:</b></p>
+                    <img src="${ck.assinatura}" style="max-width:250px;border:1px solid #ddd;border-radius:8px;background:#fff;padding:8px;">
+                   </div>` : '';
+            document.getElementById('pdf-photos').innerHTML = fotosHtml + assHtml;
 
             await renderizarEBaixarPDF(`Checklist_${ck.placa}_${ck.data_checklist}.pdf`);
             await registrarAuditoria(`PDF Checklist gerado: ${ck.placa} ${ck.data_checklist}`);
+        }
+
+        // ─────────────────────────────────────────────
+        // 4 — ALERTAS DE CHECKLIST
+        // ─────────────────────────────────────────────
+        async function verificarAlertasChecklist() {
+            try {
+                const hoje = new Date().toISOString().split('T')[0];
+                const { data: cks } = await db.from(TBL.checklists).select('*').eq('data_checklist', hoje);
+                const banner = document.getElementById('ck-alertas-banner');
+                const metEl = document.getElementById('met-ck-alertas');
+
+                const problemáticos = (cks || []).filter(ck => ck.total_ok < ck.total_itens);
+                if (metEl) metEl.textContent = problemáticos.length;
+                if (metEl) metEl.style.color = problemáticos.length > 0 ? 'var(--danger)' : 'var(--success)';
+
+                if (!banner) return;
+                if (!problemáticos.length) { banner.innerHTML = ''; return; }
+
+                const itensComProblema = {};
+                problemáticos.forEach(ck => {
+                    CK_ITENS.forEach(it => {
+                        if (ck.itens && !ck.itens[it.id]) {
+                            if (!itensComProblema[it.label]) itensComProblema[it.label] = [];
+                            itensComProblema[it.label].push(ck.placa);
+                        }
+                    });
+                });
+
+                let alertHTML = `<div class="alert-card alert-danger" style="margin-bottom:12px;">
+                    <b>🔴 ${problemáticos.length} checklist(s) com itens pendentes hoje:</b><br>`;
+                Object.entries(itensComProblema).forEach(([item, placas]) => {
+                    alertHTML += `<span style="font-size:10px;">❌ ${item} → ${placas.join(', ')}</span><br>`;
+                });
+                alertHTML += '</div>';
+                banner.innerHTML = alertHTML;
+            } catch (_) { }
+        }
+
+        // ─────────────────────────────────────────────
+        // 5 — RELATÓRIO MENSAL DE CHECKLISTS
+        // ─────────────────────────────────────────────
+        async function gerarRelatorioMensalChecklist() {
+            const mesInput = document.getElementById('ck-filter-mes');
+            const mesFiltro = mesInput?.value || new Date().toISOString().slice(0, 7);
+            const [ano, mes] = mesFiltro.split('-');
+            const nomeMes = new Date(parseInt(ano), parseInt(mes) - 1).toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+            const dataIni = mesFiltro + '-01';
+            const dataFim = new Date(parseInt(ano), parseInt(mes), 0).toISOString().split('T')[0];
+
+            loading(true, 'Gerando relatório...');
+            try {
+                const { data: cks } = await db.from(TBL.checklists).select('*')
+                    .gte('data_checklist', dataIni).lte('data_checklist', dataFim)
+                    .order('data_checklist');
+
+                if (!cks?.length) { loading(false); alert('Nenhum checklist encontrado neste período.'); return; }
+
+                // Agrupa por placa
+                const porPlaca = {};
+                cks.forEach(ck => {
+                    if (!porPlaca[ck.placa]) porPlaca[ck.placa] = [];
+                    porPlaca[ck.placa].push(ck);
+                });
+
+                // Monta itens com mais falhas
+                const falhasPorItem = {};
+                CK_ITENS.forEach(it => { falhasPorItem[it.id] = { label: it.label, count: 0 }; });
+                cks.forEach(ck => {
+                    CK_ITENS.forEach(it => {
+                        if (ck.itens && !ck.itens[it.id]) falhasPorItem[it.id].count++;
+                    });
+                });
+                const topFalhas = Object.values(falhasPorItem).filter(f => f.count > 0).sort((a, b) => b.count - a.count).slice(0, 5);
+
+                montarCabecalhoPDF(
+                    `RELATÓRIO MENSAL DE CHECKLISTS — ${nomeMes.toUpperCase()}`,
+                    `Gerado em: ${new Date().toLocaleString('pt-BR')} | Lokamig v6.1`
+                );
+
+                document.getElementById('pdf-body').innerHTML = `
+                    <div style="background:#fef9e7;border:1px solid #f39c12;border-radius:8px;padding:12px;margin-bottom:16px;">
+                        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                            <tr><td style="padding:4px;"><b>Total de Checklists:</b></td><td style="padding:4px;font-weight:bold;">${cks.length}</td></tr>
+                            <tr><td style="padding:4px;"><b>Veículos:</b></td><td style="padding:4px;">${Object.keys(porPlaca).length}</td></tr>
+                            <tr><td style="padding:4px;"><b>Média de itens OK:</b></td><td style="padding:4px;color:#1e8449;font-weight:bold;">${Math.round(cks.reduce((s, c) => s + (c.total_ok / c.total_itens * 100), 0) / cks.length)}%</td></tr>
+                        </table>
+                    </div>
+                    ${topFalhas.length ? `
+                    <h4 style="color:#d1122a;margin-bottom:8px;">⚠️ Itens com Mais Falhas</h4>
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
+                        <tr style="background:#f5f5f5;"><th style="padding:7px;text-align:left;">Item</th><th style="padding:7px;text-align:center;">Ocorrências</th></tr>
+                        ${topFalhas.map(f => `<tr><td style="padding:6px;border-bottom:1px solid #eee;">${f.label}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:#c0392b;font-weight:bold;">${f.count}x</td></tr>`).join('')}
+                    </table>` : ''}
+                    <h4 style="color:#d1122a;margin-bottom:8px;">Por Veículo</h4>
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
+                        <tr style="background:#f5f5f5;"><th style="padding:7px;text-align:left;">Placa</th><th>Checklists</th><th>Média OK</th><th>Motoristas</th></tr>
+                        ${Object.entries(porPlaca).map(([placa, lista]) => {
+                    const media = Math.round(lista.reduce((s, c) => s + (c.total_ok / c.total_itens * 100), 0) / lista.length);
+                    const motoristas = [...new Set(lista.map(c => c.motorista))].join(', ');
+                    return `<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>${placa}</b></td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${lista.length}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:${media >= 90 ? '#1e8449' : media >= 70 ? '#d4ac0d' : '#c0392b'};font-weight:bold;">${media}%</td><td style="padding:6px;border-bottom:1px solid #eee;font-size:10px;">${motoristas}</td></tr>`;
+                }).join('')}
+                    </table>
+                    <h4 style="color:#d1122a;margin-bottom:8px;">Detalhamento</h4>
+                    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                        <tr style="background:#f5f5f5;"><th style="padding:6px;text-align:left;">Data</th><th>Placa</th><th>Tipo</th><th>Motorista</th><th>OK</th><th>KM</th></tr>
+                        ${cks.map(ck => {
+                    const pct = Math.round(ck.total_ok / ck.total_itens * 100);
+                    return `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${ck.data_checklist}</td><td>${ck.placa}</td><td>${ck.tipo_op}</td><td style="font-size:10px;">${ck.motorista}</td><td style="font-weight:bold;color:${pct >= 90 ? '#1e8449' : pct >= 70 ? '#d4ac0d' : '#c0392b'};">${pct}%</td><td>${ck.km || '—'}</td></tr>`;
+                }).join('')}
+                    </table>`;
+
+                document.getElementById('pdf-photos').innerHTML = '';
+                await renderizarEBaixarPDF(`Checklist_Mensal_${mesFiltro}.pdf`);
+                await registrarAuditoria(`Relatório mensal checklist gerado: ${nomeMes}`);
+                loading(false);
+            } catch (e) { loading(false); alert('Erro: ' + e.message); }
+        }
+
+        // ─────────────────────────────────────────────
+        // 6 — GRÁFICO DE SERVIÇOS (últimos 7 dias)
+        // ─────────────────────────────────────────────
+        async function renderGrafico() {
+            const canvas = document.getElementById('grafico-servicos');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth * window.devicePixelRatio || 800;
+            canvas.height = 120 * window.devicePixelRatio || 240;
+            ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+            const W = canvas.offsetWidth;
+            const H = 120;
+
+            // Busca dados dos últimos 7 dias
+            const dias = [];
+            const hoje = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(hoje);
+                d.setDate(d.getDate() - i);
+                dias.push(d.toISOString().split('T')[0]);
+            }
+
+            try {
+                const { data: list } = await db.from(TBL.prog).select('data_servico,status_flow')
+                    .gte('data_servico', dias[0]).lte('data_servico', dias[6]);
+
+                const contagens = dias.map(d => ({
+                    dia: d,
+                    label: new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' }),
+                    total: (list || []).filter(s => s.data_servico === d && s.status_flow !== 'CANCELADO').length,
+                    concluidos: (list || []).filter(s => s.data_servico === d && s.status_flow === 'CONCLUIDO').length
+                }));
+
+                const maxVal = Math.max(...contagens.map(c => c.total), 1);
+                const padL = 30, padR = 10, padT = 15, padB = 30;
+                const chartW = W - padL - padR;
+                const chartH = H - padT - padB;
+                const barW = chartW / dias.length;
+
+                ctx.clearRect(0, 0, W, H);
+
+                // Grid lines
+                ctx.strokeStyle = 'rgba(255,255,255,.06)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 4; i++) {
+                    const y = padT + (chartH / 4) * i;
+                    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+                }
+
+                // Barras
+                contagens.forEach((c, i) => {
+                    const x = padL + i * barW;
+                    const bw = barW * 0.6;
+                    const bx = x + (barW - bw) / 2;
+
+                    // Total (fundo)
+                    if (c.total > 0) {
+                        const bh = (c.total / maxVal) * chartH;
+                        const by = padT + chartH - bh;
+                        ctx.fillStyle = 'rgba(245,158,11,0.3)';
+                        ctx.beginPath();
+                        ctx.roundRect ? ctx.roundRect(bx, by, bw, bh, 4) : ctx.rect(bx, by, bw, bh);
+                        ctx.fill();
+                    }
+
+                    // Concluídos
+                    if (c.concluidos > 0) {
+                        const bh = (c.concluidos / maxVal) * chartH;
+                        const by = padT + chartH - bh;
+                        ctx.fillStyle = 'rgba(16,185,129,0.8)';
+                        ctx.beginPath();
+                        ctx.roundRect ? ctx.roundRect(bx, by, bw, bh, 4) : ctx.rect(bx, by, bw, bh);
+                        ctx.fill();
+                    }
+
+                    // Valor
+                    if (c.total > 0) {
+                        ctx.fillStyle = '#fff';
+                        ctx.font = `bold ${10 * (window.devicePixelRatio || 1) > 1 ? 10 : 10}px Montserrat, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.fillText(c.total, bx + bw / 2, padT + chartH - (c.total / maxVal) * chartH - 4);
+                    }
+
+                    // Label dia
+                    ctx.fillStyle = 'rgba(148,163,184,0.9)';
+                    ctx.font = '9px Montserrat, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(c.label, bx + bw / 2, H - 6);
+                });
+
+                // Legenda
+                const leg = document.getElementById('grafico-legenda');
+                if (leg) {
+                    const total7 = contagens.reduce((s, c) => s + c.total, 0);
+                    const conc7 = contagens.reduce((s, c) => s + c.concluidos, 0);
+                    leg.innerHTML = `<span style="color:var(--warning);">■</span> Total: ${total7} &nbsp; <span style="color:var(--success);">■</span> Concluídos: ${conc7}`;
+                }
+            } catch (_) { }
+        }
+
+        // ─────────────────────────────────────────────
+        // 7 — ASSINATURA DIGITAL
+        // ─────────────────────────────────────────────
+        let _assinaturaAtiva = false;
+        let _assinaturaCtx = null;
+
+        function iniciarAssinatura() {
+            const canvas = document.getElementById('ck-assinatura');
+            if (!canvas || _assinaturaCtx) return;
+            canvas.width = canvas.offsetWidth * (window.devicePixelRatio || 1);
+            canvas.height = 120 * (window.devicePixelRatio || 1);
+            _assinaturaCtx = canvas.getContext('2d');
+            _assinaturaCtx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+            _assinaturaCtx.strokeStyle = '#fff';
+            _assinaturaCtx.lineWidth = 2;
+            _assinaturaCtx.lineCap = 'round';
+            _assinaturaCtx.lineJoin = 'round';
+
+            const getPos = (e) => {
+                const r = canvas.getBoundingClientRect();
+                const src = e.touches ? e.touches[0] : e;
+                return { x: (src.clientX - r.left), y: (src.clientY - r.top) };
+            };
+
+            canvas.addEventListener('mousedown', e => { _assinaturaAtiva = true; const p = getPos(e); _assinaturaCtx.beginPath(); _assinaturaCtx.moveTo(p.x, p.y); });
+            canvas.addEventListener('mousemove', e => { if (!_assinaturaAtiva) return; const p = getPos(e); _assinaturaCtx.lineTo(p.x, p.y); _assinaturaCtx.stroke(); });
+            canvas.addEventListener('mouseup', () => _assinaturaAtiva = false);
+            canvas.addEventListener('touchstart', e => { e.preventDefault(); _assinaturaAtiva = true; const p = getPos(e); _assinaturaCtx.beginPath(); _assinaturaCtx.moveTo(p.x, p.y); }, { passive: false });
+            canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!_assinaturaAtiva) return; const p = getPos(e); _assinaturaCtx.lineTo(p.x, p.y); _assinaturaCtx.stroke(); }, { passive: false });
+            canvas.addEventListener('touchend', () => _assinaturaAtiva = false);
+        }
+
+        function limparAssinatura() {
+            const canvas = document.getElementById('ck-assinatura');
+            if (!canvas || !_assinaturaCtx) return;
+            _assinaturaCtx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function obterAssinaturaBase64() {
+            const canvas = document.getElementById('ck-assinatura');
+            if (!canvas) return null;
+            // Verifica se tem algo desenhado
+            const ctx = canvas.getContext('2d');
+            const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            const temDesenho = data.some(v => v !== 0);
+            return temDesenho ? canvas.toDataURL('image/png') : null;
+        }
+
+        function verAssinatura(id) {
+            db.from(TBL.checklists).select('assinatura,placa,motorista,timestamp').eq('id', id).then(({ data }) => {
+                const ck = data?.[0]; if (!ck?.assinatura) return;
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;';
+                overlay.onclick = () => document.body.removeChild(overlay);
+                overlay.innerHTML = `
+                    <div style="color:var(--gray);font-size:11px;">✍️ Assinatura — ${ck.placa} | ${ck.motorista} | ${ck.timestamp}</div>
+                    <img src="${ck.assinatura}" style="max-width:400px;max-height:50vh;border-radius:10px;background:#fff;padding:16px;">
+                    <button onclick="document.body.removeChild(this.closest('[style*=fixed]'))" style="background:var(--danger);padding:10px 24px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:bold;">✕ Fechar</button>`;
+                document.body.appendChild(overlay);
+            });
         }
 
         async function verFotosProgCard_ck(id) {
