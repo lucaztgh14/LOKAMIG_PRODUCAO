@@ -1006,10 +1006,8 @@
         <div
             style="display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #d1122a;padding-bottom:15px;margin-bottom:20px;">
             <div style="min-width:180px;">
-                <img src="" style="width:180px;mix-blend-mode:multiply;" id="pdf-logo"
-                    onerror="this.style.display='none'">
-                <div id="pdf-logo-fallback"
-                    style="display:none;font-size:26px;font-weight:900;color:#d1122a;letter-spacing:3px;">LOKAMIG</div>
+                <img src="" style="width:180px;mix-blend-mode:multiply;" id="pdf-logo" onerror="this.style.display='none'">
+                <div id="pdf-logo-fallback" style="display:none;font-size:26px;font-weight:900;color:#d1122a;letter-spacing:3px;">LOKAMIG</div>
             </div>
             <div style="text-align:right;">
                 <h2 id="pdf-titulo" style="color:#d1122a;"></h2>
@@ -1282,10 +1280,8 @@
             <h3 style="margin-bottom:12px;">✅ Histórico de Checklists</h3>
             <div class="search-bar">
                 <input type="date" id="ck-filter-date" onchange="carregarChecklistAdmin()">
-                <input type="text" id="ck-filter-placa" placeholder="🔍 Filtrar placa"
-                    oninput="carregarChecklistAdmin()">
-                <input type="text" id="ck-filter-motorista" placeholder="🔍 Filtrar motorista"
-                    oninput="carregarChecklistAdmin()">
+                <input type="text" id="ck-filter-placa" placeholder="🔍 Filtrar placa" oninput="carregarChecklistAdmin()">
+                <input type="text" id="ck-filter-motorista" placeholder="🔍 Filtrar motorista" oninput="carregarChecklistAdmin()">
             </div>
             <div id="list-checklist-admin"></div>
         </div>
@@ -1410,8 +1406,7 @@
             <select id="ck-placa" onchange="ckAtualizarSetor()">
                 <option value="">— Selecione o veículo —</option>
             </select>
-            <div id="ck-setor-display"
-                style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.05);font-size:12px;">
+            <div id="ck-setor-display" style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.05);font-size:12px;">
                 Setor: <span id="ck-setor-label"></span>
             </div>
             <select id="ck-tipo">
@@ -1422,9 +1417,7 @@
 
             <!-- Itens do checklist -->
             <div style="margin:12px 0;">
-                <p
-                    style="font-size:11px;color:var(--gray);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">
-                    Itens de Verificação</p>
+                <p style="font-size:11px;color:var(--gray);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">Itens de Verificação</p>
                 <div id="ck-itens" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                     <!-- itens gerados por JS -->
                 </div>
@@ -1434,13 +1427,10 @@
 
             <!-- Fotos -->
             <div class="btn-row">
-                <button onclick="document.getElementById('ck-foto-cam').click()" style="background:var(--joint);"
-                    class="btn-flex">📸 CÂMERA</button>
-                <button onclick="document.getElementById('ck-foto-gal').click()" style="background:var(--return);"
-                    class="btn-flex">🖼️ GALERIA</button>
+                <button onclick="document.getElementById('ck-foto-cam').click()" style="background:var(--joint);" class="btn-flex">📸 CÂMERA</button>
+                <button onclick="document.getElementById('ck-foto-gal').click()" style="background:var(--return);" class="btn-flex">🖼️ GALERIA</button>
             </div>
-            <input type="file" id="ck-foto-cam" capture="environment" accept="image/*" class="hidden"
-                onchange="handleCkFoto(this)">
+            <input type="file" id="ck-foto-cam" capture="environment" accept="image/*" class="hidden" onchange="handleCkFoto(this)">
             <input type="file" id="ck-foto-gal" multiple accept="image/*" class="hidden" onchange="handleCkFoto(this)">
             <div id="ck-preview-fotos" class="preview-area"></div>
 
@@ -2628,11 +2618,11 @@
             overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;';
             const atualizar = () => {
                 overlay.innerHTML = `
-                    <div style="color:var(--gray);font-size:11px;">📸 ${s.placa} — ${s.tipo_op} | ${s.timestamp} (${idx + 1}/${fotos.length})</div>
+                    <div style="color:var(--gray);font-size:11px;">📸 ${s.placa} — ${s.tipo_op} | ${s.timestamp} (${idx+1}/${fotos.length})</div>
                     <img src="${fotos[idx]}" style="max-width:100%;max-height:70vh;border-radius:10px;object-fit:contain;">
                     <div style="display:flex;gap:10px;">
                         ${idx > 0 ? `<button onclick="event.stopPropagation();idx_foto--; atualizar_foto()" style="background:var(--gray);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">◀</button>` : ''}
-                        ${idx < fotos.length - 1 ? `<button onclick="event.stopPropagation();idx_foto++; atualizar_foto()" style="background:var(--gray);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">▶</button>` : ''}
+                        ${idx < fotos.length-1 ? `<button onclick="event.stopPropagation();idx_foto++; atualizar_foto()" style="background:var(--gray);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">▶</button>` : ''}
                         <button onclick="document.body.removeChild(document.getElementById('foto-overlay'))" style="background:var(--danger);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">✕ Fechar</button>
                     </div>`;
             };
@@ -2664,7 +2654,7 @@
             try {
                 const { data: v } = await db.from(TBL.veiculos).select('tipo').eq('placa', placa);
                 if (v?.[0]) payload.setor = v[0].tipo;
-            } catch (_) { }
+            } catch(_) {}
 
             if (!isOnline) {
                 enfileirarOffline(TBL.prog, payload);
@@ -3654,7 +3644,7 @@
 
                 showSuccess('CHECKLIST ENVIADO!');
                 await carregarHistoricoMotorista();
-            } catch (e) {
+            } catch(e) {
                 loading(false);
                 // Se tabela não existe ainda, orienta o admin
                 if (e.message?.includes('relation') || e.code === '42P01') {
@@ -3678,7 +3668,7 @@
 
                 if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:10px;text-align:center;">Nenhum checklist nesta data.</p>'; return; }
                 cont.innerHTML = list.map(ck => _renderCkCard(ck)).join('');
-            } catch (_) { cont.innerHTML = '<p style="color:var(--gray);padding:10px;">Erro ao carregar histórico.</p>'; }
+            } catch(_) { cont.innerHTML = '<p style="color:var(--gray);padding:10px;">Erro ao carregar histórico.</p>'; }
         }
 
         function _renderCkCard(ck) {
@@ -3701,7 +3691,7 @@
                 <div style="font-size:10px;">✅ ${ck.total_ok}/${ck.total_itens} itens OK</div>
                 ${itensFalhos.length ? `<div style="font-size:10px;color:var(--danger);margin-top:4px;">❌ Pendentes: ${itensFalhos.join(', ')}</div>` : ''}
                 ${ck.obs ? `<div style="font-size:10px;color:var(--gray);margin-top:4px;">📝 ${ck.obs}</div>` : ''}
-                ${(ck.fotos || []).length ? `<div style="margin-top:6px;"><button class="btn-info btn-sm" onclick="verFotosProgCard_ck(${ck.id})">📷 Ver fotos (${ck.fotos.length})</button></div>` : ''}
+                ${(ck.fotos||[]).length ? `<div style="margin-top:6px;"><button class="btn-info btn-sm" onclick="verFotosProgCard_ck(${ck.id})">📷 Ver fotos (${ck.fotos.length})</button></div>` : ''}
             </div>`;
         }
 
@@ -3728,7 +3718,7 @@
 
                 // Agrupa por placa para visão geral
                 cont.innerHTML = filtered.map(ck => _renderCkCard(ck)).join('');
-            } catch (e) {
+            } catch(e) {
                 if (e.message?.includes('relation') || e.code === '42P01') {
                     cont.innerHTML = `<div class="alert-card alert-danger">
                         ⚠️ <b>Tabela "checklists" não existe no Supabase!</b><br>
