@@ -1006,8 +1006,10 @@
         <div
             style="display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #d1122a;padding-bottom:15px;margin-bottom:20px;">
             <div style="min-width:180px;">
-                <img src="" style="width:180px;mix-blend-mode:multiply;" id="pdf-logo" onerror="this.style.display='none'">
-                <div id="pdf-logo-fallback" style="display:none;font-size:26px;font-weight:900;color:#d1122a;letter-spacing:3px;">LOKAMIG</div>
+                <img src="" style="width:180px;mix-blend-mode:multiply;" id="pdf-logo"
+                    onerror="this.style.display='none'">
+                <div id="pdf-logo-fallback"
+                    style="display:none;font-size:26px;font-weight:900;color:#d1122a;letter-spacing:3px;">LOKAMIG</div>
             </div>
             <div style="text-align:right;">
                 <h2 id="pdf-titulo" style="color:#d1122a;"></h2>
@@ -1280,8 +1282,10 @@
             <h3 style="margin-bottom:12px;">✅ Histórico de Checklists</h3>
             <div class="search-bar">
                 <input type="date" id="ck-filter-date" onchange="carregarChecklistAdmin()">
-                <input type="text" id="ck-filter-placa" placeholder="🔍 Filtrar placa" oninput="carregarChecklistAdmin()">
-                <input type="text" id="ck-filter-motorista" placeholder="🔍 Filtrar motorista" oninput="carregarChecklistAdmin()">
+                <input type="text" id="ck-filter-placa" placeholder="🔍 Filtrar placa"
+                    oninput="carregarChecklistAdmin()">
+                <input type="text" id="ck-filter-motorista" placeholder="🔍 Filtrar motorista"
+                    oninput="carregarChecklistAdmin()">
             </div>
             <div id="list-checklist-admin"></div>
         </div>
@@ -1406,7 +1410,8 @@
             <select id="ck-placa" onchange="ckAtualizarSetor()">
                 <option value="">— Selecione o veículo —</option>
             </select>
-            <div id="ck-setor-display" style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.05);font-size:12px;">
+            <div id="ck-setor-display"
+                style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.05);font-size:12px;">
                 Setor: <span id="ck-setor-label"></span>
             </div>
             <select id="ck-tipo">
@@ -1417,7 +1422,9 @@
 
             <!-- Itens do checklist -->
             <div style="margin:12px 0;">
-                <p style="font-size:11px;color:var(--gray);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">Itens de Verificação</p>
+                <p
+                    style="font-size:11px;color:var(--gray);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">
+                    Itens de Verificação</p>
                 <div id="ck-itens" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                     <!-- itens gerados por JS -->
                 </div>
@@ -1427,10 +1434,13 @@
 
             <!-- Fotos -->
             <div class="btn-row">
-                <button onclick="document.getElementById('ck-foto-cam').click()" style="background:var(--joint);" class="btn-flex">📸 CÂMERA</button>
-                <button onclick="document.getElementById('ck-foto-gal').click()" style="background:var(--return);" class="btn-flex">🖼️ GALERIA</button>
+                <button onclick="document.getElementById('ck-foto-cam').click()" style="background:var(--joint);"
+                    class="btn-flex">📸 CÂMERA</button>
+                <button onclick="document.getElementById('ck-foto-gal').click()" style="background:var(--return);"
+                    class="btn-flex">🖼️ GALERIA</button>
             </div>
-            <input type="file" id="ck-foto-cam" capture="environment" accept="image/*" class="hidden" onchange="handleCkFoto(this)">
+            <input type="file" id="ck-foto-cam" capture="environment" accept="image/*" class="hidden"
+                onchange="handleCkFoto(this)">
             <input type="file" id="ck-foto-gal" multiple accept="image/*" class="hidden" onchange="handleCkFoto(this)">
             <div id="ck-preview-fotos" class="preview-area"></div>
 
@@ -1577,6 +1587,28 @@
         'use strict';
 
         // ─────────────────────────────────────────────
+        // COMPRESSÃO DE FOTOS (reduz ~80% do tamanho)
+        // ─────────────────────────────────────────────
+        function compressarFoto(file, qualidade = 0.6, maxWidth = 1280) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', qualidade));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ─────────────────────────────────────────────
         // SUPABASE — inicialização
         // ─────────────────────────────────────────────
         const SUPA_URL = 'https://rpsdrhapdtipvujixoxa.supabase.co';
@@ -1643,8 +1675,27 @@
         // ─────────────────────────────────────────────
         // MODO OFFLINE — detecção e fila
         // ─────────────────────────────────────────────
-        window.addEventListener('online', () => { isOnline = true; atualizarStatusOnline(); sincronizarOffline(); });
-        window.addEventListener('offline', () => { isOnline = false; atualizarStatusOnline(); });
+        window.addEventListener('online', async () => {
+            isOnline = true;
+            atualizarStatusOnline();
+            document.getElementById('offline-banner')?.remove();
+            const b = document.createElement('div');
+            b.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:var(--success);color:#fff;text-align:center;padding:10px;font-size:12px;font-weight:bold;z-index:9999;';
+            b.textContent = '✅ CONEXÃO RESTAURADA — Sincronizando dados...';
+            document.body.prepend(b);
+            await sincronizarOffline();
+            setTimeout(() => b.remove(), 3000);
+        });
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            atualizarStatusOnline();
+            document.getElementById('offline-banner')?.remove();
+            const b = document.createElement('div');
+            b.id = 'offline-banner';
+            b.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#ef4444;color:#fff;text-align:center;padding:10px;font-size:12px;font-weight:bold;z-index:9999;';
+            b.textContent = '📵 MODO OFFLINE — Lançamentos serão salvos e enviados ao reconectar';
+            document.body.prepend(b);
+        });
 
         function atualizarStatusOnline() {
             const badge = document.querySelector('.realtime-badge');
@@ -1658,6 +1709,7 @@
                 if (badge) badge.innerHTML = '<span class="realtime-dot"></span> LIVE';
                 if (badge) badge.style.color = 'var(--success)';
                 if (sp) sp.style.display = 'none';
+                document.getElementById('offline-queue-badge')?.remove();
             }
         }
 
@@ -1667,28 +1719,43 @@
             localStorage.setItem(OFFLINE_KEY, JSON.stringify(q));
             const sp = document.getElementById('sync-pending');
             if (sp) sp.style.display = 'block';
+            // Badge flutuante mostrando quantos itens estão na fila
+            let badge = document.getElementById('offline-queue-badge');
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.id = 'offline-queue-badge';
+                badge.style.cssText = 'position:fixed;bottom:80px;right:16px;background:#ef4444;color:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;z-index:8888;box-shadow:0 2px 8px rgba(0,0,0,.5);cursor:pointer;';
+                badge.title = 'Lançamentos aguardando sincronização';
+                document.body.appendChild(badge);
+            }
+            badge.textContent = q.length;
         }
 
         async function sincronizarOffline() {
             const q = JSON.parse(localStorage.getItem(OFFLINE_KEY) || '[]');
             if (!q.length) return;
-            let erros = 0;
             const novaFila = [];
+            let sincronizados = 0;
             for (const item of q) {
                 try {
                     const { error } = await db.from(item.tabela).insert(item.dados);
-                    if (error) { novaFila.push(item); erros++; }
-                } catch (_) { novaFila.push(item); erros++; }
+                    if (error) { novaFila.push(item); }
+                    else { sincronizados++; }
+                } catch (_) { novaFila.push(item); }
             }
             localStorage.setItem(OFFLINE_KEY, JSON.stringify(novaFila));
-            if (novaFila.length === 0) {
-                showSuccess('DADOS OFFLINE SINCRONIZADOS!');
-                // Recarrega apenas a tela ativa
-                if (currentUser?.role === 'programador') {
+            if (sincronizados > 0) {
+                showSuccess(`${sincronizados} LANÇAMENTO(S) SINCRONIZADO(S)!`);
+                if (currentUser?.perfil === 'programador') {
                     try { await carregarProgGeral(); } catch (_) { }
-                } else if (currentUser?.role === 'admin' || currentUser?.perfil) {
+                } else if (currentUser?.perfil === 'motorista') {
+                    try { await carregarHistoricoMotorista(); } catch (_) { }
+                } else {
                     try { await carregarProgAdmin(); } catch (_) { }
                 }
+            }
+            if (novaFila.length > 0) {
+                console.warn(`${novaFila.length} item(s) ainda na fila offline — tentará novamente.`);
             }
         }
 
@@ -2618,11 +2685,11 @@
             overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;';
             const atualizar = () => {
                 overlay.innerHTML = `
-                    <div style="color:var(--gray);font-size:11px;">📸 ${s.placa} — ${s.tipo_op} | ${s.timestamp} (${idx+1}/${fotos.length})</div>
+                    <div style="color:var(--gray);font-size:11px;">📸 ${s.placa} — ${s.tipo_op} | ${s.timestamp} (${idx + 1}/${fotos.length})</div>
                     <img src="${fotos[idx]}" style="max-width:100%;max-height:70vh;border-radius:10px;object-fit:contain;">
                     <div style="display:flex;gap:10px;">
                         ${idx > 0 ? `<button onclick="event.stopPropagation();idx_foto--; atualizar_foto()" style="background:var(--gray);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">◀</button>` : ''}
-                        ${idx < fotos.length-1 ? `<button onclick="event.stopPropagation();idx_foto++; atualizar_foto()" style="background:var(--gray);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">▶</button>` : ''}
+                        ${idx < fotos.length - 1 ? `<button onclick="event.stopPropagation();idx_foto++; atualizar_foto()" style="background:var(--gray);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">▶</button>` : ''}
                         <button onclick="document.body.removeChild(document.getElementById('foto-overlay'))" style="background:var(--danger);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">✕ Fechar</button>
                     </div>`;
             };
@@ -2654,7 +2721,7 @@
             try {
                 const { data: v } = await db.from(TBL.veiculos).select('tipo').eq('placa', placa);
                 if (v?.[0]) payload.setor = v[0].tipo;
-            } catch(_) {}
+            } catch (_) { }
 
             if (!isOnline) {
                 enfileirarOffline(TBL.prog, payload);
@@ -2732,19 +2799,26 @@
             document.getElementById('modal-status-titulo').innerText = novoStatus === 'EM EXECUÇÃO' ? '▶ INICIAR SERVIÇO' : '✅ FINALIZAR SERVIÇO';
             document.getElementById('status-foto-preview').innerHTML = '';
             document.getElementById('status-obs').value = '';
-            document.getElementById('btn-confirmar-status').classList.add('hidden');
             document.getElementById('rating-area').classList.toggle('hidden', novoStatus !== 'CONCLUIDO');
             document.querySelectorAll('#rating-stars span').forEach(s => { s.classList.remove('active'); s.textContent = '☆'; });
+            // Para INICIAR: botão aparece imediatamente (foto opcional)
+            // Para CONCLUIR: botão aparece só após foto
+            if (novoStatus === 'EM EXECUÇÃO') {
+                document.getElementById('btn-confirmar-status').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-confirmar-status').classList.add('hidden');
+            }
             show('scr-modal-status');
         }
 
-        function handleStatusFotos(input) {
+        async function handleStatusFotos(input) {
             const now = new Date().toLocaleString('pt-BR');
-            Array.from(input.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = e => { statusPendente.fotos.push({ data: e.target.result, ts: now }); renderStatusPreviews(); };
-                reader.readAsDataURL(file);
-            });
+            const files = Array.from(input.files);
+            for (const file of files) {
+                const compressed = await compressarFoto(file);
+                statusPendente.fotos.push({ data: compressed, ts: now });
+            }
+            renderStatusPreviews();
             input.value = '';
         }
 
@@ -2772,7 +2846,10 @@
         }
 
         async function confirmarAlteracaoStatus() {
-            if (!statusPendente.fotos.length) { alert('Tire pelo menos uma foto!'); return; }
+            // Foto obrigatória apenas para CONCLUIR, não para INICIAR
+            if (statusPendente.novoStatus === 'CONCLUIDO' && !statusPendente.fotos.length) {
+                alert('📸 Tire pelo menos uma foto para concluir o serviço!'); return;
+            }
             loading(true, 'Atualizando...');
 
             const { data: rows } = await db.from(TBL.prog).select('fotos').eq('id', statusPendente.id);
@@ -3568,13 +3645,14 @@
             }
         }
 
-        function handleCkFoto(input) {
+        async function handleCkFoto(input) {
             const now = new Date().toLocaleString('pt-BR');
-            Array.from(input.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = e => { ckFotos.push({ data: e.target.result, ts: now }); ckRenderFotos(); };
-                reader.readAsDataURL(file);
-            });
+            const files = Array.from(input.files);
+            for (const file of files) {
+                const compressed = await compressarFoto(file);
+                ckFotos.push({ data: compressed, ts: now });
+                ckRenderFotos();
+            }
             input.value = '';
         }
 
@@ -3644,7 +3722,7 @@
 
                 showSuccess('CHECKLIST ENVIADO!');
                 await carregarHistoricoMotorista();
-            } catch(e) {
+            } catch (e) {
                 loading(false);
                 // Se tabela não existe ainda, orienta o admin
                 if (e.message?.includes('relation') || e.code === '42P01') {
@@ -3668,7 +3746,7 @@
 
                 if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:10px;text-align:center;">Nenhum checklist nesta data.</p>'; return; }
                 cont.innerHTML = list.map(ck => _renderCkCard(ck)).join('');
-            } catch(_) { cont.innerHTML = '<p style="color:var(--gray);padding:10px;">Erro ao carregar histórico.</p>'; }
+            } catch (_) { cont.innerHTML = '<p style="color:var(--gray);padding:10px;">Erro ao carregar histórico.</p>'; }
         }
 
         function _renderCkCard(ck) {
@@ -3691,7 +3769,7 @@
                 <div style="font-size:10px;">✅ ${ck.total_ok}/${ck.total_itens} itens OK</div>
                 ${itensFalhos.length ? `<div style="font-size:10px;color:var(--danger);margin-top:4px;">❌ Pendentes: ${itensFalhos.join(', ')}</div>` : ''}
                 ${ck.obs ? `<div style="font-size:10px;color:var(--gray);margin-top:4px;">📝 ${ck.obs}</div>` : ''}
-                ${(ck.fotos||[]).length ? `<div style="margin-top:6px;"><button class="btn-info btn-sm" onclick="verFotosProgCard_ck(${ck.id})">📷 Ver fotos (${ck.fotos.length})</button></div>` : ''}
+                ${(ck.fotos || []).length ? `<div style="margin-top:6px;"><button class="btn-info btn-sm" onclick="verFotosProgCard_ck(${ck.id})">📷 Ver fotos (${ck.fotos.length})</button></div>` : ''}
             </div>`;
         }
 
@@ -3718,7 +3796,7 @@
 
                 // Agrupa por placa para visão geral
                 cont.innerHTML = filtered.map(ck => _renderCkCard(ck)).join('');
-            } catch(e) {
+            } catch (e) {
                 if (e.message?.includes('relation') || e.code === '42P01') {
                     cont.innerHTML = `<div class="alert-card alert-danger">
                         ⚠️ <b>Tabela "checklists" não existe no Supabase!</b><br>
