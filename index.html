@@ -2268,7 +2268,17 @@
                 combustivel: carregarAbastecimentos,
                 emails: carregarEmails,
                 auditoria: carregarAuditoria,
+                mapa: async () => {
+                    await inicializarMapa();
+                    // Força o Leaflet a recalcular o tamanho após a aba aparecer
+                    setTimeout(() => { if (_mapa) { _mapa.invalidateSize(); } }, 400);
+                },
                 checklist: carregarChecklistAdmin,
+                cnh: carregarCNH,
+                chat: iniciarChat,
+                excel: () => {},
+                bases: carregarBases,
+                dashboard: () => { atualizarDashboard(); renderGrafico(); },
                 permissoes: renderPermissoes,
                 config: () => { }
             };
@@ -4824,9 +4834,11 @@ ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';</cod
                     maxZoom: 19
                 }).addTo(_mapa);
                 // Centraliza no Brasil inicialmente
-                _mapa.setView([-15.7801, -47.9292], 5);
+                _mapa.setView([-22.9, -43.2], 10);
                 L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(_mapa);
             }
+            // Força recálculo do tamanho
+            setTimeout(() => { _mapa.invalidateSize(true); }, 200);
             await atualizarMapa();
             iniciarRealtimeMapa();
         }
