@@ -150,6 +150,188 @@
             z-index: -1;
         }
 
+        /* ═══════════════════════════════════════
+           CHAT FLUTUANTE — WhatsApp interno
+        ══════════════════════════════════════ */
+        #chat-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: var(--success);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(16,185,129,.5);
+            z-index: 8000;
+            font-size: 24px;
+            transition: transform .2s, box-shadow .2s;
+            border: none;
+            color: white;
+        }
+        #chat-fab:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(16,185,129,.7); }
+        #chat-fab-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--danger);
+            color: #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        #chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 24px;
+            width: 340px;
+            max-height: 520px;
+            background: #1e293b;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.7);
+            z-index: 8001;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.1);
+        }
+        @media (max-width: 400px) {
+            #chat-window { width: calc(100vw - 32px); right: 16px; bottom: 80px; }
+        }
+        #chat-window-header {
+            background: var(--success);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        #chat-contatos {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+        #chat-conversa {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            max-height: 430px;
+        }
+        #chat-msgs-lista {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 300px;
+            min-height: 200px;
+        }
+        .chat-msg-meu {
+            align-self: flex-end;
+            background: var(--success);
+            color: #fff;
+            border-radius: 12px 12px 0 12px;
+            padding: 8px 12px;
+            max-width: 80%;
+            font-size: 12px;
+        }
+        .chat-msg-outro {
+            align-self: flex-start;
+            background: rgba(255,255,255,.1);
+            color: #fff;
+            border-radius: 12px 12px 12px 0;
+            padding: 8px 12px;
+            max-width: 80%;
+            font-size: 12px;
+        }
+        .chat-msg-autor {
+            font-size: 9px;
+            color: rgba(255,255,255,.6);
+            margin-bottom: 2px;
+        }
+        .chat-msg-hora {
+            font-size: 9px;
+            color: rgba(255,255,255,.5);
+            text-align: right;
+            margin-top: 2px;
+        }
+        .chat-contato-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,.05);
+            transition: background .2s;
+        }
+        .chat-contato-item:hover { background: rgba(255,255,255,.05); }
+        .chat-contato-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .chat-contato-badge {
+            background: var(--danger);
+            color: #fff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 9px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        #chat-input-area {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            border-top: 1px solid rgba(255,255,255,.1);
+            background: rgba(0,0,0,.2);
+        }
+        #chat-msg-input {
+            flex: 1;
+            background: rgba(255,255,255,.1);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
+        }
+        #chat-msg-input::placeholder { color: rgba(255,255,255,.4); }
+        #chat-send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--success);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
         @keyframes rotate {
             100% {
                 transform: rotate(360deg);
@@ -2090,6 +2272,7 @@
                         await popularSeletorFornecedores();
                         await carregarProgGeral();
                         iniciarRealtime();
+                        setTimeout(inicializarChat, 1000);
                         return;
                     }
 
@@ -2109,10 +2292,11 @@
                     document.getElementById('admin-user-label').textContent = 'Bem-vindo, ' + colab.nome + ' (' + colab.perfil + ')';
                     loading(false);
                     show('scr-admin');
-                    await carregarPermissoesCache(); // garante permissões atualizadas do banco
+                    await carregarPermissoesCache();
                     aplicarPermissoesAdmin(colab.perfil);
                     await Promise.all([atualizarDashboard(), carregarProgAdmin()]);
                     iniciarRealtime();
+                    setTimeout(inicializarChat, 1000);
                     return;
                 }
 
@@ -2130,6 +2314,7 @@
                     await carregarServicosForn();
                     await carregarAlertasRevisaoFornecedor();
                     iniciarRealtime();
+                    setTimeout(inicializarChat, 1000);
                     return;
                 }
 
@@ -4337,6 +4522,245 @@ ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';</cod
             }
         }
 
+        // ═══════════════════════════════════════════════════
+        // CHAT FLUTUANTE — WhatsApp interno Lokamig
+        // ═══════════════════════════════════════════════════
+        let _chatAberto = false;
+        let _chatContatoAtual = null;
+        let _chatChannel = null;
+        let _chatNaoLidas = {};
+        let _chatContatos = [];
+
+        // Regras de quem pode falar com quem
+        const CHAT_REGRAS = {
+            admin:       ['programador', 'supervisor', 'fornecedor'],
+            supervisor:  ['programador'],
+            programador: ['supervisor', 'fornecedor'],
+            fornecedor:  ['programador'],
+            motorista:   []
+        };
+
+        async function inicializarChat() {
+            const fab = document.getElementById('chat-fab');
+            if (!fab || !currentUser) return;
+            const perfil = currentUser.perfil || currentUser.tipo || '';
+            const podeChat = CHAT_REGRAS[perfil]?.length > 0 ||
+                             CHAT_REGRAS[perfil?.toLowerCase()]?.length > 0;
+            if (!podeChat) return;
+            fab.style.display = 'flex';
+            await carregarContatosChat();
+            iniciarRealtimeChat();
+        }
+
+        async function carregarContatosChat() {
+            const perfil = (currentUser?.perfil || currentUser?.tipo || '').toLowerCase();
+            const perfisPodeConversar = CHAT_REGRAS[perfil] || [];
+            _chatContatos = [];
+
+            try {
+                // Busca colaboradores dos perfis permitidos
+                for (const p of perfisPodeConversar) {
+                    if (p === 'fornecedor') {
+                        const { data: forns } = await db.from(TBL.fornUsers)
+                            .select('id,empresa,tipo').order('empresa');
+                        (forns || []).forEach(f => {
+                            _chatContatos.push({
+                                id: `forn_${f.id}`,
+                                nome: f.empresa,
+                                perfil: 'fornecedor',
+                                emoji: '🏢'
+                            });
+                        });
+                    } else {
+                        const { data: colabs } = await db.from(TBL.colaboradores)
+                            .select('id,nome,perfil').eq('perfil', p).order('nome');
+                        (colabs || []).forEach(c => {
+                            _chatContatos.push({
+                                id: `colab_${c.id}`,
+                                nome: c.nome,
+                                perfil: c.perfil,
+                                emoji: p === 'programador' ? '👤' : p === 'supervisor' ? '👔' : '👑'
+                            });
+                        });
+                    }
+                }
+                renderizarContatos();
+            } catch(e) { console.warn('Erro ao carregar contatos:', e); }
+        }
+
+        function renderizarContatos() {
+            const cont = document.getElementById('chat-contatos');
+            if (!cont) return;
+            if (!_chatContatos.length) {
+                cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;font-size:12px;">Nenhum contato disponível</p>';
+                return;
+            }
+            cont.innerHTML = _chatContatos.map(c => {
+                const naoLidas = _chatNaoLidas[c.id] || 0;
+                const bgColor = c.perfil === 'fornecedor' ? '#1e40af' :
+                                c.perfil === 'supervisor' ? '#7c3aed' :
+                                c.perfil === 'programador' ? '#065f46' : '#374151';
+                return `<div class="chat-contato-item" onclick="abrirConversa('${c.id}','${c.nome}','${c.perfil}','${c.emoji}')">
+                    <div class="chat-contato-avatar" style="background:${bgColor};">${c.emoji}</div>
+                    <div style="flex:1;">
+                        <div style="font-size:12px;font-weight:bold;">${c.nome}</div>
+                        <div style="font-size:10px;color:var(--gray);">${c.perfil}</div>
+                    </div>
+                    ${naoLidas > 0 ? `<div class="chat-contato-badge">${naoLidas}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function getChatId(contatoId) {
+            const meuId = currentUser?.id ? `colab_${currentUser.id}` :
+                          currentUser?.empresa ? `forn_${currentUser.id}` : 'unknown';
+            // ID único da conversa (ordena para ser sempre o mesmo)
+            return [meuId, contatoId].sort().join('__');
+        }
+
+        async function abrirConversa(contatoId, nome, perfil, emoji) {
+            _chatContatoAtual = { id: contatoId, nome, perfil, emoji };
+            // Reseta não lidas
+            _chatNaoLidas[contatoId] = 0;
+            atualizarBadgeTotal();
+            renderizarContatos();
+
+            // UI
+            document.getElementById('chat-contatos').style.display = 'none';
+            const conversa = document.getElementById('chat-conversa');
+            conversa.style.display = 'flex';
+            document.getElementById('chat-header-title').textContent = `${emoji} ${nome}`;
+            document.getElementById('chat-header-sub').textContent = perfil;
+
+            await carregarMsgsConversa();
+            document.getElementById('chat-msg-input').focus();
+        }
+
+        function voltarContatos() {
+            _chatContatoAtual = null;
+            document.getElementById('chat-conversa').style.display = 'none';
+            document.getElementById('chat-contatos').style.display = 'block';
+            document.getElementById('chat-header-title').textContent = 'Chat Interno';
+            document.getElementById('chat-header-sub').textContent = 'Selecione um contato';
+        }
+
+        async function carregarMsgsConversa() {
+            if (!_chatContatoAtual) return;
+            const chatId = getChatId(_chatContatoAtual.id);
+            const cont = document.getElementById('chat-msgs-lista');
+            if (!cont) return;
+
+            try {
+                const { data: msgs } = await db.from('chat_mensagens')
+                    .select('*').eq('chat_id', chatId)
+                    .order('id', { ascending: true }).limit(100);
+
+                const meuNome = currentUser?.nome || currentUser?.empresa || '';
+                if (!msgs?.length) {
+                    cont.innerHTML = `<p style="color:var(--gray);text-align:center;padding:20px;font-size:11px;">Início da conversa com ${_chatContatoAtual.nome} 👋</p>`;
+                    return;
+                }
+                cont.innerHTML = msgs.map(m => {
+                    const minha = m.autor === meuNome;
+                    return `<div class="${minha ? 'chat-msg-meu' : 'chat-msg-outro'}">
+                        ${!minha ? `<div class="chat-msg-autor">${m.autor}</div>` : ''}
+                        <div>${m.texto}</div>
+                        <div class="chat-msg-hora">${m.timestamp || ''}</div>
+                    </div>`;
+                }).join('');
+                cont.scrollTop = cont.scrollHeight;
+            } catch(e) {
+                cont.innerHTML = '<p style="color:var(--danger);text-align:center;padding:10px;font-size:11px;">Erro ao carregar mensagens</p>';
+            }
+        }
+
+        async function enviarMsgChat() {
+            if (!_chatContatoAtual) return;
+            const input = document.getElementById('chat-msg-input');
+            const texto = input?.value?.trim();
+            if (!texto) return;
+
+            const meuNome = currentUser?.nome || currentUser?.empresa || 'Usuário';
+            const meuPerfil = currentUser?.perfil || currentUser?.tipo || '';
+            const chatId = getChatId(_chatContatoAtual.id);
+
+            input.value = '';
+            const { error } = await db.from('chat_mensagens').insert({
+                chat_id: chatId,
+                autor: meuNome,
+                perfil: meuPerfil,
+                para: _chatContatoAtual.nome,
+                para_id: _chatContatoAtual.id,
+                texto,
+                timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            });
+            if (error) { console.error(error); return; }
+            await carregarMsgsConversa();
+        }
+
+        function toggleChatWindow() {
+            const win = document.getElementById('chat-window');
+            _chatAberto = !_chatAberto;
+            win.style.display = _chatAberto ? 'flex' : 'none';
+            if (_chatAberto) {
+                atualizarBadgeTotal();
+                renderizarContatos();
+            }
+        }
+
+        function fecharChatWindow() {
+            _chatAberto = false;
+            document.getElementById('chat-window').style.display = 'none';
+        }
+
+        function atualizarBadgeTotal() {
+            const badge = document.getElementById('chat-fab-badge');
+            if (!badge) return;
+            const total = Object.values(_chatNaoLidas).reduce((a, b) => a + b, 0);
+            badge.textContent = total;
+            badge.style.display = total > 0 ? 'flex' : 'none';
+        }
+
+        function iniciarRealtimeChat() {
+            if (_chatChannel) return;
+            _chatChannel = db.channel('chat-flutuante')
+                .on('postgres_changes', {
+                    event: 'INSERT', schema: 'public', table: 'chat_mensagens'
+                }, (payload) => {
+                    const msg = payload.new;
+                    const meuNome = currentUser?.nome || currentUser?.empresa || '';
+                    // Se não sou o autor
+                    if (msg.autor !== meuNome) {
+                        // Encontra o contato remetente
+                        const contato = _chatContatos.find(c => c.nome === msg.autor);
+                        if (contato) {
+                            // Se conversa está aberta com esse contato, recarrega
+                            if (_chatContatoAtual?.id === contato.id) {
+                                carregarMsgsConversa();
+                            } else {
+                                // Incrementa não lidas
+                                _chatNaoLidas[contato.id] = (_chatNaoLidas[contato.id] || 0) + 1;
+                                atualizarBadgeTotal();
+                                renderizarContatos();
+                                // Notificação sonora simples
+                                try {
+                                    const ctx = new AudioContext();
+                                    const osc = ctx.createOscillator();
+                                    const gain = ctx.createGain();
+                                    osc.connect(gain);
+                                    gain.connect(ctx.destination);
+                                    osc.frequency.value = 880;
+                                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                                    osc.start(ctx.currentTime);
+                                    osc.stop(ctx.currentTime + 0.3);
+                                } catch(_) {}
+                            }
+                        }
+                    }
+                }).subscribe();
+        }
+
         async function salvarBase() {
             const nome = document.getElementById('base-nome')?.value?.trim();
             const cidade = document.getElementById('base-cidade')?.value?.trim();
@@ -4353,6 +4777,42 @@ ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';</cod
         }
 
     </script>
+
+    <!-- ═══════════════════════════════════════
+         CHAT FLUTUANTE — WhatsApp interno
+    ════════════════════════════════════════ -->
+    <button id="chat-fab" onclick="toggleChatWindow()">
+        💬
+        <div id="chat-fab-badge"></div>
+    </button>
+
+    <div id="chat-window">
+        <!-- Header -->
+        <div id="chat-window-header">
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;">💬</div>
+            <div id="chat-header-info" style="flex:1;">
+                <div style="font-weight:bold;font-size:13px;" id="chat-header-title">Chat Interno</div>
+                <div style="font-size:10px;opacity:.8;" id="chat-header-sub">Selecione um contato</div>
+            </div>
+            <button onclick="fecharChatWindow()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;">✕</button>
+        </div>
+
+        <!-- Lista de contatos -->
+        <div id="chat-contatos"></div>
+
+        <!-- Conversa individual -->
+        <div id="chat-conversa">
+            <div style="padding:8px 12px;background:rgba(0,0,0,.2);border-bottom:1px solid rgba(255,255,255,.08);">
+                <button onclick="voltarContatos()" style="background:none;border:none;color:var(--info);cursor:pointer;font-size:11px;">← Voltar</button>
+            </div>
+            <div id="chat-msgs-lista"></div>
+            <div id="chat-input-area">
+                <input type="text" id="chat-msg-input" placeholder="Digite uma mensagem..." onkeydown="if(event.key==='Enter')enviarMsgChat()">
+                <button id="chat-send-btn" onclick="enviarMsgChat()">➤</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
