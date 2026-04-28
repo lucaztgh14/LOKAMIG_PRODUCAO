@@ -11,6 +11,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <style>
         :root {
             --primary: #d1122a;
@@ -77,12 +79,49 @@
             border-radius: 24px;
             padding: 20px;
             width: 100%;
-            max-width: 960px;
+            max-width: 1400px;
             box-shadow: 0 25px 50px rgba(0, 0, 0, .7);
             text-align: center;
             margin: 10px auto;
             max-height: 95vh;
             overflow-y: auto;
+        }
+
+        /* Desktop: aproveita toda a tela */
+        @media (min-width: 1024px) {
+            body { padding: 16px; align-items: flex-start; }
+            .container { padding: 28px 36px; border-radius: 20px; }
+            .dashboard-grid { grid-template-columns: repeat(7, 1fr) !important; }
+            .admin-content { text-align: left; }
+            .form-section { max-width: 700px; margin: 0 auto; text-align: left; }
+            .search-bar { display: flex; flex-wrap: wrap; gap: 8px; }
+            .search-bar input, .search-bar select { flex: 1; min-width: 160px; margin: 0; }
+            /* Monitor lado a lado mais espaçoso */
+            #list-prog-admin > div, #list-prog-geral > div { margin-bottom: 18px; }
+            /* Tabs maiores no desktop */
+            .tab-btn { font-size: 11px; padding: 10px 16px; }
+            /* Histórico em grid 2 colunas */
+            #list-historico { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+            /* Frota em grid 3 colunas */
+            #list-veiculos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+            /* Equipe em grid 3 colunas */
+            #list-colaboradores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+            /* Fornecedores em grid 2 colunas */
+            #list-fornecedores { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+            /* Manutenções em grid 2 colunas */
+            #list-manutencoes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+            /* Checklist admin em grid 2 colunas */
+            #list-checklist-admin { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+            /* Auditoria mais larga */
+            #list-auditoria { font-size: 11px; }
+            /* Gráfico maior */
+            #grafico-servicos { height: 160px !important; }
+        }
+
+        @media (min-width: 1280px) {
+            .dashboard-grid { grid-template-columns: repeat(7, 1fr) !important; }
+            #list-veiculos { grid-template-columns: repeat(4, 1fr); }
+            #list-colaboradores { grid-template-columns: repeat(4, 1fr); }
         }
 
         .login-box {
@@ -1083,6 +1122,10 @@
                 <button class="tab-btn" onclick="switchTab('emails',event)">📧 E-mails</button>
                 <button class="tab-btn" onclick="switchTab('auditoria',event)">📝 Auditoria</button>
                 <button class="tab-btn" onclick="switchTab('checklist',event)">✅ Checklists</button>
+                <button class="tab-btn" onclick="switchTab('cnh',event)">🪪 CNH</button>
+                <button class="tab-btn" onclick="switchTab('chat',event)">💬 Chat</button>
+                <button class="tab-btn" onclick="switchTab('excel',event)">📊 Excel</button>
+                <button class="tab-btn" onclick="switchTab('bases',event)">🏭 Bases</button>
                 <button class="tab-btn" onclick="switchTab('permissoes',event)">🔐 Aba Mestre</button>
                 <button class="tab-btn" onclick="switchTab('config',event)">⚙️ Config</button>
             </div>
@@ -1288,6 +1331,97 @@
                     oninput="carregarChecklistAdmin()">
             </div>
             <div id="list-checklist-admin"></div>
+        </div>
+
+        <!-- CNH MOTORISTAS -->
+        <div id="area-cnh" class="admin-content hidden">
+            <h3 style="margin-bottom:12px;">🪪 Controle de CNH</h3>
+            <div class="search-bar">
+                <input type="text" id="cnh-filter" placeholder="🔍 Filtrar motorista" oninput="carregarCNH()">
+            </div>
+            <div id="list-cnh"></div>
+            <div class="form-section" style="margin-top:16px;">
+                <h4 style="color:var(--info);margin-bottom:10px;">Registrar/Atualizar CNH</h4>
+                <select id="cnh-colab"></select>
+                <input type="text" id="cnh-numero" placeholder="Número da CNH">
+                <input type="text" id="cnh-categoria" placeholder="Categoria (ex: B, C, D, E)">
+                <input type="date" id="cnh-validade" placeholder="Validade">
+                <input type="date" id="cnh-nascimento" placeholder="Data de Nascimento">
+                <button onclick="salvarCNH()" class="btn-success">💾 Salvar CNH</button>
+            </div>
+        </div>
+
+        <!-- CHAT INTERNO -->
+        <div id="area-chat" class="admin-content hidden">
+            <h3 style="margin-bottom:12px;">💬 Chat Interno</h3>
+            <div id="chat-msgs" style="height:350px;overflow-y:auto;background:rgba(0,0,0,.2);border-radius:12px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;"></div>
+            <div style="display:flex;gap:8px;">
+                <input type="text" id="chat-input" placeholder="Digite sua mensagem..." onkeydown="if(event.key==='Enter')enviarMensagemChat()" style="flex:1;margin:0;">
+                <button onclick="enviarMensagemChat()" class="btn-success" style="width:auto;padding:10px 18px;margin:0;">📤</button>
+            </div>
+        </div>
+
+        <!-- EXPORTAR EXCEL -->
+        <div id="area-excel" class="admin-content hidden">
+            <h3 style="margin-bottom:12px;">📊 Exportar Dados</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px;">
+                <div class="metric-card" style="cursor:pointer;" onclick="exportarExcel('prog')">
+                    <div class="metric-icon">🚗</div>
+                    <span class="metric-label">Programações</span>
+                    <button class="btn-success btn-sm" style="margin-top:8px;">📥 Exportar</button>
+                </div>
+                <div class="metric-card" style="cursor:pointer;" onclick="exportarExcel('checklists')">
+                    <div class="metric-icon">✅</div>
+                    <span class="metric-label">Checklists</span>
+                    <button class="btn-success btn-sm" style="margin-top:8px;">📥 Exportar</button>
+                </div>
+                <div class="metric-card" style="cursor:pointer;" onclick="exportarExcel('veiculos')">
+                    <div class="metric-icon">🚛</div>
+                    <span class="metric-label">Frota</span>
+                    <button class="btn-success btn-sm" style="margin-top:8px;">📥 Exportar</button>
+                </div>
+                <div class="metric-card" style="cursor:pointer;" onclick="exportarExcel('combustivel')">
+                    <div class="metric-icon">⛽</div>
+                    <span class="metric-label">Combustível</span>
+                    <button class="btn-success btn-sm" style="margin-top:8px;">📥 Exportar</button>
+                </div>
+                <div class="metric-card" style="cursor:pointer;" onclick="exportarExcel('manutencoes')">
+                    <div class="metric-icon">🔧</div>
+                    <span class="metric-label">Manutenções</span>
+                    <button class="btn-success btn-sm" style="margin-top:8px;">📥 Exportar</button>
+                </div>
+                <div class="metric-card" style="cursor:pointer;" onclick="exportarExcel('colaboradores')">
+                    <div class="metric-icon">👥</div>
+                    <span class="metric-label">Equipe</span>
+                    <button class="btn-success btn-sm" style="margin-top:8px;">📥 Exportar</button>
+                </div>
+            </div>
+            <div style="margin-top:16px;">
+                <h4 style="color:var(--info);margin-bottom:8px;">Relatório Personalizado</h4>
+                <div class="search-bar">
+                    <input type="date" id="excel-de" style="flex:1;margin:0;">
+                    <input type="date" id="excel-ate" style="flex:1;margin:0;">
+                    <select id="excel-tabela" style="flex:1;margin:0;">
+                        <option value="prog">Programações</option>
+                        <option value="checklists">Checklists</option>
+                        <option value="combustivel">Combustível</option>
+                    </select>
+                    <button onclick="exportarExcelFiltrado()" class="btn-success" style="width:auto;margin:0;padding:10px 16px;">📥 Exportar Período</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MULTI-BASE -->
+        <div id="area-bases" class="admin-content hidden">
+            <h3 style="margin-bottom:12px;">🏭 Gestão de Bases</h3>
+            <div id="bases-resumo" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;"></div>
+            <div class="form-section">
+                <h4 style="color:var(--info);margin-bottom:10px;">Cadastrar Nova Base</h4>
+                <input type="text" id="base-nome" placeholder="Nome da base (ex: Macaé)">
+                <input type="text" id="base-cidade" placeholder="Cidade">
+                <input type="text" id="base-estado" placeholder="Estado (ex: RJ)">
+                <button onclick="salvarBase()" class="btn-success">💾 Cadastrar Base</button>
+            </div>
         </div>
 
         <!-- ABA MESTRE -->
@@ -1681,10 +1815,10 @@
         // PERMISSÕES PADRÃO
         // ─────────────────────────────────────────────
         const PERMISSOES_PADRAO = {
-            admin: { monitor: true, history: true, forn: true, colab: true, veic: true, manutencao: true, orcamentos: true, combustivel: true, emails: true, auditoria: true, checklist: true, permissoes: true, config: true },
-            programador: { monitor: false, history: false, forn: false, colab: false, veic: false, manutencao: false, orcamentos: false, combustivel: false, emails: false, auditoria: false, checklist: false, permissoes: false, config: false },
-            supervisor: { monitor: true, history: true, forn: false, colab: false, veic: true, manutencao: true, orcamentos: true, combustivel: false, emails: true, auditoria: false, checklist: true, permissoes: false, config: false },
-            motorista: { monitor: false, history: false, forn: false, colab: false, veic: false, manutencao: false, orcamentos: false, combustivel: false, emails: false, auditoria: false, checklist: false, permissoes: false, config: false }
+            admin: { monitor: true, history: true, forn: true, colab: true, veic: true, manutencao: true, orcamentos: true, combustivel: true, emails: true, auditoria: true, checklist: true, cnh: true, chat: true, excel: true, bases: true, permissoes: true, config: true },
+            programador: { monitor: false, history: false, forn: false, colab: false, veic: false, manutencao: false, orcamentos: false, combustivel: false, emails: false, auditoria: false, checklist: false, cnh: false, chat: true, excel: false, bases: false, permissoes: false, config: false },
+            supervisor: { monitor: true, history: true, forn: false, colab: false, veic: true, manutencao: true, orcamentos: true, combustivel: false, emails: true, auditoria: false, checklist: true, cnh: true, chat: true, excel: true, bases: false, permissoes: false, config: false },
+            motorista: { monitor: false, history: false, forn: false, colab: false, veic: false, manutencao: false, orcamentos: false, combustivel: false, emails: false, auditoria: false, checklist: false, cnh: false, chat: false, excel: false, bases: false, permissoes: false, config: false }
         };
 
         const NOMES_TABS = {
@@ -1692,7 +1826,8 @@
             colab: '👥 Equipe', veic: '🚛 Frota', manutencao: '🔧 Manutenções',
             orcamentos: '💰 Orçamentos', combustivel: '⛽ Combustível',
             emails: '📧 E-mails', auditoria: '📝 Auditoria',
-            checklist: '✅ Checklists', permissoes: '🔐 Aba Mestre', config: '⚙️ Config'
+            checklist: '✅ Checklists', cnh: '🪪 CNH', chat: '💬 Chat',
+            excel: '📊 Excel', bases: '🏭 Bases', permissoes: '🔐 Aba Mestre', config: '⚙️ Config'
         };
 
         // ─────────────────────────────────────────────
@@ -3904,6 +4039,317 @@
                 </div>
                 <button onclick="document.body.removeChild(document.getElementById('foto-overlay-ck'))" style="background:var(--danger);padding:10px 24px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:bold;margin-top:10px;">✕ Fechar</button>`;
             document.body.appendChild(overlay);
+        }
+
+
+        // ─────────────────────────────────────────────
+        // QR CODE — Gerar QR para veículo
+        // ─────────────────────────────────────────────
+        async function gerarQRCodeVeiculo(placa) {
+            const url = `${window.location.origin}?veiculo=${placa}`;
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;';
+            overlay.onclick = () => document.body.removeChild(overlay);
+            const canvas = document.createElement('canvas');
+            overlay.innerHTML = `
+                <div style="color:#fff;font-size:14px;font-weight:bold;">📷 QR Code — ${placa}</div>
+                <div id="qr-container" style="background:#fff;padding:20px;border-radius:16px;"></div>
+                <div style="color:var(--gray);font-size:10px;">Escaneie para abrir o checklist do veículo</div>
+                <div style="display:flex;gap:10px;">
+                    <button onclick="baixarQR('${placa}')" style="background:var(--success);padding:10px 20px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:bold;">📥 Baixar PNG</button>
+                    <button onclick="document.body.removeChild(document.getElementById('qr-overlay'))" style="background:var(--danger);padding:10px 20px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:bold;">✕ Fechar</button>
+                </div>`;
+            overlay.id = 'qr-overlay';
+            document.body.appendChild(overlay);
+            // Gera QR
+            const qrDiv = document.getElementById('qr-container');
+            QRCode.toCanvas(canvas, url, { width: 250, margin: 2 }, (err) => {
+                if (!err) { canvas.id = 'qr-canvas'; qrDiv.appendChild(canvas); }
+            });
+        }
+
+        function baixarQR(placa) {
+            const canvas = document.getElementById('qr-canvas');
+            if (!canvas) return;
+            const a = document.createElement('a');
+            a.download = `QR_${placa}.png`;
+            a.href = canvas.toDataURL('image/png');
+            a.click();
+        }
+
+        // Verificar se veio de QR Code
+        const _urlParams = new URLSearchParams(window.location.search);
+        const _veiculoQR = _urlParams.get('veiculo');
+        if (_veiculoQR) {
+            // Após login do motorista, pre-seleciona o veículo
+            window._preSelectVeiculo = _veiculoQR;
+        }
+
+        // ─────────────────────────────────────────────
+        // CNH — Controle de habilitação
+        // ─────────────────────────────────────────────
+        async function carregarCNH() {
+            const filtro = (document.getElementById('cnh-filter')?.value || '').toLowerCase();
+            const cont = document.getElementById('list-cnh');
+            if (!cont) return;
+
+            // Popular select de colaboradores
+            const sel = document.getElementById('cnh-colab');
+            if (sel && sel.options.length <= 1) {
+                const { data: colabs } = await db.from(TBL.colaboradores).select('id,nome').order('nome');
+                sel.innerHTML = '<option value="">— Selecione o motorista —</option>' +
+                    (colabs || []).filter(c => c.nome).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+            }
+
+            try {
+                const { data: cnhs } = await db.from('cnh_motoristas').select('*').order('validade');
+                let list = cnhs || [];
+                if (filtro) list = list.filter(c => (c.motorista || '').toLowerCase().includes(filtro));
+
+                const hoje = new Date();
+                if (!list.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhuma CNH cadastrada.</p>'; return; }
+
+                cont.innerHTML = list.map(c => {
+                    const val = new Date(c.validade);
+                    const diasRestantes = Math.ceil((val - hoje) / 86400000);
+                    const cor = diasRestantes < 0 ? 'var(--danger)' : diasRestantes < 30 ? 'var(--warning)' : 'var(--success)';
+                    const status = diasRestantes < 0 ? '❌ VENCIDA' : diasRestantes < 30 ? `⚠️ Vence em ${diasRestantes} dias` : `✅ Válida (${diasRestantes} dias)`;
+                    return `<div class="prog-item" style="border-left-color:${cor};">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <div>
+                                <b style="font-size:13px;">👤 ${c.motorista}</b>
+                                <span class="setor-badge" style="background:${cor};color:#fff;margin-left:6px;">${c.categoria}</span>
+                            </div>
+                            <span style="font-size:11px;color:${cor};font-weight:bold;">${status}</span>
+                        </div>
+                        <div style="font-size:11px;color:var(--gray);margin-top:4px;">
+                            CNH: ${c.numero || '—'} | Validade: ${c.validade ? new Date(c.validade + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}
+                            ${c.nascimento ? ` | Nasc: ${new Date(c.nascimento + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                if (e.message?.includes('relation') || e.code === '42P01') {
+                    cont.innerHTML = `<div class="alert-card alert-danger">
+                        ⚠️ Tabela "cnh_motoristas" não existe. Execute no Supabase:<br>
+                        <code style="font-size:10px;background:rgba(0,0,0,.3);padding:8px;border-radius:6px;display:block;margin-top:8px;white-space:pre-wrap;">CREATE TABLE cnh_motoristas (
+  id bigserial PRIMARY KEY,
+  motorista text,
+  motorista_id bigint,
+  numero text,
+  categoria text,
+  validade date,
+  nascimento date,
+  criado_em timestamp default now()
+);</code></div>`;
+                }
+            }
+        }
+
+        async function salvarCNH() {
+            const colabId = document.getElementById('cnh-colab').value;
+            const numero = document.getElementById('cnh-numero').value;
+            const categoria = document.getElementById('cnh-categoria').value;
+            const validade = document.getElementById('cnh-validade').value;
+            const nascimento = document.getElementById('cnh-nascimento').value;
+            if (!colabId || !categoria || !validade) { alert('Preencha motorista, categoria e validade!'); return; }
+
+            const { data: colab } = await db.from(TBL.colaboradores).select('nome').eq('id', colabId);
+            const nome = colab?.[0]?.nome || '';
+
+            loading(true, 'Salvando CNH...');
+            // Upsert por motorista_id
+            const { error } = await db.from('cnh_motoristas').upsert({
+                motorista: nome, motorista_id: parseInt(colabId),
+                numero, categoria, validade, nascimento: nascimento || null
+            }, { onConflict: 'motorista_id' });
+
+            if (error) { loading(false); alert('Erro: ' + error.message); return; }
+            await registrarAuditoria(`CNH atualizada: ${nome} | Cat: ${categoria} | Val: ${validade}`);
+            loading(false);
+            showSuccess('CNH SALVA!');
+            await carregarCNH();
+        }
+
+        // ─────────────────────────────────────────────
+        // CHAT INTERNO
+        // ─────────────────────────────────────────────
+        let _chatChannel = null;
+
+        async function iniciarChat() {
+            await carregarMensagensChat();
+            // Realtime
+            if (_chatChannel) return;
+            _chatChannel = db.channel('chat-interno')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_mensagens' }, () => {
+                    carregarMensagensChat();
+                }).subscribe();
+        }
+
+        async function carregarMensagensChat() {
+            const cont = document.getElementById('chat-msgs');
+            if (!cont) return;
+            try {
+                const { data: msgs } = await db.from('chat_mensagens').select('*').order('id', { ascending: true }).limit(100);
+                if (!msgs?.length) { cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Nenhuma mensagem ainda. Seja o primeiro! 👋</p>'; return; }
+                cont.innerHTML = msgs.map(m => {
+                    const minha = m.autor === (currentUser?.nome || currentUser?.empresa);
+                    return `<div style="display:flex;justify-content:${minha ? 'flex-end' : 'flex-start'};">
+                        <div style="max-width:70%;background:${minha ? 'var(--primary)' : 'rgba(255,255,255,.1)'};border-radius:${minha ? '12px 12px 0 12px' : '12px 12px 12px 0'};padding:8px 12px;">
+                            ${!minha ? `<div style="font-size:9px;color:var(--gray);margin-bottom:2px;">${m.autor}</div>` : ''}
+                            <div style="font-size:12px;">${m.texto}</div>
+                            <div style="font-size:9px;color:rgba(255,255,255,.5);text-align:right;margin-top:2px;">${m.timestamp || ''}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+                cont.scrollTop = cont.scrollHeight;
+            } catch(e) {
+                if (e.message?.includes('relation') || e.code === '42P01') {
+                    cont.innerHTML = `<div class="alert-card alert-danger" style="font-size:11px;">
+                        ⚠️ Tabela "chat_mensagens" não existe. Execute no Supabase:<br>
+                        <code style="font-size:10px;display:block;margin-top:8px;white-space:pre-wrap;">CREATE TABLE chat_mensagens (
+  id bigserial PRIMARY KEY,
+  autor text,
+  perfil text,
+  texto text,
+  timestamp text,
+  criado_em timestamp default now()
+);</code></div>`;
+                }
+            }
+        }
+
+        async function enviarMensagemChat() {
+            const input = document.getElementById('chat-input');
+            const texto = input?.value?.trim();
+            if (!texto) return;
+            const autor = currentUser?.nome || currentUser?.empresa || 'Anônimo';
+            const perfil = currentUser?.perfil || currentUser?.tipo || 'user';
+            const { error } = await db.from('chat_mensagens').insert({
+                autor, perfil, texto,
+                timestamp: new Date().toLocaleString('pt-BR')
+            });
+            if (!error) { input.value = ''; await carregarMensagensChat(); }
+            else alert('Erro: ' + error.message);
+        }
+
+        // ─────────────────────────────────────────────
+        // EXPORTAR EXCEL
+        // ─────────────────────────────────────────────
+        async function exportarExcel(tabela) {
+            loading(true, `Exportando ${tabela}...`);
+            try {
+                const { data } = await db.from(tabela).select('*').order('id', { ascending: false });
+                if (!data?.length) { loading(false); alert('Nenhum dado para exportar!'); return; }
+
+                // Remove colunas de fotos/base64 para não travar o Excel
+                const limpo = data.map(row => {
+                    const r = { ...row };
+                    ['fotos', 'assinatura', 'comprovante'].forEach(k => { if (r[k]) r[k] = r[k] instanceof Array ? `${r[k].length} foto(s)` : 'ver sistema'; });
+                    return r;
+                });
+
+                const ws = XLSX.utils.json_to_sheet(limpo);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, tabela);
+                XLSX.writeFile(wb, `Lokamig_${tabela}_${new Date().toISOString().split('T')[0]}.xlsx`);
+                loading(false);
+                await registrarAuditoria(`Excel exportado: ${tabela}`);
+                showSuccess('EXCEL GERADO!');
+            } catch(e) { loading(false); alert('Erro: ' + e.message); }
+        }
+
+        async function exportarExcelFiltrado() {
+            const de = document.getElementById('excel-de')?.value;
+            const ate = document.getElementById('excel-ate')?.value;
+            const tabela = document.getElementById('excel-tabela')?.value;
+            if (!de || !ate || !tabela) { alert('Preencha todos os campos!'); return; }
+
+            loading(true, 'Exportando período...');
+            try {
+                const campoData = tabela === 'checklists' ? 'data_checklist' : tabela === 'combustivel' ? 'data_abast' : 'data_servico';
+                const { data } = await db.from(tabela).select('*').gte(campoData, de).lte(campoData, ate).order('id');
+                if (!data?.length) { loading(false); alert('Nenhum dado neste período!'); return; }
+
+                const limpo = data.map(row => {
+                    const r = { ...row };
+                    ['fotos', 'assinatura', 'comprovante', 'itens'].forEach(k => {
+                        if (r[k]) r[k] = r[k] instanceof Array ? `${r[k].length} item(s)` : typeof r[k] === 'object' ? JSON.stringify(r[k]) : 'ver sistema';
+                    });
+                    return r;
+                });
+
+                const ws = XLSX.utils.json_to_sheet(limpo);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, tabela);
+                XLSX.writeFile(wb, `Lokamig_${tabela}_${de}_${ate}.xlsx`);
+                loading(false);
+                showSuccess('EXCEL DO PERÍODO GERADO!');
+            } catch(e) { loading(false); alert('Erro: ' + e.message); }
+        }
+
+        // ─────────────────────────────────────────────
+        // MULTI-BASE
+        // ─────────────────────────────────────────────
+        async function carregarBases() {
+            const cont = document.getElementById('bases-resumo');
+            if (!cont) return;
+            try {
+                const { data: bases } = await db.from('bases').select('*').order('nome');
+                if (!bases?.length) {
+                    cont.innerHTML = '<p style="color:var(--gray);">Nenhuma base cadastrada ainda.</p>';
+                    return;
+                }
+                // Para cada base, busca métricas
+                const hoje = new Date().toISOString().split('T')[0];
+                const resultados = await Promise.all(bases.map(async b => {
+                    const { data: servs } = await db.from(TBL.prog).select('id,status_flow').eq('data_servico', hoje).eq('base', b.nome);
+                    const total = servs?.length || 0;
+                    const concluidos = servs?.filter(s => s.status_flow === 'CONCLUIDO').length || 0;
+                    return { ...b, total, concluidos };
+                }));
+                cont.innerHTML = resultados.map(b => `
+                    <div class="metric-card" style="cursor:pointer;">
+                        <div class="metric-icon">🏭</div>
+                        <b style="font-size:13px;">${b.nome}</b>
+                        <div style="font-size:10px;color:var(--gray);">${b.cidade} — ${b.estado}</div>
+                        <div style="margin-top:8px;font-size:11px;">
+                            <span style="color:var(--warning);">📋 ${b.total} hoje</span> &nbsp;
+                            <span style="color:var(--success);">✅ ${b.concluidos}</span>
+                        </div>
+                    </div>`).join('');
+            } catch(e) {
+                if (e.message?.includes('relation') || e.code === '42P01') {
+                    cont.innerHTML = `<div class="alert-card alert-danger" style="font-size:11px;">
+                        ⚠️ Execute no Supabase SQL Editor:<br>
+                        <code style="font-size:10px;display:block;margin-top:8px;white-space:pre-wrap;">CREATE TABLE bases (
+  id bigserial PRIMARY KEY,
+  nome text UNIQUE,
+  cidade text,
+  estado text,
+  criado_em timestamp default now()
+);
+-- Adicionar coluna base nas tabelas principais:
+ALTER TABLE prog ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';
+ALTER TABLE checklists ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';
+ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';</code></div>`;
+                }
+            }
+        }
+
+        async function salvarBase() {
+            const nome = document.getElementById('base-nome')?.value?.trim();
+            const cidade = document.getElementById('base-cidade')?.value?.trim();
+            const estado = document.getElementById('base-estado')?.value?.trim();
+            if (!nome || !cidade) { alert('Preencha nome e cidade!'); return; }
+            loading(true, 'Salvando base...');
+            const { error } = await db.from('bases').insert({ nome, cidade, estado });
+            if (error) { loading(false); alert('Erro: ' + error.message); return; }
+            ['base-nome','base-cidade','base-estado'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+            await registrarAuditoria(`Nova base cadastrada: ${nome} — ${cidade}/${estado}`);
+            loading(false);
+            showSuccess('BASE CADASTRADA!');
+            await carregarBases();
         }
 
     </script>
