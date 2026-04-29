@@ -1807,6 +1807,19 @@
     <!-- TELA 2: ADMINISTRAÇÃO -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-admin" class="container hidden">
+        <!-- Badge de base — canto superior direito -->
+        <div id="base-badge-admin" style="
+            position:fixed; top:12px; right:12px; z-index:9999;
+            display:flex; align-items:center; gap:6px;
+            background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(14,165,233,.1));
+            border:1px solid rgba(14,165,233,.5); border-radius:20px;
+            padding:6px 14px; font-size:11px; font-weight:700;
+            color:#7dd3fc; backdrop-filter:blur(8px);
+            box-shadow:0 4px 12px rgba(0,0,0,.3);
+        ">
+            <span style="width:8px;height:8px;border-radius:50%;background:#22d3ee;display:inline-block;animation:pulse-gps 2s infinite;"></span>
+            <span id="base-badge-nome">🏭 Base</span>
+        </div>
         <h1>📊 ADMINISTRAÇÃO <span class="realtime-badge"><span class="realtime-dot"></span>LIVE</span></h1>
         <div class="sub" id="admin-user-label">Bem-vindo, Administrador</div>
         <div class="dashboard-grid">
@@ -1853,7 +1866,7 @@
                 <button class="tab-btn" onclick="switchTab('cnh',event)">🪪 CNH</button>
                 <button class="tab-btn" onclick="switchTab('chat',event)">💬 Chat</button>
                 <button class="tab-btn" onclick="switchTab('excel',event)">📊 Excel</button>
-                <button class="tab-btn" onclick="switchTab('bases',event)">🏭 Bases</button>
+                <button class="tab-btn" onclick="switchTab('relatorio',event)">📈 Relatório</button>
                 <button class="tab-btn" onclick="switchTab('permissoes',event)">🔐 Aba Mestre</button>
                 <button class="tab-btn" onclick="switchTab('config',event)">⚙️ Config</button>
             </div>
@@ -2167,16 +2180,30 @@
         </div>
 
         <!-- MULTI-BASE -->
-        <div id="area-bases" class="admin-content hidden">
-            <h3 style="margin-bottom:12px;">🏭 Gestão de Bases</h3>
-            <div id="bases-resumo" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;"></div>
+        <!-- RELATÓRIO MENSAL -->
+        <div id="area-relatorio" class="admin-content hidden">
+            <h3 style="margin-bottom:12px;">📈 Relatório Mensal da Base</h3>
             <div class="form-section">
-                <h4 style="color:var(--info);margin-bottom:10px;">Cadastrar Nova Base</h4>
-                <input type="text" id="base-nome" placeholder="Nome da base (ex: Macaé)">
-                <input type="text" id="base-cidade" placeholder="Cidade">
-                <input type="text" id="base-estado" placeholder="Estado (ex: RJ)">
-                <button onclick="salvarBase()" class="btn-success">💾 Cadastrar Base</button>
+                <h4 style="color:var(--info);margin-bottom:12px;">🗓️ Selecione o período</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                    <select id="rel-mes" style="flex:1;margin:0;min-width:140px;">
+                        <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+                        <option value="3">Março</option><option value="4">Abril</option>
+                        <option value="5">Maio</option><option value="6">Junho</option>
+                        <option value="7">Julho</option><option value="8">Agosto</option>
+                        <option value="9">Setembro</option><option value="10">Outubro</option>
+                        <option value="11">Novembro</option><option value="12">Dezembro</option>
+                    </select>
+                    <select id="rel-ano" style="flex:1;margin:0;min-width:100px;"></select>
+                    <button onclick="gerarRelatorioMensal('preview')" class="btn-info" style="margin:0;white-space:nowrap;">👁️ Preview</button>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+                    <button onclick="gerarRelatorioMensal('excel')" class="btn-success" style="flex:1;margin:0;">📊 Exportar Excel</button>
+                    <button onclick="gerarRelatorioMensal('pdf')" style="flex:1;margin:0;background:#ff5722;">📄 Exportar PDF</button>
+                </div>
             </div>
+            <!-- Preview do relatório -->
+            <div id="rel-preview" style="display:none;margin-top:16px;"></div>
         </div>
 
         <!-- ABA MESTRE -->
@@ -2959,15 +2986,27 @@
         }
 
         async function _entrarAdmin() {
-            let baseLabel = '';
-            if (currentUser?.base_id) {
+            let baseLabel = 'Itaguaí';
+            let baseId = currentUser?.base_id || null;
+            if (baseId) {
                 try {
-                    const { data: base } = await db.from('bases').select('nome').eq('id', currentUser.base_id).single();
-                    if (base?.nome) baseLabel = ` · Base: ${base.nome}`;
+                    const { data: base } = await db.from('bases').select('nome,cidade').eq('id', baseId).single();
+                    if (base?.nome) baseLabel = base.nome + (base.cidade ? ' — ' + base.cidade : '');
                 } catch(_) {}
             }
+            // Badge de base
+            const badge = document.getElementById('base-badge-nome');
+            if (badge) badge.textContent = '🏭 ' + baseLabel;
             const nomeExib = currentUser?.nome === 'Administrador' ? 'Administrador' : currentUser?.nome;
-            document.getElementById('admin-user-label').textContent = `Bem-vindo, ${nomeExib}${baseLabel}`;
+            document.getElementById('admin-user-label').textContent = `Bem-vindo, ${nomeExib} · ${baseLabel}`;
+            // Popular anos no select de relatório
+            const anoSel = document.getElementById('rel-ano');
+            if (anoSel) {
+                const anoAtual = new Date().getFullYear();
+                anoSel.innerHTML = [anoAtual, anoAtual-1, anoAtual-2].map(a => `<option value="${a}">${a}</option>`).join('');
+            }
+            const mesSel = document.getElementById('rel-mes');
+            if (mesSel) mesSel.value = new Date().getMonth() + 1;
             loading(false);
             show('scr-admin');
             await Promise.all([
@@ -2975,7 +3014,7 @@
                 carregarProgAdmin(),
                 renderPermissoes()
             ]);
-            await registrarAuditoria('Login: ' + (currentUser?.nome || 'ADMIN'));
+            await registrarAuditoria('Login: ' + (currentUser?.nome || 'ADMIN') + ' | Base: ' + baseLabel);
             iniciarRealtime();
             setTimeout(inicializarChat, 1000);
         }
@@ -4360,7 +4399,6 @@
             ]);
             const totalComb = (comb || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
             const totalOrcs = (orcs || []).reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
-
             montarCabecalhoPDF('RELATÓRIO FINANCEIRO GERAL');
             document.getElementById('pdf-body').innerHTML = `
     <h3 style="color:#d1122a;margin-bottom:10px;">Resumo Financeiro</h3>
@@ -4377,6 +4415,186 @@
     </table>`;
             document.getElementById('pdf-photos').innerHTML = '';
             await renderizarEBaixarPDF(`Relatorio_Financeiro_${new Date().toISOString().split('T')[0]}.pdf`);
+        }
+
+        async function gerarRelatorioMensal(formato) {
+            const mes = parseInt(document.getElementById('rel-mes')?.value || new Date().getMonth()+1);
+            const ano = parseInt(document.getElementById('rel-ano')?.value || new Date().getFullYear());
+            const baseId = currentUser?.base_id || null;
+            const mesesNomes = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            const nomeMes = mesesNomes[mes];
+            const dataIni = `${ano}-${String(mes).padStart(2,'0')}-01`;
+            const dataFim = `${ano}-${String(mes).padStart(2,'0')}-31`;
+            let nomBase = 'Itaguaí';
+            if (baseId) {
+                try { const {data:b} = await db.from('bases').select('nome').eq('id',baseId).single(); if(b?.nome) nomBase=b.nome; } catch(_){}
+            }
+
+            loading(true, 'Gerando relatório...');
+            try {
+                // Buscar dados do período filtrados por base
+                let qProg = db.from(TBL.prog).select('*').gte('data_servico',dataIni).lte('data_servico',dataFim);
+                let qComb = db.from(TBL.combustivel).select('*').gte('data_abast',dataIni).lte('data_abast',dataFim);
+                let qManut = db.from(TBL.manutencoes).select('*').gte('data_exec',dataIni).lte('data_exec',dataFim);
+                let qOrcs = db.from(TBL.orcamentos).select('*').gte('data_orc',dataIni).lte('data_orc',dataFim);
+                let qCkl = db.from(TBL.checklists).select('*').gte('data_checklist',dataIni).lte('data_checklist',dataFim);
+                let qVeic = db.from(TBL.veiculos).select('*');
+                if (baseId) {
+                    qProg = qProg.eq('base_id',baseId);
+                    qComb = qComb.eq('base_id',baseId);
+                    qManut = qManut.eq('base_id',baseId);
+                    qOrcs = qOrcs.eq('base_id',baseId);
+                    qCkl = qCkl.eq('base_id',baseId);
+                    qVeic = qVeic.eq('base_id',baseId);
+                }
+                const [
+                    {data:servicos}, {data:combustivel}, {data:manutencoes},
+                    {data:orcamentos}, {data:checklists}, {data:veiculos}
+                ] = await Promise.all([qProg,qComb,qManut,qOrcs,qCkl,qVeic]);
+
+                // Calcular métricas
+                const totalServicos = (servicos||[]).length;
+                const concluidos = (servicos||[]).filter(s=>s.status_flow==='CONCLUIDO').length;
+                const cancelados = (servicos||[]).filter(s=>s.status_flow==='CANCELADO').length;
+                const taxaConclusao = totalServicos > 0 ? Math.round(concluidos/totalServicos*100) : 0;
+                const totalComb = (combustivel||[]).reduce((s,c)=>s+(parseFloat(c.valor)||0),0);
+                const totalLitros = (combustivel||[]).reduce((s,c)=>s+(parseFloat(c.litros)||0),0);
+                const totalManut = (manutencoes||[]).reduce((s,m)=>s+(parseFloat(m.custo)||0),0);
+                const totalOrcsAprov = (orcamentos||[]).filter(o=>o.status==='APROVADO').reduce((s,o)=>s+(parseFloat(o.total)||0),0);
+                const totalGeral = totalComb + totalManut + totalOrcsAprov;
+
+                // Serviços por fornecedor
+                const porForn = {};
+                (servicos||[]).forEach(s => { const f=s.fornecedor||'PÁTIO'; porForn[f]=(porForn[f]||0)+1; });
+
+                // Checklists por motorista
+                const porMotorista = {};
+                (checklists||[]).forEach(c => { const m=c.motorista||'—'; porMotorista[m]=(porMotorista[m]||0)+1; });
+
+                if (formato === 'preview') {
+                    const prev = document.getElementById('rel-preview');
+                    if (prev) {
+                        prev.style.display = 'block';
+                        prev.innerHTML = `
+                        <div class="form-section">
+                            <h4 style="color:var(--info);margin-bottom:12px;">📊 ${nomBase} — ${nomeMes}/${ano}</h4>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:12px;">
+                                ${[
+                                    ['🚗 Serviços',''+totalServicos,'var(--info)'],
+                                    ['✅ Concluídos',concluidos+' ('+taxaConclusao+'%)','var(--success)'],
+                                    ['❌ Cancelados',''+cancelados,'var(--danger)'],
+                                    ['⛽ Combustível','R$ '+totalComb.toFixed(2),'var(--warning)'],
+                                    ['🔧 Manutenções','R$ '+totalManut.toFixed(2),'#f97316'],
+                                    ['💰 Total Gasto','R$ '+totalGeral.toFixed(2),'#a78bfa'],
+                                    ['✅ Checklists',''+(checklists||[]).length,'var(--success)'],
+                                    ['🚛 Frota Ativa',''+(veiculos||[]).length,'var(--info)'],
+                                ].map(([l,v,c])=>`<div style="background:rgba(255,255,255,.06);border-radius:10px;padding:12px;text-align:center;">
+                                    <div style="font-size:18px;font-weight:bold;color:${c};">${v}</div>
+                                    <div style="font-size:10px;color:var(--gray);">${l}</div>
+                                </div>`).join('')}
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                <div>
+                                    <h5 style="color:var(--gray);margin-bottom:6px;">Por Fornecedor</h5>
+                                    ${Object.entries(porForn).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([f,n])=>`
+                                    <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+                                        <span>${f}</span><b style="color:var(--info);">${n}</b>
+                                    </div>`).join('')}
+                                </div>
+                                <div>
+                                    <h5 style="color:var(--gray);margin-bottom:6px;">Checklists por Motorista</h5>
+                                    ${Object.entries(porMotorista).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([m,n])=>`
+                                    <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+                                        <span>${m}</span><b style="color:var(--success);">${n}</b>
+                                    </div>`).join('')}
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                    loading(false);
+                    return;
+                }
+
+                if (formato === 'excel') {
+                    const wb = XLSX.utils.book_new();
+                    // Aba Resumo
+                    const resumo = [
+                        ['RELATÓRIO MENSAL — ' + nomBase.toUpperCase(),''],
+                        ['Período:', nomeMes + '/' + ano],['',''],
+                        ['SERVIÇOS',''],
+                        ['Total de Serviços', totalServicos],['Concluídos', concluidos],
+                        ['Cancelados', cancelados],['Taxa de Conclusão', taxaConclusao+'%'],['',''],
+                        ['FINANCEIRO',''],
+                        ['Combustível (R$)', totalComb.toFixed(2)],['Litros Abastecidos', totalLitros.toFixed(1)],
+                        ['Manutenções (R$)', totalManut.toFixed(2)],['Orçamentos Aprovados (R$)', totalOrcsAprov.toFixed(2)],
+                        ['TOTAL GASTO (R$)', totalGeral.toFixed(2)],['',''],
+                        ['FROTA',''],['Veículos Cadastrados', (veiculos||[]).length],
+                        ['Checklists Realizados', (checklists||[]).length],
+                    ];
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(resumo), 'Resumo');
+                    // Aba Serviços
+                    const servHeader = ['Data','Placa','Tipo','Fornecedor','Status','Programador','KM'];
+                    const servRows = (servicos||[]).map(s=>[s.data_servico,s.placa,s.tipo_op,s.fornecedor,s.status_flow,s.programador,s.km]);
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([servHeader,...servRows]), 'Serviços');
+                    // Aba Combustível
+                    const combHeader = ['Data','Placa','Litros','Valor R$','KM','Motorista'];
+                    const combRows = (combustivel||[]).map(c=>[c.data_abast,c.placa,c.litros,c.valor,c.km,c.motorista]);
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([combHeader,...combRows]), 'Combustível');
+                    // Aba Checklists
+                    const cklHeader = ['Data','Placa','Motorista','Status'];
+                    const cklRows = (checklists||[]).map(c=>[c.data_checklist,c.placa,c.motorista,c.status_geral]);
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([cklHeader,...cklRows]), 'Checklists');
+                    XLSX.writeFile(wb, `Relatorio_${nomBase}_${nomeMes}_${ano}.xlsx`);
+                    loading(false);
+                    showSuccess('EXCEL GERADO!');
+                    await registrarAuditoria(`Relatório Excel gerado: ${nomBase} — ${nomeMes}/${ano}`);
+                    return;
+                }
+
+                if (formato === 'pdf') {
+                    montarCabecalhoPDF(`RELATÓRIO MENSAL — ${nomBase.toUpperCase()} — ${nomeMes.toUpperCase()}/${ano}`);
+                    document.getElementById('pdf-body').innerHTML = `
+                    <div style="margin-bottom:16px;">
+                        <h3 style="color:#d1122a;margin-bottom:10px;">📊 Resumo do Período</h3>
+                        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                            <tr style="background:#f5f5f5;"><th style="padding:7px;text-align:left;">Indicador</th><th style="padding:7px;">Valor</th></tr>
+                            <tr><td style="padding:6px;border-bottom:1px solid #eee;">🚗 Total de Serviços</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;font-weight:bold;">${totalServicos}</td></tr>
+                            <tr><td style="padding:6px;border-bottom:1px solid #eee;">✅ Concluídos</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:green;font-weight:bold;">${concluidos} (${taxaConclusao}%)</td></tr>
+                            <tr><td style="padding:6px;border-bottom:1px solid #eee;">❌ Cancelados</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:red;">${cancelados}</td></tr>
+                            <tr><td style="padding:6px;border-bottom:1px solid #eee;">⛽ Combustível</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:#1a5276;font-weight:bold;">R$ ${totalComb.toFixed(2)} (${totalLitros.toFixed(1)}L)</td></tr>
+                            <tr><td style="padding:6px;border-bottom:1px solid #eee;">🔧 Manutenções</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:#1a5276;font-weight:bold;">R$ ${totalManut.toFixed(2)}</td></tr>
+                            <tr style="background:#e8f5e9;font-weight:bold;"><td style="padding:7px;">💰 Total Gasto</td><td style="padding:7px;text-align:center;color:#1e8449;font-size:14px;">R$ ${totalGeral.toFixed(2)}</td></tr>
+                            <tr><td style="padding:6px;border-bottom:1px solid #eee;">✅ Checklists Realizados</td><td style="padding:6px;text-align:center;">${(checklists||[]).length}</td></tr>
+                            <tr><td style="padding:6px;">🚛 Frota Ativa</td><td style="padding:6px;text-align:center;">${(veiculos||[]).length} veículos</td></tr>
+                        </table>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                        <div>
+                            <h4 style="color:#d1122a;margin-bottom:8px;">Serviços por Fornecedor</h4>
+                            <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                                <tr style="background:#f5f5f5;"><th style="padding:5px;">Fornecedor</th><th style="padding:5px;">Qtd</th></tr>
+                                ${Object.entries(porForn).sort((a,b)=>b[1]-a[1]).map(([f,n])=>`<tr><td style="padding:4px;border-bottom:1px solid #eee;">${f}</td><td style="padding:4px;text-align:center;font-weight:bold;">${n}</td></tr>`).join('')}
+                            </table>
+                        </div>
+                        <div>
+                            <h4 style="color:#d1122a;margin-bottom:8px;">Checklists por Motorista</h4>
+                            <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                                <tr style="background:#f5f5f5;"><th style="padding:5px;">Motorista</th><th style="padding:5px;">Qtd</th></tr>
+                                ${Object.entries(porMotorista).sort((a,b)=>b[1]-a[1]).map(([m,n])=>`<tr><td style="padding:4px;border-bottom:1px solid #eee;">${m}</td><td style="padding:4px;text-align:center;font-weight:bold;">${n}</td></tr>`).join('')}
+                            </table>
+                        </div>
+                    </div>
+                    <h4 style="color:#d1122a;margin-bottom:8px;">Detalhamento de Serviços</h4>
+                    <table style="width:100%;border-collapse:collapse;font-size:10px;">
+                        <tr style="background:#f5f5f5;"><th style="padding:5px;">Data</th><th>Placa</th><th>Tipo</th><th>Fornecedor</th><th>Status</th></tr>
+                        ${(servicos||[]).slice(0,40).map(s=>`<tr><td style="padding:4px;border-bottom:1px solid #eee;">${s.data_servico}</td><td>${s.placa}</td><td>${s.tipo_op||'—'}</td><td>${s.fornecedor||'PÁTIO'}</td><td style="color:${s.status_flow==='CONCLUIDO'?'green':s.status_flow==='CANCELADO'?'red':'orange'}">${s.status_flow}</td></tr>`).join('')}
+                    </table>`;
+                    document.getElementById('pdf-photos').innerHTML = '';
+                    await renderizarEBaixarPDF(`Relatorio_${nomBase}_${nomeMes}_${ano}.pdf`);
+                    loading(false);
+                    await registrarAuditoria(`Relatório PDF gerado: ${nomBase} — ${nomeMes}/${ano}`);
+                }
+            } catch(e) { loading(false); alert('Erro ao gerar relatório: ' + e.message); }
         }
 
         // ─────────────────────────────────────────────
