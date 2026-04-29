@@ -3305,7 +3305,7 @@
 
             document.getElementById('srv-det-titulo').textContent = `🔍 ${s.placa} — ${s.tipo_op}`;
 
-            const { data: revs } = await db.from(TBL.manutencoes).select('*').eq('placa', s.placa).eq('status', 'PENDENTE');
+            const { data: revs } = await _filtrarBase(db.from(TBL.manutencoes).select('*').eq('placa', s.placa).eq('status', 'PENDENTE'));
             const revisao = revs?.[0];
 
             const fotos = s.fotos || [];
@@ -3370,7 +3370,7 @@
         async function popularFiltroFornHistorico() {
             const sel = document.getElementById('hist-filter-forn');
             if (!sel) return;
-            const { data } = await db.from(TBL.fornecedores).select('nome');
+            const { data } = await _filtrarBase(db.from(TBL.fornecedores).select('nome'));
             sel.innerHTML = '<option value="">Todos fornecedores</option>' +
                 (data || []).map(f => `<option value="${f.nome}">${f.nome}</option>`).join('');
         }
@@ -3648,7 +3648,7 @@
         }
 
         async function popularSeletorFornecedores() {
-            const { data: forns } = await db.from(TBL.fornecedores).select('nome').order('nome');
+            const { data: forns } = await _filtrarBase(db.from(TBL.fornecedores).select('nome').order('nome'));
             const sel = document.getElementById('p-fornecedor-select');
             if (!sel) return;
             sel.innerHTML = '<option value="">— Selecione o destino —</option>' +
@@ -3658,13 +3658,13 @@
         async function atualizarSetor() {
             const placa = document.getElementById('p-placa')?.value;
             if (!placa) { document.getElementById('p-setor-display').style.display = 'none'; return; }
-            const { data: rows } = await db.from(TBL.veiculos).select('tipo,placa').eq('placa', placa);
+            const { data: rows } = await _filtrarBase(db.from(TBL.veiculos).select('tipo,placa').eq('placa', placa));
             const veic = rows?.[0];
             const display = document.getElementById('p-setor-display');
             if (veic) {
                 document.getElementById('p-setor-label').innerText = veic.tipo || 'Operacional';
                 display.style.display = 'block';
-                const { data: revs } = await db.from(TBL.manutencoes).select('id').eq('placa', placa).eq('status', 'PENDENTE');
+                const { data: revs } = await _filtrarBase(db.from(TBL.manutencoes).select('id').eq('placa', placa).eq('status', 'PENDENTE'));
                 const alerta = document.getElementById('p-revisao-alerta');
                 if (alerta) alerta.textContent = revs?.length ? ' ⚠️ REVISÃO PENDENTE!' : '';
             } else {
@@ -3832,7 +3832,7 @@
             };
             // Busca setor do veículo
             try {
-                const { data: v } = await db.from(TBL.veiculos).select('tipo').eq('placa', placa);
+                const { data: v } = await _filtrarBase(db.from(TBL.veiculos).select('tipo').eq('placa', placa));
                 if (v?.[0]) payload.setor = v[0].tipo;
             } catch (_) { }
 
@@ -4115,7 +4115,7 @@
         }
 
         async function carregarEmails() {
-            const { data: items } = await db.from(TBL.emails).select('*').order('id');
+            const { data: items } = await _filtrarBase(db.from(TBL.emails).select('*').order('id'));
             const cont = document.getElementById('list-emails');
             if (!cont) return;
             if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum e-mail cadastrado.</p>'; return; }
@@ -4467,8 +4467,8 @@
 
         async function gerarRelatorioFinanceiro() {
             const [{ data: comb }, { data: orcs }] = await Promise.all([
-                db.from(TBL.combustivel).select('*'),
-                db.from(TBL.orcamentos).select('*').eq('status', 'APROVADO')
+                _filtrarBase(db.from(TBL.combustivel).select('*')),
+                _filtrarBase(db.from(TBL.orcamentos).select('*').eq('status', 'APROVADO'))
             ]);
             const totalComb = (comb || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
             const totalOrcs = (orcs || []).reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
@@ -4506,12 +4506,12 @@
             loading(true, 'Gerando relatório...');
             try {
                 // Buscar dados do período filtrados por base
-                let qProg = db.from(TBL.prog).select('*').gte('data_servico',dataIni).lte('data_servico',dataFim);
-                let qComb = db.from(TBL.combustivel).select('*').gte('data_abast',dataIni).lte('data_abast',dataFim);
-                let qManut = db.from(TBL.manutencoes).select('*').gte('data_exec',dataIni).lte('data_exec',dataFim);
-                let qOrcs = db.from(TBL.orcamentos).select('*').gte('data_orc',dataIni).lte('data_orc',dataFim);
-                let qCkl = db.from(TBL.checklists).select('*').gte('data_checklist',dataIni).lte('data_checklist',dataFim);
-                let qVeic = db.from(TBL.veiculos).select('*');
+                let qProg = _filtrarBase(db.from(TBL.prog).select('*').gte('data_servico',dataIni).lte('data_servico',dataFim));
+                let qComb = _filtrarBase(db.from(TBL.combustivel).select('*').gte('data_abast',dataIni).lte('data_abast',dataFim));
+                let qManut = _filtrarBase(db.from(TBL.manutencoes).select('*').gte('data_exec',dataIni).lte('data_exec',dataFim));
+                let qOrcs = _filtrarBase(db.from(TBL.orcamentos).select('*').gte('data_orc',dataIni).lte('data_orc',dataFim));
+                let qCkl = _filtrarBase(db.from(TBL.checklists).select('*').gte('data_checklist',dataIni).lte('data_checklist',dataFim));
+                let qVeic = _filtrarBase(db.from(TBL.veiculos).select('*'));
                 if (baseId) {
                     qProg = qProg.eq('base_id',baseId);
                     qComb = qComb.eq('base_id',baseId);
@@ -4818,7 +4818,7 @@
             const dataIni = mesFiltro + '-01';
             const dataFim = new Date(parseInt(ano), parseInt(mes), 0).toISOString().split('T')[0];
 
-            const { data: mesList } = await db.from(TBL.combustivel).select('*').gte('data_abast', dataIni).lte('data_abast', dataFim);
+            const { data: mesList } = await _filtrarBase(db.from(TBL.combustivel).select('*').gte('data_abast', dataIni).lte('data_abast', dataFim));
             const totalLitros = (mesList || []).reduce((s, c) => s + (parseFloat(c.litros) || 0), 0);
             const totalValor = (mesList || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
             const porPlaca = {};
@@ -4929,7 +4929,7 @@
         }
 
         async function ckPopularVeiculos() {
-            const { data: veics } = await db.from(TBL.veiculos).select('placa,modelo,tipo').order('placa');
+            const { data: veics } = await _filtrarBase(db.from(TBL.veiculos).select('placa,modelo,tipo').order('placa'));
             const sel = document.getElementById('ck-placa');
             if (!sel) return;
             sel.innerHTML = '<option value="">— Selecione o veículo —</option>' +
@@ -4943,7 +4943,7 @@
             if (currentUser?.perfil === 'motorista' && !_gpsAtivo) {
                 iniciarGPS();
             }
-            const { data: rows } = await db.from(TBL.veiculos).select('tipo').eq('placa', placa);
+            const { data: rows } = await _filtrarBase(db.from(TBL.veiculos).select('tipo').eq('placa', placa));
             const veic = rows?.[0];
             if (veic) {
                 document.getElementById('ck-setor-label').innerText = veic.tipo || '—';
@@ -5207,7 +5207,7 @@
             // Popular select de colaboradores
             const sel = document.getElementById('cnh-colab');
             if (sel && sel.options.length <= 1) {
-                const { data: colabs } = await db.from(TBL.colaboradores).select('id,nome').order('nome');
+                const { data: colabs } = await _filtrarBase(db.from(TBL.colaboradores).select('id,nome').order('nome'));
                 sel.innerHTML = '<option value="">— Selecione o motorista —</option>' +
                     (colabs || []).filter(c => c.nome).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
             }
@@ -5414,7 +5414,7 @@
                 // Para cada base, busca métricas
                 const hoje = new Date().toISOString().split('T')[0];
                 const resultados = await Promise.all(bases.map(async b => {
-                    const { data: servs } = await db.from(TBL.prog).select('id,status_flow').eq('data_servico', hoje).eq('base', b.nome);
+                    const { data: servs } = await db.from(TBL.prog).select('id,status_flow').eq('data_servico', hoje).eq('base_id', b.id);
                     const total = servs?.length || 0;
                     const concluidos = servs?.filter(s => s.status_flow === 'CONCLUIDO').length || 0;
                     return { ...b, total, concluidos };
@@ -5726,8 +5726,8 @@ ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';</cod
             try {
                 // Busca última localização de cada motorista/placa (últimas 8h)
                 const oitoHorasAtras = new Date(Date.now() - 8*60*60*1000).toISOString();
-                const { data: locs } = await db.from('rastreamento')
-                    .select('*').gte('timestamp', oitoHorasAtras).order('timestamp', { ascending: false });
+                const { data: locs } = await _filtrarBase(db.from('rastreamento')
+                    .select('*').gte('timestamp', oitoHorasAtras).order('timestamp', { ascending: false }));
 
                 // Busca programações de hoje para status
                 const { data: progs } = await _filtrarBase(db.from(TBL.prog)
@@ -6082,7 +6082,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             const baseId = document.getElementById('chf-frota-base')?.value || '';
             cont.innerHTML = '<p style="color:var(--gray);padding:10px;">Carregando...</p>';
             try {
-                let q = db.from(TBL.veiculos).select('*').order('placa');
+                let q = _filtrarBase(db.from(TBL.veiculos).select('*').order('placa'));
                 if (baseId) q = q.eq('base_id', parseInt(baseId));
                 const { data: veics } = await q;
                 if (!veics?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum veículo encontrado.</p>'; return; }
