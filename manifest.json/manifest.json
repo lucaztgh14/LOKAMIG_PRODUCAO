@@ -1,11 +1,11 @@
 {
-  "name": "LOKAMIG — Gestão Operacional",
-  "short_name": "LOKAMIG",
-  "description": "Sistema de Gestão Operacional de Frotas",
+  "name": "O.G.A.I.T. Systems",
+  "short_name": "OGAIT",
+  "description": "O.G.A.I.T. Systems — Integrated Transport | Multi-Base Management",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#d1122a",
+  "background_color": "#020c1b",
+  "theme_color": "#0369a1",
   "orientation": "portrait-primary",
   "icons": [
     {

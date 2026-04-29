@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#d1122a">
+    <meta name="theme-color" content="#0369a1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="LOKAMIG">
-    <meta name="description" content="LOKAMIG — Gestão Operacional de Frotas">
+    <meta name="apple-mobile-web-app-title" content="O.G.A.I.T.">
+    <meta name="description" content="O.G.A.I.T. Systems — Integrated Transport | Multi-Base Management">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="https://res.cloudinary.com/dlaregq2k/image/upload/v1/lokamig/logo_icon.png">
-    <title>LOKAMIG | Gestão Operacional v7.2</title>
+    <title>O.G.A.I.T. Systems | v7.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -25,8 +25,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
-            --primary: #d1122a;
-            --primary-dark: #a00d20;
+            --primary: #0369a1;
+            --primary-dark: #075985;
             --bg: #0f172a;
             --text: #f8fafc;
             --success: #10b981;
@@ -65,9 +65,11 @@
         }
 
         body.login-bg {
-            background: radial-gradient(circle at top left, rgba(209, 18, 42, .3) 0%, transparent 50%),
-                radial-gradient(circle at bottom right, rgba(16, 185, 129, .2) 0%, transparent 50%),
-                linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background:
+                radial-gradient(circle at 20% 20%, rgba(3,105,161,.5) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(14,165,233,.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(56,189,248,.1) 0%, transparent 70%),
+                linear-gradient(135deg, #020c1b 0%, #0c1929 50%, #071324 100%);
             background-size: cover;
             background-attachment: fixed;
             display: flex;
@@ -76,8 +78,8 @@
         }
 
         body.app-bg {
-            background: linear-gradient(rgba(15, 23, 42, .95), rgba(15, 23, 42, .95)),
-                url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background: linear-gradient(rgba(2,12,27,.97), rgba(7,19,42,.97)),
+                url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80');
             background-size: cover;
             background-attachment: fixed;
         }
@@ -155,7 +157,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(209, 18, 42, .15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(3, 105, 161, .15) 0%, transparent 70%);
             animation: rotate 20s linear infinite;
             z-index: -1;
         }
@@ -164,7 +166,7 @@
         #mapa-container { width:100%; height:450px; border-radius:12px; overflow:hidden; position:relative; z-index:1; }
         #mapa-leaflet { width:100%; height:100%; }
         .veiculo-popup { font-family:'Montserrat',sans-serif; font-size:12px; min-width:180px; }
-        .veiculo-popup b { font-size:14px; color:#d1122a; }
+        .veiculo-popup b { font-size:14px; color:#0369a1; }
         .leaflet-popup-content-wrapper { border-radius:12px; }
         @media (min-width:1024px) { #mapa-container { height:550px; } }
 
@@ -184,7 +186,7 @@
 
         /* MASTER PANEL */
         .master-card {
-            background: linear-gradient(135deg, rgba(124,58,237,.15), rgba(209,18,42,.1));
+            background: linear-gradient(135deg, rgba(124,58,237,.15), rgba(3,105,161,.1));
             border: 1px solid rgba(124,58,237,.4);
             border-radius:16px; padding:16px; margin-bottom:12px;
         }
@@ -289,7 +291,7 @@
         }
         .badge-master { background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; }
         .badge-chefao { background:linear-gradient(135deg,#0ea5e9,#0284c7); color:#fff; }
-        .badge-admin { background:linear-gradient(135deg,#d1122a,#a00d20); color:#fff; }
+        .badge-admin { background:linear-gradient(135deg,#0369a1,#075985); color:#fff; }
         .badge-programador { background:rgba(59,130,246,.3); color:#93c5fd; }
         .badge-supervisor { background:rgba(245,158,11,.3); color:#fcd34d; }
         .badge-motorista { background:rgba(16,185,129,.3); color:#6ee7b7; }
@@ -488,7 +490,7 @@
             height: auto;
             margin: 0 auto 20px;
             display: block;
-            filter: drop-shadow(0 0 25px rgba(209, 18, 42, .8));
+            filter: drop-shadow(0 0 25px rgba(3, 105, 161, .8));
         }
 
         .login-box h1 {
@@ -522,8 +524,8 @@
 
         .login-box input:focus {
             border-color: var(--primary);
-            background: rgba(209, 18, 42, .1);
-            box-shadow: 0 0 15px rgba(209, 18, 42, .3);
+            background: rgba(3, 105, 161, .1);
+            box-shadow: 0 0 15px rgba(3, 105, 161, .3);
         }
 
         .login-box button {
@@ -545,7 +547,7 @@
         .login-box button:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(209, 18, 42, .4);
+            box-shadow: 0 10px 25px rgba(3, 105, 161, .4);
         }
 
         .login-box .footer-text {
@@ -588,7 +590,7 @@
         select:focus,
         textarea:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(209, 18, 42, .4);
+            box-shadow: 0 0 10px rgba(3, 105, 161, .4);
         }
 
         select option {
@@ -1088,7 +1090,7 @@
         .spinner {
             width: 48px;
             height: 48px;
-            border: 4px solid rgba(209, 18, 42, .2);
+            border: 4px solid rgba(3, 105, 161, .2);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin .8s linear infinite;
@@ -1396,15 +1398,15 @@
     <div id="pdf-template"
         style="position:fixed;left:-9999px;width:800px;background:#fff;color:#000;padding:40px;font-family:Arial;">
         <div
-            style="display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #d1122a;padding-bottom:15px;margin-bottom:20px;">
+            style="display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #0369a1;padding-bottom:15px;margin-bottom:20px;">
             <div style="min-width:180px;">
                 <img src="" style="width:180px;mix-blend-mode:multiply;" id="pdf-logo"
                     onerror="this.style.display='none'">
                 <div id="pdf-logo-fallback"
-                    style="display:none;font-size:26px;font-weight:900;color:#d1122a;letter-spacing:3px;">LOKAMIG</div>
+                    style="display:none;font-size:26px;font-weight:900;color:#0369a1;letter-spacing:3px;">O.G.A.I.T. SYSTEMS</div>
             </div>
             <div style="text-align:right;">
-                <h2 id="pdf-titulo" style="color:#d1122a;"></h2>
+                <h2 id="pdf-titulo" style="color:#0369a1;"></h2>
                 <p id="pdf-data-geracao" style="font-size:12px;color:#666;"></p>
             </div>
         </div>
@@ -1417,7 +1419,7 @@
     <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-chefao" class="container hidden" style="max-width:1400px;">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap;">
-            <h1 style="margin:0;">🏆 PAINEL CHEFÃO</h1>
+            <h1 style="margin:0;">🏆 O.G.A.I.T. <span style="font-size:13px;opacity:.6;font-weight:400;">CHEFÃO</span></h1>
             <span class="chefao-badge">🌐 Multi-Base</span>
             <span class="realtime-badge" style="margin-left:auto;"><span class="realtime-dot"></span>LIVE</span>
         </div>
@@ -1553,7 +1555,7 @@
     <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-master" class="container hidden" style="max-width:1400px;">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap;">
-            <h1 style="margin:0;">👑 PAINEL MASTER</h1>
+            <h1 style="margin:0;">👑 O.G.A.I.T. <span style="font-size:13px;opacity:.6;font-weight:400;">MASTER</span></h1>
             <span class="crown-badge">⭐ Acesso Total</span>
             <span class="realtime-badge" style="margin-left:auto;"><span class="realtime-dot"></span>LIVE</span>
         </div>
@@ -1829,17 +1831,65 @@
     </section>
 
     <section id="scr-login" style="display:flex;justify-content:center;align-items:center;width:100%;min-height:100vh;">
-        <div class="login-box">
-            <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg" alt="LOKAMIG"
-                class="login-logo" onerror="this.style.display='none'">
-            <h1>LOKAMIG</h1>
-            <div class="subtitle">Gestão Operacional · v7.0 · Multi-Base</div>
+        <div class="login-box" style="position:relative;overflow:hidden;">
+            <!-- Hexágono SVG decorativo de fundo -->
+            <div style="position:absolute;top:-60px;right:-60px;opacity:.06;pointer-events:none;">
+                <svg width="220" height="220" viewBox="0 0 220 220">
+                    <polygon points="110,10 200,57 200,163 110,210 20,163 20,57" fill="none" stroke="#0ea5e9" stroke-width="2"/>
+                    <polygon points="110,30 185,70 185,150 110,190 35,150 35,70" fill="none" stroke="#0ea5e9" stroke-width="1.5"/>
+                    <polygon points="110,50 170,83 170,137 110,170 50,137 50,83" fill="none" stroke="#0ea5e9" stroke-width="1"/>
+                </svg>
+            </div>
+            <!-- Logo OGAIT SVG inline -->
+            <div style="margin-bottom:8px;display:flex;justify-content:center;">
+                <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="hexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#38bdf8"/>
+                            <stop offset="100%" style="stop-color:#0369a1"/>
+                        </linearGradient>
+                        <linearGradient id="arrowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#7dd3fc"/>
+                            <stop offset="100%" style="stop-color:#0ea5e9"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Hexágono externo -->
+                    <polygon points="40,4 72,22 72,58 40,76 8,58 8,22" fill="url(#hexGrad)" opacity="0.15"/>
+                    <polygon points="40,4 72,22 72,58 40,76 8,58 8,22" fill="none" stroke="url(#hexGrad)" stroke-width="1.5"/>
+                    <!-- Hexágono interno -->
+                    <polygon points="40,14 62,26 62,50 40,62 18,50 18,26" fill="url(#hexGrad)" opacity="0.1"/>
+                    <polygon points="40,14 62,26 62,50 40,62 18,26" fill="none" stroke="#38bdf8" stroke-width="1" opacity="0.6"/>
+                    <!-- Seta cima -->
+                    <line x1="40" y1="38" x2="40" y2="20" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round"/>
+                    <polygon points="40,16 36,24 44,24" fill="#38bdf8"/>
+                    <!-- Seta baixo-direita -->
+                    <line x1="40" y1="42" x2="54" y2="54" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round"/>
+                    <polygon points="57,57 49,52 54,48" fill="#0ea5e9"/>
+                    <!-- Seta baixo-esquerda -->
+                    <line x1="40" y1="42" x2="26" y2="54" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round"/>
+                    <polygon points="23,57 27,48 32,52" fill="#0369a1"/>
+                    <!-- Círculo central -->
+                    <circle cx="40" cy="40" r="5" fill="url(#hexGrad)" opacity="0.9"/>
+                    <!-- Pontos nos vértices -->
+                    <circle cx="40" cy="4" r="2" fill="#38bdf8" opacity="0.8"/>
+                    <circle cx="72" cy="22" r="2" fill="#38bdf8" opacity="0.6"/>
+                    <circle cx="72" cy="58" r="2" fill="#38bdf8" opacity="0.6"/>
+                    <circle cx="40" cy="76" r="2" fill="#38bdf8" opacity="0.8"/>
+                    <circle cx="8" cy="58" r="2" fill="#38bdf8" opacity="0.6"/>
+                    <circle cx="8" cy="22" r="2" fill="#38bdf8" opacity="0.6"/>
+                </svg>
+            </div>
+            <!-- Nome -->
+            <h1 style="font-size:28px;font-weight:900;letter-spacing:6px;background:linear-gradient(135deg,#38bdf8,#0369a1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px;">O.G.A.I.T.</h1>
+            <div style="font-size:13px;font-weight:700;letter-spacing:4px;color:#7dd3fc;margin-bottom:4px;">SYSTEMS</div>
+            <div class="subtitle" style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#475569;">Integrated Transport · Multi-Base Management</div>
+            <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#0369a1,transparent);margin:14px auto;"></div>
             <input type="text" id="user" placeholder="Usuário" autocomplete="off"
                 onkeydown="if(event.key==='Enter') document.getElementById('pass').focus()">
             <input type="password" id="pass" placeholder="Senha" onkeydown="if(event.key==='Enter') handleLogin()">
-            <button onclick="handleLogin()">🔐 Acessar Sistema</button>
-            <div class="footer-text">Plataforma integrada de logística e frotas · v7.2 Multi-Base</div>
-            <button id="btn-instalar-pwa" onclick="instalarPWA()" style="display:none;margin-top:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:10px 20px;border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;align-items:center;gap:8px;width:100%;justify-content:center;">
+            <button onclick="handleLogin()">🔐 ACESSAR SISTEMA</button>
+            <div class="footer-text" style="color:#334155;font-size:10px;letter-spacing:1px;">v7.2 · Powered by O.G.A.I.T. Systems</div>
+            <button id="btn-instalar-pwa" onclick="instalarPWA()" style="display:none;margin-top:12px;background:rgba(3,105,161,.2);border:1px solid rgba(3,105,161,.4);color:#7dd3fc;padding:10px 20px;border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;align-items:center;gap:8px;width:100%;justify-content:center;">
                 📲 Instalar App no Celular
             </button>
         </div>
@@ -1862,7 +1912,7 @@
             <span style="width:8px;height:8px;border-radius:50%;background:#22d3ee;display:inline-block;animation:pulse-gps 2s infinite;"></span>
             <span id="base-badge-nome">🏭 Base</span>
         </div>
-        <h1>📊 ADMINISTRAÇÃO <span class="realtime-badge"><span class="realtime-dot"></span>LIVE</span></h1>
+        <h1>📊 O.G.A.I.T. <span style="font-size:13px;opacity:.6;font-weight:400;">ADMINISTRAÇÃO</span> <span class="realtime-badge"><span class="realtime-dot"></span>LIVE</span></h1>
         <div class="sub" id="admin-user-label">Bem-vindo, Administrador</div>
         <div class="dashboard-grid">
             <div class="metric-card">
@@ -2752,7 +2802,7 @@
         let permissoesCache = null;
         let emailjsCfg = {};
         let isOnline = navigator.onLine;
-        const OFFLINE_KEY = 'lokamig_offline_queue';
+        const OFFLINE_KEY = 'ogait_offline_queue';
 
         // ─────────────────────────────────────────────
         // MODO OFFLINE — detecção e fila
@@ -2965,7 +3015,7 @@
         function iniciarRealtime() {
             if (realtimeChannel) db.removeChannel(realtimeChannel);
             realtimeChannel = db
-                .channel('lokamig-realtime')
+                .channel('ogait-realtime-v2')
                 .on('postgres_changes', { event: '*', schema: 'public', table: TBL.prog }, () => {
                     carregarProgAdmin();
                     atualizarDashboard();
@@ -3789,9 +3839,9 @@
             if (!isOnline) {
                 enfileirarOffline(TBL.prog, payload);
                 // Salva localmente para exibição imediata
-                const local = JSON.parse(localStorage.getItem('lokamig_prog_local') || '[]');
+                const local = JSON.parse(localStorage.getItem('ogait_prog_local') || '[]');
                 local.push({ ...payload, id: Date.now(), _offline: true });
-                localStorage.setItem('lokamig_prog_local', JSON.stringify(local));
+                localStorage.setItem('ogait_prog_local', JSON.stringify(local));
                 showSuccess('SALVO OFFLINE!');
             } else {
                 loading(true, 'Enviando...');
@@ -4541,7 +4591,7 @@
             const totalOrcs = (orcs || []).reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
             montarCabecalhoPDF('RELATÓRIO FINANCEIRO GERAL');
             document.getElementById('pdf-body').innerHTML = `
-    <h3 style="color:#d1122a;margin-bottom:10px;">Resumo Financeiro</h3>
+    <h3 style="color:#0369a1;margin-bottom:10px;">Resumo Financeiro</h3>
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
         <tr style="background:#f5f5f5;"><th style="padding:8px;">Categoria</th><th style="padding:8px;">Valor</th></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;">⛽ Combustível Total</td><td style="padding:8px;border-bottom:1px solid #eee;color:#1a5276;font-weight:bold;">R$ ${totalComb.toFixed(2)}</td></tr>
@@ -4695,7 +4745,7 @@
                     montarCabecalhoPDF(`RELATÓRIO MENSAL — ${nomBase.toUpperCase()} — ${nomeMes.toUpperCase()}/${ano}`);
                     document.getElementById('pdf-body').innerHTML = `
                     <div style="margin-bottom:16px;">
-                        <h3 style="color:#d1122a;margin-bottom:10px;">📊 Resumo do Período</h3>
+                        <h3 style="color:#0369a1;margin-bottom:10px;">📊 Resumo do Período</h3>
                         <table style="width:100%;border-collapse:collapse;font-size:12px;">
                             <tr style="background:#f5f5f5;"><th style="padding:7px;text-align:left;">Indicador</th><th style="padding:7px;">Valor</th></tr>
                             <tr><td style="padding:6px;border-bottom:1px solid #eee;">🚗 Total de Serviços</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;font-weight:bold;">${totalServicos}</td></tr>
@@ -4710,21 +4760,21 @@
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
                         <div>
-                            <h4 style="color:#d1122a;margin-bottom:8px;">Serviços por Fornecedor</h4>
+                            <h4 style="color:#0369a1;margin-bottom:8px;">Serviços por Fornecedor</h4>
                             <table style="width:100%;border-collapse:collapse;font-size:11px;">
                                 <tr style="background:#f5f5f5;"><th style="padding:5px;">Fornecedor</th><th style="padding:5px;">Qtd</th></tr>
                                 ${Object.entries(porForn).sort((a,b)=>b[1]-a[1]).map(([f,n])=>`<tr><td style="padding:4px;border-bottom:1px solid #eee;">${f}</td><td style="padding:4px;text-align:center;font-weight:bold;">${n}</td></tr>`).join('')}
                             </table>
                         </div>
                         <div>
-                            <h4 style="color:#d1122a;margin-bottom:8px;">Checklists por Motorista</h4>
+                            <h4 style="color:#0369a1;margin-bottom:8px;">Checklists por Motorista</h4>
                             <table style="width:100%;border-collapse:collapse;font-size:11px;">
                                 <tr style="background:#f5f5f5;"><th style="padding:5px;">Motorista</th><th style="padding:5px;">Qtd</th></tr>
                                 ${Object.entries(porMotorista).sort((a,b)=>b[1]-a[1]).map(([m,n])=>`<tr><td style="padding:4px;border-bottom:1px solid #eee;">${m}</td><td style="padding:4px;text-align:center;font-weight:bold;">${n}</td></tr>`).join('')}
                             </table>
                         </div>
                     </div>
-                    <h4 style="color:#d1122a;margin-bottom:8px;">Detalhamento de Serviços</h4>
+                    <h4 style="color:#0369a1;margin-bottom:8px;">Detalhamento de Serviços</h4>
                     <table style="width:100%;border-collapse:collapse;font-size:10px;">
                         <tr style="background:#f5f5f5;"><th style="padding:5px;">Data</th><th>Placa</th><th>Tipo</th><th>Fornecedor</th><th>Status</th></tr>
                         ${(servicos||[]).slice(0,40).map(s=>`<tr><td style="padding:4px;border-bottom:1px solid #eee;">${s.data_servico}</td><td>${s.placa}</td><td>${s.tipo_op||'—'}</td><td>${s.fornecedor||'PÁTIO'}</td><td style="color:${s.status_flow==='CONCLUIDO'?'green':s.status_flow==='CANCELADO'?'red':'orange'}">${s.status_flow}</td></tr>`).join('')}
@@ -4906,12 +4956,12 @@
             <tr><td style="padding:4px;"><b>Preço médio/L:</b></td><td style="padding:4px;">${totalLitros > 0 ? 'R$ ' + (totalValor / totalLitros).toFixed(3) : '—'}</td></tr>
         </table>
     </div>
-    <h4 style="margin-bottom:8px;color:#d1122a;">Por Veículo</h4>
+    <h4 style="margin-bottom:8px;color:#0369a1;">Por Veículo</h4>
     <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
         <tr style="background:#f5f5f5;"><th style="padding:7px;text-align:left;">Placa</th><th style="padding:7px;">Litros</th><th style="padding:7px;">Valor</th><th style="padding:7px;">Abast.</th><th style="padding:7px;">R$/L méd.</th></tr>
         ${Object.entries(porPlaca).map(([placa, v]) => `<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>${placa}</b></td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros.toFixed(1)}L</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:#1e8449;">R$ ${v.valor.toFixed(2)}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.count}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros > 0 ? 'R$ ' + (v.valor / v.litros).toFixed(3) : '—'}</td></tr>`).join('')}
     </table>
-    <h4 style="margin-bottom:8px;color:#d1122a;">Detalhamento Completo</h4>
+    <h4 style="margin-bottom:8px;color:#0369a1;">Detalhamento Completo</h4>
     <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <tr style="background:#f5f5f5;"><th style="padding:6px;text-align:left;">Data/Hora</th><th>Placa</th><th>Litros</th><th>Valor</th><th>KM</th><th>R$/L</th></tr>
         ${(mesList || []).map(a => `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${a.timestamp || a.data_abast}</td><td>${a.placa}</td><td style="text-align:center;">${parseFloat(a.litros).toFixed(1)}L</td><td style="text-align:center;">R$ ${parseFloat(a.valor).toFixed(2)}</td><td style="text-align:center;">${a.km}</td><td style="text-align:center;">${parseFloat(a.litros) > 0 ? 'R$ ' + (parseFloat(a.valor) / parseFloat(a.litros)).toFixed(3) : '—'}</td></tr>`).join('')}
@@ -6114,7 +6164,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 const ctxTop = document.getElementById('chart-top-veiculos');
                 if (ctxTop && top5.length) _charts['top-veiculos'] = new Chart(ctxTop, {
                     type: 'bar', indexAxis: 'y',
-                    data: { labels: top5.map(([p])=>p), datasets: [{ label: 'R$', data: top5.map(([,v])=>v.toFixed(2)), backgroundColor: '#d1122a88', borderColor: '#d1122a', borderWidth: 2 }] },
+                    data: { labels: top5.map(([p])=>p), datasets: [{ label: 'R$', data: top5.map(([,v])=>v.toFixed(2)), backgroundColor: '#0369a188', borderColor: '#0369a1', borderWidth: 2 }] },
                     options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:'#94a3b8',callback:v=>'R$'+v},grid:{color:'rgba(255,255,255,.05)'}}, y:{ticks:{color:'#94a3b8'},grid:{display:false}} } }
                 });
                 // Tabela por veículo
@@ -6187,19 +6237,19 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             const secoes = _getSecoesManuais(perfil);
             document.getElementById('pdf-body').innerHTML = secoes;
             document.getElementById('pdf-photos').innerHTML = '';
-            await renderizarEBaixarPDF(`Manual_LOKAMIG_${perfil}.pdf`);
+            await renderizarEBaixarPDF(`Manual_OGAIT_${perfil}.pdf`);
             loading(false);
         }
 
         function _getSecoesManuais(perfil) {
             const comum = `
-                <div style="background:#f0f7ff;border-left:4px solid #d1122a;padding:12px;margin-bottom:16px;border-radius:4px;">
-                    <b style="color:#d1122a;">LOKAMIG — Sistema de Gestão Operacional de Frotas</b>
+                <div style="background:#f0f7ff;border-left:4px solid #0369a1;padding:12px;margin-bottom:16px;border-radius:4px;">
+                    <b style="color:#0369a1;">O.G.A.I.T. Systems — Integrated Transport | Multi-Base Management</b>
                     <p style="font-size:11px;margin-top:4px;">Versão 7.2 · Suporte: sistema.lokamig@gmail.com</p>
                 </div>`;
             const secoes = {
                 admin: `${comum}
-                    <h3 style="color:#d1122a;border-bottom:2px solid #d1122a;padding-bottom:4px;">📊 PAINEL ADMINISTRADOR</h3>
+                    <h3 style="color:#0369a1;border-bottom:2px solid #0369a1;padding-bottom:4px;">📊 PAINEL ADMINISTRADOR</h3>
                     <h4>1. Acesso ao Sistema</h4>
                     <p>Acesse <b>lokamig-producao-lucaztgh14.vercel.app</b> e faça login com suas credenciais de admin da base.</p>
                     <h4>2. Dashboard</h4>
@@ -6222,7 +6272,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                     <p>Altere sua senha diretamente pelo painel sem precisar de suporte técnico.</p>`,
 
                 programador: `${comum}
-                    <h3 style="color:#d1122a;border-bottom:2px solid #d1122a;padding-bottom:4px;">📋 MANUAL DO PROGRAMADOR</h3>
+                    <h3 style="color:#0369a1;border-bottom:2px solid #0369a1;padding-bottom:4px;">📋 MANUAL DO PROGRAMADOR</h3>
                     <h4>1. Lançar Serviço</h4>
                     <p>Preencha: data, placa, tipo de operação, fornecedor destino e KM. Anexe fotos se necessário. Clique em "Lançar".</p>
                     <h4>2. Acompanhar Status</h4>
@@ -6233,7 +6283,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                     <p>• Sempre atualize o KM ao lançar serviços<br>• Anexe fotos para registrar avarias<br>• Use o filtro de data para localizar serviços antigos</p>`,
 
                 motorista: `${comum}
-                    <h3 style="color:#d1122a;border-bottom:2px solid #d1122a;padding-bottom:4px;">🚗 MANUAL DO MOTORISTA</h3>
+                    <h3 style="color:#0369a1;border-bottom:2px solid #0369a1;padding-bottom:4px;">🚗 MANUAL DO MOTORISTA</h3>
                     <h4>1. Checklist de Saída</h4>
                     <p>Antes de sair com o veículo: selecione a placa, preencha o KM, marque todos os itens do checklist, fotografe o veículo (mínimo 4 fotos) e assine digitalmente.</p>
                     <h4>2. GPS Automático</h4>
@@ -6244,7 +6294,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                     <p>• Mantenha o GPS ativado durante toda a viagem<br>• Fotografe avarias antes de sair e ao retornar<br>• Sempre assine o checklist para validar<br>• Em caso de problemas, contate o programador</p>`,
 
                 fornecedor: `${comum}
-                    <h3 style="color:#d1122a;border-bottom:2px solid #d1122a;padding-bottom:4px;">🏢 MANUAL DO FORNECEDOR</h3>
+                    <h3 style="color:#0369a1;border-bottom:2px solid #0369a1;padding-bottom:4px;">🏢 MANUAL DO FORNECEDOR</h3>
                     <h4>1. Ver Serviços</h4>
                     <p>Na tela inicial veja todos os serviços designados para sua empresa. Filtre por data e status.</p>
                     <h4>2. Enviar Orçamento</h4>
@@ -7236,7 +7286,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 // Listener de mensagens em foreground
                 messaging.onMessage(payload => {
                     const { title, body } = payload.notification || {};
-                    mostrarNotificacaoLocal(title || 'LOKAMIG', body || '');
+                    mostrarNotificacaoLocal(title || 'O.G.A.I.T.', body || '');
                 });
             } catch(e) { console.warn('Firebase push:', e.message); }
         }
