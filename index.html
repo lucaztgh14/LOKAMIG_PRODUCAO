@@ -1584,6 +1584,11 @@
                 <input type="text" id="mst-base-estado" placeholder="Estado (ex: RJ, SP)">
                 <input type="text" id="mst-base-admin-login" placeholder="Login do Admin desta base (ex: admin_macae)">
                 <input type="password" id="mst-base-admin-pass" placeholder="Senha do Admin desta base">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <label style="font-size:11px;color:var(--gray);white-space:nowrap;">📅 Validade da licença:</label>
+                    <input type="date" id="mst-base-validade" style="flex:1;margin:0;">
+                    <span style="font-size:10px;color:var(--gray);">(deixe em branco = sem limite)</span>
+                </div>
                 <button onclick="masterCriarBase()" class="btn-purple">🏭 Criar Base + Admin</button>
             </div>
             <div id="master-lista-bases"></div>
@@ -1867,6 +1872,7 @@
                 <button class="tab-btn" onclick="switchTab('chat',event)">💬 Chat</button>
                 <button class="tab-btn" onclick="switchTab('excel',event)">📊 Excel</button>
                 <button class="tab-btn" onclick="switchTab('relatorio',event)">📈 Relatório</button>
+                <button class="tab-btn" onclick="switchTab('minha-conta-admin',event)">🔑 Minha Conta</button>
                 <button class="tab-btn" onclick="switchTab('permissoes',event)">🔐 Aba Mestre</button>
                 <button class="tab-btn" onclick="switchTab('config',event)">⚙️ Config</button>
             </div>
@@ -2204,6 +2210,23 @@
             </div>
             <!-- Preview do relatório -->
             <div id="rel-preview" style="display:none;margin-top:16px;"></div>
+        </div>
+
+        <!-- MINHA CONTA ADMIN -->
+        <div id="area-minha-conta-admin" class="admin-content hidden">
+            <h3 style="margin-bottom:12px;">🔑 Minha Conta</h3>
+            <div class="form-section">
+                <h4 style="color:var(--info);margin-bottom:12px;">🔒 Alterar Minha Senha</h4>
+                <p style="font-size:11px;color:var(--gray);margin-bottom:12px;">Após alterar, use a nova senha no próximo login.</p>
+                <input type="password" id="adm-senha-atual" placeholder="Senha atual">
+                <input type="password" id="adm-senha-nova" placeholder="Nova senha (mínimo 6 caracteres)">
+                <input type="password" id="adm-senha-confirma" placeholder="Confirmar nova senha">
+                <button onclick="adminAlterarSenha()" class="btn-success">🔑 Alterar Senha</button>
+            </div>
+            <div class="form-section" style="margin-top:10px;">
+                <h4 style="color:var(--info);margin-bottom:12px;">👤 Meus Dados</h4>
+                <div id="adm-meus-dados"></div>
+            </div>
         </div>
 
         <!-- ABA MESTRE -->
@@ -2904,6 +2927,8 @@
                     }
 
                     if (colab.perfil === 'admin') {
+                        const liberado = await verificarLicencaBase(colab.base_id);
+                        if (!liberado) { loading(false); return; }
                         await _entrarAdmin();
                         return;
                     }
@@ -3005,6 +3030,8 @@
             await registrarAuditoria('Login: ' + (currentUser?.nome || 'ADMIN') + ' | Base: ' + baseLabel);
             iniciarRealtime();
             setTimeout(inicializarChat, 1000);
+            setTimeout(verificarNotificacoesPendentes, 2000);
+            setTimeout(adminCarregarMeusDados, 500);
         }
 
         function aplicarPermissoesAdmin(role) {
@@ -3093,29 +3120,32 @@
         // ─────────────────────────────────────────────
         // DASHBOARD
         // ─────────────────────────────────────────────
+        // Helper — retorna filtro base_id do usuário logado
+        function _baseId() { return currentUser?.base_id ? parseInt(currentUser.base_id) : null; }
+        function _filtrarBase(query) {
+            const bid = _baseId();
+            return bid ? query.eq('base_id', bid) : query;
+        }
+
         async function atualizarDashboard() {
             const hoje = new Date().toISOString().split('T')[0];
             const mesAtual = hoje.slice(0, 7);
-
             const [{ data: progHoje }, { data: veics }, { data: manut }, { data: comb }] = await Promise.all([
-                db.from(TBL.prog).select('status_flow,placa').eq('data_servico', hoje),
-                db.from(TBL.veiculos).select('id'),
-                db.from(TBL.manutencoes).select('status').eq('status', 'PENDENTE'),
-                db.from(TBL.combustivel).select('valor').gte('data_abast', mesAtual + '-01')
+                _filtrarBase(db.from(TBL.prog).select('status_flow,placa').eq('data_servico', hoje)),
+                _filtrarBase(db.from(TBL.veiculos).select('id')),
+                _filtrarBase(db.from(TBL.manutencoes).select('status').eq('status', 'PENDENTE')),
+                _filtrarBase(db.from(TBL.combustivel).select('valor').gte('data_abast', mesAtual + '-01'))
             ]);
-
             const lista = progHoje || [];
             const naoCancelados = lista.filter(i => i.status_flow !== 'CANCELADO');
             const placasHoje = [...new Set(naoCancelados.map(i => i.placa))];
             const gastoMes = (comb || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
-
             document.getElementById('met-total-hoje').textContent = placasHoje.length;
             document.getElementById('met-concluidos').textContent = lista.filter(i => i.status_flow === 'CONCLUIDO').length;
             document.getElementById('met-pendentes').textContent = lista.filter(i => i.status_flow === 'PENDENTE').length;
             document.getElementById('met-gasto-mes').textContent = 'R$' + gastoMes.toFixed(0);
             document.getElementById('met-frota').textContent = (veics || []).length;
             document.getElementById('met-manut').textContent = (manut || []).length;
-
             await verificarAlertasGarantia();
         }
 
@@ -3125,7 +3155,7 @@
         async function verificarAlertasGarantia() {
             const cont = document.getElementById('alertas-garantia');
             if (!cont) return;
-            const { data: manut } = await db.from(TBL.manutencoes).select('*').eq('status', 'PENDENTE');
+            const { data: manut } = await _filtrarBase(db.from(TBL.manutencoes).select('*').eq('status', 'PENDENTE'));
             let html = '';
             (manut || []).filter(m => m.urgencia === 'critico').forEach(m => {
                 html += `<div class="alert-card alert-danger">🚨 <b>CRÍTICO:</b> ${m.placa} — ${m.descricao} (KM: ${m.km_programada || '—'} | Até: ${m.data_limite || '—'})</div>`;
@@ -3136,16 +3166,12 @@
             cont.innerHTML = html;
         }
 
-        // ─────────────────────────────────────────────
-        // MONITOR ADMIN
-        // ─────────────────────────────────────────────
         async function carregarProgAdmin() {
             const dt = document.getElementById('mon-filter-date')?.value || '';
             const placa = (document.getElementById('mon-filter-placa')?.value || '').toUpperCase().trim();
             const status = document.getElementById('mon-filter-status')?.value || '';
             const setor = document.getElementById('mon-filter-setor')?.value || '';
-
-            let query = db.from(TBL.prog).select('*').order('id', { ascending: false });
+            let query = _filtrarBase(db.from(TBL.prog).select('*').order('id', { ascending: false }));
             if (dt) query = query.eq('data_servico', dt);
             if (placa) query = query.ilike('placa', `%${placa}%`);
             if (status) query = query.eq('status_flow', status);
@@ -3440,7 +3466,7 @@
         }
 
         async function renderListaVeic() {
-            const { data: items } = await db.from(TBL.veiculos).select('*').order('placa');
+            const { data: items } = await _filtrarBase(db.from(TBL.veiculos).select('*').order('placa'));
             const cont = document.getElementById('list-veic');
             if (!cont) return;
             if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum veículo cadastrado.</p>'; return; }
@@ -3462,7 +3488,7 @@
         }
 
         async function popularSeletorVeiculos() {
-            const { data: veics } = await db.from(TBL.veiculos).select('placa,modelo,tipo').order('placa');
+            const { data: veics } = await _filtrarBase(db.from(TBL.veiculos).select('placa,modelo,tipo').order('placa'));
             ['p-placa', 'm-veiculo', 'ab-veiculo'].forEach(id => {
                 const sel = document.getElementById(id);
                 if (!sel) return;
@@ -3494,7 +3520,7 @@
         }
 
         async function carregarManutencoes() {
-            const { data: list } = await db.from(TBL.manutencoes).select('*').order('id', { ascending: false });
+            const { data: list } = await _filtrarBase(db.from(TBL.manutencoes).select('*').order('id', { ascending: false }));
             const cont = document.getElementById('list-manutencoes');
             if (!cont) return;
             if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhuma revisão programada.</p>'; return; }
@@ -3981,7 +4007,7 @@
             const dataIni = mesFiltro + '-01';
             const dataFim = new Date(parseInt(ano), parseInt(mes), 0).toISOString().split('T')[0];
 
-            const { data: mesList } = await db.from(TBL.combustivel).select('*')
+            const { data: mesList } = await _filtrarBase(db.from(TBL.combustivel).select('*'))
                 .gte('data_abast', dataIni).lte('data_abast', dataFim).order('id', { ascending: false });
 
             const totalLitros = (mesList || []).reduce((s, c) => s + (parseFloat(c.litros) || 0), 0);
@@ -5016,7 +5042,7 @@
             if (!cont) return;
 
             try {
-                let q = db.from(TBL.checklists).select('*').order('id', { ascending: false });
+                let q = _filtrarBase(db.from(TBL.checklists).select('*').order('id', { ascending: false }));
                 if (dt) q = q.eq('data_checklist', dt);
                 if (placa) q = q.ilike('placa', `%${placa}%`);
 
@@ -6447,14 +6473,28 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             try {
                 const { data: bases } = await db.from('bases').select('*').order('nome');
                 if (!bases?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhuma base cadastrada.</p>'; return; }
-                cont.innerHTML = bases.map(b => `
-                    <div class="master-user-row">
-                        <div>
+                cont.innerHTML = bases.map(b => {
+                    const validade = b.validade_licenca;
+                    let licStatus = '<span style="color:var(--success);font-size:10px;">✅ Sem limite</span>';
+                    if (validade) {
+                        const dias = Math.ceil((new Date(validade) - new Date()) / 86400000);
+                        const cor = dias < 0 ? 'var(--danger)' : dias <= 7 ? 'var(--warning)' : 'var(--success)';
+                        licStatus = `<span style="color:${cor};font-size:10px;">${dias < 0 ? '❌ EXPIRADA' : `⏳ ${dias} dias`} (${validade})</span>`;
+                    }
+                    const ativa = b.ativa !== false;
+                    return `
+                    <div class="master-user-row" style="flex-wrap:wrap;gap:8px;">
+                        <div style="flex:1;">
                             <b>🏭 ${b.nome}</b>
                             <span style="font-size:10px;color:var(--gray);margin-left:8px;">${b.cidade} — ${b.estado}</span>
+                            <div style="margin-top:4px;">${licStatus} ${!ativa ? '<span style="color:var(--danger);font-size:10px;margin-left:8px;">🚫 DESATIVADA</span>' : ''}</div>
                         </div>
-                        <button class="btn-danger btn-sm" onclick="masterExcluirBase(${b.id},'${b.nome}')">✕</button>
-                    </div>`).join('');
+                        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                            <button class="btn-sm" style="background:var(--info);color:#000;" onclick="masterRenovarLicenca(${b.id},'${b.nome}')">📅 Renovar</button>
+                            <button class="btn-sm" style="background:${ativa ? 'var(--warning)' : 'var(--success)'};" onclick="masterToggleBase(${b.id},'${b.nome}',${!ativa})">${ativa ? '🚫 Desativar' : '✅ Ativar'}</button>
+                            <button class="btn-danger btn-sm" onclick="masterExcluirBase(${b.id},'${b.nome}')">✕</button>
+                        </div>
+                    </div>`}).join('');
             } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
         }
 
@@ -6475,27 +6515,26 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             const estado = document.getElementById('mst-base-estado')?.value?.trim();
             const adminLogin = document.getElementById('mst-base-admin-login')?.value?.trim();
             const adminPass = document.getElementById('mst-base-admin-pass')?.value?.trim();
+            const validade = document.getElementById('mst-base-validade')?.value || null;
             if (!nome || !cidade || !adminLogin || !adminPass) {
                 alert('Preencha: nome da base, cidade, login e senha do admin!'); return;
             }
             loading(true, 'Criando base e admin...');
             try {
-                // Cria a base
-                const { data: base, error: errBase } = await db.from('bases').insert({ nome, cidade, estado }).select().single();
+                const { data: base, error: errBase } = await db.from('bases').insert({ nome, cidade, estado, validade_licenca: validade, ativa: true }).select().single();
                 if (errBase) throw errBase;
-                // Cria o colaborador admin com base_id
                 const { error: errColab } = await db.from(TBL.colaboradores).insert({
                     nome: `Admin ${nome}`, matricula: `ADM-${nome.toUpperCase().replace(/\s/g,'')}`,
                     user_login: adminLogin, senha: adminPass,
                     perfil: 'admin', base_id: base.id
                 });
                 if (errColab) throw errColab;
-                await registrarAuditoria(`Base criada: ${nome} | Admin: ${adminLogin}`);
-                ['mst-base-nome','mst-base-cidade','mst-base-estado','mst-base-admin-login','mst-base-admin-pass'].forEach(id => {
+                await registrarAuditoria(`Base criada: ${nome} | Admin: ${adminLogin} | Validade: ${validade||'sem limite'}`);
+                ['mst-base-nome','mst-base-cidade','mst-base-estado','mst-base-admin-login','mst-base-admin-pass','mst-base-validade'].forEach(id => {
                     const el = document.getElementById(id); if(el) el.value = '';
                 });
                 loading(false);
-                showSuccess('BASE CRIADA!');
+                showSuccess(`✅ BASE "${nome.toUpperCase()}" CRIADA!\n\nLogin: ${adminLogin}\nSenha: ${adminPass}\n\nCompartilhe com o admin da base.`);
                 await masterCarregarBases();
                 await masterCarregarMetricas();
             } catch(e) { loading(false); alert('Erro: ' + e.message); }
@@ -6633,6 +6672,192 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                         <span>${l.acao||''}</span>
                     </div>`).join('');
             } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SENHA DO ADMIN DE BASE
+        // ═══════════════════════════════════════════════════
+        async function adminAlterarSenha() {
+            const atual = document.getElementById('adm-senha-atual')?.value?.trim();
+            const nova = document.getElementById('adm-senha-nova')?.value?.trim();
+            const confirma = document.getElementById('adm-senha-confirma')?.value?.trim();
+            if (!atual || !nova || !confirma) { alert('Preencha todos os campos!'); return; }
+            if (nova !== confirma) { alert('As senhas não coincidem!'); return; }
+            if (nova.length < 6) { alert('Mínimo 6 caracteres!'); return; }
+            if ((currentUser?.senha||'').trim() !== atual) { alert('❌ Senha atual incorreta!'); return; }
+            loading(true, 'Atualizando...');
+            const { error } = await db.from(TBL.colaboradores).update({ senha: nova }).eq('id', currentUser.id);
+            loading(false);
+            if (error) { alert('Erro: ' + error.message); return; }
+            currentUser.senha = nova;
+            await registrarAuditoria('Admin alterou própria senha: ' + currentUser.nome);
+            ['adm-senha-atual','adm-senha-nova','adm-senha-confirma'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+            showSuccess('SENHA ALTERADA COM SUCESSO!');
+        }
+
+        async function adminCarregarMeusDados() {
+            const cont = document.getElementById('adm-meus-dados');
+            if (!cont || !currentUser) return;
+            let baseNome = 'Itaguaí (padrão)';
+            if (currentUser.base_id) {
+                try {
+                    const { data: b } = await db.from('bases').select('nome,cidade,validade_licenca').eq('id', currentUser.base_id).single();
+                    if (b) {
+                        baseNome = b.nome + (b.cidade ? ' — ' + b.cidade : '');
+                        if (b.validade_licenca) {
+                            const dias = Math.ceil((new Date(b.validade_licenca) - new Date()) / 86400000);
+                            const cor = dias <= 7 ? 'var(--danger)' : dias <= 30 ? 'var(--warning)' : 'var(--success)';
+                            baseNome += ` <span style="color:${cor};font-size:10px;">(licença: ${dias > 0 ? dias + ' dias restantes' : 'EXPIRADA'})</span>`;
+                        }
+                    }
+                } catch(_) {}
+            }
+            cont.innerHTML = `
+                <div class="master-user-row"><span>👤 Nome</span><b>${currentUser.nome}</b></div>
+                <div class="master-user-row"><span>🔑 Login</span><b>${currentUser.user_login}</b></div>
+                <div class="master-user-row"><span>📋 Perfil</span><b>${currentUser.perfil}</b></div>
+                <div class="master-user-row"><span>🏭 Base</span><b>${baseNome}</b></div>`;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // VERIFICAÇÃO DE LICENÇA NO LOGIN
+        // ═══════════════════════════════════════════════════
+        async function verificarLicencaBase(baseId) {
+            if (!baseId) return true; // sem base_id = sem restrição
+            try {
+                const { data: base } = await db.from('bases').select('validade_licenca,ativa,nome').eq('id', baseId).single();
+                if (!base) return true;
+                if (base.ativa === false) {
+                    alert(`❌ Base "${base.nome}" está desativada.\n\nEntre em contato com o administrador.`);
+                    return false;
+                }
+                if (base.validade_licenca) {
+                    const diasRestantes = Math.ceil((new Date(base.validade_licenca) - new Date()) / 86400000);
+                    if (diasRestantes < 0) {
+                        alert(`❌ Licença da base "${base.nome}" expirada.\n\nEntre em contato com o administrador para renovar.`);
+                        return false;
+                    }
+                    if (diasRestantes <= 7) {
+                        alert(`⚠️ ATENÇÃO: Licença da base "${base.nome}" expira em ${diasRestantes} dia(s)!\n\nContate o administrador para renovar.`);
+                    }
+                }
+                return true;
+            } catch(_) { return true; }
+        }
+
+        // ═══════════════════════════════════════════════════
+        // CONTROLE DE LICENÇA NO MASTER — ativar/desativar
+        // ═══════════════════════════════════════════════════
+        async function masterToggleBase(id, nome, ativar) {
+            if (!confirm(`${ativar ? '✅ Ativar' : '🚫 Desativar'} a base "${nome}"?`)) return;
+            loading(true);
+            await db.from('bases').update({ ativa: ativar }).eq('id', id);
+            await registrarAuditoria(`Base ${ativar ? 'ativada' : 'desativada'} pelo Master: ${nome}`);
+            loading(false);
+            showSuccess(ativar ? 'BASE ATIVADA!' : 'BASE DESATIVADA!');
+            await masterCarregarBases();
+        }
+
+        async function masterRenovarLicenca(id, nome) {
+            const data = prompt(`Nova data de validade para "${nome}" (formato: AAAA-MM-DD):`);
+            if (!data) return;
+            loading(true);
+            await db.from('bases').update({ validade_licenca: data, ativa: true }).eq('id', id);
+            await registrarAuditoria(`Licença renovada: ${nome} até ${data}`);
+            loading(false);
+            showSuccess('LICENÇA RENOVADA!');
+            await masterCarregarBases();
+        }
+
+        // ═══════════════════════════════════════════════════
+        // FIREBASE PUSH NOTIFICATIONS
+        // ═══════════════════════════════════════════════════
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyA4LRLfeAIRafTMEmNIFJre5KEeLnT_0w4",
+            authDomain: "lokamig-47904.firebaseapp.com",
+            projectId: "lokamig-47904",
+            storageBucket: "lokamig-47904.firebasestorage.app",
+            messagingSenderId: "819331280641",
+            appId: "1:819331280641:web:68b3668401f63edccef500"
+        };
+        const VAPID_KEY = "BIx7rInj9_wiy4LEk45tX79BrRUAKrowYoYlZ4rjFzOwV8mwIayKwfzq6r0t4cU_9VIfSMBDAdrAqYpnNdksj0";
+
+        let _firebaseApp = null;
+        let _fcmToken = null;
+
+        async function inicializarFirebase() {
+            try {
+                if (typeof firebase === 'undefined') return;
+                if (!_firebaseApp) {
+                    _firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+                }
+                const messaging = firebase.messaging();
+                // Pedir permissão
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') return;
+                // Obter token
+                _fcmToken = await messaging.getToken({ vapidKey: VAPID_KEY });
+                if (_fcmToken && currentUser?.id) {
+                    await db.from(TBL.colaboradores).update({ fcm_token: _fcmToken }).eq('id', currentUser.id);
+                }
+                // Listener de mensagens em foreground
+                messaging.onMessage(payload => {
+                    const { title, body } = payload.notification || {};
+                    mostrarNotificacaoLocal(title || 'LOKAMIG', body || '');
+                });
+            } catch(e) { console.warn('Firebase push:', e.message); }
+        }
+
+        function mostrarNotificacaoLocal(titulo, corpo) {
+            // Cria toast de notificação na tela
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position:fixed;top:20px;right:20px;z-index:99999;
+                background:linear-gradient(135deg,#1e293b,#0f172a);
+                border:1px solid rgba(14,165,233,.5);border-radius:14px;
+                padding:14px 18px;max-width:320px;
+                box-shadow:0 8px 32px rgba(0,0,0,.5);
+                animation:slideInRight .3s ease;
+                font-family:'Montserrat',sans-serif;
+            `;
+            toast.innerHTML = `
+                <div style="display:flex;align-items:start;gap:10px;">
+                    <span style="font-size:20px;">🔔</span>
+                    <div style="flex:1;">
+                        <div style="font-size:12px;font-weight:700;color:#7dd3fc;margin-bottom:4px;">${titulo}</div>
+                        <div style="font-size:11px;color:#cbd5e1;">${corpo}</div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:14px;margin:0;padding:0;">✕</button>
+                </div>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 6000);
+        }
+
+        async function enviarPushParaBase(baseId, titulo, corpo) {
+            // Salva notificação no banco para ser exibida quando o usuário logar
+            try {
+                await db.from('notificacoes').insert({
+                    base_id: baseId,
+                    titulo,
+                    corpo,
+                    lida: false,
+                    criado_em: new Date().toISOString()
+                });
+            } catch(e) { console.warn('Push:', e); }
+        }
+
+        async function verificarNotificacoesPendentes() {
+            if (!currentUser?.base_id && currentUser?.role !== 'master') return;
+            try {
+                const bid = _baseId();
+                let q = db.from('notificacoes').select('*').eq('lida', false).order('id', { ascending: false }).limit(5);
+                if (bid) q = q.eq('base_id', bid);
+                const { data: notifs } = await q;
+                (notifs || []).forEach(n => {
+                    mostrarNotificacaoLocal(n.titulo, n.corpo);
+                    db.from('notificacoes').update({ lida: true }).eq('id', n.id);
+                });
+            } catch(_) {}
         }
 
     </script>
