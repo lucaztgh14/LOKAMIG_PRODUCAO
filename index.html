@@ -986,23 +986,42 @@
 
         #img-viewer {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, .95);
-            z-index: 2000;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,.95);
+            z-index: 99999;
             display: none;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             cursor: zoom-out;
         }
-
         #img-viewer img {
             max-width: 90%;
-            max-height: 90%;
+            max-height: 85vh;
             border-radius: 10px;
             border: 2px solid var(--primary);
+            object-fit: contain;
+            transition: transform .3s;
+            cursor: zoom-in;
+        }
+        #img-viewer img.zoomed {
+            transform: scale(2);
+            cursor: zoom-out;
+        }
+        #img-viewer-controls {
+            position: fixed;
+            bottom: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100000;
+        }
+        #img-viewer-info {
+            position: fixed;
+            top: 16px;
+            color: rgba(255,255,255,.6);
+            font-size: 11px;
+            font-family: 'Montserrat', sans-serif;
         }
 
         #success-overlay {
@@ -1349,8 +1368,14 @@
         <div class="check-v">✓</div>
         <h2 style="color:white;letter-spacing:2px;" id="success-msg">ENVIADO COM SUCESSO!</h2>
     </div>
-    <div id="img-viewer" onclick="this.style.display='none'">
-        <img src="" id="full-img" alt="">
+    <div id="img-viewer" onclick="fecharImgViewer(event)">
+        <div id="img-viewer-info"></div>
+        <img src="" id="full-img" alt="" onclick="event.stopPropagation();toggleZoomFoto(this)">
+        <div id="img-viewer-controls">
+            <button id="btn-foto-prev" onclick="event.stopPropagation();navegarFoto(-1)" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:16px;display:none;">◀</button>
+            <button onclick="event.stopPropagation();fecharImgViewer(null)" style="background:var(--danger);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-weight:bold;">✕ Fechar</button>
+            <button id="btn-foto-next" onclick="event.stopPropagation();navegarFoto(1)" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:16px;display:none;">▶</button>
+        </div>
     </div>
     <div id="loading-overlay">
         <div class="spinner"></div>
@@ -2778,9 +2803,48 @@
             setTimeout(() => { document.getElementById('success-overlay').style.display = 'none'; }, 2000);
         }
 
-        function verFotoGrande(src) {
-            document.getElementById('full-img').src = src;
-            document.getElementById('img-viewer').style.display = 'flex';
+        let _fotosGaleria = [];
+        let _fotoIdx = 0;
+
+        function verFotoGrande(src, galeria) {
+            _fotosGaleria = galeria || [src];
+            _fotoIdx = _fotosGaleria.indexOf(src);
+            if (_fotoIdx < 0) _fotoIdx = 0;
+            _abrirFotoIdx(_fotoIdx);
+        }
+
+        function _abrirFotoIdx(idx) {
+            const img = document.getElementById('full-img');
+            const viewer = document.getElementById('img-viewer');
+            const info = document.getElementById('img-viewer-info');
+            const prev = document.getElementById('btn-foto-prev');
+            const next = document.getElementById('btn-foto-next');
+            if (!img || !viewer) return;
+            img.classList.remove('zoomed');
+            img.src = _fotosGaleria[idx];
+            viewer.style.display = 'flex';
+            if (info) info.textContent = _fotosGaleria.length > 1 ? `${idx + 1} / ${_fotosGaleria.length} — clique na foto para zoom` : 'Clique na foto para zoom';
+            if (prev) prev.style.display = (_fotosGaleria.length > 1 && idx > 0) ? 'block' : 'none';
+            if (next) next.style.display = (_fotosGaleria.length > 1 && idx < _fotosGaleria.length - 1) ? 'block' : 'none';
+        }
+
+        function navegarFoto(dir) {
+            _fotoIdx = Math.max(0, Math.min(_fotosGaleria.length - 1, _fotoIdx + dir));
+            _abrirFotoIdx(_fotoIdx);
+        }
+
+        function toggleZoomFoto(img) {
+            img.classList.toggle('zoomed');
+            img.style.cursor = img.classList.contains('zoomed') ? 'zoom-out' : 'zoom-in';
+        }
+
+        function fecharImgViewer(e) {
+            if (e && e.target !== document.getElementById('img-viewer')) return;
+            const viewer = document.getElementById('img-viewer');
+            const img = document.getElementById('full-img');
+            if (viewer) viewer.style.display = 'none';
+            if (img) { img.src = ''; img.classList.remove('zoomed'); }
+            _fotosGaleria = [];
         }
 
         // ─────────────────────────────────────────────
@@ -3733,29 +3797,18 @@
             const s = rows?.[0]; if (!s) return;
             const fotos = s.fotos || [];
             if (!fotos.length) { alert('Nenhuma foto neste lançamento.'); return; }
-            // Mostra fotos em lightbox simples
-            let idx = 0;
+            const existing = document.getElementById('foto-overlay');
+            if (existing) existing.remove();
             const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;';
-            const atualizar = () => {
-                overlay.innerHTML = `
-                    <div style="color:var(--gray);font-size:11px;">📸 ${s.placa} — ${s.tipo_op} | ${s.timestamp} (${idx + 1}/${fotos.length})</div>
-                    <img src="${fotos[idx]}" style="max-width:100%;max-height:70vh;border-radius:10px;object-fit:contain;">
-                    <div style="display:flex;gap:10px;">
-                        ${idx > 0 ? `<button onclick="event.stopPropagation();idx_foto--; atualizar_foto()" style="background:var(--gray);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">◀</button>` : ''}
-                        ${idx < fotos.length - 1 ? `<button onclick="event.stopPropagation();idx_foto++; atualizar_foto()" style="background:var(--gray);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">▶</button>` : ''}
-                        <button onclick="document.body.removeChild(document.getElementById('foto-overlay'))" style="background:var(--danger);padding:8px 18px;border-radius:8px;border:none;color:#fff;cursor:pointer;">✕ Fechar</button>
-                    </div>`;
-            };
             overlay.id = 'foto-overlay';
-            overlay.onclick = () => document.body.removeChild(overlay);
-            // Galeria simples
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;overflow-y:auto;';
             overlay.innerHTML = `
-                <div style="color:var(--gray);font-size:11px;margin-bottom:8px;">📸 ${s.placa} — ${s.tipo_op} | ${s.timestamp}</div>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;overflow-y:auto;max-height:80vh;">
-                    ${fotos.map(f => `<img src="${f}" style="width:calc(50% - 8px);max-width:300px;border-radius:8px;cursor:pointer;object-fit:cover;" onclick="event.stopPropagation();verFotoGrande('${f}')">`).join('')}
+                <div style="color:rgba(255,255,255,.6);font-size:11px;margin-bottom:4px;">📸 ${s.placa} — ${s.tipo_op||''} | ${s.timestamp||''}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-height:75vh;overflow-y:auto;">
+                    ${fotos.map((f,i) => `<img src="${f}" style="width:calc(50% - 8px);max-width:280px;border-radius:8px;cursor:pointer;object-fit:cover;height:160px;transition:.2s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'" onclick="event.stopPropagation();document.getElementById('foto-overlay').remove();verFotoGrande('${f}',${JSON.stringify(fotos).replace(/'/g,'&#39;')})">`).join('')}
                 </div>
-                <button onclick="document.body.removeChild(document.getElementById('foto-overlay'))" style="background:var(--danger);padding:10px 24px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:bold;margin-top:10px;">✕ Fechar</button>`;
+                <button onclick="document.getElementById('foto-overlay').remove()" style="background:var(--danger);padding:10px 24px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:bold;margin-top:10px;font-family:'Montserrat',sans-serif;">✕ Fechar</button>`;
+            overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
             document.body.appendChild(overlay);
         }
 
@@ -4880,8 +4933,10 @@
         async function ckAtualizarSetor() {
             const placa = document.getElementById('ck-placa')?.value;
             if (!placa) { document.getElementById('ck-setor-display').style.display = 'none'; return; }
-            // Inicia envio de GPS quando seleciona o veículo
-            if (currentUser?.perfil === 'motorista') { /* GPS agora é manual via botão toggleGPS */ }
+            // GPS automático ao selecionar veículo — sem precisar clicar em botão
+            if (currentUser?.perfil === 'motorista' && !_gpsAtivo) {
+                iniciarGPS();
+            }
             const { data: rows } = await db.from(TBL.veiculos).select('tipo').eq('placa', placa);
             const veic = rows?.[0];
             if (veic) {
@@ -5087,16 +5142,18 @@
             const s = rows?.[0]; if (!s) return;
             const fotos = s.fotos || [];
             if (!fotos.length) { alert('Nenhuma foto neste checklist.'); return; }
+            const existing = document.getElementById('foto-overlay-ck');
+            if (existing) existing.remove();
             const overlay = document.createElement('div');
             overlay.id = 'foto-overlay-ck';
-            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;';
-            overlay.onclick = () => document.body.removeChild(overlay);
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;overflow-y:auto;';
             overlay.innerHTML = `
-                <div style="color:var(--gray);font-size:11px;margin-bottom:8px;">📸 Checklist ${s.tipo_op} — ${s.placa} | ${s.timestamp}</div>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;overflow-y:auto;max-height:80vh;">
-                    ${fotos.map(f => `<img src="${f}" style="width:calc(50% - 8px);max-width:300px;border-radius:8px;cursor:pointer;object-fit:cover;" onclick="event.stopPropagation();verFotoGrande('${f}')">`).join('')}
+                <div style="color:rgba(255,255,255,.6);font-size:11px;margin-bottom:4px;">📸 Checklist ${s.tipo_op||''} — ${s.placa} | ${s.timestamp||''}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-height:75vh;overflow-y:auto;">
+                    ${fotos.map((f,i) => `<img src="${f}" style="width:calc(50% - 8px);max-width:280px;border-radius:8px;cursor:pointer;object-fit:cover;height:160px;transition:.2s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'" onclick="event.stopPropagation();document.getElementById('foto-overlay-ck').remove();verFotoGrande('${f}',${JSON.stringify(fotos).replace(/'/g,'&#39;')})">`).join('')}
                 </div>
-                <button onclick="document.body.removeChild(document.getElementById('foto-overlay-ck'))" style="background:var(--danger);padding:10px 24px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:bold;margin-top:10px;">✕ Fechar</button>`;
+                <button onclick="document.getElementById('foto-overlay-ck').remove()" style="background:var(--danger);padding:10px 24px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:bold;margin-top:10px;font-family:'Montserrat',sans-serif;">✕ Fechar</button>`;
+            overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
             document.body.appendChild(overlay);
         }
 
