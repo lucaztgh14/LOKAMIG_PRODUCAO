@@ -4649,7 +4649,7 @@
             const placa = document.getElementById('ck-placa')?.value;
             if (!placa) { document.getElementById('ck-setor-display').style.display = 'none'; return; }
             // Inicia envio de GPS quando seleciona o veículo
-            if (currentUser?.perfil === 'motorista') iniciarEnvioLocalizacao();
+            if (currentUser?.perfil === 'motorista') { /* GPS agora é manual via botão toggleGPS */ }
             const { data: rows } = await db.from(TBL.veiculos).select('tipo').eq('placa', placa);
             const veic = rows?.[0];
             if (veic) {
@@ -5600,37 +5600,6 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 .subscribe();
         }
 
-        // ─────────────────────────────────────────────
-        // ENVIO DE LOCALIZAÇÃO pelo motorista
-        // ─────────────────────────────────────────────
-        let _gpsInterval = null;
-
-        function iniciarEnvioLocalizacao() {
-            if (!navigator.geolocation) return;
-            if (_gpsInterval) return;
-            // Envia imediatamente e depois a cada 2 minutos
-            enviarLocalizacao();
-            _gpsInterval = setInterval(enviarLocalizacao, 120000);
-        }
-
-        async function enviarLocalizacao() {
-            if (!currentUser || currentUser.perfil !== 'motorista') return;
-            const placa = document.getElementById('ck-placa')?.value;
-            if (!placa) return; // só envia se tiver veículo selecionado
-
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                try {
-                    await db.from('rastreamento').insert({
-                        placa,
-                        lat: pos.coords.latitude,
-                        lng: pos.coords.longitude,
-                        precisao: pos.coords.accuracy,
-                        motorista: currentUser.nome
-                    });
-                } catch(_) {}
-            }, null, { enableHighAccuracy: true, timeout: 10000 });
-        }
-
         async function salvarBase() {
             const nome = document.getElementById('base-nome')?.value?.trim();
             const cidade = document.getElementById('base-cidade')?.value?.trim();
@@ -5652,6 +5621,10 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
 
         async function _entrarChefao() {
             document.getElementById('chefao-user-label').textContent = `Bem-vindo, ${currentUser.nome} — Visão Multi-Base`;
+            // Inicializa data do monitor com hoje
+            const hoje = new Date().toISOString().split('T')[0];
+            const monDate = document.getElementById('chf-mon-date');
+            if (monDate) monDate.value = hoje;
             loading(false);
             show('scr-chefao');
             await chefaoCarregarMetricas();
@@ -5899,6 +5872,21 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             showSuccess('SENHA ATUALIZADA!');
         }
 
+        async function chefaoCarregarAuditoria() {
+            // Chefão vê auditoria global (somente leitura)
+            const cont = document.getElementById('chefao-lista-auditoria');
+            if (!cont) return;
+            try {
+                const { data: logs } = await db.from(TBL.auditoria).select('*').order('id', { ascending: false }).limit(100);
+                if (!logs?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum registro.</p>'; return; }
+                cont.innerHTML = logs.map(l => `
+                    <div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;">
+                        <span style="color:var(--gray);font-size:10px;">${l.timestamp||''}</span> —
+                        <span>${l.acao||''}</span>
+                    </div>`).join('');
+            } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
+        }
+
         async function chefaoAlterarSenha() {
             const atual = document.getElementById('chf-senha-atual')?.value?.trim();
             const nova = document.getElementById('chf-senha-nova')?.value?.trim();
@@ -5998,9 +5986,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
         }
 
         function iniciarEnvioLocalizacao() {
-            // Compatibilidade — agora o GPS é manual via botão
-            // mas se já estava ativo, continua
-            if (_gpsAtivo) enviarLocalizacao();
+            // GPS agora controlado manualmente pelo botão toggleGPS na tela do motorista
         }
 
         // ═══════════════════════════════════════════════════
