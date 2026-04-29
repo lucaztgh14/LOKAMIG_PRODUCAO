@@ -2859,9 +2859,11 @@
         // LOGIN
         // ─────────────────────────────────────────────
         async function handleLogin() {
-            const u = DOMPurify.sanitize(document.getElementById('user').value.trim().toUpperCase());
+            const uRaw = DOMPurify.sanitize(document.getElementById('user').value.trim());
+            const u = uRaw.toUpperCase(); // só usado para checar MASTER e ADMIN
+            const uOriginal = uRaw; // preservado para buscar no banco
             const p = document.getElementById('pass').value.trim();
-            if (!u || !p) { alert('Preencha todos os campos!'); return; }
+            if (!uRaw || !p) { alert('Preencha todos os campos!'); return; }
 
             loading(true, 'Autenticando...');
 
@@ -2902,10 +2904,10 @@
 
                 // Colaboradores (admin de base, programador, supervisor, motorista)
                 const { data: colabs, error: colabErr } = await db.from(TBL.colaboradores)
-                    .select('*').ilike('user_login', u);
+                    .select('*').ilike('user_login', uOriginal.trim());
                 if (colabs?.length) {
-                    const colab = colabs.find(c => c.senha === p);
-                    if (!colab) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.'); return; }
+                    const colab = colabs.find(c => (c.senha||'').trim() === p.trim());
+                    if (!colab) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.\n\nDica: verifique se a senha foi cadastrada corretamente pelo Master.'); return; }
                     currentUser = { ...colab, nome: colab.nome, role: colab.perfil };
                     await registrarAuditoria('Login: ' + colab.nome + ' (' + colab.perfil + ')');
 
@@ -2960,7 +2962,7 @@
 
                 // Fornecedores
                 const { data: forns } = await db.from(TBL.fornUsers)
-                    .select('*').ilike('user_login', u);
+                    .select('*').ilike('user_login', uOriginal);
                 if (forns?.length) {
                     const forn = forns.find(f => f.senha === p);
                     if (!forn) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.'); return; }
