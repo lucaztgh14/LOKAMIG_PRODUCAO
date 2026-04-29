@@ -1372,10 +1372,11 @@
         <div id="img-viewer-info"></div>
         <img src="" id="full-img" alt="" onclick="event.stopPropagation();toggleZoomFoto(this)">
         <div id="img-viewer-controls">
-            <button id="btn-foto-prev" onclick="event.stopPropagation();navegarFoto(-1)" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:16px;display:none;">◀</button>
-            <button onclick="event.stopPropagation();fecharImgViewer(null)" style="background:var(--danger);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-weight:bold;">✕ Fechar</button>
-            <button id="btn-foto-next" onclick="event.stopPropagation();navegarFoto(1)" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:16px;display:none;">▶</button>
+            <button id="btn-foto-prev" onclick="event.stopPropagation();navegarFoto(-1)" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:18px;display:none;">◀</button>
+            <button onclick="event.stopPropagation();fecharImgViewer(null)" style="background:var(--danger);border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:bold;font-family:'Montserrat',sans-serif;">✕ Fechar</button>
+            <button id="btn-foto-next" onclick="event.stopPropagation();navegarFoto(1)" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:18px;display:none;">▶</button>
         </div>
+        <div id="img-viewer-thumbs" onclick="event.stopPropagation()" style="display:none;flex-wrap:nowrap;gap:6px;overflow-x:auto;max-width:90vw;padding:6px;position:fixed;bottom:70px;"></div>
     </div>
     <div id="loading-overlay">
         <div class="spinner"></div>
@@ -2806,30 +2807,46 @@
         let _fotosGaleria = [];
         let _fotoIdx = 0;
 
-        function verFotoGrande(src, galeria) {
+        function verFotoGrande(src, galeria, titulo) {
             _fotosGaleria = galeria || [src];
             _fotoIdx = _fotosGaleria.indexOf(src);
             if (_fotoIdx < 0) _fotoIdx = 0;
-            _abrirFotoIdx(_fotoIdx);
+            _abrirFotoIdx(_fotoIdx, titulo);
         }
 
-        function _abrirFotoIdx(idx) {
-            const img = document.getElementById('full-img');
+        function _abrirFotoIdx(idx, titulo) {
             const viewer = document.getElementById('img-viewer');
+            const img = document.getElementById('full-img');
             const info = document.getElementById('img-viewer-info');
             const prev = document.getElementById('btn-foto-prev');
             const next = document.getElementById('btn-foto-next');
+            const thumbs = document.getElementById('img-viewer-thumbs');
             if (!img || !viewer) return;
             img.classList.remove('zoomed');
             img.src = _fotosGaleria[idx];
             viewer.style.display = 'flex';
-            if (info) info.textContent = _fotosGaleria.length > 1 ? `${idx + 1} / ${_fotosGaleria.length} — clique na foto para zoom` : 'Clique na foto para zoom';
-            if (prev) prev.style.display = (_fotosGaleria.length > 1 && idx > 0) ? 'block' : 'none';
-            if (next) next.style.display = (_fotosGaleria.length > 1 && idx < _fotosGaleria.length - 1) ? 'block' : 'none';
+            // Info
+            if (info) {
+                const t = titulo || '';
+                const counter = _fotosGaleria.length > 1 ? ` (${idx+1}/${_fotosGaleria.length})` : '';
+                info.textContent = t + counter + ' — clique na foto para zoom';
+            }
+            // Botões nav
+            if (prev) prev.style.display = (_fotosGaleria.length > 1 && idx > 0) ? 'inline-block' : 'none';
+            if (next) next.style.display = (_fotosGaleria.length > 1 && idx < _fotosGaleria.length-1) ? 'inline-block' : 'none';
+            // Miniaturas
+            if (thumbs) {
+                thumbs.style.display = _fotosGaleria.length > 1 ? 'flex' : 'none';
+                thumbs.innerHTML = _fotosGaleria.map((f,i) => `
+                    <img src="${f}" onclick="event.stopPropagation();_fotoIdx=${i};_abrirFotoIdx(${i})"
+                    style="width:52px;height:52px;object-fit:cover;border-radius:6px;cursor:pointer;
+                    border:2px solid ${i===idx?'var(--primary)':'rgba(255,255,255,.2)'};
+                    opacity:${i===idx?'1':'.6'};transition:.2s;flex-shrink:0;">`).join('');
+            }
         }
 
         function navegarFoto(dir) {
-            _fotoIdx = Math.max(0, Math.min(_fotosGaleria.length - 1, _fotoIdx + dir));
+            _fotoIdx = Math.max(0, Math.min(_fotosGaleria.length-1, _fotoIdx+dir));
             _abrirFotoIdx(_fotoIdx);
         }
 
@@ -2843,7 +2860,7 @@
             const viewer = document.getElementById('img-viewer');
             const img = document.getElementById('full-img');
             if (viewer) viewer.style.display = 'none';
-            if (img) { img.src = ''; img.classList.remove('zoomed'); }
+            if (img) { img.src=''; img.classList.remove('zoomed'); }
             _fotosGaleria = [];
         }
 
@@ -3797,19 +3814,8 @@
             const s = rows?.[0]; if (!s) return;
             const fotos = s.fotos || [];
             if (!fotos.length) { alert('Nenhuma foto neste lançamento.'); return; }
-            const existing = document.getElementById('foto-overlay');
-            if (existing) existing.remove();
-            const overlay = document.createElement('div');
-            overlay.id = 'foto-overlay';
-            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;overflow-y:auto;';
-            overlay.innerHTML = `
-                <div style="color:rgba(255,255,255,.6);font-size:11px;margin-bottom:4px;">📸 ${s.placa} — ${s.tipo_op||''} | ${s.timestamp||''}</div>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-height:75vh;overflow-y:auto;">
-                    ${fotos.map((f,i) => `<img src="${f}" style="width:calc(50% - 8px);max-width:280px;border-radius:8px;cursor:pointer;object-fit:cover;height:160px;transition:.2s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'" onclick="event.stopPropagation();document.getElementById('foto-overlay').remove();verFotoGrande('${f}',${JSON.stringify(fotos).replace(/'/g,'&#39;')})">`).join('')}
-                </div>
-                <button onclick="document.getElementById('foto-overlay').remove()" style="background:var(--danger);padding:10px 24px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:bold;margin-top:10px;font-family:'Montserrat',sans-serif;">✕ Fechar</button>`;
-            overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
-            document.body.appendChild(overlay);
+            // Abre direto no lightbox com todas as fotos navegáveis
+            verFotoGrande(fotos[0], fotos, `📸 ${s.placa} — ${s.tipo_op||''} | ${s.timestamp||''}`);
         }
 
         async function lancarRetornoRapido(placa) {
@@ -5142,19 +5148,8 @@
             const s = rows?.[0]; if (!s) return;
             const fotos = s.fotos || [];
             if (!fotos.length) { alert('Nenhuma foto neste checklist.'); return; }
-            const existing = document.getElementById('foto-overlay-ck');
-            if (existing) existing.remove();
-            const overlay = document.createElement('div');
-            overlay.id = 'foto-overlay-ck';
-            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;overflow-y:auto;';
-            overlay.innerHTML = `
-                <div style="color:rgba(255,255,255,.6);font-size:11px;margin-bottom:4px;">📸 Checklist ${s.tipo_op||''} — ${s.placa} | ${s.timestamp||''}</div>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-height:75vh;overflow-y:auto;">
-                    ${fotos.map((f,i) => `<img src="${f}" style="width:calc(50% - 8px);max-width:280px;border-radius:8px;cursor:pointer;object-fit:cover;height:160px;transition:.2s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'" onclick="event.stopPropagation();document.getElementById('foto-overlay-ck').remove();verFotoGrande('${f}',${JSON.stringify(fotos).replace(/'/g,'&#39;')})">`).join('')}
-                </div>
-                <button onclick="document.getElementById('foto-overlay-ck').remove()" style="background:var(--danger);padding:10px 24px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:bold;margin-top:10px;font-family:'Montserrat',sans-serif;">✕ Fechar</button>`;
-            overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
-            document.body.appendChild(overlay);
+            // Abre direto no lightbox com todas as fotos navegáveis
+            verFotoGrande(fotos[0], fotos, `📸 Checklist ${s.tipo_op||''} — ${s.placa} | ${s.timestamp||''}`);
         }
 
 
