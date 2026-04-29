@@ -4,7 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOKAMIG | Gestão Operacional v6.1</title>
+    <meta name="theme-color" content="#d1122a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOKAMIG">
+    <meta name="description" content="LOKAMIG — Gestão Operacional de Frotas">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="https://res.cloudinary.com/dlaregq2k/image/upload/v1/lokamig/logo_icon.png">
+    <title>LOKAMIG | Gestão Operacional v7.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -13,6 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -1830,7 +1838,10 @@
                 onkeydown="if(event.key==='Enter') document.getElementById('pass').focus()">
             <input type="password" id="pass" placeholder="Senha" onkeydown="if(event.key==='Enter') handleLogin()">
             <button onclick="handleLogin()">🔐 Acessar Sistema</button>
-            <div class="footer-text">Plataforma integrada de logística e frotas · v6.1 Supabase</div>
+            <div class="footer-text">Plataforma integrada de logística e frotas · v7.2 Multi-Base</div>
+            <button id="btn-instalar-pwa" onclick="instalarPWA()" style="display:none;margin-top:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:10px 20px;border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;align-items:center;gap:8px;width:100%;justify-content:center;">
+                📲 Instalar App no Celular
+            </button>
         </div>
     </section>
 
@@ -1883,6 +1894,7 @@
             <button class="tab-scroll-btn" onclick="scrollTabs(-120)">◀</button>
             <div class="tabs" id="admin-tabs">
                 <button class="tab-btn tab-active" onclick="switchTab('monitor',event)">📡 Monitor</button>
+                <button class="tab-btn" onclick="switchTab('dashboard',event)">📊 Dashboard</button>
                 <button class="tab-btn" onclick="switchTab('history',event)">📋 Histórico</button>
                 <button class="tab-btn" onclick="switchTab('forn',event)">🏢 Fornecedores</button>
                 <button class="tab-btn" onclick="switchTab('colab',event)">👥 Equipe</button>
@@ -2106,6 +2118,47 @@
             <div id="list-checklist-admin"></div>
         </div>
 
+        <!-- DASHBOARD FINANCEIRO -->
+        <div id="area-dashboard" class="admin-content hidden">
+            <h3 style="margin-bottom:12px;">📊 Dashboard Financeiro</h3>
+            <!-- Filtro de período -->
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;">
+                <select id="dash-periodo" onchange="carregarDashboard()" style="margin:0;width:auto;padding:8px 12px;font-size:12px;">
+                    <option value="7">Últimos 7 dias</option>
+                    <option value="30" selected>Últimos 30 dias</option>
+                    <option value="90">Últimos 90 dias</option>
+                    <option value="365">Último ano</option>
+                </select>
+                <button onclick="carregarDashboard()" class="btn-info btn-sm">🔄 Atualizar</button>
+            </div>
+            <!-- Cards resumo -->
+            <div class="dashboard-grid" style="margin-bottom:20px;" id="dash-cards"></div>
+            <!-- Gráficos -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:16px;">
+                <div class="form-section" style="padding:16px;">
+                    <h4 style="color:var(--info);margin-bottom:12px;">⛽ Combustível por Mês (R$)</h4>
+                    <canvas id="chart-combustivel" height="200"></canvas>
+                </div>
+                <div class="form-section" style="padding:16px;">
+                    <h4 style="color:var(--info);margin-bottom:12px;">🚗 Serviços por Status</h4>
+                    <canvas id="chart-servicos" height="200"></canvas>
+                </div>
+                <div class="form-section" style="padding:16px;">
+                    <h4 style="color:var(--info);margin-bottom:12px;">🔧 Manutenções por Tipo</h4>
+                    <canvas id="chart-manutencoes" height="200"></canvas>
+                </div>
+                <div class="form-section" style="padding:16px;">
+                    <h4 style="color:var(--info);margin-bottom:12px;">🏆 Top 5 Veículos — Gasto</h4>
+                    <canvas id="chart-top-veiculos" height="200"></canvas>
+                </div>
+            </div>
+            <!-- Tabela de gastos por veículo -->
+            <div class="form-section" style="padding:16px;">
+                <h4 style="color:var(--info);margin-bottom:12px;">📋 Detalhamento por Veículo</h4>
+                <div id="dash-tabela-veiculos" style="overflow-x:auto;"></div>
+            </div>
+        </div>
+
         <!-- MAPA DE RASTREAMENTO -->
         <div id="area-mapa" class="admin-content hidden">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
@@ -2120,6 +2173,19 @@
                     <button onclick="centralizarMapa()" class="btn-info btn-sm">🎯 Centralizar</button>
                     <button onclick="atualizarMapa()" class="btn-success btn-sm">🔄 Atualizar</button>
                 </div>
+            </div>
+            <!-- Histórico de rota -->
+            <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin-bottom:12px;">
+                <h4 style="color:var(--info);margin-bottom:8px;font-size:12px;">📍 Histórico de Rota</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                    <select id="rota-placa" style="flex:1;margin:0;min-width:140px;font-size:11px;padding:6px;">
+                        <option value="">— Selecione o veículo/motorista —</option>
+                    </select>
+                    <input type="date" id="rota-data" style="flex:1;margin:0;min-width:130px;font-size:11px;padding:6px;">
+                    <button onclick="exibirHistoricoRota()" class="btn-info btn-sm">📍 Ver Rota</button>
+                    <button onclick="limparRota()" class="btn-gray btn-sm">✕ Limpar</button>
+                </div>
+                <div id="rota-info" style="font-size:10px;color:var(--gray);margin-top:6px;"></div>
             </div>
             <div id="mapa-container">
                 <div id="mapa-leaflet"></div>
@@ -2295,11 +2361,12 @@
             </div>
         </div>
 
-        <button onclick="handleLogout()" class="btn-gray" style="margin-top:20px;">🚪 Sair do Sistema</button>
+        <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
+            <button onclick="handleLogout()" class="btn-gray" style="flex:1;">🚪 Sair do Sistema</button>
+            <button onclick="gerarManualPDF()" style="flex:1;background:rgba(59,130,246,.3);border:1px solid rgba(59,130,246,.5);color:#93c5fd;padding:10px;border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;">📖 Manual PDF</button>
+            <button onclick="instalarPWA()" style="flex:1;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.4);color:#6ee7b7;padding:10px;border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;">📲 Instalar App</button>
+        </div>
     </section>
-
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- TELA 3: PROGRAMADOR -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-programador" class="container hidden">
         <h1>📋 LANÇAMENTOS</h1>
@@ -2933,6 +3000,7 @@
 
             const loaders = {
                 monitor: carregarProgAdmin,
+                dashboard: carregarDashboard,
                 history: () => { popularFiltroFornHistorico(); renderHistorico(); },
                 forn: renderListaForn,
                 colab: renderListaColab,
@@ -2944,17 +3012,16 @@
                 auditoria: carregarAuditoria,
                 mapa: async () => {
                     await inicializarMapa();
-                    // Força o Leaflet a recalcular o tamanho após a aba aparecer
-                    setTimeout(() => { if (_mapa) { _mapa.invalidateSize(); } }, 400);
+                    setTimeout(() => { if (_mapa) { _mapa.invalidateSize(); inicializarSeletorRota(); } }, 400);
                 },
                 checklist: carregarChecklistAdmin,
                 cnh: carregarCNH,
                 chat: iniciarChat,
                 excel: () => {},
-                bases: carregarBases,
-                dashboard: () => { atualizarDashboard(); renderGrafico(); },
+                relatorio: () => {},
+                'minha-conta-admin': adminCarregarMeusDados,
                 permissoes: renderPermissoes,
-                config: () => { }
+                config: () => {}
             };
             if (loaders[id]) loaders[id]();
         }
@@ -5883,6 +5950,312 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
         }
 
         function filtrarMapaSetor() { atualizarMapa(); }
+
+        // ═══════════════════════════════════════════════════
+        // HISTÓRICO DE ROTA NO MAPA
+        // ═══════════════════════════════════════════════════
+        let _rotaLayer = null;
+        let _rotaMarkers = [];
+
+        async function inicializarSeletorRota() {
+            const sel = document.getElementById('rota-placa');
+            if (!sel) return;
+            // Data padrão = hoje
+            const dtEl = document.getElementById('rota-data');
+            if (dtEl && !dtEl.value) dtEl.value = new Date().toISOString().split('T')[0];
+            // Popular com motoristas/placas que têm rastreamento
+            try {
+                const { data } = await _filtrarBase(db.from('rastreamento').select('placa,motorista').order('timestamp', { ascending: false }));
+                const opcoes = new Set();
+                (data||[]).forEach(r => {
+                    if (r.placa && r.placa !== 'SEM_PLACA') opcoes.add('placa:' + r.placa);
+                    if (r.motorista) opcoes.add('mot:' + r.motorista);
+                });
+                sel.innerHTML = '<option value="">— Selecione —</option>' +
+                    [...opcoes].map(o => {
+                        const [tipo, val] = o.split(':');
+                        return `<option value="${o}">${tipo === 'placa' ? '🚗 ' : '👤 '}${val}</option>`;
+                    }).join('');
+            } catch(e) {}
+        }
+
+        async function exibirHistoricoRota() {
+            const sel = document.getElementById('rota-placa')?.value;
+            const dt = document.getElementById('rota-data')?.value;
+            const infoEl = document.getElementById('rota-info');
+            if (!sel || !dt) { alert('Selecione o veículo/motorista e a data!'); return; }
+            limparRota();
+            const [tipo, val] = sel.split(':');
+            const dtIni = dt + 'T00:00:00';
+            const dtFim = dt + 'T23:59:59';
+            try {
+                let q = _filtrarBase(db.from('rastreamento').select('*').gte('timestamp', dtIni).lte('timestamp', dtFim).order('timestamp', { ascending: true }));
+                if (tipo === 'placa') q = q.eq('placa', val);
+                else q = q.eq('motorista', val);
+                const { data: pontos } = await q;
+                if (!pontos?.length) { if(infoEl) infoEl.textContent = 'Nenhum rastreamento encontrado para esta data.'; return; }
+                const coords = pontos.map(p => [p.lat, p.lng]);
+                // Linha da rota
+                _rotaLayer = L.polyline(coords, {
+                    color: '#3b82f6', weight: 4, opacity: 0.8,
+                    dashArray: null, lineJoin: 'round'
+                }).addTo(_mapa);
+                // Marcador de início (verde)
+                const inicio = L.circleMarker(coords[0], { radius: 10, fillColor: '#10b981', color: '#fff', weight: 2, fillOpacity: 1 })
+                    .addTo(_mapa).bindPopup(`🟢 Início<br>${new Date(pontos[0].timestamp).toLocaleTimeString('pt-BR')}`);
+                // Marcador de fim (vermelho)
+                const fim = L.circleMarker(coords[coords.length-1], { radius: 10, fillColor: '#ef4444', color: '#fff', weight: 2, fillOpacity: 1 })
+                    .addTo(_mapa).bindPopup(`🔴 Último ponto<br>${new Date(pontos[pontos.length-1].timestamp).toLocaleTimeString('pt-BR')}`);
+                // Pontos intermediários menores
+                pontos.slice(1, -1).forEach((p, i) => {
+                    const m = L.circleMarker([p.lat, p.lng], { radius: 5, fillColor: '#f59e0b', color: '#fff', weight: 1, fillOpacity: 0.8 })
+                        .addTo(_mapa).bindPopup(`📍 ${new Date(p.timestamp).toLocaleTimeString('pt-BR')}<br>Precisão: ±${Math.round(p.precisao||0)}m`);
+                    _rotaMarkers.push(m);
+                });
+                _rotaMarkers.push(inicio, fim);
+                _mapa.fitBounds(_rotaLayer.getBounds(), { padding: [30, 30] });
+                // Calcular distância aproximada
+                let dist = 0;
+                for (let i = 1; i < coords.length; i++) {
+                    dist += _mapa.distance(coords[i-1], coords[i]);
+                }
+                if (infoEl) infoEl.textContent = `📍 ${pontos.length} pontos registrados | 🕐 ${new Date(pontos[0].timestamp).toLocaleTimeString('pt-BR')} → ${new Date(pontos[pontos.length-1].timestamp).toLocaleTimeString('pt-BR')} | 📏 ~${(dist/1000).toFixed(1)}km`;
+            } catch(e) { if(infoEl) infoEl.textContent = 'Erro: ' + e.message; }
+        }
+
+        function limparRota() {
+            if (_rotaLayer) { _mapa.removeLayer(_rotaLayer); _rotaLayer = null; }
+            _rotaMarkers.forEach(m => _mapa.removeLayer(m));
+            _rotaMarkers = [];
+            const infoEl = document.getElementById('rota-info');
+            if (infoEl) infoEl.textContent = '';
+        }
+
+        // ═══════════════════════════════════════════════════
+        // DASHBOARD FINANCEIRO
+        // ═══════════════════════════════════════════════════
+        let _charts = {};
+
+        function _destroyChart(id) {
+            if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
+        }
+
+        async function carregarDashboard() {
+            const dias = parseInt(document.getElementById('dash-periodo')?.value || 30);
+            const dataIni = new Date(Date.now() - dias * 86400000).toISOString().split('T')[0];
+            const hoje = new Date().toISOString().split('T')[0];
+            try {
+                const [{ data: servicos }, { data: combustivel }, { data: manutencoes }, { data: orcamentos }] = await Promise.all([
+                    _filtrarBase(db.from(TBL.prog).select('*').gte('data_servico', dataIni).lte('data_servico', hoje)),
+                    _filtrarBase(db.from(TBL.combustivel).select('*').gte('data_abast', dataIni).lte('data_abast', hoje)),
+                    _filtrarBase(db.from(TBL.manutencoes).select('*').gte('data_exec', dataIni).lte('data_exec', hoje)),
+                    _filtrarBase(db.from(TBL.orcamentos).select('*').gte('data_orc', dataIni).lte('data_orc', hoje))
+                ]);
+                const totalComb = (combustivel||[]).reduce((s,c) => s+(parseFloat(c.valor)||0), 0);
+                const totalManut = (manutencoes||[]).reduce((s,m) => s+(parseFloat(m.custo)||0), 0);
+                const totalOrcs = (orcamentos||[]).filter(o=>o.status==='APROVADO').reduce((s,o) => s+(parseFloat(o.total)||0), 0);
+                const totalGeral = totalComb + totalManut + totalOrcs;
+                // Cards
+                const cards = document.getElementById('dash-cards');
+                if (cards) cards.innerHTML = [
+                    ['⛽','Combustível','R$ '+totalComb.toFixed(2),'var(--warning)'],
+                    ['🔧','Manutenções','R$ '+totalManut.toFixed(2),'#f97316'],
+                    ['💰','Orçamentos Aprov.','R$ '+totalOrcs.toFixed(2),'var(--success)'],
+                    ['📊','Total Gasto','R$ '+totalGeral.toFixed(2),'var(--primary)'],
+                    ['🚗','Serviços',''+(servicos||[]).length,'var(--info)'],
+                    ['✅','Concluídos',''+(servicos||[]).filter(s=>s.status_flow==='CONCLUIDO').length,'var(--success)'],
+                ].map(([icon,label,val,cor])=>`<div class="metric-card" style="border:1px solid ${cor}33;">
+                    <div class="metric-icon">${icon}</div>
+                    <span class="metric-value" style="color:${cor};font-size:18px;">${val}</span>
+                    <span class="metric-label">${label}</span>
+                </div>`).join('');
+                // Gráfico combustível por mês
+                _destroyChart('combustivel');
+                const combPorMes = {};
+                (combustivel||[]).forEach(c => {
+                    const mes = (c.data_abast||'').substring(0,7);
+                    if (mes) combPorMes[mes] = (combPorMes[mes]||0) + (parseFloat(c.valor)||0);
+                });
+                const meses = Object.keys(combPorMes).sort();
+                const ctxComb = document.getElementById('chart-combustivel');
+                if (ctxComb) _charts.combustivel = new Chart(ctxComb, {
+                    type: 'bar',
+                    data: { labels: meses.map(m => { const [y,mo] = m.split('-'); return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mo)-1]+'/'+y.slice(2); }),
+                        datasets: [{ label: 'R$', data: meses.map(m => combPorMes[m].toFixed(2)), backgroundColor: '#f59e0b88', borderColor: '#f59e0b', borderWidth: 2 }] },
+                    options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ ticks:{ color:'#94a3b8', callback: v => 'R$'+v }, grid:{color:'rgba(255,255,255,.05)'} }, x:{ ticks:{color:'#94a3b8'}, grid:{display:false} } } }
+                });
+                // Gráfico serviços por status (donut)
+                _destroyChart('servicos');
+                const statusCount = {};
+                (servicos||[]).forEach(s => { statusCount[s.status_flow] = (statusCount[s.status_flow]||0)+1; });
+                const ctxServ = document.getElementById('chart-servicos');
+                if (ctxServ && Object.keys(statusCount).length) _charts.servicos = new Chart(ctxServ, {
+                    type: 'doughnut',
+                    data: { labels: Object.keys(statusCount), datasets: [{ data: Object.values(statusCount),
+                        backgroundColor: ['#f59e0b','#ef4444','#10b981','#6b7280','#3b82f6'] }] },
+                    options: { responsive:true, plugins:{ legend:{ labels:{ color:'#94a3b8', font:{size:10} } } } }
+                });
+                // Gráfico manutenções por tipo
+                _destroyChart('manutencoes');
+                const manutTipo = {};
+                (manutencoes||[]).forEach(m => { const t = m.tipo||'Outros'; manutTipo[t]=(manutTipo[t]||0)+1; });
+                const ctxManut = document.getElementById('chart-manutencoes');
+                if (ctxManut && Object.keys(manutTipo).length) _charts.manutencoes = new Chart(ctxManut, {
+                    type: 'bar',
+                    data: { labels: Object.keys(manutTipo), datasets: [{ label: 'Qtd', data: Object.values(manutTipo), backgroundColor: '#8b5cf688', borderColor: '#8b5cf6', borderWidth: 2 }] },
+                    options: { responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ticks:{color:'#94a3b8'},grid:{color:'rgba(255,255,255,.05)'}}, x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}} } }
+                });
+                // Top 5 veículos por gasto
+                _destroyChart('top-veiculos');
+                const gastoPorVeic = {};
+                (combustivel||[]).forEach(c => { if(c.placa) gastoPorVeic[c.placa]=(gastoPorVeic[c.placa]||0)+(parseFloat(c.valor)||0); });
+                (orcamentos||[]).filter(o=>o.status==='APROVADO').forEach(o => { if(o.placa) gastoPorVeic[o.placa]=(gastoPorVeic[o.placa]||0)+(parseFloat(o.total)||0); });
+                const top5 = Object.entries(gastoPorVeic).sort((a,b)=>b[1]-a[1]).slice(0,5);
+                const ctxTop = document.getElementById('chart-top-veiculos');
+                if (ctxTop && top5.length) _charts['top-veiculos'] = new Chart(ctxTop, {
+                    type: 'bar', indexAxis: 'y',
+                    data: { labels: top5.map(([p])=>p), datasets: [{ label: 'R$', data: top5.map(([,v])=>v.toFixed(2)), backgroundColor: '#d1122a88', borderColor: '#d1122a', borderWidth: 2 }] },
+                    options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:'#94a3b8',callback:v=>'R$'+v},grid:{color:'rgba(255,255,255,.05)'}}, y:{ticks:{color:'#94a3b8'},grid:{display:false}} } }
+                });
+                // Tabela por veículo
+                const tabela = document.getElementById('dash-tabela-veiculos');
+                if (tabela) {
+                    const todasPlacas = [...new Set([...(combustivel||[]).map(c=>c.placa), ...(orcamentos||[]).map(o=>o.placa)])].filter(Boolean);
+                    tabela.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:11px;">
+                        <tr style="background:rgba(255,255,255,.08);">
+                            <th style="padding:8px;text-align:left;">Placa</th>
+                            <th style="padding:8px;text-align:right;">⛽ Combustível</th>
+                            <th style="padding:8px;text-align:right;">🔧 Manutenção</th>
+                            <th style="padding:8px;text-align:right;">💰 Total</th>
+                            <th style="padding:8px;text-align:right;">🚗 Serviços</th>
+                        </tr>
+                        ${todasPlacas.sort().map(placa => {
+                            const c = (combustivel||[]).filter(x=>x.placa===placa).reduce((s,x)=>s+(parseFloat(x.valor)||0),0);
+                            const m = (manutencoes||[]).filter(x=>x.placa===placa).reduce((s,x)=>s+(parseFloat(x.custo)||0),0);
+                            const t = c + m;
+                            const sv = (servicos||[]).filter(x=>x.placa===placa).length;
+                            return `<tr style="border-bottom:1px solid rgba(255,255,255,.05);">
+                                <td style="padding:7px;font-weight:bold;">${placa}</td>
+                                <td style="padding:7px;text-align:right;color:var(--warning);">R$ ${c.toFixed(2)}</td>
+                                <td style="padding:7px;text-align:right;color:#f97316;">R$ ${m.toFixed(2)}</td>
+                                <td style="padding:7px;text-align:right;color:var(--primary);font-weight:bold;">R$ ${t.toFixed(2)}</td>
+                                <td style="padding:7px;text-align:right;color:var(--info);">${sv}</td>
+                            </tr>`;
+                        }).join('')}
+                    </table>`;
+                }
+            } catch(e) { console.error('Dashboard:', e); }
+        }
+
+        // ═══════════════════════════════════════════════════
+        // PWA — INSTALAÇÃO
+        // ═══════════════════════════════════════════════════
+        let _pwaPrompt = null;
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            _pwaPrompt = e;
+            // Mostra botão de instalar se disponível
+            const btn = document.getElementById('btn-instalar-pwa');
+            if (btn) btn.style.display = 'flex';
+        });
+
+        async function instalarPWA() {
+            if (!_pwaPrompt) {
+                alert('Para instalar:\n📱 iOS: Compartilhar → Adicionar à Tela de Início\n🤖 Android/Chrome: Menu → Adicionar à tela inicial');
+                return;
+            }
+            _pwaPrompt.prompt();
+            const { outcome } = await _pwaPrompt.userChoice;
+            if (outcome === 'accepted') { showSuccess('APP INSTALADO!'); }
+            _pwaPrompt = null;
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+
+        // ═══════════════════════════════════════════════════
+        // MANUAL DO USUÁRIO PDF
+        // ═══════════════════════════════════════════════════
+        async function gerarManualPDF() {
+            loading(true, 'Gerando manual...');
+            const perfil = currentUser?.perfil || currentUser?.role || 'admin';
+            const nomeBase = document.getElementById('base-badge-nome')?.textContent || 'LOKAMIG';
+            montarCabecalhoPDF('MANUAL DO USUÁRIO — ' + nomeBase.toUpperCase());
+            const secoes = _getSecoesManuais(perfil);
+            document.getElementById('pdf-body').innerHTML = secoes;
+            document.getElementById('pdf-photos').innerHTML = '';
+            await renderizarEBaixarPDF(`Manual_LOKAMIG_${perfil}.pdf`);
+            loading(false);
+        }
+
+        function _getSecoesManuais(perfil) {
+            const comum = `
+                <div style="background:#f0f7ff;border-left:4px solid #d1122a;padding:12px;margin-bottom:16px;border-radius:4px;">
+                    <b style="color:#d1122a;">LOKAMIG — Sistema de Gestão Operacional de Frotas</b>
+                    <p style="font-size:11px;margin-top:4px;">Versão 7.2 · Suporte: sistema.lokamig@gmail.com</p>
+                </div>`;
+            const secoes = {
+                admin: `${comum}
+                    <h3 style="color:#d1122a;border-bottom:2px solid #d1122a;padding-bottom:4px;">📊 PAINEL ADMINISTRADOR</h3>
+                    <h4>1. Acesso ao Sistema</h4>
+                    <p>Acesse <b>lokamig-producao-lucaztgh14.vercel.app</b> e faça login com suas credenciais de admin da base.</p>
+                    <h4>2. Dashboard</h4>
+                    <p>Visualize gráficos financeiros: combustível por mês, serviços por status, manutenções e gastos por veículo. Use o filtro de período para ajustar o intervalo.</p>
+                    <h4>3. Monitor de Serviços</h4>
+                    <p>Acompanhe em tempo real todos os serviços do dia. Filtre por data, placa, status e setor. Clique em um serviço para ver detalhes e alterar status.</p>
+                    <h4>4. Mapa da Frota</h4>
+                    <p>Visualize a localização em tempo real de todos os veículos. Use "Histórico de Rota" para ver o trajeto de um veículo em uma data específica.</p>
+                    <h4>5. Frota</h4>
+                    <p>Cadastre e gerencie veículos. Cada veículo tem placa, modelo, tipo (Operacional/Reserva/Gerencial), KM atual e foto.</p>
+                    <h4>6. Manutenções</h4>
+                    <p>Controle revisões e manutenções pendentes. Configure alertas por KM ou data limite. Status: Pendente → Concluído.</p>
+                    <h4>7. Combustível</h4>
+                    <p>Registre abastecimentos com data, placa, litros, valor e KM. O dashboard calcula o custo por veículo automaticamente.</p>
+                    <h4>8. Relatório Mensal</h4>
+                    <p>Na aba "Relatório", selecione mês e ano e exporte em Excel (4 abas) ou PDF com resumo completo da base.</p>
+                    <h4>9. Checklists</h4>
+                    <p>Visualize todos os checklists realizados pelos motoristas com fotos, assinatura e status de cada item.</p>
+                    <h4>10. Minha Conta</h4>
+                    <p>Altere sua senha diretamente pelo painel sem precisar de suporte técnico.</p>`,
+
+                programador: `${comum}
+                    <h3 style="color:#d1122a;border-bottom:2px solid #d1122a;padding-bottom:4px;">📋 MANUAL DO PROGRAMADOR</h3>
+                    <h4>1. Lançar Serviço</h4>
+                    <p>Preencha: data, placa, tipo de operação, fornecedor destino e KM. Anexe fotos se necessário. Clique em "Lançar".</p>
+                    <h4>2. Acompanhar Status</h4>
+                    <p>Na tela principal veja todos os serviços do dia. Status: Pendente → Em Execução → Concluído.</p>
+                    <h4>3. Retorno de Veículo</h4>
+                    <p>Ao receber o veículo de volta, registre o retorno com KM atualizado e fotos do estado do veículo.</p>
+                    <h4>4. Dicas</h4>
+                    <p>• Sempre atualize o KM ao lançar serviços<br>• Anexe fotos para registrar avarias<br>• Use o filtro de data para localizar serviços antigos</p>`,
+
+                motorista: `${comum}
+                    <h3 style="color:#d1122a;border-bottom:2px solid #d1122a;padding-bottom:4px;">🚗 MANUAL DO MOTORISTA</h3>
+                    <h4>1. Checklist de Saída</h4>
+                    <p>Antes de sair com o veículo: selecione a placa, preencha o KM, marque todos os itens do checklist, fotografe o veículo (mínimo 4 fotos) e assine digitalmente.</p>
+                    <h4>2. GPS Automático</h4>
+                    <p>Ao selecionar a placa, o GPS é ativado automaticamente. Permita o acesso à localização quando solicitado. Sua posição é enviada a cada 2 minutos para o mapa do admin.</p>
+                    <h4>3. Checklist de Retorno</h4>
+                    <p>Ao retornar: selecione "Retorno", preencha o KM final, verifique os itens e registre qualquer avaria observada com foto.</p>
+                    <h4>4. Dicas Importantes</h4>
+                    <p>• Mantenha o GPS ativado durante toda a viagem<br>• Fotografe avarias antes de sair e ao retornar<br>• Sempre assine o checklist para validar<br>• Em caso de problemas, contate o programador</p>`,
+
+                fornecedor: `${comum}
+                    <h3 style="color:#d1122a;border-bottom:2px solid #d1122a;padding-bottom:4px;">🏢 MANUAL DO FORNECEDOR</h3>
+                    <h4>1. Ver Serviços</h4>
+                    <p>Na tela inicial veja todos os serviços designados para sua empresa. Filtre por data e status.</p>
+                    <h4>2. Enviar Orçamento</h4>
+                    <p>Para serviços aprovados, cadastre o orçamento com itens, valores e prazo. Anexe fotos do serviço realizado.</p>
+                    <h4>3. Acompanhar Aprovações</h4>
+                    <p>Orçamentos passam por: Enviado → Aprovado/Rejeitado. Você recebe atualização em tempo real.</p>
+                    <h4>4. Avaliações</h4>
+                    <p>Após cada serviço você pode ser avaliado. Mantenha a qualidade para manter a parceria.</p>`
+            };
+            return secoes[perfil] || secoes.admin;
+        }
 
         function iniciarRealtimeMapa() {
             if (_mapaRealtimeChannel) return;
