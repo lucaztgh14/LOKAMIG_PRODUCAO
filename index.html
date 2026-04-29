@@ -160,6 +160,133 @@
         .leaflet-popup-content-wrapper { border-radius:12px; }
         @media (min-width:1024px) { #mapa-container { height:550px; } }
 
+        /* GPS MOTORISTA */
+        #gps-status-bar {
+            display:flex; align-items:center; gap:10px; padding:10px 14px;
+            background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.3);
+            border-radius:10px; margin-bottom:10px; font-size:12px;
+        }
+        #gps-dot { width:10px; height:10px; border-radius:50%; background:var(--gray); flex-shrink:0; }
+        #gps-dot.ativo { background:var(--success); animation: pulse-gps 1.5s infinite; }
+        #gps-dot.erro { background:var(--danger); }
+        @keyframes pulse-gps {
+            0%,100% { opacity:1; transform:scale(1); }
+            50% { opacity:.5; transform:scale(1.3); }
+        }
+
+        /* MASTER PANEL */
+        .master-card {
+            background: linear-gradient(135deg, rgba(124,58,237,.15), rgba(209,18,42,.1));
+            border: 1px solid rgba(124,58,237,.4);
+            border-radius:16px; padding:16px; margin-bottom:12px;
+        }
+        .master-base-card {
+            background:rgba(255,255,255,.05);
+            border:1px solid rgba(255,255,255,.1);
+            border-radius:14px; padding:16px; cursor:pointer;
+            transition:.3s; position:relative; overflow:hidden;
+        }
+        .master-base-card:hover { background:rgba(255,255,255,.1); transform:translateY(-2px); }
+        .master-base-card .base-indicator {
+            position:absolute; top:0; left:0; width:4px; height:100%;
+            background:var(--primary);
+        }
+        .master-user-row {
+            display:flex; justify-content:space-between; align-items:center;
+            padding:10px 12px; background:rgba(255,255,255,.04);
+            border-radius:10px; margin-bottom:6px; font-size:12px;
+        }
+        .master-tabs {
+            display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;
+        }
+        .master-tab-btn {
+            padding:8px 16px; border-radius:8px; border:1px solid rgba(124,58,237,.4);
+            background:rgba(124,58,237,.1); color:#c4b5fd; font-size:11px;
+            cursor:pointer; transition:.3s; font-family:'Montserrat',sans-serif;
+            font-weight:600; margin:0;
+        }
+        .master-tab-btn.active { background:rgba(124,58,237,.5); color:#fff; }
+        .master-section { display:none; }
+        .master-section.active { display:block; }
+        #scr-master { background: linear-gradient(rgba(15,23,42,.97),rgba(15,23,42,.97)),
+            url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400');
+            background-size:cover; background-attachment:fixed; }
+        .crown-badge {
+            display:inline-flex; align-items:center; gap:4px;
+            background:linear-gradient(135deg,#f59e0b,#d97706);
+            color:#000; font-size:9px; font-weight:900; padding:3px 8px;
+            border-radius:20px; letter-spacing:1px; text-transform:uppercase;
+        }
+        .chefao-badge {
+            display:inline-flex; align-items:center; gap:4px;
+            background:linear-gradient(135deg,#7c3aed,#4f46e5);
+            color:#fff; font-size:9px; font-weight:900; padding:3px 8px;
+            border-radius:20px; letter-spacing:1px; text-transform:uppercase;
+        }
+        /* TELA CHEFÃO */
+        #scr-chefao {
+            background: linear-gradient(rgba(15,23,42,.97),rgba(15,23,42,.97)),
+                url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1400');
+            background-size:cover; background-attachment:fixed;
+        }
+        .chefao-base-card {
+            background:rgba(255,255,255,.05);
+            border:1px solid rgba(99,102,241,.3);
+            border-radius:14px; padding:16px; cursor:pointer;
+            transition:.3s; position:relative; overflow:hidden;
+        }
+        .chefao-base-card:hover { background:rgba(99,102,241,.1); transform:translateY(-2px); }
+        .chefao-base-card .base-indicator { position:absolute; top:0; left:0; width:4px; height:100%; background:#6366f1; }
+        .chefao-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+        .chefao-tab-btn {
+            padding:8px 16px; border-radius:8px; border:1px solid rgba(99,102,241,.4);
+            background:rgba(99,102,241,.1); color:#a5b4fc; font-size:11px;
+            cursor:pointer; transition:.3s; font-family:'Montserrat',sans-serif;
+            font-weight:600; margin:0;
+        }
+        .chefao-tab-btn.active { background:rgba(99,102,241,.5); color:#fff; }
+        .chefao-section { display:none; }
+        .chefao-section.active { display:block; }
+
+        /* CHEFÃO */
+        #scr-chefao { background: linear-gradient(rgba(15,23,42,.97),rgba(15,23,42,.97)),
+            url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1400');
+            background-size:cover; background-attachment:fixed; }
+        .chefao-badge {
+            display:inline-flex; align-items:center; gap:4px;
+            background:linear-gradient(135deg,#0ea5e9,#0284c7);
+            color:#fff; font-size:9px; font-weight:900; padding:3px 8px;
+            border-radius:20px; letter-spacing:1px; text-transform:uppercase;
+        }
+        .chefao-tab-btn {
+            padding:8px 16px; border-radius:8px; border:1px solid rgba(14,165,233,.4);
+            background:rgba(14,165,233,.1); color:#7dd3fc; font-size:11px;
+            cursor:pointer; transition:.3s; font-family:'Montserrat',sans-serif;
+            font-weight:600; margin:0; white-space:nowrap;
+        }
+        .chefao-tab-btn.active { background:rgba(14,165,233,.4); color:#fff; }
+        .chefao-section { display:none; }
+        .chefao-section.active { display:block; }
+        .chefao-base-card {
+            background:rgba(255,255,255,.05);
+            border:1px solid rgba(14,165,233,.2);
+            border-radius:14px; padding:16px; cursor:pointer;
+            transition:.3s; position:relative; overflow:hidden;
+        }
+        .chefao-base-card:hover { background:rgba(14,165,233,.08); transform:translateY(-2px); }
+        .hierarquia-badge {
+            display:inline-flex; align-items:center; gap:4px;
+            font-size:9px; font-weight:900; padding:2px 8px;
+            border-radius:20px; letter-spacing:1px; text-transform:uppercase;
+        }
+        .badge-master { background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; }
+        .badge-chefao { background:linear-gradient(135deg,#0ea5e9,#0284c7); color:#fff; }
+        .badge-admin { background:linear-gradient(135deg,#d1122a,#a00d20); color:#fff; }
+        .badge-programador { background:rgba(59,130,246,.3); color:#93c5fd; }
+        .badge-supervisor { background:rgba(245,158,11,.3); color:#fcd34d; }
+        .badge-motorista { background:rgba(16,185,129,.3); color:#6ee7b7; }
+        .badge-fornecedor { background:rgba(249,115,22,.3); color:#fdba74; }
+
         /* ═══════════════════════════════════════
            CHAT FLUTUANTE — WhatsApp interno
         ══════════════════════════════════════ */
@@ -1252,14 +1379,422 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- TELA 1: LOGIN -->
+    <!-- TELA CHEFÃO — VISÃO MULTI-BASE                         -->
     <!-- ═══════════════════════════════════════════════════════ -->
+    <section id="scr-chefao" class="container hidden" style="max-width:1400px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap;">
+            <h1 style="margin:0;">🏆 PAINEL CHEFÃO</h1>
+            <span class="chefao-badge">🌐 Multi-Base</span>
+            <span class="realtime-badge" style="margin-left:auto;"><span class="realtime-dot"></span>LIVE</span>
+        </div>
+        <div class="sub" id="chefao-user-label">Visão consolidada de todas as bases</div>
+
+        <!-- Métricas globais -->
+        <div class="dashboard-grid" style="margin-bottom:16px;">
+            <div class="metric-card" style="border:1px solid rgba(99,102,241,.3);">
+                <div class="metric-icon">🏭</div>
+                <span class="metric-value" id="chf-bases" style="color:#a5b4fc;">0</span>
+                <span class="metric-label">Bases Ativas</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(99,102,241,.3);">
+                <div class="metric-icon">🚗</div>
+                <span class="metric-value" id="chf-servicos" style="color:#a5b4fc;">0</span>
+                <span class="metric-label">Serviços Hoje</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(99,102,241,.3);">
+                <div class="metric-icon">✅</div>
+                <span class="metric-value" id="chf-concluidos" style="color:var(--success);">0</span>
+                <span class="metric-label">Concluídos</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(99,102,241,.3);">
+                <div class="metric-icon">⏳</div>
+                <span class="metric-value" id="chf-pendentes" style="color:var(--warning);">0</span>
+                <span class="metric-label">Pendentes</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(99,102,241,.3);">
+                <div class="metric-icon">🚛</div>
+                <span class="metric-value" id="chf-frota" style="color:#a5b4fc;">0</span>
+                <span class="metric-label">Total Frota</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(99,102,241,.3);">
+                <div class="metric-icon">⚠️</div>
+                <span class="metric-value" id="chf-alertas" style="color:var(--danger);">0</span>
+                <span class="metric-label">Alertas</span>
+            </div>
+        </div>
+
+        <!-- Tabs Chefão -->
+        <div class="chefao-tabs">
+            <button class="chefao-tab-btn active" onclick="chefaoSwitchTab('visao-geral',this)">🌐 Visão Geral</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('monitor',this)">📡 Monitor Global</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('frota',this)">🚛 Frota Global</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('orcamentos',this)">💰 Orçamentos</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('usuarios',this)">👥 Usuários</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('minha-conta',this)">🔑 Minha Conta</button>
+        </div>
+
+        <!-- TAB: Visão Geral -->
+        <div id="chefao-visao-geral" class="chefao-section active">
+            <h3 style="color:#a5b4fc;margin-bottom:12px;">📊 Status de Todas as Bases — Hoje</h3>
+            <div id="chefao-bases-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;"></div>
+        </div>
+
+        <!-- TAB: Monitor Global -->
+        <div id="chefao-monitor" class="chefao-section">
+            <h3 style="color:#a5b4fc;margin-bottom:12px;">📡 Monitor Global de Serviços</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                <input type="date" id="chf-mon-date" onchange="chefaoCarregarMonitor()" style="flex:1;margin:0;min-width:140px;">
+                <select id="chf-mon-base" onchange="chefaoCarregarMonitor()" style="flex:1;margin:0;min-width:140px;">
+                    <option value="">Todas as bases</option>
+                </select>
+                <select id="chf-mon-status" onchange="chefaoCarregarMonitor()" style="flex:1;margin:0;min-width:140px;">
+                    <option value="">Todos os status</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="EM EXECUÇÃO">Em Execução</option>
+                    <option value="CONCLUIDO">Concluído</option>
+                    <option value="CANCELADO">Cancelado</option>
+                </select>
+            </div>
+            <div id="chefao-lista-monitor"></div>
+        </div>
+
+        <!-- TAB: Frota Global -->
+        <div id="chefao-frota" class="chefao-section">
+            <h3 style="color:#a5b4fc;margin-bottom:12px;">🚛 Frota — Todas as Bases</h3>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <select id="chf-frota-base" onchange="chefaoCarregarFrota()" style="flex:1;margin:0;">
+                    <option value="">Todas as bases</option>
+                </select>
+            </div>
+            <div id="chefao-lista-frota" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;"></div>
+        </div>
+
+        <!-- TAB: Orçamentos -->
+        <div id="chefao-orcamentos" class="chefao-section">
+            <h3 style="color:#a5b4fc;margin-bottom:12px;">💰 Orçamentos — Todas as Bases</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                <select id="chf-orc-base" onchange="chefaoCarregarOrcamentos()" style="flex:1;margin:0;min-width:140px;">
+                    <option value="">Todas as bases</option>
+                </select>
+                <select id="chf-orc-status" onchange="chefaoCarregarOrcamentos()" style="flex:1;margin:0;min-width:140px;">
+                    <option value="">Todos</option>
+                    <option value="PENDENTE">Pendentes</option>
+                    <option value="APROVADO">Aprovados</option>
+                    <option value="REJEITADO">Rejeitados</option>
+                </select>
+            </div>
+            <div id="chefao-lista-orc"></div>
+        </div>
+
+        <!-- TAB: Usuários -->
+        <div id="chefao-usuarios" class="chefao-section">
+            <h3 style="color:#a5b4fc;margin-bottom:12px;">👥 Usuários das Bases</h3>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <select id="chf-user-base" onchange="chefaoCarregarUsuarios()" style="flex:1;margin:0;">
+                    <option value="">Todas as bases</option>
+                </select>
+                <input type="text" id="chf-user-busca" placeholder="🔍 Buscar..." oninput="chefaoCarregarUsuarios()" style="flex:1;margin:0;">
+            </div>
+            <div id="chefao-lista-usuarios"></div>
+        </div>
+
+        <!-- TAB: Minha Conta -->
+        <div id="chefao-minha-conta" class="chefao-section">
+            <h3 style="color:#a5b4fc;margin-bottom:12px;">🔑 Minha Conta</h3>
+            <div class="master-card" style="border-color:rgba(99,102,241,.4);">
+                <h4 style="color:#a5b4fc;margin-bottom:12px;">🔒 Alterar Minha Senha</h4>
+                <p style="font-size:11px;color:var(--gray);margin-bottom:12px;">Após alterar, use a nova senha no próximo login.</p>
+                <input type="password" id="chf-senha-atual" placeholder="Senha atual">
+                <input type="password" id="chf-senha-nova" placeholder="Nova senha">
+                <input type="password" id="chf-senha-confirma" placeholder="Confirmar nova senha">
+                <button onclick="chefaoAlterarSenha()" style="background:#6366f1;">🔑 Alterar Senha</button>
+            </div>
+        </div>
+
+        <button onclick="handleLogout()" class="btn-gray" style="margin-top:20px;">🚪 Sair do Sistema</button>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TELA MASTER — CHEFÃO GLOBAL                            -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section id="scr-master" class="container hidden" style="max-width:1400px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap;">
+            <h1 style="margin:0;">👑 PAINEL MASTER</h1>
+            <span class="crown-badge">⭐ Acesso Total</span>
+            <span class="realtime-badge" style="margin-left:auto;"><span class="realtime-dot"></span>LIVE</span>
+        </div>
+        <div class="sub" id="master-user-label">Bem-vindo, Master</div>
+
+        <!-- Métricas globais -->
+        <div class="dashboard-grid" style="margin-bottom:16px;">
+            <div class="metric-card" style="border:1px solid rgba(124,58,237,.3);">
+                <div class="metric-icon">🏭</div>
+                <span class="metric-value" id="mst-bases" style="color:#a78bfa;">0</span>
+                <span class="metric-label">Bases Ativas</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(124,58,237,.3);">
+                <div class="metric-icon">🚗</div>
+                <span class="metric-value" id="mst-servicos" style="color:#a78bfa;">0</span>
+                <span class="metric-label">Serviços Hoje</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(124,58,237,.3);">
+                <div class="metric-icon">✅</div>
+                <span class="metric-value" id="mst-concluidos" style="color:var(--success);">0</span>
+                <span class="metric-label">Concluídos</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(124,58,237,.3);">
+                <div class="metric-icon">🚛</div>
+                <span class="metric-value" id="mst-frota" style="color:#a78bfa;">0</span>
+                <span class="metric-label">Total Frota</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(124,58,237,.3);">
+                <div class="metric-icon">👥</div>
+                <span class="metric-value" id="mst-usuarios" style="color:#a78bfa;">0</span>
+                <span class="metric-label">Usuários</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(124,58,237,.3);">
+                <div class="metric-icon">⚠️</div>
+                <span class="metric-value" id="mst-alertas" style="color:var(--warning);">0</span>
+                <span class="metric-label">Alertas</span>
+            </div>
+        </div>
+
+        <!-- Tabs Master -->
+        <div class="master-tabs">
+            <button class="master-tab-btn active" onclick="masterSwitchTab('visao-geral',this)">🌐 Visão Geral</button>
+            <button class="master-tab-btn" onclick="masterSwitchTab('bases',this)">🏭 Bases</button>
+            <button class="master-tab-btn" onclick="masterSwitchTab('usuarios',this)">👥 Usuários</button>
+            <button class="master-tab-btn" onclick="masterSwitchTab('minha-conta',this)">🔑 Minha Conta</button>
+            <button class="master-tab-btn" onclick="masterSwitchTab('auditoria-global',this)">📝 Auditoria Global</button>
+        </div>
+
+        <!-- TAB: Visão Geral -->
+        <div id="master-visao-geral" class="master-section active">
+            <h3 style="color:#a78bfa;margin-bottom:12px;">📊 Status de Todas as Bases — Hoje</h3>
+            <div id="master-bases-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;"></div>
+        </div>
+
+        <!-- TAB: Bases -->
+        <div id="master-bases" class="master-section">
+            <h3 style="color:#a78bfa;margin-bottom:12px;">🏭 Gestão de Bases</h3>
+            <div class="master-card">
+                <h4 style="color:#c4b5fd;margin-bottom:12px;">➕ Cadastrar Nova Base</h4>
+                <input type="text" id="mst-base-nome" placeholder="Nome da base (ex: Macaé, Itaguaí...)">
+                <input type="text" id="mst-base-cidade" placeholder="Cidade">
+                <input type="text" id="mst-base-estado" placeholder="Estado (ex: RJ, SP)">
+                <input type="text" id="mst-base-admin-login" placeholder="Login do Admin desta base (ex: admin_macae)">
+                <input type="password" id="mst-base-admin-pass" placeholder="Senha do Admin desta base">
+                <button onclick="masterCriarBase()" class="btn-purple">🏭 Criar Base + Admin</button>
+            </div>
+            <div id="master-lista-bases"></div>
+        </div>
+
+        <!-- TAB: Usuários -->
+        <div id="master-usuarios" class="master-section">
+            <h3 style="color:#a78bfa;margin-bottom:12px;">👥 Todos os Usuários do Sistema</h3>
+            <div class="master-card">
+                <h4 style="color:#c4b5fd;margin-bottom:12px;">➕ Criar Novo Usuário</h4>
+                <select id="mst-user-base" style="margin-bottom:8px;">
+                    <option value="">— Selecione a base —</option>
+                </select>
+                <input type="text" id="mst-user-nome" placeholder="Nome completo">
+                <input type="text" id="mst-user-login" placeholder="Login de acesso">
+                <input type="password" id="mst-user-pass" placeholder="Senha">
+                <select id="mst-user-perfil">
+                    <option value="chefao">🏆 Chefão (visão multi-base)</option>
+                    <option value="admin">Admin de Base</option>
+                    <option value="programador">Programador</option>
+                    <option value="supervisor">Supervisor</option>
+                    <option value="motorista">Motorista</option>
+                </select>
+                <button onclick="masterCriarUsuario()" class="btn-purple">👤 Criar Usuário</button>
+            </div>
+            <div style="margin-bottom:10px;">
+                <input type="text" id="mst-user-busca" placeholder="🔍 Buscar usuário..." oninput="masterCarregarUsuarios()">
+            </div>
+            <div id="master-lista-usuarios"></div>
+        </div>
+
+        <!-- TAB: Minha Conta -->
+        <div id="master-minha-conta" class="master-section">
+            <h3 style="color:#a78bfa;margin-bottom:12px;">🔑 Minha Conta Master</h3>
+            <div class="master-card">
+                <h4 style="color:#c4b5fd;margin-bottom:12px;">🔒 Alterar Senha Master</h4>
+                <p style="font-size:11px;color:var(--gray);margin-bottom:12px;">Sua senha é armazenada de forma segura no banco. Após alterar, use a nova senha no próximo login.</p>
+                <input type="password" id="mst-senha-atual" placeholder="Senha atual">
+                <input type="password" id="mst-senha-nova" placeholder="Nova senha (mínimo 8 caracteres)">
+                <input type="password" id="mst-senha-confirma" placeholder="Confirmar nova senha">
+                <button onclick="masterAlterarSenha()" class="btn-purple">🔑 Alterar Senha</button>
+            </div>
+            <div class="master-card" style="margin-top:12px;">
+                <h4 style="color:#c4b5fd;margin-bottom:12px;">⚙️ Configurações Globais</h4>
+                <div class="master-user-row">
+                    <span>🔐 Login Master</span>
+                    <b id="mst-login-exibido" style="color:#a78bfa;">MASTER</b>
+                </div>
+                <div class="master-user-row">
+                    <span>📅 Último acesso</span>
+                    <b id="mst-ultimo-acesso" style="color:var(--gray);">—</b>
+                </div>
+                <div class="master-user-row">
+                    <span>🏭 Bases cadastradas</span>
+                    <b id="mst-conta-bases" style="color:#a78bfa;">0</b>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Auditoria Global -->
+        <div id="master-auditoria-global" class="master-section">
+            <h3 style="color:#a78bfa;margin-bottom:12px;">📝 Auditoria Global — Todas as Bases</h3>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <input type="text" id="mst-audit-busca" placeholder="🔍 Filtrar..." oninput="masterCarregarAuditoria()" style="flex:1;margin:0;">
+                <button onclick="masterCarregarAuditoria()" class="btn-info btn-sm">🔄 Atualizar</button>
+            </div>
+            <div id="master-lista-auditoria"></div>
+        </div>
+
+        <button onclick="handleLogout()" class="btn-gray" style="margin-top:20px;">🚪 Sair do Sistema</button>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TELA CHEFÃO — VISÃO MULTI-BASE                         -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section id="scr-chefao" class="container hidden" style="max-width:1400px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap;">
+            <h1 style="margin:0;">🏆 PAINEL CHEFÃO</h1>
+            <span class="chefao-badge">🌐 Multi-Base</span>
+            <span class="realtime-badge" style="margin-left:auto;"><span class="realtime-dot"></span>LIVE</span>
+        </div>
+        <div class="sub" id="chefao-user-label">Visão consolidada de todas as bases</div>
+
+        <div class="dashboard-grid" style="margin-bottom:16px;">
+            <div class="metric-card" style="border:1px solid rgba(14,165,233,.3);">
+                <div class="metric-icon">🏭</div><span class="metric-value" id="chf-bases" style="color:#7dd3fc;">0</span><span class="metric-label">Bases Ativas</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(14,165,233,.3);">
+                <div class="metric-icon">🚗</div><span class="metric-value" id="chf-servicos" style="color:#7dd3fc;">0</span><span class="metric-label">Serviços Hoje</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(14,165,233,.3);">
+                <div class="metric-icon">✅</div><span class="metric-value" id="chf-concluidos" style="color:var(--success);">0</span><span class="metric-label">Concluídos</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(14,165,233,.3);">
+                <div class="metric-icon">⏱️</div><span class="metric-value" id="chf-pendentes" style="color:var(--warning);">0</span><span class="metric-label">Pendentes</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(14,165,233,.3);">
+                <div class="metric-icon">🚛</div><span class="metric-value" id="chf-frota" style="color:#7dd3fc;">0</span><span class="metric-label">Total Frota</span>
+            </div>
+            <div class="metric-card" style="border:1px solid rgba(14,165,233,.3);">
+                <div class="metric-icon">⚠️</div><span class="metric-value" id="chf-alertas" style="color:var(--danger);">0</span><span class="metric-label">Alertas</span>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;">
+            <button class="chefao-tab-btn active" onclick="chefaoSwitchTab('visao-geral',this)">🌐 Visão Geral</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('monitor-global',this)">📡 Monitor Global</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('frota-global',this)">🚛 Frota Global</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('orcamentos-global',this)">💰 Orçamentos</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('usuarios-global',this)">👥 Usuários</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('mapa-global',this)">🗺️ Mapa Global</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('auditoria-chefao',this)">📝 Auditoria</button>
+            <button class="chefao-tab-btn" onclick="chefaoSwitchTab('conta-chefao',this)">🔑 Minha Conta</button>
+        </div>
+
+        <!-- Visão Geral -->
+        <div id="chefao-visao-geral" class="chefao-section active">
+            <h3 style="color:#7dd3fc;margin-bottom:12px;">📊 Status de Todas as Bases — Hoje</h3>
+            <div id="chf-bases-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;"></div>
+        </div>
+
+        <!-- Monitor Global -->
+        <div id="chefao-monitor-global" class="chefao-section">
+            <h3 style="color:#7dd3fc;margin-bottom:12px;">📡 Todos os Serviços</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                <input type="date" id="chf-mon-date" onchange="chefaoCarregarMonitor()" style="flex:1;min-width:140px;margin:0;">
+                <select id="chf-mon-base" onchange="chefaoCarregarMonitor()" style="flex:1;min-width:140px;margin:0;"><option value="">Todas as bases</option></select>
+                <select id="chf-mon-status" onchange="chefaoCarregarMonitor()" style="flex:1;min-width:140px;margin:0;">
+                    <option value="">Todos os status</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="EM EXECUÇÃO">Em Execução</option>
+                    <option value="CONCLUIDO">Concluído</option>
+                </select>
+            </div>
+            <div id="chf-monitor-lista"></div>
+        </div>
+
+        <!-- Frota Global -->
+        <div id="chefao-frota-global" class="chefao-section">
+            <h3 style="color:#7dd3fc;margin-bottom:12px;">🚛 Frota de Todas as Bases</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                <select id="chf-frota-base" onchange="chefaoCarregarFrota()" style="flex:1;margin:0;"><option value="">Todas as bases</option></select>
+                <input type="text" id="chf-frota-busca" placeholder="🔍 Buscar placa..." oninput="chefaoCarregarFrota()" style="flex:1;margin:0;">
+            </div>
+            <div id="chf-frota-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;"></div>
+        </div>
+
+        <!-- Orçamentos Global -->
+        <div id="chefao-orcamentos-global" class="chefao-section">
+            <h3 style="color:#7dd3fc;margin-bottom:12px;">💰 Orçamentos — Todas as Bases</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                <select id="chf-orc-base" onchange="chefaoCarregarOrcamentos()" style="flex:1;margin:0;"><option value="">Todas as bases</option></select>
+                <select id="chf-orc-status" onchange="chefaoCarregarOrcamentos()" style="flex:1;margin:0;">
+                    <option value="">Todos</option><option value="PENDENTE">Pendentes</option>
+                    <option value="APROVADO">Aprovados</option><option value="REJEITADO">Rejeitados</option>
+                </select>
+            </div>
+            <div id="chf-orc-lista"></div>
+        </div>
+
+        <!-- Usuários Global -->
+        <div id="chefao-usuarios-global" class="chefao-section">
+            <h3 style="color:#7dd3fc;margin-bottom:12px;">👥 Usuários — Todas as Bases</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                <select id="chf-usr-base" onchange="chefaoCarregarUsuarios()" style="flex:1;margin:0;"><option value="">Todas as bases</option></select>
+                <input type="text" id="chf-usr-busca" placeholder="🔍 Buscar..." oninput="chefaoCarregarUsuarios()" style="flex:1;margin:0;">
+            </div>
+            <div id="chf-usr-lista"></div>
+        </div>
+
+        <!-- Mapa Global -->
+        <div id="chefao-mapa-global" class="chefao-section">
+            <h3 style="color:#7dd3fc;margin-bottom:12px;">🗺️ Mapa Global da Frota</h3>
+            <div style="width:100%;height:500px;border-radius:12px;overflow:hidden;position:relative;z-index:1;">
+                <div id="chf-mapa-leaflet" style="width:100%;height:100%;"></div>
+            </div>
+            <div id="chf-mapa-lista" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:12px;"></div>
+        </div>
+
+        <!-- Auditoria -->
+        <div id="chefao-auditoria-chefao" class="chefao-section">
+            <h3 style="color:#7dd3fc;margin-bottom:12px;">📝 Auditoria Global</h3>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <input type="text" id="chf-audit-busca" placeholder="🔍 Filtrar..." oninput="chefaoCarregarAuditoria()" style="flex:1;margin:0;">
+                <button onclick="chefaoCarregarAuditoria()" class="btn-info btn-sm">🔄</button>
+            </div>
+            <div id="chf-audit-lista"></div>
+        </div>
+
+        <!-- Minha Conta -->
+        <div id="chefao-conta-chefao" class="chefao-section">
+            <h3 style="color:#7dd3fc;margin-bottom:12px;">🔑 Minha Conta</h3>
+            <div class="master-card" style="border-color:rgba(14,165,233,.3);">
+                <h4 style="color:#7dd3fc;margin-bottom:12px;">🔒 Alterar Minha Senha</h4>
+                <p style="font-size:11px;color:var(--gray);margin-bottom:12px;">Somente você pode alterar sua própria senha. O MASTER não pode ser alterado por aqui.</p>
+                <input type="password" id="chf-senha-atual" placeholder="Senha atual">
+                <input type="password" id="chf-senha-nova" placeholder="Nova senha (mínimo 6 caracteres)">
+                <input type="password" id="chf-senha-confirma" placeholder="Confirmar nova senha">
+                <button onclick="chefaoAlterarSenha()" style="background:#0ea5e9;">🔑 Alterar Senha</button>
+            </div>
+        </div>
+
+        <button onclick="handleLogout()" class="btn-gray" style="margin-top:20px;">🚪 Sair do Sistema</button>
+    </section>
+
     <section id="scr-login" style="display:flex;justify-content:center;align-items:center;width:100%;min-height:100vh;">
         <div class="login-box">
             <img src="https://www.multiartesbh.com.br/wp-content/uploads/logo_lokamig.jpg" alt="LOKAMIG"
                 class="login-logo" onerror="this.style.display='none'">
             <h1>LOKAMIG</h1>
-            <div class="subtitle">Gestão Operacional · v6.1 · Realtime</div>
+            <div class="subtitle">Gestão Operacional · v7.0 · Multi-Base</div>
             <input type="text" id="user" placeholder="Usuário" autocomplete="off"
                 onkeydown="if(event.key==='Enter') document.getElementById('pass').focus()">
             <input type="password" id="pass" placeholder="Senha" onkeydown="if(event.key==='Enter') handleLogin()">
@@ -1758,7 +2293,15 @@
         <h1>🚗 CHECKLIST DO VEÍCULO</h1>
         <div class="sub" id="motorista-user-label"></div>
 
-        <!-- Seletor de veículo e data -->
+        <!-- Barra de status GPS -->
+        <div id="gps-status-bar">
+            <div id="gps-dot"></div>
+            <div style="flex:1;">
+                <span id="gps-status-texto" style="font-weight:600;">GPS: Aguardando veículo...</span>
+                <div id="gps-coords" style="font-size:10px;color:var(--gray);margin-top:2px;"></div>
+            </div>
+            <button id="btn-gps-toggle" onclick="toggleGPS()" class="btn-sm" style="background:var(--success);width:auto;padding:6px 12px;margin:0;">📍 Ativar GPS</button>
+        </div>
         <div class="form-section">
             <h4 style="color:var(--info);margin-bottom:10px;">Novo Checklist</h4>
             <select id="ck-placa" onchange="ckAtualizarSetor()">
@@ -2296,14 +2839,41 @@
             loading(true, 'Autenticando...');
 
             try {
-                // ADMIN hardcoded
-                if (u === 'ADMIN' && p === 'Luc45t1@go') {
-                    currentUser = { nome: 'Administrador', role: 'admin' };
-                    await _entrarAdmin();
+                // MASTER — senha dinâmica (busca no banco, fallback hardcoded)
+                if (u === 'MASTER') {
+                    let senhaMaster = 'Luc45t1@go'; // fallback padrão
+                    try {
+                        const { data: cfg } = await db.from(TBL.config).select('valor').eq('chave', 'master_senha').single();
+                        if (cfg?.valor?.senha) senhaMaster = cfg.valor.senha;
+                    } catch(_) {}
+                    if (p === senhaMaster) {
+                        currentUser = { nome: 'MASTER', role: 'master' };
+                        await _entrarMaster();
+                        return;
+                    }
+                    loading(false);
+                    alert('❌ Acesso Negado.');
                     return;
                 }
 
-                // Colaboradores
+                // ADMIN legado — senha dinâmica
+                if (u === 'ADMIN') {
+                    let senhaAdmin = 'Luc45t1@go';
+                    try {
+                        const { data: cfg } = await db.from(TBL.config).select('valor').eq('chave', 'admin_senha').single();
+                        if (cfg?.valor?.senha) senhaAdmin = cfg.valor.senha;
+                    } catch(_) {}
+                    if (p === senhaAdmin) {
+                        currentUser = { nome: 'Administrador', role: 'admin', base_id: null };
+                        await _entrarAdmin();
+                        return;
+                    }
+                    loading(false);
+                    alert('❌ Acesso Negado.');
+                    return;
+                }
+
+                // Colaboradores (admin de base, programador, supervisor, motorista)
                 const { data: colabs, error: colabErr } = await db.from(TBL.colaboradores)
                     .select('*').ilike('user_login', u);
                 if (colabs?.length) {
@@ -2311,6 +2881,17 @@
                     if (!colab) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.'); return; }
                     currentUser = { ...colab, nome: colab.nome, role: colab.perfil };
                     await registrarAuditoria('Login: ' + colab.nome + ' (' + colab.perfil + ')');
+
+                    if (colab.perfil === 'chefao') {
+                        currentUser = { ...colab, nome: colab.nome, role: 'chefao' };
+                        await _entrarChefao();
+                        return;
+                    }
+
+                    if (colab.perfil === 'admin') {
+                        await _entrarAdmin();
+                        return;
+                    }
 
                     if (colab.perfil === 'programador') {
                         document.getElementById('prog-user-label').textContent = 'Usuário: ' + colab.nome;
@@ -2334,6 +2915,8 @@
                         document.getElementById('ck-hist-date').value = hoje;
                         await carregarHistoricoMotorista();
                         iniciarRealtime();
+                        // GPS não inicia automaticamente — usuário ativa via botão
+                        atualizarUIGPS('inativo', 'GPS: Clique em "Ativar GPS" para iniciar o rastreamento', null);
                         return;
                     }
 
@@ -2376,7 +2959,15 @@
         }
 
         async function _entrarAdmin() {
-            document.getElementById('admin-user-label').textContent = 'Bem-vindo, Administrador';
+            let baseLabel = '';
+            if (currentUser?.base_id) {
+                try {
+                    const { data: base } = await db.from('bases').select('nome').eq('id', currentUser.base_id).single();
+                    if (base?.nome) baseLabel = ` · Base: ${base.nome}`;
+                } catch(_) {}
+            }
+            const nomeExib = currentUser?.nome === 'Administrador' ? 'Administrador' : currentUser?.nome;
+            document.getElementById('admin-user-label').textContent = `Bem-vindo, ${nomeExib}${baseLabel}`;
             loading(false);
             show('scr-admin');
             await Promise.all([
@@ -2384,8 +2975,9 @@
                 carregarProgAdmin(),
                 renderPermissoes()
             ]);
-            await registrarAuditoria('Login: ADMIN');
+            await registrarAuditoria('Login: ' + (currentUser?.nome || 'ADMIN'));
             iniciarRealtime();
+            setTimeout(inicializarChat, 1000);
         }
 
         function aplicarPermissoesAdmin(role) {
@@ -5052,6 +5644,689 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             loading(false);
             showSuccess('BASE CADASTRADA!');
             await carregarBases();
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SISTEMA CHEFÃO — VISÃO MULTI-BASE
+        // ═══════════════════════════════════════════════════
+
+        async function _entrarChefao() {
+            document.getElementById('chefao-user-label').textContent = `Bem-vindo, ${currentUser.nome} — Visão Multi-Base`;
+            loading(false);
+            show('scr-chefao');
+            await chefaoCarregarMetricas();
+            await chefaoCarregarVisaoGeral();
+            await chefaoPopularSelects();
+            await registrarAuditoria('Login CHEFÃO: ' + currentUser.nome);
+            iniciarRealtime();
+        }
+
+        function chefaoSwitchTab(id, el) {
+            document.querySelectorAll('.chefao-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.chefao-tab-btn').forEach(b => b.classList.remove('active'));
+            const sec = document.getElementById('chefao-' + id);
+            if (sec) sec.classList.add('active');
+            if (el) el.classList.add('active');
+            const loaders = {
+                'visao-geral': chefaoCarregarVisaoGeral,
+                'monitor': chefaoCarregarMonitor,
+                'frota': chefaoCarregarFrota,
+                'orcamentos': chefaoCarregarOrcamentos,
+                'usuarios': chefaoCarregarUsuarios,
+                'minha-conta': () => {}
+            };
+            if (loaders[id]) loaders[id]();
+        }
+
+        async function chefaoPopularSelects() {
+            const { data: bases } = await db.from('bases').select('id,nome').order('nome');
+            const ids = ['chf-mon-base','chf-frota-base','chf-orc-base','chf-user-base'];
+            ids.forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                sel.innerHTML = '<option value="">Todas as bases</option>' +
+                    (bases||[]).map(b => `<option value="${b.id}">${b.nome}</option>`).join('');
+            });
+        }
+
+        async function chefaoCarregarMetricas() {
+            const hoje = new Date().toISOString().split('T')[0];
+            const [{ data: bases }, { data: servicos }, { data: veics }, { data: alertas }] = await Promise.all([
+                db.from('bases').select('id'),
+                db.from(TBL.prog).select('id,status_flow').eq('data_servico', hoje),
+                db.from(TBL.veiculos).select('id'),
+                db.from(TBL.manutencoes).select('id').eq('status','PENDENTE')
+            ]);
+            const el = id => document.getElementById(id);
+            if(el('chf-bases')) el('chf-bases').textContent = (bases||[]).length;
+            if(el('chf-servicos')) el('chf-servicos').textContent = (servicos||[]).length;
+            if(el('chf-concluidos')) el('chf-concluidos').textContent = (servicos||[]).filter(s=>s.status_flow==='CONCLUIDO').length;
+            if(el('chf-pendentes')) el('chf-pendentes').textContent = (servicos||[]).filter(s=>s.status_flow==='PENDENTE').length;
+            if(el('chf-frota')) el('chf-frota').textContent = (veics||[]).length;
+            if(el('chf-alertas')) el('chf-alertas').textContent = (alertas||[]).length;
+        }
+
+        async function chefaoCarregarVisaoGeral() {
+            await chefaoCarregarMetricas();
+            const grid = document.getElementById('chefao-bases-grid');
+            if (!grid) return;
+            const hoje = new Date().toISOString().split('T')[0];
+            try {
+                const { data: bases } = await db.from('bases').select('*').order('nome');
+                if (!bases?.length) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;">
+                        <div style="font-size:40px;margin-bottom:12px;">🏭</div>
+                        <p style="color:var(--gray);">Nenhuma base cadastrada ainda.</p>
+                        <p style="color:var(--gray);font-size:11px;margin-top:8px;">Solicite ao Master a criação de novas bases.</p>
+                    </div>`;
+                    return;
+                }
+                const resultados = await Promise.all(bases.map(async b => {
+                    const [{ data: servs }, { data: veics }, { data: manut }, { data: ckLists }] = await Promise.all([
+                        db.from(TBL.prog).select('id,status_flow').eq('data_servico', hoje).eq('base_id', b.id),
+                        db.from(TBL.veiculos).select('id').eq('base_id', b.id),
+                        db.from(TBL.manutencoes).select('id').eq('base_id', b.id).eq('status','PENDENTE'),
+                        db.from(TBL.checklists).select('id').eq('data_checklist', hoje).eq('base_id', b.id)
+                    ]);
+                    const total = servs?.length || 0;
+                    const concluidos = (servs||[]).filter(s=>s.status_flow==='CONCLUIDO').length;
+                    const emExec = (servs||[]).filter(s=>s.status_flow==='EM EXECUÇÃO').length;
+                    const pendentes = (servs||[]).filter(s=>s.status_flow==='PENDENTE').length;
+                    return { ...b, total, concluidos, emExec, pendentes,
+                        frota: (veics||[]).length, alertas: (manut||[]).length, checklists: (ckLists||[]).length };
+                }));
+                grid.innerHTML = resultados.map(b => {
+                    const pct = b.total > 0 ? Math.round(b.concluidos/b.total*100) : 0;
+                    const cor = pct === 100 ? '#10b981' : pct >= 50 ? '#f59e0b' : b.total === 0 ? '#6b7280' : '#ef4444';
+                    return `<div class="chefao-base-card">
+                        <div class="base-indicator" style="background:${cor};"></div>
+                        <div style="padding-left:8px;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                                <div>
+                                    <b style="font-size:14px;">🏭 ${b.nome}</b>
+                                    <div style="font-size:10px;color:var(--gray);">${b.cidade} — ${b.estado}</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div style="font-size:22px;font-weight:900;color:${cor};">${b.total === 0 ? '—' : pct+'%'}</div>
+                                    <div style="font-size:9px;color:var(--gray);">hoje</div>
+                                </div>
+                            </div>
+                            ${b.total > 0 ? `<div style="background:rgba(255,255,255,.1);border-radius:4px;height:4px;margin-bottom:10px;">
+                                <div style="background:${cor};height:4px;border-radius:4px;width:${pct}%;transition:.5s;"></div>
+                            </div>` : ''}
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center;margin-bottom:8px;">
+                                <div style="background:rgba(245,158,11,.15);border-radius:8px;padding:6px;">
+                                    <div style="font-size:18px;font-weight:bold;color:var(--warning);">${b.pendentes}</div>
+                                    <div style="font-size:9px;color:var(--gray);">Pendentes</div>
+                                </div>
+                                <div style="background:rgba(239,68,68,.15);border-radius:8px;padding:6px;">
+                                    <div style="font-size:18px;font-weight:bold;color:#f87171;">${b.emExec}</div>
+                                    <div style="font-size:9px;color:var(--gray);">Em Exec.</div>
+                                </div>
+                                <div style="background:rgba(16,185,129,.15);border-radius:8px;padding:6px;">
+                                    <div style="font-size:18px;font-weight:bold;color:var(--success);">${b.concluidos}</div>
+                                    <div style="font-size:9px;color:var(--gray);">Concluídos</div>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:10px;font-size:10px;color:var(--gray);flex-wrap:wrap;">
+                                <span>🚛 ${b.frota} veículos</span>
+                                <span>✅ ${b.checklists} checklists</span>
+                                ${b.alertas > 0 ? `<span style="color:var(--warning);font-weight:bold;">⚠️ ${b.alertas} alertas</span>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                grid.innerHTML = `<div class="alert-card alert-danger">Erro: ${e.message}</div>`;
+            }
+        }
+
+        async function chefaoCarregarMonitor() {
+            const cont = document.getElementById('chefao-lista-monitor');
+            if (!cont) return;
+            const dt = document.getElementById('chf-mon-date')?.value || new Date().toISOString().split('T')[0];
+            const baseId = document.getElementById('chf-mon-base')?.value || '';
+            const status = document.getElementById('chf-mon-status')?.value || '';
+            cont.innerHTML = '<p style="color:var(--gray);padding:10px;">Carregando...</p>';
+            try {
+                let q = db.from(TBL.prog).select('*').eq('data_servico', dt).order('id', { ascending: false });
+                if (baseId) q = q.eq('base_id', parseInt(baseId));
+                if (status) q = q.eq('status_flow', status);
+                const { data: list } = await q;
+                if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum serviço encontrado.</p>'; return; }
+                const statusColor = { 'PENDENTE':'var(--warning)', 'EM EXECUÇÃO':'#ef4444', 'CONCLUIDO':'var(--success)', 'CANCELADO':'var(--cancelled)' };
+                cont.innerHTML = list.map(s => `
+                    <div class="prog-item status-${s.status_flow?.replace(' ','-')}">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+                            <span class="status-badge" style="background:${statusColor[s.status_flow]||'var(--gray)'};">${s.status_flow}</span>
+                            <b>${s.placa}</b>
+                            ${s.setor ? `<span class="setor-badge setor-${s.setor}">${s.setor}</span>` : ''}
+                            <span style="font-size:10px;color:var(--gray);margin-left:auto;">${s.tipo_op||''}</span>
+                        </div>
+                        <div style="font-size:11px;color:var(--gray);">
+                            → ${s.fornecedor||'PÁTIO'} | KM: ${s.km||'—'} | ${s.timestamp||s.data_servico}
+                            ${s.programador ? `<br>👤 ${s.programador}` : ''}
+                        </div>
+                    </div>`).join('');
+            } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
+        }
+
+        async function chefaoCarregarFrota() {
+            const cont = document.getElementById('chefao-lista-frota');
+            if (!cont) return;
+            const baseId = document.getElementById('chf-frota-base')?.value || '';
+            cont.innerHTML = '<p style="color:var(--gray);padding:10px;">Carregando...</p>';
+            try {
+                let q = db.from(TBL.veiculos).select('*').order('placa');
+                if (baseId) q = q.eq('base_id', parseInt(baseId));
+                const { data: veics } = await q;
+                if (!veics?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum veículo encontrado.</p>'; return; }
+                cont.innerHTML = veics.map(v => `
+                    <div class="prog-item" style="text-align:left;">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                            <b>${v.placa}</b>
+                            <span class="setor-badge setor-${v.tipo}">${v.tipo}</span>
+                        </div>
+                        <div style="font-size:11px;color:var(--gray);">
+                            ${v.modelo||'—'} ${v.ano ? '· '+v.ano : ''}
+                        </div>
+                        <div style="font-size:10px;color:var(--gray);margin-top:4px;">KM: ${v.km_atual||'—'}</div>
+                    </div>`).join('');
+            } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
+        }
+
+        async function chefaoCarregarOrcamentos() {
+            const cont = document.getElementById('chefao-lista-orc');
+            if (!cont) return;
+            const baseId = document.getElementById('chf-orc-base')?.value || '';
+            const status = document.getElementById('chf-orc-status')?.value || '';
+            cont.innerHTML = '<p style="color:var(--gray);padding:10px;">Carregando...</p>';
+            try {
+                let q = db.from(TBL.orcamentos).select('*').order('id', { ascending: false });
+                if (baseId) q = q.eq('base_id', parseInt(baseId));
+                if (status) q = q.eq('status', status);
+                const { data: list } = await q;
+                if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum orçamento.</p>'; return; }
+                const corStatus = { 'PENDENTE':'var(--warning)', 'APROVADO':'var(--success)', 'REJEITADO':'var(--danger)', 'CANCELADO':'var(--cancelled)' };
+                cont.innerHTML = list.map(o => `
+                    <div class="orc-card ${(o.status||'').toLowerCase()}">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <b>${o.placa}</b>
+                            <span class="status-badge" style="background:${corStatus[o.status]||'var(--gray)'};">${o.status}</span>
+                        </div>
+                        <div style="font-size:11px;color:var(--gray);">${o.empresa||'—'} | ${o.timestamp||o.data_orc||'—'}</div>
+                        <div style="font-size:13px;font-weight:bold;color:var(--success);margin-top:4px;">R$ ${(o.total||0).toFixed(2)}</div>
+                    </div>`).join('');
+            } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
+        }
+
+        async function chefaoCarregarUsuarios() {
+            const cont = document.getElementById('chefao-lista-usuarios');
+            if (!cont) return;
+            const baseId = document.getElementById('chf-user-base')?.value || '';
+            const busca = (document.getElementById('chf-user-busca')?.value || '').toLowerCase();
+            cont.innerHTML = '<p style="color:var(--gray);padding:10px;">Carregando...</p>';
+            try {
+                let q = db.from(TBL.colaboradores).select('*,bases(nome)').order('nome');
+                if (baseId) q = q.eq('base_id', parseInt(baseId));
+                const { data: users } = await q;
+                let lista = users || [];
+                if (busca) lista = lista.filter(u => (u.nome||'').toLowerCase().includes(busca) || (u.user_login||'').toLowerCase().includes(busca));
+                if (!lista.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum usuário encontrado.</p>'; return; }
+                const perfilCor = { admin:'#a78bfa', chefao:'#6366f1', programador:'#3b82f6', supervisor:'#f59e0b', motorista:'#10b981' };
+                cont.innerHTML = lista.map(u => `
+                    <div class="master-user-row">
+                        <div>
+                            <b>${u.nome}</b>
+                            <span style="background:${perfilCor[u.perfil]||'#6b7280'};color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px;font-weight:bold;">${u.perfil}</span>
+                            <div style="font-size:10px;color:var(--gray);">
+                                Login: ${u.user_login||'—'} | Base: ${u.bases?.nome || 'Padrão'}
+                            </div>
+                        </div>
+                        <button class="btn-warning btn-sm" onclick="chefaoResetarSenha(${u.id},'${u.nome}')">🔑 Senha</button>
+                    </div>`).join('');
+            } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
+        }
+
+        async function chefaoResetarSenha(id, nome) {
+            const nova = prompt(`Nova senha para "${nome}":`);
+            if (!nova || nova.length < 4) { if(nova !== null) alert('Senha muito curta!'); return; }
+            loading(true, 'Atualizando...');
+            const { error } = await db.from(TBL.colaboradores).update({ senha: nova }).eq('id', id);
+            loading(false);
+            if (error) { alert('Erro: ' + error.message); return; }
+            await registrarAuditoria(`CHEFÃO resetou senha de: ${nome}`);
+            showSuccess('SENHA ATUALIZADA!');
+        }
+
+        async function chefaoAlterarSenha() {
+            const atual = document.getElementById('chf-senha-atual')?.value?.trim();
+            const nova = document.getElementById('chf-senha-nova')?.value?.trim();
+            const confirma = document.getElementById('chf-senha-confirma')?.value?.trim();
+            if (!atual || !nova || !confirma) { alert('Preencha todos os campos!'); return; }
+            if (nova !== confirma) { alert('As senhas não coincidem!'); return; }
+            if (nova.length < 6) { alert('Mínimo 6 caracteres!'); return; }
+            // Verifica senha atual
+            if (atual !== currentUser.senha) { alert('❌ Senha atual incorreta!'); return; }
+            loading(true, 'Atualizando...');
+            const { error } = await db.from(TBL.colaboradores).update({ senha: nova }).eq('id', currentUser.id);
+            loading(false);
+            if (error) { alert('Erro: ' + error.message); return; }
+            currentUser.senha = nova;
+            await registrarAuditoria('CHEFÃO alterou própria senha');
+            ['chf-senha-atual','chf-senha-nova','chf-senha-confirma'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+            showSuccess('SENHA ALTERADA!');
+        }
+        let _gpsInterval = null;
+        let _gpsAtivo = false;
+        let _gpsWatchId = null;
+
+        function atualizarUIGPS(estado, texto, coords) {
+            const dot = document.getElementById('gps-dot');
+            const txtEl = document.getElementById('gps-status-texto');
+            const coordsEl = document.getElementById('gps-coords');
+            const btn = document.getElementById('btn-gps-toggle');
+            if (!dot) return;
+            dot.className = 'ativo';
+            if (estado === 'inativo') { dot.className = ''; }
+            else if (estado === 'erro') { dot.className = 'erro'; }
+            if (txtEl) txtEl.textContent = texto;
+            if (coordsEl && coords) coordsEl.textContent = `Lat: ${coords.lat.toFixed(5)} | Lng: ${coords.lng.toFixed(5)} | Precisão: ±${Math.round(coords.precisao)}m`;
+            else if (coordsEl) coordsEl.textContent = '';
+            if (btn) {
+                if (_gpsAtivo) {
+                    btn.textContent = '⏹ Parar GPS';
+                    btn.style.background = 'var(--danger)';
+                } else {
+                    btn.textContent = '📍 Ativar GPS';
+                    btn.style.background = 'var(--success)';
+                }
+            }
+        }
+
+        function toggleGPS() {
+            if (_gpsAtivo) {
+                pararGPS();
+            } else {
+                iniciarGPS();
+            }
+        }
+
+        function iniciarGPS() {
+            if (!navigator.geolocation) {
+                atualizarUIGPS('erro', 'GPS: Não suportado neste dispositivo', null);
+                return;
+            }
+            _gpsAtivo = true;
+            atualizarUIGPS('ativo', 'GPS: Obtendo localização...', null);
+            // Envia imediatamente
+            enviarLocalizacao();
+            // Repete a cada 2 minutos
+            if (_gpsInterval) clearInterval(_gpsInterval);
+            _gpsInterval = setInterval(enviarLocalizacao, 120000);
+        }
+
+        function pararGPS() {
+            _gpsAtivo = false;
+            if (_gpsInterval) { clearInterval(_gpsInterval); _gpsInterval = null; }
+            if (_gpsWatchId) { navigator.geolocation.clearWatch(_gpsWatchId); _gpsWatchId = null; }
+            atualizarUIGPS('inativo', 'GPS: Desativado', null);
+        }
+
+        async function enviarLocalizacao() {
+            if (!currentUser || currentUser.perfil !== 'motorista') return;
+            if (!_gpsAtivo) return;
+            const placa = document.getElementById('ck-placa')?.value || null;
+
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude, precisao: pos.coords.accuracy };
+                atualizarUIGPS('ativo', `GPS: Ativo ✓ — ${new Date().toLocaleTimeString('pt-BR')}`, coords);
+                try {
+                    await db.from('rastreamento').insert({
+                        placa: placa || 'SEM_PLACA',
+                        lat: coords.lat,
+                        lng: coords.lng,
+                        precisao: coords.precisao,
+                        motorista: currentUser.nome,
+                        base_id: currentUser.base_id || null
+                    });
+                } catch(e) { console.warn('Erro GPS:', e); }
+            }, (err) => {
+                const msgs = { 1: 'Permissão negada', 2: 'Posição indisponível', 3: 'Tempo esgotado' };
+                atualizarUIGPS('erro', 'GPS: ' + (msgs[err.code] || 'Erro desconhecido'), null);
+            }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 });
+        }
+
+        function iniciarEnvioLocalizacao() {
+            // Compatibilidade — agora o GPS é manual via botão
+            // mas se já estava ativo, continua
+            if (_gpsAtivo) enviarLocalizacao();
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SISTEMA MASTER — PAINEL DO CHEFÃO
+        // ═══════════════════════════════════════════════════
+        let _masterSenhaAtual = null; // armazenada no Supabase na tabela config_sistema
+
+        function masterSwitchTab(id, el) {
+            document.querySelectorAll('.master-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.master-tab-btn').forEach(b => b.classList.remove('active'));
+            const sec = document.getElementById('master-' + id);
+            if (sec) sec.classList.add('active');
+            if (el) el.classList.add('active');
+            // Carrega dados da aba
+            const loaders = {
+                'visao-geral': masterCarregarVisaoGeral,
+                'bases': masterCarregarBases,
+                'usuarios': masterCarregarUsuarios,
+                'minha-conta': masterCarregarConta,
+                'auditoria-global': masterCarregarAuditoria
+            };
+            if (loaders[id]) loaders[id]();
+        }
+
+        async function _entrarMaster() {
+            document.getElementById('master-user-label').textContent = 'Bem-vindo, Master — Controle Total do Sistema';
+            const ts = new Date().toLocaleString('pt-BR');
+            document.getElementById('mst-ultimo-acesso').textContent = ts;
+            loading(false);
+            show('scr-master');
+            await masterCarregarMetricas();
+            await masterCarregarVisaoGeral();
+            await registrarAuditoria('Login MASTER');
+            iniciarRealtime();
+        }
+
+        async function masterCarregarMetricas() {
+            const hoje = new Date().toISOString().split('T')[0];
+            const [{ data: bases }, { data: servicos }, { data: veics }, { data: users }, { data: alertas }] = await Promise.all([
+                db.from('bases').select('id'),
+                db.from(TBL.prog).select('id,status_flow').eq('data_servico', hoje),
+                db.from(TBL.veiculos).select('id'),
+                db.from(TBL.colaboradores).select('id'),
+                db.from(TBL.manutencoes).select('id').eq('status','PENDENTE')
+            ]);
+            const el = id => document.getElementById(id);
+            if(el('mst-bases')) el('mst-bases').textContent = (bases||[]).length;
+            if(el('mst-servicos')) el('mst-servicos').textContent = (servicos||[]).length;
+            if(el('mst-concluidos')) el('mst-concluidos').textContent = (servicos||[]).filter(s=>s.status_flow==='CONCLUIDO').length;
+            if(el('mst-frota')) el('mst-frota').textContent = (veics||[]).length;
+            if(el('mst-usuarios')) el('mst-usuarios').textContent = (users||[]).length;
+            if(el('mst-alertas')) el('mst-alertas').textContent = (alertas||[]).length;
+        }
+
+        async function masterCarregarVisaoGeral() {
+            await masterCarregarMetricas();
+            const grid = document.getElementById('master-bases-grid');
+            if (!grid) return;
+            const hoje = new Date().toISOString().split('T')[0];
+            try {
+                const { data: bases } = await db.from('bases').select('*').order('nome');
+                if (!bases?.length) {
+                    grid.innerHTML = `<div class="master-card" style="grid-column:1/-1;text-align:center;">
+                        <p style="color:var(--gray);">Nenhuma base cadastrada ainda.</p>
+                        <button onclick="masterSwitchTab('bases',null)" class="btn-purple" style="margin-top:10px;width:auto;padding:10px 20px;">➕ Cadastrar Primeira Base</button>
+                    </div>`;
+                    return;
+                }
+                const resultados = await Promise.all(bases.map(async b => {
+                    const [{ data: servs }, { data: veics }, { data: users }, { data: manut }] = await Promise.all([
+                        db.from(TBL.prog).select('id,status_flow,placa').eq('data_servico', hoje).eq('base_id', b.id),
+                        db.from(TBL.veiculos).select('id').eq('base_id', b.id),
+                        db.from(TBL.colaboradores).select('id').eq('base_id', b.id),
+                        db.from(TBL.manutencoes).select('id').eq('base_id', b.id).eq('status','PENDENTE')
+                    ]);
+                    const total = servs?.length || 0;
+                    const concluidos = (servs||[]).filter(s=>s.status_flow==='CONCLUIDO').length;
+                    const emExec = (servs||[]).filter(s=>s.status_flow==='EM EXECUÇÃO').length;
+                    const pendentes = (servs||[]).filter(s=>s.status_flow==='PENDENTE').length;
+                    return { ...b, total, concluidos, emExec, pendentes, frota: (veics||[]).length, users: (users||[]).length, alertas: (manut||[]).length };
+                }));
+                grid.innerHTML = resultados.map(b => {
+                    const pct = b.total > 0 ? Math.round(b.concluidos/b.total*100) : 0;
+                    const cor = pct === 100 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
+                    return `<div class="master-base-card" onclick="masterVerBase(${b.id},'${b.nome}')">
+                        <div class="base-indicator" style="background:${cor};"></div>
+                        <div style="padding-left:8px;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                                <div>
+                                    <b style="font-size:14px;">🏭 ${b.nome}</b>
+                                    <div style="font-size:10px;color:var(--gray);">${b.cidade} — ${b.estado}</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div style="font-size:20px;font-weight:900;color:${cor};">${pct}%</div>
+                                    <div style="font-size:9px;color:var(--gray);">concluído</div>
+                                </div>
+                            </div>
+                            <div style="background:rgba(255,255,255,.1);border-radius:4px;height:4px;margin-bottom:10px;">
+                                <div style="background:${cor};height:4px;border-radius:4px;width:${pct}%;transition:.5s;"></div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center;">
+                                <div style="background:rgba(245,158,11,.15);border-radius:8px;padding:6px;">
+                                    <div style="font-size:16px;font-weight:bold;color:var(--warning);">${b.pendentes}</div>
+                                    <div style="font-size:9px;color:var(--gray);">Pendentes</div>
+                                </div>
+                                <div style="background:rgba(239,68,68,.15);border-radius:8px;padding:6px;">
+                                    <div style="font-size:16px;font-weight:bold;color:var(--danger);">${b.emExec}</div>
+                                    <div style="font-size:9px;color:var(--gray);">Em Exec.</div>
+                                </div>
+                                <div style="background:rgba(16,185,129,.15);border-radius:8px;padding:6px;">
+                                    <div style="font-size:16px;font-weight:bold;color:var(--success);">${b.concluidos}</div>
+                                    <div style="font-size:9px;color:var(--gray);">Concluídos</div>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:8px;margin-top:8px;font-size:10px;color:var(--gray);">
+                                <span>🚛 ${b.frota} veículos</span>
+                                <span>👥 ${b.users} usuários</span>
+                                ${b.alertas > 0 ? `<span style="color:var(--warning);">⚠️ ${b.alertas} alertas</span>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                grid.innerHTML = `<div class="alert-card alert-danger">Erro ao carregar bases: ${e.message}</div>`;
+            }
+        }
+
+        function masterVerBase(id, nome) {
+            // Por ora abre detalhes — pode expandir para tela dedicada
+            alert(`🏭 ${nome}\n\nPara gerenciar esta base, faça login com o admin específico dela.`);
+        }
+
+        async function masterCarregarBases() {
+            const cont = document.getElementById('master-lista-bases');
+            if (!cont) return;
+            // Popular select de bases
+            await masterPopularSelectBases();
+            try {
+                const { data: bases } = await db.from('bases').select('*').order('nome');
+                if (!bases?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhuma base cadastrada.</p>'; return; }
+                cont.innerHTML = bases.map(b => `
+                    <div class="master-user-row">
+                        <div>
+                            <b>🏭 ${b.nome}</b>
+                            <span style="font-size:10px;color:var(--gray);margin-left:8px;">${b.cidade} — ${b.estado}</span>
+                        </div>
+                        <button class="btn-danger btn-sm" onclick="masterExcluirBase(${b.id},'${b.nome}')">✕</button>
+                    </div>`).join('');
+            } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
+        }
+
+        async function masterPopularSelectBases() {
+            const sels = ['mst-user-base'];
+            const { data: bases } = await db.from('bases').select('id,nome').order('nome');
+            sels.forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                sel.innerHTML = '<option value="">— Selecione a base —</option>' +
+                    (bases||[]).map(b => `<option value="${b.id}">${b.nome}</option>`).join('');
+            });
+        }
+
+        async function masterCriarBase() {
+            const nome = document.getElementById('mst-base-nome')?.value?.trim();
+            const cidade = document.getElementById('mst-base-cidade')?.value?.trim();
+            const estado = document.getElementById('mst-base-estado')?.value?.trim();
+            const adminLogin = document.getElementById('mst-base-admin-login')?.value?.trim();
+            const adminPass = document.getElementById('mst-base-admin-pass')?.value?.trim();
+            if (!nome || !cidade || !adminLogin || !adminPass) {
+                alert('Preencha: nome da base, cidade, login e senha do admin!'); return;
+            }
+            loading(true, 'Criando base e admin...');
+            try {
+                // Cria a base
+                const { data: base, error: errBase } = await db.from('bases').insert({ nome, cidade, estado }).select().single();
+                if (errBase) throw errBase;
+                // Cria o colaborador admin com base_id
+                const { error: errColab } = await db.from(TBL.colaboradores).insert({
+                    nome: `Admin ${nome}`, matricula: `ADM-${nome.toUpperCase().replace(/\s/g,'')}`,
+                    user_login: adminLogin, senha: adminPass,
+                    perfil: 'admin', base_id: base.id
+                });
+                if (errColab) throw errColab;
+                await registrarAuditoria(`Base criada: ${nome} | Admin: ${adminLogin}`);
+                ['mst-base-nome','mst-base-cidade','mst-base-estado','mst-base-admin-login','mst-base-admin-pass'].forEach(id => {
+                    const el = document.getElementById(id); if(el) el.value = '';
+                });
+                loading(false);
+                showSuccess('BASE CRIADA!');
+                await masterCarregarBases();
+                await masterCarregarMetricas();
+            } catch(e) { loading(false); alert('Erro: ' + e.message); }
+        }
+
+        async function masterExcluirBase(id, nome) {
+            if (!confirm(`Excluir a base "${nome}"?\n\nATENÇÃO: Isso não remove os dados associados à base!`)) return;
+            await db.from('bases').delete().eq('id', id);
+            await registrarAuditoria(`Base excluída: ${nome}`);
+            showSuccess('BASE EXCLUÍDA!');
+            await masterCarregarBases();
+        }
+
+        async function masterCarregarUsuarios() {
+            const cont = document.getElementById('master-lista-usuarios');
+            if (!cont) return;
+            await masterPopularSelectBases();
+            const busca = (document.getElementById('mst-user-busca')?.value || '').toLowerCase();
+            try {
+                const [{ data: colabs }, { data: fornUsers }, { data: bases }] = await Promise.all([
+                    db.from(TBL.colaboradores).select('*').order('nome'),
+                    db.from(TBL.fornUsers).select('*').order('empresa'),
+                    db.from('bases').select('id,nome')
+                ]);
+                const baseMap = {};
+                (bases||[]).forEach(b => baseMap[b.id] = b.nome);
+                let todos = [
+                    ...(colabs||[]).map(c => ({ ...c, tipo: c.perfil, origem: 'colaborador', baseNome: baseMap[c.base_id] || 'Itaguaí (padrão)' })),
+                    ...(fornUsers||[]).map(f => ({ ...f, nome: f.empresa, tipo: 'fornecedor', origem: 'fornecedor', baseNome: baseMap[f.base_id] || 'Itaguaí (padrão)' }))
+                ];
+                if (busca) todos = todos.filter(u => (u.nome||'').toLowerCase().includes(busca) || (u.user_login||'').toLowerCase().includes(busca));
+                if (!todos.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum usuário encontrado.</p>'; return; }
+                const perfilCor = { admin:'#a78bfa', programador:'#3b82f6', supervisor:'#f59e0b', motorista:'#10b981', fornecedor:'#f97316' };
+                cont.innerHTML = todos.map(u => `
+                    <div class="master-user-row">
+                        <div>
+                            <b>${u.nome || u.empresa}</b>
+                            <span style="background:${perfilCor[u.tipo]||'#6b7280'};color:#000;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px;font-weight:bold;">${u.tipo}</span>
+                            <div style="font-size:10px;color:var(--gray);">Login: ${u.user_login||'—'} | Base: ${u.baseNome}</div>
+                        </div>
+                        <div style="display:flex;gap:4px;">
+                            <button class="btn-warning btn-sm" onclick="masterEditarSenhaUser(${u.id},'${u.origem}','${u.nome||u.empresa}')">🔑</button>
+                            <button class="btn-danger btn-sm" onclick="masterExcluirUser(${u.id},'${u.origem}','${u.nome||u.empresa}')">✕</button>
+                        </div>
+                    </div>`).join('');
+            } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
+        }
+
+        async function masterCriarUsuario() {
+            const baseId = document.getElementById('mst-user-base')?.value;
+            const nome = document.getElementById('mst-user-nome')?.value?.trim();
+            const login = document.getElementById('mst-user-login')?.value?.trim();
+            const pass = document.getElementById('mst-user-pass')?.value?.trim();
+            const perfil = document.getElementById('mst-user-perfil')?.value;
+            if (!nome || !login || !pass) { alert('Preencha nome, login e senha!'); return; }
+            loading(true, 'Criando usuário...');
+            try {
+                const { error } = await db.from(TBL.colaboradores).insert({
+                    nome, matricula: 'MST-' + Date.now(),
+                    user_login: login, senha: pass, perfil,
+                    base_id: baseId ? parseInt(baseId) : null
+                });
+                if (error) throw error;
+                await registrarAuditoria(`Usuário criado pelo Master: ${nome} (${perfil})`);
+                ['mst-user-nome','mst-user-login','mst-user-pass'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+                loading(false);
+                showSuccess('USUÁRIO CRIADO!');
+                await masterCarregarUsuarios();
+            } catch(e) { loading(false); alert('Erro: ' + e.message); }
+        }
+
+        async function masterEditarSenhaUser(id, origem, nome) {
+            const nova = prompt(`Nova senha para "${nome}":`);
+            if (!nova || nova.length < 4) { alert('Senha muito curta!'); return; }
+            const tabela = origem === 'colaborador' ? TBL.colaboradores : TBL.fornUsers;
+            loading(true, 'Atualizando senha...');
+            const { error } = await db.from(tabela).update({ senha: nova }).eq('id', id);
+            loading(false);
+            if (error) { alert('Erro: ' + error.message); return; }
+            await registrarAuditoria(`Senha alterada pelo Master: ${nome}`);
+            showSuccess('SENHA ATUALIZADA!');
+        }
+
+        async function masterExcluirUser(id, origem, nome) {
+            if (!confirm(`Excluir usuário "${nome}"?`)) return;
+            const tabela = origem === 'colaborador' ? TBL.colaboradores : TBL.fornUsers;
+            await db.from(tabela).delete().eq('id', id);
+            await registrarAuditoria(`Usuário excluído pelo Master: ${nome}`);
+            showSuccess('USUÁRIO EXCLUÍDO!');
+            await masterCarregarUsuarios();
+        }
+
+        async function masterCarregarConta() {
+            const { data: bases } = await db.from('bases').select('id');
+            const el = document.getElementById('mst-conta-bases');
+            if (el) el.textContent = (bases||[]).length;
+            const loginEl = document.getElementById('mst-login-exibido');
+            if (loginEl) loginEl.textContent = currentUser?.nome || 'MASTER';
+        }
+
+        async function masterAlterarSenha() {
+            const atual = document.getElementById('mst-senha-atual')?.value?.trim();
+            const nova = document.getElementById('mst-senha-nova')?.value?.trim();
+            const confirma = document.getElementById('mst-senha-confirma')?.value?.trim();
+            if (!atual || !nova || !confirma) { alert('Preencha todos os campos!'); return; }
+            if (nova !== confirma) { alert('A nova senha e a confirmação não coincidem!'); return; }
+            if (nova.length < 6) { alert('A senha precisa ter pelo menos 6 caracteres!'); return; }
+            // Verifica senha atual no banco
+            loading(true, 'Verificando...');
+            try {
+                const { data: cfg } = await db.from(TBL.config).select('valor').eq('chave', 'master_senha').single();
+                const senhaAtualBanco = cfg?.valor?.senha || 'Luc45t1@go'; // fallback para senha original
+                if (atual !== senhaAtualBanco) { loading(false); alert('❌ Senha atual incorreta!'); return; }
+                // Salva nova senha
+                await db.from(TBL.config).upsert({ chave: 'master_senha', valor: { senha: nova } }, { onConflict: 'chave' });
+                await registrarAuditoria('Senha Master alterada');
+                ['mst-senha-atual','mst-senha-nova','mst-senha-confirma'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+                loading(false);
+                showSuccess('SENHA ALTERADA!');
+            } catch(e) { loading(false); alert('Erro: ' + e.message); }
+        }
+
+        async function masterCarregarAuditoria() {
+            const cont = document.getElementById('master-lista-auditoria');
+            if (!cont) return;
+            const busca = (document.getElementById('mst-audit-busca')?.value || '').toLowerCase();
+            try {
+                const { data: logs } = await db.from(TBL.auditoria).select('*').order('id', { ascending: false }).limit(200);
+                let lista = logs || [];
+                if (busca) lista = lista.filter(l => (l.acao||'').toLowerCase().includes(busca));
+                if (!lista.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum registro.</p>'; return; }
+                cont.innerHTML = lista.map(l => `
+                    <div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;">
+                        <span style="color:var(--gray);font-size:10px;">${l.timestamp||''}</span> —
+                        <span>${l.acao||''}</span>
+                    </div>`).join('');
+            } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
         }
 
     </script>
