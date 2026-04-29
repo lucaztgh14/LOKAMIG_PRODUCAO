@@ -2885,22 +2885,8 @@
                     return;
                 }
 
-                // ADMIN legado — senha dinâmica
-                if (u === 'ADMIN') {
-                    let senhaAdmin = 'Luc45t1@go';
-                    try {
-                        const { data: cfg } = await db.from(TBL.config).select('valor').eq('chave', 'admin_senha').single();
-                        if (cfg?.valor?.senha) senhaAdmin = cfg.valor.senha;
-                    } catch(_) {}
-                    if (p === senhaAdmin) {
-                        currentUser = { nome: 'Administrador', role: 'admin', base_id: null };
-                        await _entrarAdmin();
-                        return;
-                    }
-                    loading(false);
-                    alert('❌ Acesso Negado.');
-                    return;
-                }
+                // ADMIN hardcoded removido — agora todos os admins são colaboradores no banco
+                // Use admin_ita, admin_pe, admin_xxx conforme a base
 
                 // Colaboradores (admin de base, programador, supervisor, motorista)
                 const { data: colabs, error: colabErr } = await db.from(TBL.colaboradores)
