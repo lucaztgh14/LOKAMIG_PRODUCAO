@@ -3380,7 +3380,7 @@
             const placa = (document.getElementById('hist-filter-placa')?.value || '').toUpperCase().trim();
             const forn = document.getElementById('hist-filter-forn')?.value || '';
 
-            let q = db.from(TBL.prog).select('*').order('id');
+            let q = _filtrarBase(db.from(TBL.prog).select('*').order('id'));
             if (dt) q = q.eq('data_servico', dt);
             if (placa) q = q.ilike('placa', `%${placa}%`);
             if (forn) q = q.eq('fornecedor', forn);
@@ -3426,8 +3426,8 @@
         // ─────────────────────────────────────────────
         async function renderListaForn() {
             const [{ data: items }, { data: users }] = await Promise.all([
-                db.from(TBL.fornecedores).select('*'),
-                db.from(TBL.fornUsers).select('*')
+                _filtrarBase(db.from(TBL.fornecedores).select('*')),
+                _filtrarBase(db.from(TBL.fornUsers).select('*'))
             ]);
             const cont = document.getElementById('list-forn');
             if (!cont) return;
@@ -3501,7 +3501,7 @@
         }
 
         async function renderListaColab() {
-            const { data: items } = await db.from(TBL.colaboradores).select('*');
+            const { data: items } = await _filtrarBase(db.from(TBL.colaboradores).select('*'));
             const cont = document.getElementById('list-colab');
             if (!cont) return;
             if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum colaborador cadastrado.</p>'; return; }
@@ -3747,7 +3747,7 @@
 
         async function carregarProgGeral() {
             const dt = document.getElementById('p-filter-date')?.value || '';
-            const { data: list } = await db.from(TBL.prog).select('*').eq('data_servico', dt).order('id');
+            const { data: list } = await _filtrarBase(db.from(TBL.prog).select('*').eq('data_servico', dt).order('id'));
             const cont = document.getElementById('list-prog-geral');
             if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento nesta data.</p>'; return; }
 
@@ -3898,7 +3898,7 @@
         async function carregarAlertasRevisaoFornecedor() {
             const cont = document.getElementById('forn-alertas-revisao');
             if (!cont) return;
-            const { data: manut } = await db.from(TBL.manutencoes).select('placa,descricao').eq('status', 'PENDENTE').eq('urgencia', 'critico');
+            const { data: manut } = await _filtrarBase(db.from(TBL.manutencoes).select('placa,descricao').eq('status', 'PENDENTE').eq('urgencia', 'critico'));
             cont.innerHTML = (manut || []).map(m =>
                 `<div class="alert-card alert-danger">🚨 REVISÃO CRÍTICA: <b>${m.placa}</b> — ${m.descricao}</div>`
             ).join('');
@@ -4146,7 +4146,7 @@
         }
 
         async function carregarAuditoria() {
-            const { data: logs } = await db.from(TBL.auditoria).select('*').order('id', { ascending: false }).limit(100);
+            const { data: logs } = await _filtrarBase(db.from(TBL.auditoria).select('*').order('id', { ascending: false }).limit(100));
             const cont = document.getElementById('list-auditoria');
             if (!cont) return;
             cont.innerHTML = (logs || []).length ? logs.map(l =>
@@ -4243,7 +4243,7 @@
             orcDetalheOrigem = 'fornecedor';
             telaAnteriorOrc = 'scr-orc-enviados';
             const empresa = currentUser?.empresa || '';
-            const { data: orcs } = await db.from(TBL.orcamentos).select('*').eq('empresa', empresa).order('id', { ascending: false });
+            const { data: orcs } = await _filtrarBase(db.from(TBL.orcamentos).select('*').eq('empresa', empresa).order('id', { ascending: false }));
 
             document.getElementById('list-orc-enviados').innerHTML = (orcs || []).length
                 ? orcs.map(o => `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrcForn(${o.id})">
@@ -4259,7 +4259,7 @@
             const status = document.getElementById('orc-filter-status')?.value || '';
             const placa = (document.getElementById('orc-filter-placa')?.value || '').toUpperCase().trim();
 
-            let q = db.from(TBL.orcamentos).select('*').order('id', { ascending: false });
+            let q = _filtrarBase(db.from(TBL.orcamentos).select('*').order('id', { ascending: false }));
             if (status) q = q.eq('status', status);
             if (placa) q = q.ilike('placa', `%${placa}%`);
 
