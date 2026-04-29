@@ -5729,26 +5729,28 @@ ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';</cod
             const filtroSetor = document.getElementById('mapa-filter-setor')?.value || '';
 
             try {
-                // Busca última localização de cada veículo
+                // Busca última localização de cada motorista/placa (últimas 8h)
+                const oitoHorasAtras = new Date(Date.now() - 8*60*60*1000).toISOString();
                 const { data: locs } = await db.from('rastreamento')
-                    .select('*').order('timestamp', { ascending: false });
+                    .select('*').gte('timestamp', oitoHorasAtras).order('timestamp', { ascending: false });
 
                 // Busca programações de hoje para status
-                const { data: progs } = await db.from(TBL.prog)
+                const { data: progs } = await _filtrarBase(db.from(TBL.prog)
                     .select('placa,status_flow,fornecedor,programador,tipo_op,setor')
                     .eq('data_servico', hoje)
-                    .neq('status_flow', 'CANCELADO');
+                    .neq('status_flow', 'CANCELADO'));
 
                 // Busca veículos cadastrados
-                const { data: veics } = await db.from(TBL.veiculos)
-                    .select('placa,modelo,tipo,km_atual,foto');
+                const { data: veics } = await _filtrarBase(db.from(TBL.veiculos)
+                    .select('placa,modelo,tipo,km_atual,foto'));
 
                 _mapaVeiculos = veics || [];
 
-                // Monta mapa de última posição por placa
+                // Monta mapa de última posição por placa/motorista
                 const ultimaPosicao = {};
                 (locs || []).forEach(l => {
-                    if (!ultimaPosicao[l.placa]) ultimaPosicao[l.placa] = l;
+                    const chave = l.placa && l.placa !== 'SEM_PLACA' ? l.placa : ('mot_' + l.motorista);
+                    if (!ultimaPosicao[chave]) ultimaPosicao[chave] = l;
                 });
 
                 // Monta status por placa
@@ -5761,66 +5763,72 @@ ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';</cod
                 Object.values(_mapaMarkers).forEach(m => _mapa.removeLayer(m));
                 _mapaMarkers = {};
 
-                const veicsFiltrados = _mapaVeiculos.filter(v =>
-                    !filtroSetor || v.tipo === filtroSetor
-                );
-
                 const listaEl = document.getElementById('mapa-lista-veiculos');
                 let listaHTML = '';
                 let bounds = [];
 
-                veicsFiltrados.forEach(v => {
-                    const pos = ultimaPosicao[v.placa];
+                // Combina veículos cadastrados + rastreamentos sem cadastro
+                const veicsMap = {};
+                (_mapaVeiculos).forEach(v => { veicsMap[v.placa] = v; });
+
+                // Adiciona entradas do rastreamento que não têm veículo cadastrado
+                const todasChaves = new Set([
+                    ..._mapaVeiculos.map(v => v.placa),
+                    ...Object.keys(ultimaPosicao)
+                ]);
+
+                todasChaves.forEach(chave => {
+                    const pos = ultimaPosicao[chave] || ultimaPosicao['mot_' + chave];
+                    if (!pos?.lat || !pos?.lng) return;
+
+                    const v = veicsMap[pos.placa] || { placa: pos.placa === 'SEM_PLACA' ? pos.motorista : pos.placa, modelo: '', tipo: 'Reserva' };
                     const prog = statusPorPlaca[v.placa];
                     const info = ICONES_SETOR[v.tipo] || ICONES_SETOR.default;
+
+                    if (filtroSetor && v.tipo !== filtroSetor) return;
+
                     const emMovimento = prog?.status_flow === 'EM EXECUÇÃO';
                     const statusLabel = emMovimento ? '🟢 Em movimento' :
                                        prog ? '🔵 Com serviço hoje' : '⚪ No pátio';
-                    const corBorda = emMovimento ? '#10b981' :
-                                    prog ? '#3b82f6' : '#6b7280';
+                    const corBorda = emMovimento ? '#10b981' : prog ? '#3b82f6' : '#6b7280';
 
-                    // Adiciona marker se tiver posição
-                    if (pos?.lat && pos?.lng) {
-                        const svgIcon = `<svg xmlns='http://www.w3.org/2000/svg' width='36' height='44' viewBox='0 0 36 44'>
-                            <ellipse cx='18' cy='42' rx='8' ry='3' fill='rgba(0,0,0,0.3)'/>
-                            <path d='M18 0C10.3 0 4 6.3 4 14c0 10.5 14 28 14 28s14-17.5 14-28C32 6.3 25.7 0 18 0z' fill='${info.color}'/>
-                            <circle cx='18' cy='14' r='8' fill='white' opacity='0.9'/>
-                            <text x='18' y='18' text-anchor='middle' font-size='10' font-family='Arial'>${info.emoji}</text>
-                        </svg>`;
-                        const icon = L.divIcon({
-                            html: svgIcon,
-                            iconSize: [36, 44],
-                            iconAnchor: [18, 44],
-                            popupAnchor: [0, -44],
-                            className: ''
-                        });
-                        const marker = L.marker([pos.lat, pos.lng], { icon })
-                            .addTo(_mapa)
-                            .bindPopup(`
-                                <div class="veiculo-popup">
-                                    <b>${info.emoji} ${v.placa}</b>
-                                    <div style="color:#666;font-size:11px;margin:4px 0;">${v.modelo || ''} — ${v.tipo || ''}</div>
-                                    <div style="margin:4px 0;">${statusLabel}</div>
-                                    ${prog ? `<div style="font-size:11px;">→ ${prog.fornecedor || 'PÁTIO'}</div>
-                                    <div style="font-size:11px;">Por: ${prog.programador || '—'}</div>` : ''}
-                                    <div style="font-size:10px;color:#999;margin-top:4px;">KM: ${v.km_atual || '—'}</div>
-                                    <div style="font-size:10px;color:#999;">📍 ${new Date(pos.timestamp).toLocaleString('pt-BR')}</div>
-                                </div>`);
-                        _mapaMarkers[v.placa] = marker;
-                        bounds.push([pos.lat, pos.lng]);
-                    }
+                    const svgIcon = `<svg xmlns='http://www.w3.org/2000/svg' width='36' height='44' viewBox='0 0 36 44'>
+                        <ellipse cx='18' cy='42' rx='8' ry='3' fill='rgba(0,0,0,0.3)'/>
+                        <path d='M18 0C10.3 0 4 6.3 4 14c0 10.5 14 28 14 28s14-17.5 14-28C32 6.3 25.7 0 18 0z' fill='${info.color}'/>
+                        <circle cx='18' cy='14' r='8' fill='white' opacity='0.9'/>
+                        <text x='18' y='18' text-anchor='middle' font-size='10' font-family='Arial'>${info.emoji}</text>
+                    </svg>`;
+                    const icon = L.divIcon({ html: svgIcon, iconSize: [36,44], iconAnchor: [18,44], popupAnchor: [0,-44], className: '' });
+
+                    const minutosAtras = Math.round((Date.now() - new Date(pos.timestamp)) / 60000);
+                    const tempoLabel = minutosAtras < 2 ? '🟢 Agora' : minutosAtras < 60 ? `🟡 ${minutosAtras}min atrás` : `⚪ ${Math.round(minutosAtras/60)}h atrás`;
+
+                    const marker = L.marker([pos.lat, pos.lng], { icon })
+                        .addTo(_mapa)
+                        .bindPopup(`
+                            <div class="veiculo-popup">
+                                <b>${info.emoji} ${v.placa !== 'SEM_PLACA' ? v.placa : '📍'} ${pos.motorista || ''}</b>
+                                <div style="color:#666;font-size:11px;margin:4px 0;">${v.modelo || ''} ${v.tipo ? '— ' + v.tipo : ''}</div>
+                                <div style="margin:4px 0;">${statusLabel}</div>
+                                ${prog ? `<div style="font-size:11px;">→ ${prog.fornecedor||'PÁTIO'} | ${prog.programador||'—'}</div>` : ''}
+                                <div style="font-size:10px;color:#999;margin-top:4px;">${tempoLabel}</div>
+                                <div style="font-size:10px;color:#999;">Precisão: ±${Math.round(pos.precisao||0)}m</div>
+                                <div style="font-size:10px;color:#999;">📍 ${new Date(pos.timestamp).toLocaleString('pt-BR')}</div>
+                            </div>`);
+                    _mapaMarkers[chave] = marker;
+                    bounds.push([pos.lat, pos.lng]);
 
                     // Card na lista abaixo do mapa
+                    const minutosAtras2 = Math.round((Date.now() - new Date(pos.timestamp)) / 60000);
                     listaHTML += `<div style="background:rgba(255,255,255,.05);border:1px solid ${corBorda};border-radius:10px;padding:10px;cursor:pointer;"
-                        onclick="focarVeiculoMapa('${v.placa}')">
+                        onclick="focarVeiculoMapa('${chave}')">
                         <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
                             <span style="font-size:16px;">${info.emoji}</span>
-                            <b style="font-size:12px;">${v.placa}</b>
-                            <span class="setor-badge setor-${v.tipo}" style="margin-left:auto;">${v.tipo}</span>
+                            <b style="font-size:12px;">${v.placa !== 'SEM_PLACA' ? v.placa : '📍'} ${pos.motorista||''}</b>
+                            <span class="setor-badge setor-${v.tipo}" style="margin-left:auto;">${v.tipo||'—'}</span>
                         </div>
                         <div style="font-size:10px;color:var(--gray);">${statusLabel}</div>
-                        ${pos ? `<div style="font-size:10px;color:var(--gray);">📍 ${new Date(pos.timestamp).toLocaleTimeString('pt-BR')}</div>` :
-                        `<div style="font-size:10px;color:var(--warning);">📍 Sem localização registrada</div>`}
+                        <div style="font-size:10px;color:var(--gray);">📍 ${minutosAtras2 < 2 ? 'Agora' : minutosAtras2 + 'min atrás'}</div>
                     </div>`;
                 });
 
