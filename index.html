@@ -2440,60 +2440,143 @@
 
         <script>
             (function () {
+                // ── FLEET 3D LOGIN ANIMATION ──────────────────────────────
                 const canvas = document.getElementById('login-canvas');
                 const ctx = canvas.getContext('2d');
-                let W, H, pts = [], t = 0;
-                const N = 90;
+                let W, H, T = 0;
                 function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-                function mkPt() {
-                    return {
-                        x: Math.random() * W, y: Math.random() * H, z: Math.random() * 500 + 100,
-                        vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5, vz: (Math.random() - .5) * .4
-                    };
+                resize();
+                window.addEventListener('resize', resize);
+
+                // ── GEARS ──────────────────────────────────────────────────────
+                const gears = [
+                    { x: .12, y: .18, r: 72, teeth: 12, speed: .003, color: 'rgba(14,165,233,.18)', stroke: 'rgba(56,189,248,.35)', angle: 0 },
+                    { x: .88, y: .82, r: 55, teeth: 9,  speed:-.004, color: 'rgba(14,165,233,.13)', stroke: 'rgba(56,189,248,.28)', angle: 0 },
+                    { x: .05, y: .75, r: 38, teeth: 7,  speed: .006, color: 'rgba(3,105,161,.15)',  stroke: 'rgba(14,165,233,.25)', angle: 0 },
+                    { x: .92, y: .20, r: 44, teeth: 8,  speed:-.005, color: 'rgba(3,105,161,.12)',  stroke: 'rgba(14,165,233,.22)', angle: 0 },
+                    { x: .50, y: .92, r: 30, teeth: 6,  speed: .007, color: 'rgba(14,165,233,.10)', stroke: 'rgba(56,189,248,.20)', angle: 0 },
+                ];
+                function drawGear(g) {
+                    const cx = g.x * W, cy = g.y * H, r = g.r, teeth = g.teeth, a = g.angle;
+                    const ir = r * .65, or = r * 1.22, tw = Math.PI / teeth * .42;
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate(a);
+                    // body
+                    ctx.beginPath();
+                    for (let i = 0; i < teeth * 2; i++) {
+                        const ang = (i / (teeth * 2)) * Math.PI * 2;
+                        const rad = i % 2 === 0 ? or : r;
+                        const dw = i % 2 === 0 ? tw : tw * 1.6;
+                        ctx.arc(0, 0, rad, ang - dw, ang + dw);
+                    }
+                    ctx.closePath();
+                    ctx.fillStyle = g.color;
+                    ctx.strokeStyle = g.stroke;
+                    ctx.lineWidth = 1.2;
+                    ctx.fill();
+                    ctx.stroke();
+                    // inner ring
+                    ctx.beginPath(); ctx.arc(0, 0, ir, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(2,12,27,.6)'; ctx.fill();
+                    ctx.strokeStyle = g.stroke; ctx.lineWidth = 1; ctx.stroke();
+                    // spokes
+                    for (let i = 0; i < 6; i++) {
+                        const sa = (i / 6) * Math.PI * 2;
+                        ctx.beginPath();
+                        ctx.moveTo(Math.cos(sa) * (ir * .3), Math.sin(sa) * (ir * .3));
+                        ctx.lineTo(Math.cos(sa) * (ir * .92), Math.sin(sa) * (ir * .92));
+                        ctx.strokeStyle = g.stroke; ctx.lineWidth = 1.5; ctx.stroke();
+                    }
+                    // center dot
+                    ctx.beginPath(); ctx.arc(0, 0, ir * .18, 0, Math.PI * 2);
+                    ctx.fillStyle = g.stroke; ctx.fill();
+                    ctx.restore();
                 }
-                function init() { resize(); pts = Array.from({ length: N }, mkPt); }
-                function draw() {
-                    ctx.clearRect(0, 0, W, H);
-                    ctx.fillStyle = '#020c1b'; ctx.fillRect(0, 0, W, H);
-                    t += .005;
-                    // Glows
-                    [[W * .15, H * .25, 350, .1], [W * .85, H * .75, 280, .07], [W * .5, H * .5, 220, .05]].forEach(([gx, gy, gr, ga]) => {
-                        const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, gr + Math.sin(t) * 25);
-                        g.addColorStop(0, `rgba(3,105,161,${ga + Math.sin(t) * .02})`);
+
+                // ── TRUCKS ────────────────────────────────────────────────────
+                const trucks = [
+                    { x: -160, y: H * .35, speed: .55, scale: .55, color: '#0ea5e9', flip: false },
+                    { x: W + 120, y: H * .62, speed:-.42, scale: .42, color: '#38bdf8', flip: true  },
+                    { x: -100, y: H * .80, speed: .38, scale: .35, color: '#0284c7', flip: false },
+                ];
+                function drawTruck(t2) {
+                    const { x, y, scale, color, flip } = t2;
+                    ctx.save();
+                    ctx.translate(x, y);
+                    if (flip) ctx.scale(-1, 1);
+                    ctx.scale(scale, scale);
+                    ctx.globalAlpha = .28;
+                    // trailer
+                    ctx.fillStyle = color;
+                    ctx.beginPath(); ctx.roundRect(-160, -28, 130, 48, 4); ctx.fill();
+                    // cabin
+                    ctx.fillStyle = color;
+                    ctx.beginPath(); ctx.roundRect(-20, -38, 72, 58, 6); ctx.fill();
+                    // windshield
+                    ctx.fillStyle = 'rgba(200,240,255,.35)';
+                    ctx.beginPath(); ctx.roundRect(-14, -32, 36, 28, 3); ctx.fill();
+                    // wheels
+                    [[-130,22],[-90,22],[-30,22],[30,22]].forEach(([wx, wy]) => {
+                        ctx.beginPath(); ctx.arc(wx, wy, 14, 0, Math.PI*2);
+                        ctx.fillStyle = '#1e293b'; ctx.fill();
+                        ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.stroke();
+                        ctx.beginPath(); ctx.arc(wx, wy, 5, 0, Math.PI*2);
+                        ctx.fillStyle = color; ctx.fill();
+                    });
+                    ctx.globalAlpha = 1;
+                    ctx.restore();
+                }
+
+                // ── ROAD DASHES ───────────────────────────────────────────────
+                let roadOffset = 0;
+                function drawRoad() {
+                    ctx.strokeStyle = 'rgba(56,189,248,.07)';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([22, 18]);
+                    ctx.lineDashOffset = -roadOffset;
+                    [H * .35, H * .62, H * .80].forEach(ry => {
+                        ctx.beginPath(); ctx.moveTo(0, ry + 28); ctx.lineTo(W, ry + 28); ctx.stroke();
+                    });
+                    ctx.setLineDash([]);
+                }
+
+                // ── GLOWS ─────────────────────────────────────────────────────
+                function drawGlows() {
+                    [[W*.15, H*.2, 350, .09], [W*.85, H*.8, 280, .06], [W*.5, H*.5, 180, .04]].forEach(([gx, gy, gr, ga]) => {
+                        const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, gr + Math.sin(T) * 20);
+                        g.addColorStop(0, `rgba(3,105,161,${ga + Math.sin(T)*.015})`);
                         g.addColorStop(1, 'transparent');
                         ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
                     });
-                    // Grid
-                    const gs = 55, go = (t * 18) % gs;
-                    ctx.strokeStyle = 'rgba(56,189,248,0.045)'; ctx.lineWidth = .5;
+                }
+
+                // ── GRID ──────────────────────────────────────────────────────
+                function drawGrid() {
+                    const gs = 58, go = (T * 16) % gs;
+                    ctx.strokeStyle = 'rgba(56,189,248,.035)'; ctx.lineWidth = .5;
                     for (let x = -gs + go; x < W + gs; x += gs) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
                     for (let y = -gs + go; y < H + gs; y += gs) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
-                    // Particles + connections
-                    const proj = pts.map(p => {
-                        const sc = 500 / p.z;
-                        return { sx: (p.x - W / 2) * sc + W / 2, sy: (p.y - H / 2) * sc + H / 2, a: Math.min(1, sc * .9), r: 1.2 * sc, p };
-                    });
-                    for (let i = 0; i < proj.length; i++) {
-                        for (let j = i + 1; j < proj.length; j++) {
-                            const d = Math.hypot(proj[i].sx - proj[j].sx, proj[i].sy - proj[j].sy);
-                            if (d < 130) {
-                                ctx.beginPath(); ctx.moveTo(proj[i].sx, proj[i].sy); ctx.lineTo(proj[j].sx, proj[j].sy);
-                                ctx.strokeStyle = `rgba(56,189,248,${(1 - d / 130) * .14})`; ctx.lineWidth = .5; ctx.stroke();
-                            }
-                        }
-                    }
-                    proj.forEach(({ sx, sy, a, r }) => {
-                        ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2);
-                        ctx.fillStyle = `rgba(56,189,248,${a * .7})`; ctx.fill();
-                    });
-                    pts.forEach(p => {
-                        p.x += p.vx; p.y += p.vy; p.z += p.vz;
-                        if (p.x < 0 || p.x > W || p.y < 0 || p.y > H || p.z < 60 || p.z > 650) Object.assign(p, mkPt());
-                    });
-                    requestAnimationFrame(draw);
                 }
-                window.addEventListener('resize', () => { resize(); pts = Array.from({ length: N }, mkPt); });
-                init(); draw();
+
+                function loop() {
+                    T += .004;
+                    roadOffset = (roadOffset + .9) % 40;
+                    ctx.clearRect(0, 0, W, H);
+                    ctx.fillStyle = '#020c1b'; ctx.fillRect(0, 0, W, H);
+                    drawGlows();
+                    drawGrid();
+                    drawRoad();
+                    gears.forEach(g => { g.angle += g.speed; drawGear(g); });
+                    trucks.forEach(t2 => {
+                        t2.x += t2.speed;
+                        if (t2.speed > 0 && t2.x > W + 200) t2.x = -200;
+                        if (t2.speed < 0 && t2.x < -200) t2.x = W + 200;
+                        drawTruck(t2);
+                    });
+                    requestAnimationFrame(loop);
+                }
+                loop();
             })();
         </script>
     </section>
@@ -3173,6 +3256,16 @@
     <section id="scr-programador" class="container hidden">
         <h1>📋 LANÇAMENTOS</h1>
         <div class="sub" id="prog-user-label"></div>
+
+        <!-- Tabs do Programador -->
+        <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;">
+            <button onclick="progSwitchTab('lancamentos',this)" class="tab-btn tab-active" id="prog-tab-lancamentos">📋 Lançamentos</button>
+            <button onclick="progSwitchTab('manutencao',this)" class="tab-btn" id="prog-tab-manutencao">🔧 Manutenções</button>
+            <button onclick="progSwitchTab('historico',this)" class="tab-btn" id="prog-tab-historico">📜 Histórico</button>
+        </div>
+
+        <!-- Aba Lançamentos -->
+        <div id="prog-area-lancamentos">
         <div class="form-section">
             <h4 style="color:var(--info);margin-bottom:10px;">Novo Lançamento</h4>
             <select id="p-placa" onchange="atualizarSetor()">
@@ -3205,12 +3298,39 @@
             <input type="file" id="p-fotos-gal" multiple accept="image/*" class="hidden"
                 onchange="handleNewUpload(this)">
             <div id="p-preview-fotos" class="preview-area"></div>
-            <button onclick="lancarProgramacao()" class="btn-success" style="margin-top:5px;">✅ Finalizar e
-                Enviar</button>
+            <button onclick="lancarProgramacao()" class="btn-success" style="margin-top:5px;">✅ Finalizar e Enviar</button>
         </div>
         <input type="date" id="p-filter-date" onchange="carregarProgGeral()" style="margin-bottom:10px;">
         <div id="list-prog-geral"></div>
-        <button onclick="handleLogout()" class="btn-gray">🚪 Sair</button>
+        </div>
+
+        <!-- Aba Manutenções -->
+        <div id="prog-area-manutencao" style="display:none;">
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">🔧 Programar Revisão</h4>
+                <select id="pm-veiculo">
+                    <option value="">— Selecione o veículo —</option>
+                </select>
+                <input type="text" id="pm-descricao" placeholder="Descrição da revisão / serviço">
+                <input type="number" id="pm-km-programada" placeholder="KM programada">
+                <input type="date" id="pm-data-limite">
+                <select id="pm-urgencia">
+                    <option value="normal">Normal</option>
+                    <option value="urgente">Urgente</option>
+                    <option value="critico">Crítico</option>
+                </select>
+                <button onclick="salvarManutencaoProg()" class="btn-success">✅ Programar Revisão</button>
+            </div>
+            <div id="prog-list-manutencoes"></div>
+        </div>
+
+        <!-- Aba Histórico -->
+        <div id="prog-area-historico" style="display:none;">
+            <input type="date" id="p-hist-date" onchange="carregarHistoricoProgReal()" style="margin-bottom:10px;">
+            <div id="prog-list-historico"><p style="color:var(--gray);text-align:center;padding:20px;">Selecione uma data para ver o histórico.</p></div>
+        </div>
+
+        <button onclick="handleLogout()" class="btn-gray" style="margin-top:16px;">🚪 Sair</button>
     </section>
 
     <!-- ═══════════════════════════════════════════════════════ -->
@@ -5076,6 +5196,82 @@
         }
 
         // ═══════════════════════════════════════════════════
+        // PROGRAMADOR — TABS
+        // ═══════════════════════════════════════════════════
+        function progSwitchTab(aba, btn) {
+            ['lancamentos', 'manutencao', 'historico'].forEach(a => {
+                const el = document.getElementById(`prog-area-${a}`);
+                const tb = document.getElementById(`prog-tab-${a}`);
+                if (el) el.style.display = a === aba ? '' : 'none';
+                if (tb) tb.classList.toggle('tab-active', a === aba);
+            });
+            if (aba === 'manutencao') carregarManutencoesProg();
+            if (aba === 'historico') carregarHistoricoProgReal();
+        }
+
+        async function salvarManutencaoProg() {
+            const placa = document.getElementById('pm-veiculo').value;
+            const desc = document.getElementById('pm-descricao').value.trim();
+            const km = document.getElementById('pm-km-programada').value || null;
+            const data = document.getElementById('pm-data-limite').value || null;
+            const urg = document.getElementById('pm-urgencia').value;
+            if (!placa || !desc) { alert('Preencha veículo e descrição!'); return; }
+            loading(true, 'Salvando...');
+            const { error } = await db.from(TBL.manutencoes).insert({ placa, descricao: desc, km_programada: km ? parseInt(km) : null, data_limite: data, urgencia: urg, status: 'PENDENTE' });
+            if (error) { loading(false); alert('Erro: ' + error.message); return; }
+            ['pm-descricao', 'pm-km-programada', 'pm-data-limite'].forEach(id => document.getElementById(id).value = '');
+            await carregarManutencoesProg();
+            await registrarAuditoria('Revisão programada (prog): ' + placa + ' — ' + desc);
+            loading(false);
+            alert('✅ Revisão programada!');
+        }
+
+        async function carregarManutencoesProg() {
+            const cont = document.getElementById('prog-list-manutencoes');
+            if (!cont) return;
+            // Popular select de veículos
+            const sel = document.getElementById('pm-veiculo');
+            if (sel && sel.options.length <= 1) {
+                const { data: vs } = await db.from(TBL.veiculos).select('placa').order('placa');
+                if (vs) vs.forEach(v => { const o = new Option(v.placa, v.placa); sel.add(o); });
+            }
+            const { data: list } = await db.from(TBL.manutencoes).select('*').order('id', { ascending: false });
+            if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhuma revisão programada.</p>'; return; }
+            cont.innerHTML = list.map(m => {
+                const urgColor = { critico: 'var(--danger)', urgente: 'var(--warning)', normal: 'var(--info)' }[m.urgencia] || 'var(--gray)';
+                const concluido = m.status === 'CONCLUIDO';
+                return `<div class="prog-item" style="border-left-color:${urgColor};${concluido ? 'opacity:.5' : ''}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+                        <div>
+                            <b>${m.placa}</b> — ${m.descricao}
+                            <div style="font-size:11px;color:var(--gray);margin-top:3px;">
+                                ${m.km_programada ? '📏 ' + m.km_programada + ' km' : ''} ${m.data_limite ? '📅 ' + m.data_limite : ''} · <span style="color:${urgColor};text-transform:uppercase;font-weight:700;">${m.urgencia}</span>
+                            </div>
+                        </div>
+                        <span class="status-badge" style="background:${concluido ? 'var(--success)' : 'rgba(245,158,11,.3)'};color:${concluido ? '#fff' : 'var(--warning)'};">${m.status}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function carregarHistoricoProgReal() {
+            const cont = document.getElementById('prog-list-historico');
+            if (!cont) return;
+            const date = document.getElementById('p-hist-date')?.value;
+            if (!date) { cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Selecione uma data.</p>'; return; }
+            cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Carregando...</p>';
+            const { data: list } = await db.from(TBL.prog).select('*').eq('data_servico', date).order('id', { ascending: false });
+            if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Nenhum lançamento nesta data.</p>'; return; }
+            cont.innerHTML = list.map(s => `<div class="prog-item">
+                <b>${s.placa}</b> <span class="status-badge">${s.tipo_op||'—'}</span>
+                <div style="font-size:11px;color:var(--gray);margin-top:4px;">
+                    ${s.fornecedor ? '🏢 ' + s.fornecedor + ' · ' : ''}📏 ${s.km||'—'} km · Por: ${s.programador||'—'}
+                </div>
+                ${s.obs ? '<div style="font-size:11px;margin-top:4px;opacity:.7;">📝 ' + s.obs + '</div>' : ''}
+            </div>`).join('');
+        }
+
+        // ═══════════════════════════════════════════════════
         // FORNECEDOR — ORÇAMENTOS
         // ═══════════════════════════════════════════════════
         async function carregarOrcForn() {
@@ -5782,15 +5978,14 @@
             if (!orcs?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum orçamento encontrado.</p>'; return; }
             cont.innerHTML = orcs.map(o => {
                 const cor = o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : o.status === 'CANCELADO' ? 'var(--cancelled)' : 'rgba(245,158,11,.3)';
-                return `< div class="orc-card ${o.status.toLowerCase()}" onclick = "abrirDetalheOrc(${o.id})" >
+                return `<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrc(${o.id})">
                 <div style="display:flex;justify-content:space-between;align-items:center;">
                     <div>
-                        <b>${o.placa}</b> — <span style="color:var(--success);font-weight:bold;">R$ ${o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        <br><small style="color:var(--gray);">${o.empresa} | ${o.timestamp}</small>
+                        <b>${o.placa}</b> — <span style="color:var(--success);font-weight:bold;">R$ ${parseFloat(o.total||0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <br><small style="color:var(--gray);">${o.empresa || '—'} | ${(o.timestamp||'').substring(0,10)}</small>
                     </div>
                     <span class="status-badge" style="background:${cor};color:#fff;">${o.status}</span>
-                </div>
-        </div > `;
+                </div></div>`;
             }).join('');
         }
 
@@ -7176,7 +7371,7 @@
                     _filtrarBase(db.from(TBL.colaboradores).select('id,nome,perfil').eq('perfil', 'motorista')),
                     _filtrarBase(db.from(TBL.checklists).select('motorista,km,data_checklist').gte('data_checklist', dataIni)),
                     _filtrarBase(db.from(TBL.prog).select('programador,status_flow,data_servico').gte('data_servico', dataIni)),
-                    db.from('multas').select('*').gte('data', dataIni).catch(() => ({ data: [] }))
+                    (async () => { try { return await db.from('multas').select('*').gte('data', dataIni); } catch(_) { return { data: [] }; } })()
                 ]);
                 const motoristas = (colabs || []);
                 if (!motoristas.length) {
