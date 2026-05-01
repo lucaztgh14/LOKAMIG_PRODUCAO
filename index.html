@@ -4202,7 +4202,7 @@
             // Miniaturas
             if (thumbs) {
                 thumbs.style.display = _fotosGaleria.length > 1 ? 'flex' : 'none';
-                thumbs.innerHTML = _fotosGaleria.map((f, i) => `
+                thumbs.innerHTML = _fotosGaleria.map((f, i) =>`
                     <img src="${f}" onclick="event.stopPropagation();_fotoIdx=${i};_abrirFotoIdx(${i})"
                     style="width:52px;height:52px;object-fit:cover;border-radius:6px;cursor:pointer;
                     border:2px solid ${i === idx ? 'var(--primary)' : 'rgba(255,255,255,.2)'};
@@ -4811,8 +4811,8 @@
                         document.getElementById('prog-user-label').textContent = 'Usuário: ' + colab.nome;
                         loading(false);
                         show('scr-programador');
-                        await popularSeletorVeiculos();
-                        await popularSeletorFornecedores();
+                        await Promise.all([popularSeletorVeiculos(), popularSeletorFornecedores()]);
+                        toggleFornDiv();
                         await carregarProgGeral();
                         iniciarRealtime();
                         setTimeout(inicializarChat, 1000);
@@ -4900,7 +4900,7 @@
             const anoSel = document.getElementById('rel-ano');
             if (anoSel) {
                 const anoAtual = new Date().getFullYear();
-                anoSel.innerHTML = [anoAtual, anoAtual - 1, anoAtual - 2].map(a => `<option value="${a}">${a}</option>`).join('');
+                anoSel.innerHTML = [anoAtual, anoAtual - 1, anoAtual - 2].map(a =>`<option value="${a}">${a}</option>`).join('');
             }
             const mesSel = document.getElementById('rel-mes');
             if (mesSel) mesSel.value = new Date().getMonth() + 1;
@@ -5131,8 +5131,7 @@
         ${s.obs_status ? `<tr><th>Obs. Serviço</th><td>${s.obs_status}</td></tr>` : ''}
     </table>`;
 
-            document.getElementById('srv-det-fotos').innerHTML = fotos.map(f =>
-                `<div class="photo-card"><img src="${f}" class="thumb" onclick="verFotoGrande('${f}')">
+            document.getElementById('srv-det-fotos').innerHTML = fotos.map(f =>`<div class="photo-card"><img src="${f}" class="thumb" onclick="verFotoGrande('${f}')">
          <div class="timestamp-overlay">${s.timestamp || s.data_servico}</div></div>`
             ).join('');
 
@@ -5179,7 +5178,7 @@
             if (!sel) return;
             const { data } = await _filtrarBase(db.from(TBL.fornecedores).select('nome'));
             sel.innerHTML = '<option value="">Todos fornecedores</option>' +
-                (data || []).map(f => `<option value="${f.nome}">${f.nome}</option>`).join('');
+                (data || []).map(f =>`<option value="${f.nome}">${f.nome}</option>`).join('');
         }
 
         async function renderHistorico() {
@@ -5359,7 +5358,7 @@
             const cont = document.getElementById('list-colab');
             if (!cont) return;
             if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum colaborador cadastrado.</p>'; return; }
-            cont.innerHTML = items.map(it => `
+            cont.innerHTML = items.map(it =>`
         <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
             <div>
                 <b>${it.nome}</b> <small style="color:var(--gray);">#${it.matricula}</small>
@@ -5405,7 +5404,7 @@
             const cont = document.getElementById('list-veic');
             if (!cont) return;
             if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum veículo cadastrado.</p>'; return; }
-            cont.innerHTML = items.map(v => `
+            cont.innerHTML = items.map(v =>`
         <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
             <div>
                 <b>${v.placa}</b> <span class="setor-badge setor-${v.tipo}">${v.tipo}</span>
@@ -5424,11 +5423,11 @@
 
         async function popularSeletorVeiculos() {
             const { data: veics } = await _filtrarBase(db.from(TBL.veiculos).select('placa,modelo,tipo').order('placa'));
-            ['p-placa', 'm-veiculo', 'ab-veiculo'].forEach(id => {
+            ['p-placa', 'm-veiculo', 'pm-veiculo', 'ab-veiculo'].forEach(id => {
                 const sel = document.getElementById(id);
                 if (!sel) return;
                 sel.innerHTML = '<option value="">— Selecione —</option>' +
-                    (veics || []).map(v => `<option value="${v.placa}">${v.placa}${v.modelo ? ' - ' + v.modelo : ''} (${v.tipo})</option>`).join('');
+                    (veics || []).map(v =>`<option value="${v.placa}">${v.placa}${v.modelo ? ' - ' + v.modelo : ''} (${v.tipo})</option>`).join('');
             });
         }
 
@@ -5506,7 +5505,7 @@
             const sel = document.getElementById('p-fornecedor-select');
             if (!sel) return;
             sel.innerHTML = '<option value="">— Selecione o destino —</option>' +
-                (forns || []).map(f => `<option value="${f.nome}">${f.nome}</option>`).join('');
+                (forns || []).map(f =>`<option value="${f.nome}">${f.nome}</option>`).join('');
         }
 
         async function atualizarSetor() {
@@ -5794,13 +5793,13 @@
         async function carregarManutencoesProg() {
             const cont = document.getElementById('prog-list-manutencoes');
             if (!cont) return;
-            // Popular select de veículos
+            // Popular select de veículos filtrado por base
             const sel = document.getElementById('pm-veiculo');
             if (sel && sel.options.length <= 1) {
-                const { data: vs } = await db.from(TBL.veiculos).select('placa').order('placa');
+                const { data: vs } = await _filtrarBase(db.from(TBL.veiculos).select('placa').order('placa'));
                 if (vs) vs.forEach(v => { const o = new Option(v.placa, v.placa); sel.add(o); });
             }
-            const { data: list } = await db.from(TBL.manutencoes).select('*').order('id', { ascending: false });
+            const { data: list } = await _filtrarBase(db.from(TBL.manutencoes).select('*').order('id', { ascending: false }));
             if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhuma revisão programada.</p>'; return; }
             cont.innerHTML = list.map(m => {
                 const urgColor = { critico: 'var(--danger)', urgente: 'var(--warning)', normal: 'var(--info)' }[m.urgencia] || 'var(--gray)';
@@ -5827,7 +5826,7 @@
             cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Carregando...</p>';
             const { data: list } = await db.from(TBL.prog).select('*').eq('data_servico', date).order('id', { ascending: false });
             if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Nenhum lançamento nesta data.</p>'; return; }
-            cont.innerHTML = list.map(s => `<div class="prog-item">
+            cont.innerHTML = list.map(s =>`<div class="prog-item">
                 <b>${s.placa}</b> <span class="status-badge">${s.tipo_op||'—'}</span>
                 <div style="font-size:11px;color:var(--gray);margin-top:4px;">
                     ${s.fornecedor ? '🏢 ' + s.fornecedor + ' · ' : ''}📏 ${s.km||'—'} km · Por: ${s.programador||'—'}
@@ -5865,7 +5864,7 @@
                                     📅 ${o.data_orc || '—'} · ${itensArr.length} item(ns)
                                 </div>
                                 <div style="margin-top:6px;font-size:11px;">
-                                    ${itensArr.map(i => `<span style="color:#94a3b8;">• ${i.desc}: R$ ${parseFloat(i.valor || 0).toFixed(2)}</span>`).join('<br>')}
+                                    ${itensArr.map(i =>`<span style="color:#94a3b8;">• ${i.desc}: R$ ${parseFloat(i.valor || 0).toFixed(2)}</span>`).join('<br>')}
                                 </div>
                             </div>
                             <div style="text-align:right;">
@@ -5874,16 +5873,16 @@
                                     <button class="btn-info btn-sm" onclick="gerarPDFOrcamento(${o.id})">📄 PDF</button>
                                     ${podeNF ? `<button class="btn-success btn-sm" onclick="emitirNF(${o.id},'${o.placa}',${o.total},this.dataset.emp)" data-emp="${(o.empresa || '').replace(/"/g, '&quot;')}">🧾 Emitir NF</button>` : ''}
                                     ${ nfEmitida ? `<span style="font-size:10px;color:var(--success);">✅ NF Emitida</span>` : '' }
-                                </div >
-                            </div >
-                        </div >
-                    </div > `;
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
                 }).join('');
                 // Atualizar counters
                 const aprovados = orcs.filter(o => o.status === 'APROVADO').length;
                 document.getElementById('forn-total-orc').textContent = orcs.length;
                 document.getElementById('forn-aprovados').textContent = aprovados;
-            } catch(e) { cont.innerHTML = `< div class="alert-card alert-danger" > Erro: ${ e.message }</div > `; }
+            } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger"> Erro: ${e.message}</div>`; }
         }
 
         // ═══════════════════════════════════════════════════
@@ -5891,7 +5890,7 @@
         // ═══════════════════════════════════════════════════
         async function emitirNF(orcId, placa, total, empresaOrEl) {
             const empresa = (typeof empresaOrEl === 'string') ? empresaOrEl : (empresaOrEl?.dataset?.emp || '');
-            if (!confirm(`Emitir Nota Fiscal para o orçamento ?\n\nPlaca: ${ placa } \nValor: R$ ${ parseFloat(total).toFixed(2) } `)) return;
+            if (!confirm(`Emitir Nota Fiscal para o orçamento ?\n\nPlaca: ${placa} \nValor: R$ ${ parseFloat(total).toFixed(2) } `)) return;
             loading(true, 'Emitindo Nota Fiscal...');
             try {
                 // Buscar dados completos do orçamento
@@ -5901,12 +5900,12 @@
                 const { data: nfCriada, error } = await db.from('notas_fiscais').insert({
                     orcamento_id: orcId, fornecedor: currentUser.empresa,
                     placa: orc.placa, valor: orc.total,
-                    descricao: `Serviços conforme orçamento #${ orcId } — ${ orc.placa } `,
+                    descricao: `Serviços conforme orçamento #${orcId} — ${orc.placa} `,
                     base_id: orc.base_id, status: 'emitida',
                     emitida_em: new Date().toISOString()
                 }).select().single();
                 if (error) throw error;
-                await registrarAuditoria(`NF emitida: ${ currentUser.empresa } — ${ orc.placa } — R$ ${ orc.total } `);
+                await registrarAuditoria(`NF emitida: ${currentUser.empresa} — ${orc.placa} — R$ ${orc.total} `);
                 loading(false);
                 showSuccess('🧾 Nota Fiscal emitida com sucesso!');
                 // Gerar PDF automaticamente
@@ -5931,17 +5930,17 @@
                 const total = (nfs || []).length;
                 document.getElementById('forn-total-nf').textContent = total;
                 if (!nfs?.length) {
-                    cont.innerHTML = `< div style = "text-align:center;padding:32px;" >
+                    cont.innerHTML = `<div style="text-align:center;padding:32px;">
                         <div style="font-size:48px;margin-bottom:12px;">🧾</div>
                         <p style="color:var(--gray);font-size:13px;">Nenhuma NF emitida ainda.</p>
                         <p style="color:var(--gray);font-size:11px;margin-top:8px;">As NFs aparecem aqui após aprovação do orçamento.</p>
-                    </div > `;
+                    </div>`;
                     return;
                 }
                 // Valor total faturado
                 const totalValor = nfs.reduce((s, n) => s + parseFloat(n.valor || 0), 0);
                 cont.innerHTML = `
-                        < div style = "display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;" >
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
                         <div class="metric-card">
                             <span class="metric-value" style="color:var(--success);font-size:20px;">R$ ${totalValor.toFixed(2)}</span>
                             <span class="metric-label">Total Faturado</span>
@@ -5950,11 +5949,10 @@
                             <span class="metric-value" style="font-size:20px;">${nfs.length}</span>
                             <span class="metric-label">NFs Emitidas</span>
                         </div>
-                    </div >
-                        ` + nfs.map((nf, idx) => {
+                    </div>` + nfs.map((nf, idx) => {
                     const num = String(nf.id).padStart(6, '0');
                     const data = nf.emitida_em ? new Date(nf.emitida_em).toLocaleDateString('pt-BR') : '—';
-                    return `< div class="prog-item" style = "margin-bottom:8px;" >
+                    return `<div class="prog-item" style="margin-bottom:8px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
                             <div>
                                 <div style="display:flex;align-items:center;gap:8px;">
@@ -5974,7 +5972,7 @@
                                 <button class="btn-info btn-sm" style="margin-top:6px;" onclick="reimprimirNF(${nf.id})">📄 PDF</button>
                             </div>
                         </div>
-                    </div > `;
+                    </div>`;
                 }).join('');
             } catch(e) {
                 cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:12px;">Crie a tabela notas_fiscais no Supabase.</p>';
@@ -6021,12 +6019,12 @@
             doc.text('NOTA FISCAL DE SERVIÇO', M + 32, 30);
             doc.setFontSize(10);
             doc.setTextColor(56, 189, 248);
-            doc.text(`Nº ${ num } `, M + 32, 37);
+            doc.text(`Nº ${num} `, M + 32, 37);
 
             // Data no canto
             doc.setFontSize(9);
             doc.setTextColor(148, 163, 184);
-            doc.text(`Emissão: ${ dataEmissao } `, W - M - 40, 37);
+            doc.text(`Emissão: ${dataEmissao} `, W - M - 40, 37);
 
             // Linha separadora
             doc.setDrawColor(56, 189, 248);
@@ -6139,7 +6137,7 @@
             y += 24;
 
             // Código de autenticidade
-            const hash = btoa(`NF${ num } -${ nf.orcamento_id } -${ nf.valor } `).substring(0, 20).toUpperCase();
+            const hash = btoa(`NF${num} -${nf.orcamento_id} -${nf.valor} `).substring(0, 20).toUpperCase();
             doc.setFillColor(12, 25, 41);
             doc.roundedRect(M, y, W - M*2, 16, 3, 3, 'F');
             doc.setFont('helvetica','bold');
@@ -6166,7 +6164,7 @@
             doc.text('O.G.A.I.T. Systems · Operação Global de Ativos e Integração de Transporte · v7.2', W/2, 288, { align: 'center' });
             doc.text('Este documento tem validade para fins de controle interno. Para NF-e fiscal, consulte o departamento financeiro.', W/2, 292, { align: 'center' });
 
-            doc.save(`NF_${ num }_${ nf.placa }_${ dataEmissao.replace(/\//g, '-') }.pdf`);
+            doc.save(`NF_${num}_${nf.placa}_${ dataEmissao.replace(/\//g, '-') }.pdf`);
             showSuccess('📄 PDF da NF gerado com sucesso!');
         }
 
@@ -6174,8 +6172,7 @@
             const cont = document.getElementById('forn-alertas-revisao');
             if (!cont) return;
             const { data: manut } = await _filtrarBase(db.from(TBL.manutencoes).select('placa,descricao').eq('status', 'PENDENTE').eq('urgencia', 'critico'));
-            cont.innerHTML = (manut || []).map(m =>
-                `< div class="alert-card alert-danger" >🚨 REVISÃO CRÍTICA: <b>${m.placa}</b> — ${ m.descricao }</div > `
+            cont.innerHTML = (manut || []).map(m =>`<div class="alert-card alert-danger">🚨 REVISÃO CRÍTICA: <b>${m.placa}</b> — ${m.descricao}</div>`
             ).join('');
         }
 
@@ -6216,7 +6213,7 @@
             cont.innerHTML = statusPendente.fotos.map((f, i) => {
                 const src = typeof f === 'object' ? f.data : f;
                 const ts = typeof f === 'object' ? f.ts : '';
-                return `< div class="photo-card" >
+                return `<div class="photo-card">
                         <img src="${src}" class="thumb" onclick="verFotoGrande('${src}')">
                             <div class="timestamp-overlay">📅 ${ts}</div>
                             <button class="del-btn" onclick="statusPendente.fotos.splice(${i},1);renderStatusPreviews()">✕</button>
@@ -6251,7 +6248,7 @@
             let novasFotos = [];
             try {
                 novasFotos = await uploadFotosCloudinary(statusPendente.fotos, (atual, total) => {
-                    loading(true, `Enviando foto ${ atual } de ${ total }...`);
+                    loading(true, `Enviando foto ${atual} de ${total}...`);
                 });
             } catch (e) {
                 // Fallback: salva base64 se Cloudinary falhar
@@ -6275,7 +6272,7 @@
                 });
             }
 
-            await registrarAuditoria(`Status: ID ${ statusPendente.id } → ${ statusPendente.novoStatus } | ${ currentUser?.empresa }`);
+            await registrarAuditoria(`Status: ID ${statusPendente.id} → ${statusPendente.novoStatus} | ${ currentUser?.empresa }`);
             loading(false);
             showSuccess(statusPendente.novoStatus === 'CONCLUIDO' ? 'SERVIÇO CONCLUÍDO!' : 'SERVIÇO INICIADO!');
             fecharModalStatus();
@@ -6296,7 +6293,7 @@
             reader.onload = e => {
                 abastecimentoFoto = e.target.result;
                 document.getElementById('ab-preview-foto').innerHTML =
-                    `< div class= "photo-card" > <img src="${e.target.result}" class="thumb" onclick="verFotoGrande('${e.target.result}')">
+                    `<div class="photo-card"> <img src="${e.target.result}" class="thumb" onclick="verFotoGrande('${e.target.result}')">
                     <button class="del-btn" onclick="abastecimentoFoto=null;document.getElementById('ab-preview-foto').innerHTML=''">✕</button></div>`;
             };
             reader.readAsDataURL(input.files[0]);
@@ -6326,7 +6323,7 @@
             abastecimentoFoto = null;
             ['ab-litros', 'ab-valor', 'ab-km'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('ab-preview-foto').innerHTML = '';
-            await registrarAuditoria(`Abastecimento: ${ placa } | ${ litros }L | R$${ valor }`);
+            await registrarAuditoria(`Abastecimento: ${placa} | ${litros}L | R$${valor}`);
             await carregarAbastecimentos();
             await atualizarDashboard();
             loading(false);
@@ -6354,8 +6351,8 @@
             const cont = document.getElementById('list-abastecimentos');
             if (!cont) return;
             if (!mesList?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum abastecimento neste mês.</p>'; return; }
-            cont.innerHTML = mesList.map(a => `
-                < div class="prog-item" >
+            cont.innerHTML = mesList.map(a =>`
+                <div class="prog-item">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
                         <div>
                             <b>${a.placa}</b> — <span style="color:var(--success);">${a.litros}L | R$ ${parseFloat(a.valor).toFixed(2)}</span>
@@ -6366,7 +6363,7 @@
                             R$/L: ${a.litros > 0 ? (parseFloat(a.valor) / parseFloat(a.litros)).toFixed(2) : '—'}
                         </div>
                     </div>
-        </div > `).join('');
+        </div>`).join('');
         }
 
         // ─────────────────────────────────────────────
@@ -6394,11 +6391,11 @@
             const cont = document.getElementById('list-emails');
             if (!cont) return;
             if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum e-mail cadastrado.</p>'; return; }
-            cont.innerHTML = items.map(it => `
-                < div class="prog-item" style = "display:flex;justify-content:space-between;align-items:center;" >
+            cont.innerHTML = items.map(it =>`
+                <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
             <div><b>${it.nome || '—'}</b><br><small style="color:var(--gray);">${it.email}</small></div>
             <button class="btn-danger btn-sm" onclick="excluirEmail(${it.id})">✕</button>
-        </div > `).join('');
+        </div>`).join('');
         }
 
         async function excluirEmail(id) {
@@ -6424,9 +6421,8 @@
             const { data: logs } = await _filtrarBase(db.from(TBL.auditoria).select('*').order('id', { ascending: false }).limit(100));
             const cont = document.getElementById('list-auditoria');
             if (!cont) return;
-            cont.innerHTML = (logs || []).length ? logs.map(l =>
-                `< div class="prog-item" style = "font-size:10px;padding:8px 12px;" >
-                <b>${l.usuario || '—'}</b> — ${ l.acao }
+            cont.innerHTML = (logs || []).length ? logs.map(l =>`<div class="prog-item" style="font-size:10px;padding:8px 12px;">
+                <b>${l.usuario || '—'}</b> — ${l.acao}
             <br><small style="color:var(--gray);">${l.data_hora}</small>
             </div>`).join('') : '<p style="color:var(--gray);">Nenhuma atividade registrada.</p>';
         }
@@ -6470,11 +6466,11 @@
             if (!cont) return;
             cont.innerHTML = tempEvidencias.map((ev, i) => {
                 const content = ev.mime?.startsWith('image/')
-                    ? `< img src = "${ev.data}" onclick = "verFotoGrande('${ev.data}')" > `
+                    ? `<img src="${ev.data}" onclick="verFotoGrande('${ev.data}')">`
                     : ev.mime?.startsWith('video/')
-                        ? `< video src = "${ev.data}" controls style = "width:100%;height:100%;object-fit:cover;" ></video > `
-                        : `< div class="ev-label" >📎<span style="padding:4px;text-align:center;">${ev.nome}</span></div > `;
-                return `< div class="ev-card" > ${ content } <button class="del-btn" onclick="tempEvidencias.splice(${i},1);renderEvidencias()">✕</button></div > `;
+                        ? `<video src="${ev.data}" controls style="width:100%;height:100%;object-fit:cover;"></video>`
+                        : `<div class="ev-label">📎<span style="padding:4px;text-align:center;">${ev.nome}</span></div>`;
+                return `<div class="ev-card"> ${content} <button class="del-btn" onclick="tempEvidencias.splice(${i},1);renderEvidencias()">✕</button></div>`;
             }).join('');
         }
 
@@ -6508,7 +6504,7 @@
             document.getElementById('orc-itens').innerHTML = '<div style="display:flex;gap:5px;margin-bottom:8px;"><input type="text" placeholder="Descrição do item" style="flex:2;margin:0;"><input type="number" class="v-item" placeholder="R$" style="flex:1;margin:0;" oninput="calcTotal()"></div>';
             document.getElementById('total-orc').textContent = '0,00';
             renderEvidencias();
-            await registrarAuditoria(`Orçamento enviado: ${ placa } | R$${ total.toFixed(2) } | ${ currentUser?.empresa } `);
+            await registrarAuditoria(`Orçamento enviado: ${placa} | R$${ total.toFixed(2) } | ${ currentUser?.empresa } `);
             loading(false);
             showSuccess('ORÇAMENTO ENVIADO!');
             setTimeout(() => show('scr-fornecedor'), 2000);
@@ -6521,7 +6517,7 @@
             const { data: orcs } = await _filtrarBase(db.from(TBL.orcamentos).select('*').eq('empresa', empresa).order('id', { ascending: false }));
 
             document.getElementById('list-orc-enviados').innerHTML = (orcs || []).length
-                ? orcs.map(o => `< div class="orc-card ${o.status.toLowerCase()}" onclick = "abrirDetalheOrcForn(${o.id})" >
+                ? orcs.map(o =>`<div class="orc-card ${o.status.toLowerCase()}" onclick="abrirDetalheOrcForn(${o.id})">
                 <b>${o.placa}</b> — R$ ${ o.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }
             <span class="status-badge" style="float:right;background:${o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : o.status === 'CANCELADO' ? 'var(--cancelled)' : 'rgba(245,158,11,.3)'};">${o.status}</span>
             <br><small style="color:var(--gray);">${o.empresa} | ${o.timestamp}</small>
@@ -6536,7 +6532,7 @@
 
             let q = _filtrarBase(db.from(TBL.orcamentos).select('*').order('id', { ascending: false }));
             if (status) q = q.eq('status', status);
-            if (placa) q = q.ilike('placa', `% ${ placa }% `);
+            if (placa) q = q.ilike('placa', `% ${placa}% `);
 
             const { data: orcs } = await q;
             const cont = document.getElementById('list-orcamentos-admin');
@@ -6571,43 +6567,43 @@
             const o = rows?.[0]; if (!o) return;
             orcAtual = { ...o };
 
-            document.getElementById('orc-det-titulo').textContent = `ORÇAMENTO — ${ o.placa } `;
+            document.getElementById('orc-det-titulo').textContent = `ORÇAMENTO — ${o.placa} `;
             document.getElementById('orc-det-body').innerHTML = `
-                < table >
+                <table >
         <tr><th>Empresa</th><td>${o.empresa}</td></tr>
         <tr><th>Placa</th><td><b>${o.placa}</b></td></tr>
         <tr><th>Data</th><td>${o.timestamp}</td></tr>
         <tr><th>Descrição</th><td>${o.descricao || '—'}</td></tr>
         <tr><th colspan="2" style="padding-top:8px;color:var(--gray);">ITENS</th></tr>
-        ${ (o.itens || []).map(it => `<tr><td>${it.desc}</td><td style="color:var(--success);">R$ ${it.valor.toFixed(2)}</td></tr>`).join('') }
+        ${ (o.itens || []).map(it =>`<tr><td>${it.desc}</td><td style="color:var(--success);">R$ ${it.valor.toFixed(2)}</td></tr>`).join('') }
             <tr><td><b>TOTAL</b></td><td><b style="color:var(--success);font-size:14px;">R$ ${o.total.toFixed(2)}</b></td></tr>
-    </table > `;
+    </table>`;
 
             const evCont = document.getElementById('orc-det-evidencias');
             // Guarda as evidências globalmente para abrirDocEvidenciaPorIndex
             window._evAtual = o.evidencias || [];
             evCont.innerHTML = (o.evidencias || []).map((ev, ei) => {
                 if (!ev?.data) return '';
-                if (ev.mime?.startsWith('image/')) return `< div class="ev-card" onclick = "verFotoGrande('${ev.data}')" > <img src="${ev.data}"></div>`;
-                if (ev.mime?.startsWith('video/')) return `< div class="ev-card" > <video src="${ev.data}" controls style="width:100%;height:100%;object-fit:cover;"></video></div > `;
-                return `< div class="ev-card" onclick = "abrirDocEvidenciaPorIndex(${ei})" style = "cursor:pointer;" >
+                if (ev.mime?.startsWith('image/')) return `<div class="ev-card" onclick="verFotoGrande('${ev.data}')"> <img src="${ev.data}"></div>`;
+                if (ev.mime?.startsWith('video/')) return `<div class="ev-card"> <video src="${ev.data}" controls style="width:100%;height:100%;object-fit:cover;"></video></div>`;
+                return `<div class="ev-card" onclick="abrirDocEvidenciaPorIndex(${ei})" style="cursor:pointer;">
                 <div class="ev-label">📄<span style="font-size:9px;padding:4px;word-break:break-all;">${ev.nome || 'Documento'}</span><span style="font-size:10px;color:var(--info);">Clique para abrir</span></div>
-        </div > `;
+        </div>`;
             }).join('');
 
             const acoesCont = document.getElementById('orc-det-acoes');
             if (orcDetalheOrigem === 'admin' && o.status === 'PENDENTE') {
-                acoesCont.innerHTML = `< div class="btn-row" style = "margin-top:10px;" >
+                acoesCont.innerHTML = `<div class="btn-row" style="margin-top:10px;">
             <button class="btn-success btn-flex" onclick="mudarStatusOrc(${id},'APROVADO')">✅ APROVAR</button>
             <button class="btn-danger btn-flex" onclick="mudarStatusOrc(${id},'REJEITADO')">❌ REJEITAR</button>
-        </div > `;
+        </div>`;
             } else if (orcDetalheOrigem === 'fornecedor' && o.status === 'PENDENTE') {
-                acoesCont.innerHTML = `< div class="btn-row" style = "margin-top:10px;" >
+                acoesCont.innerHTML = `<div class="btn-row" style="margin-top:10px;">
                 <button class="btn-cancel btn-flex" onclick="fornCancelarOrcamento(${id})">🚫 CANCELAR ORÇAMENTO</button>
-        </div > `;
+        </div>`;
             } else {
                 const cor = o.status === 'APROVADO' ? 'var(--success)' : o.status === 'REJEITADO' ? 'var(--danger)' : o.status === 'CANCELADO' ? 'var(--cancelled)' : 'var(--warning)';
-                acoesCont.innerHTML = `< p style = "font-size:13px;margin:10px 0;font-weight:bold;color:${cor};" > Status: ${ o.status }</p > `;
+                acoesCont.innerHTML = `<p style="font-size:13px;margin:10px 0;font-weight:bold;color:${cor};"> Status: ${o.status}</p>`;
             }
 
             document.getElementById('orc-email-actions').style.display = orcDetalheOrigem === 'admin' ? 'block' : 'none';
@@ -6618,7 +6614,7 @@
             loading(true, 'Atualizando...');
             const ts = new Date().toLocaleString('pt-BR');
             await db.from(TBL.orcamentos).update({ status: s, atualizado_em: ts }).eq('id', id);
-            await registrarAuditoria(`Orçamento ${ s }: ID ${ id } `);
+            await registrarAuditoria(`Orçamento ${s}: ID ${id} `);
             loading(false);
             await _abrirDetalheOrcComum(id);
         }
@@ -6628,7 +6624,7 @@
             loading(true, 'Cancelando...');
             const ts = new Date().toLocaleString('pt-BR');
             await db.from(TBL.orcamentos).update({ status: 'CANCELADO', atualizado_em: ts, cancelado_por: currentUser?.empresa }).eq('id', id);
-            await registrarAuditoria(`Orçamento CANCELADO pelo fornecedor ${ currentUser?.empresa }: ID ${ id } `);
+            await registrarAuditoria(`Orçamento CANCELADO pelo fornecedor ${ currentUser?.empresa }: ID ${id} `);
             loading(false);
             showSuccess('ORÇAMENTO CANCELADO!');
             await fecharDetalheOrc();
@@ -6675,11 +6671,11 @@
                 empresa: orcAtual.empresa,
                 data: orcAtual.timestamp,
                 total: orcAtual.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                itens: (orcAtual.itens || []).map(it => `• ${ it.desc }: R$ ${ it.valor.toFixed(2) } `).join('\n'),
+                itens: (orcAtual.itens || []).map(it =>`• ${it.desc}: R$ ${ it.valor.toFixed(2) } `).join('\n'),
                 descricao: orcAtual.descricao || '—',
                 status: orcAtual.status
             }).then(async () => {
-                await registrarAuditoria(`E - mail orçamento enviado para ${ email } | ${ orcAtual.placa } `);
+                await registrarAuditoria(`E - mail orçamento enviado para ${email} | ${orcAtual.placa} `);
                 alert('✅ E-mail enviado com sucesso!');
             }).catch(err => alert('❌ Erro ao enviar e-mail: ' + JSON.stringify(err)));
         }
@@ -6698,7 +6694,7 @@
             const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `lokamig_backup_${ new Date().toISOString().split('T')[0] }.json`;
+            a.download = `ogait_backup_${ new Date().toISOString().split('T')[0] }.json`;
             a.click();
             await registrarAuditoria('Backup exportado');
             loading(false);
@@ -6748,7 +6744,7 @@
             const totalOrcs = (orcs || []).reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
             montarCabecalhoPDF('RELATÓRIO FINANCEIRO GERAL');
             document.getElementById('pdf-body').innerHTML = `
-                < h3 style = "color:#0369a1;margin-bottom:10px;" > Resumo Financeiro</h3 >
+                <h3 style="color:#0369a1;margin-bottom:10px;"> Resumo Financeiro</h3>
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
         <tr style="background:#f5f5f5;"><th style="padding:8px;">Categoria</th><th style="padding:8px;">Valor</th></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;">⛽ Combustível Total</td><td style="padding:8px;border-bottom:1px solid #eee;color:#1a5276;font-weight:bold;">R$ ${totalComb.toFixed(2)}</td></tr>
@@ -6758,7 +6754,7 @@
     <h4 style="margin-bottom:8px;">Últimos 20 Abastecimentos</h4>
     <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <tr style="background:#f5f5f5;"><th style="padding:6px;">Data</th><th>Placa</th><th>Litros</th><th>Valor</th><th>KM</th></tr>
-        ${(comb || []).slice(-20).map(c => `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${c.data_abast}</td><td>${c.placa}</td><td>${parseFloat(c.litros).toFixed(1)}L</td><td>R$ ${parseFloat(c.valor).toFixed(2)}</td><td>${c.km}</td></tr>`).join('')}
+        ${(comb || []).slice(-20).map(c =>`<tr><td style="padding:5px;border-bottom:1px solid #eee;">${c.data_abast}</td><td>${c.placa}</td><td>${parseFloat(c.litros).toFixed(1)}L</td><td>R$ ${parseFloat(c.valor).toFixed(2)}</td><td>${c.km}</td></tr>`).join('')}
     </table>`;
             document.getElementById('pdf-photos').innerHTML = '';
             await renderizarEBaixarPDF(`Relatorio_Financeiro_${ new Date().toISOString().split('T')[0] }.pdf`);
@@ -6770,8 +6766,8 @@
             const baseId = currentUser?.base_id || null;
             const mesesNomes = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
             const nomeMes = mesesNomes[mes];
-            const dataIni = `${ ano } -${ String(mes).padStart(2, '0') }-01`;
-            const dataFim = `${ ano } -${ String(mes).padStart(2, '0') } -31`;
+            const dataIni = `${ano} -${ String(mes).padStart(2, '0') }-01`;
+            const dataFim = `${ano} -${ String(mes).padStart(2, '0') } -31`;
             let nomBase = 'Itaguaí';
             if (baseId) {
                 try { const {data:b} = await db.from('bases').select('nome').eq('id',baseId).single(); if(b?.nome) nomBase=b.nome; } catch(_){}
@@ -6823,7 +6819,7 @@
                     if (prev) {
                         prev.style.display = 'block';
                         prev.innerHTML = `
-                < div class="form-section" >
+                <div class="form-section">
                             <h4 style="color:var(--info);margin-bottom:12px;">📊 ${nomBase} — ${nomeMes}/${ano}</h4>
                             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:12px;">
                                 ${[
@@ -6856,7 +6852,7 @@
                                     </div>`).join('')}
                                 </div>
                             </div>
-                        </div > `;
+                        </div>`;
                     }
                     loading(false);
                     return;
@@ -6891,10 +6887,10 @@
                     const cklHeader = ['Data','Placa','Motorista','Status'];
                     const cklRows = (checklists||[]).map(c=>[c.data_checklist,c.placa,c.motorista,c.status_geral]);
                     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([cklHeader,...cklRows]), 'Checklists');
-                    XLSX.writeFile(wb, `Relatorio_${ nomBase }_${ nomeMes }_${ ano }.xlsx`);
+                    XLSX.writeFile(wb, `Relatorio_${nomBase}_${nomeMes}_${ano}.xlsx`);
                     loading(false);
                     showSuccess('EXCEL GERADO!');
-                    await registrarAuditoria(`Relatório Excel gerado: ${ nomBase } — ${ nomeMes }/${ano}`);
+                    await registrarAuditoria(`Relatório Excel gerado: ${nomBase} — ${nomeMes}/${ano}`);
             return;
         }
 
@@ -6920,21 +6916,21 @@
                             <h4 style="color:#0369a1;margin-bottom:8px;">Serviços por Fornecedor</h4>
                             <table style="width:100%;border-collapse:collapse;font-size:11px;">
                                 <tr style="background:#f5f5f5;"><th style="padding:5px;">Fornecedor</th><th style="padding:5px;">Qtd</th></tr>
-                                ${Object.entries(porForn).sort((a, b) => b[1] - a[1]).map(([f, n]) => `<tr><td style="padding:4px;border-bottom:1px solid #eee;">${f}</td><td style="padding:4px;text-align:center;font-weight:bold;">${n}</td></tr>`).join('')}
+                                ${Object.entries(porForn).sort((a, b) => b[1] - a[1]).map(([f, n]) =>`<tr><td style="padding:4px;border-bottom:1px solid #eee;">${f}</td><td style="padding:4px;text-align:center;font-weight:bold;">${n}</td></tr>`).join('')}
                             </table>
                         </div>
                         <div>
                             <h4 style="color:#0369a1;margin-bottom:8px;">Checklists por Motorista</h4>
                             <table style="width:100%;border-collapse:collapse;font-size:11px;">
                                 <tr style="background:#f5f5f5;"><th style="padding:5px;">Motorista</th><th style="padding:5px;">Qtd</th></tr>
-                                ${Object.entries(porMotorista).sort((a, b) => b[1] - a[1]).map(([m, n]) => `<tr><td style="padding:4px;border-bottom:1px solid #eee;">${m}</td><td style="padding:4px;text-align:center;font-weight:bold;">${n}</td></tr>`).join('')}
+                                ${Object.entries(porMotorista).sort((a, b) => b[1] - a[1]).map(([m, n]) =>`<tr><td style="padding:4px;border-bottom:1px solid #eee;">${m}</td><td style="padding:4px;text-align:center;font-weight:bold;">${n}</td></tr>`).join('')}
                             </table>
                         </div>
                     </div>
                     <h4 style="color:#0369a1;margin-bottom:8px;">Detalhamento de Serviços</h4>
                     <table style="width:100%;border-collapse:collapse;font-size:10px;">
                         <tr style="background:#f5f5f5;"><th style="padding:5px;">Data</th><th>Placa</th><th>Tipo</th><th>Fornecedor</th><th>Status</th></tr>
-                        ${(servicos || []).slice(0, 40).map(s => `<tr><td style="padding:4px;border-bottom:1px solid #eee;">${s.data_servico}</td><td>${s.placa}</td><td>${s.tipo_op || '—'}</td><td>${s.fornecedor || 'PÁTIO'}</td><td style="color:${s.status_flow === 'CONCLUIDO' ? 'green' : s.status_flow === 'CANCELADO' ? 'red' : 'orange'}">${s.status_flow}</td></tr>`).join('')}
+                        ${(servicos || []).slice(0, 40).map(s =>`<tr><td style="padding:4px;border-bottom:1px solid #eee;">${s.data_servico}</td><td>${s.placa}</td><td>${s.tipo_op || '—'}</td><td>${s.fornecedor || 'PÁTIO'}</td><td style="color:${s.status_flow === 'CONCLUIDO' ? 'green' : s.status_flow === 'CANCELADO' ? 'red' : 'orange'}">${s.status_flow}</td></tr>`).join('')}
                     </table>`;
             document.getElementById('pdf-photos').innerHTML = '';
             await renderizarEBaixarPDF(`Relatorio_${nomBase}_${nomeMes}_${ano}.pdf`);
@@ -6982,7 +6978,7 @@
                     logo.src = b64;
                     logo.style.display = 'block';
                 } else {
-                    // Fallback: esconde a tag img e exibe texto LOKAMIG no lugar
+                    // Fallback: esconde a tag img e exibe o nome do sistema
                     logo.style.display = 'none';
                     const fallback = document.getElementById('pdf-logo-fallback');
                     if (fallback) fallback.style.display = 'block';
@@ -7052,13 +7048,12 @@
         ${item.obs ? `<tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Observações</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${item.obs}</td></tr>` : ''}
         ${item.rating ? `<tr><td style="padding:8px;"><b>Avaliação</b></td><td style="padding:8px;">${'★'.repeat(item.rating)}${'☆'.repeat(5 - item.rating)}</td></tr>` : ''}
     </table>`;
-            document.getElementById('pdf-photos').innerHTML = (item.fotos || []).slice(0, 4).map(f =>
-                `<div style="position:relative;break-inside:avoid;">
+            document.getElementById('pdf-photos').innerHTML = (item.fotos || []).slice(0, 4).map(f =>`<div style="position:relative;break-inside:avoid;">
             <img src="${f}" style="width:100%;border-radius:8px;border:1px solid #ddd;">
             <div style="position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.7);color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;">${item.timestamp || item.data_servico}</div>
         </div>`
             ).join('');
-            await renderizarEBaixarPDF(`Lokamig_${item.placa}_${item.data_servico}.pdf`);
+            await renderizarEBaixarPDF(`OGAIT_${item.placa}_${item.data_servico}.pdf`);
             await registrarAuditoria(`PDF gerado: ${item.placa} ${item.data_servico}`);
         }
 
@@ -7074,12 +7069,11 @@
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Data</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.timestamp}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Status</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.status}</td></tr>
         <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;">Item</th><th style="padding:8px;text-align:left;">Valor</th></tr>
-        ${(o.itens || []).map(it => `<tr><td style="padding:8px;border-bottom:1px solid #eee;">${it.desc}</td><td style="padding:8px;border-bottom:1px solid #eee;">R$ ${it.valor.toFixed(2)}</td></tr>`).join('')}
+        ${(o.itens || []).map(it =>`<tr><td style="padding:8px;border-bottom:1px solid #eee;">${it.desc}</td><td style="padding:8px;border-bottom:1px solid #eee;">R$ ${it.valor.toFixed(2)}</td></tr>`).join('')}
         <tr style="background:#e8f5e9;font-weight:bold;"><td style="padding:8px;">TOTAL</td><td style="padding:8px;color:#2e7d32;">R$ ${o.total.toFixed(2)}</td></tr>
     </table>`;
             const fotos = (o.evidencias || []).filter(ev => ev.mime?.startsWith('image/')).slice(0, 4);
-            document.getElementById('pdf-photos').innerHTML = fotos.map(ev =>
-                `<img src="${ev.data}" style="width:100%;border-radius:8px;border:1px solid #ddd;">`
+            document.getElementById('pdf-photos').innerHTML = fotos.map(ev =>`<img src="${ev.data}" style="width:100%;border-radius:8px;border:1px solid #ddd;">`
             ).join('');
             await renderizarEBaixarPDF(`Orcamento_${o.placa}_${o.data_orc || ''}.pdf`);
         }
@@ -7103,7 +7097,7 @@
                 porPlaca[a.placa].count++;
             });
 
-            montarCabecalhoPDF(`RELATÓRIO DE COMBUSTÍVEL — ${nomeMes.toUpperCase()}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | Lokamig v6.1`);
+            montarCabecalhoPDF(`RELATÓRIO DE COMBUSTÍVEL — ${nomeMes.toUpperCase()}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | O.G.A.I.T. v7.2`);
             document.getElementById('pdf-body').innerHTML = `
     <div style="background:#fef9e7;border:1px solid #f39c12;border-radius:8px;padding:12px;margin-bottom:16px;">
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
@@ -7116,12 +7110,12 @@
     <h4 style="margin-bottom:8px;color:#0369a1;">Por Veículo</h4>
     <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
         <tr style="background:#f5f5f5;"><th style="padding:7px;text-align:left;">Placa</th><th style="padding:7px;">Litros</th><th style="padding:7px;">Valor</th><th style="padding:7px;">Abast.</th><th style="padding:7px;">R$/L méd.</th></tr>
-        ${Object.entries(porPlaca).map(([placa, v]) => `<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>${placa}</b></td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros.toFixed(1)}L</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:#1e8449;">R$ ${v.valor.toFixed(2)}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.count}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros > 0 ? 'R$ ' + (v.valor / v.litros).toFixed(3) : '—'}</td></tr>`).join('')}
+        ${Object.entries(porPlaca).map(([placa, v]) =>`<tr><td style="padding:6px;border-bottom:1px solid #eee;"><b>${placa}</b></td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros.toFixed(1)}L</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;color:#1e8449;">R$ ${v.valor.toFixed(2)}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.count}</td><td style="padding:6px;border-bottom:1px solid #eee;text-align:center;">${v.litros > 0 ? 'R$ ' + (v.valor / v.litros).toFixed(3) : '—'}</td></tr>`).join('')}
     </table>
     <h4 style="margin-bottom:8px;color:#0369a1;">Detalhamento Completo</h4>
     <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <tr style="background:#f5f5f5;"><th style="padding:6px;text-align:left;">Data/Hora</th><th>Placa</th><th>Litros</th><th>Valor</th><th>KM</th><th>R$/L</th></tr>
-        ${(mesList || []).map(a => `<tr><td style="padding:5px;border-bottom:1px solid #eee;">${a.timestamp || a.data_abast}</td><td>${a.placa}</td><td style="text-align:center;">${parseFloat(a.litros).toFixed(1)}L</td><td style="text-align:center;">R$ ${parseFloat(a.valor).toFixed(2)}</td><td style="text-align:center;">${a.km}</td><td style="text-align:center;">${parseFloat(a.litros) > 0 ? 'R$ ' + (parseFloat(a.valor) / parseFloat(a.litros)).toFixed(3) : '—'}</td></tr>`).join('')}
+        ${(mesList || []).map(a =>`<tr><td style="padding:5px;border-bottom:1px solid #eee;">${a.timestamp || a.data_abast}</td><td>${a.placa}</td><td style="text-align:center;">${parseFloat(a.litros).toFixed(1)}L</td><td style="text-align:center;">R$ ${parseFloat(a.valor).toFixed(2)}</td><td style="text-align:center;">${a.km}</td><td style="text-align:center;">${parseFloat(a.litros) > 0 ? 'R$ ' + (parseFloat(a.valor) / parseFloat(a.litros)).toFixed(3) : '—'}</td></tr>`).join('')}
     </table>`;
             document.getElementById('pdf-photos').innerHTML = '';
             await renderizarEBaixarPDF(`Combustivel_${mesFiltro}.pdf`);
@@ -7195,7 +7189,7 @@
         function ckRenderItens() {
             const cont = document.getElementById('ck-itens');
             if (!cont) return;
-            cont.innerHTML = CK_ITENS.map(it => `
+            cont.innerHTML = CK_ITENS.map(it =>`
                 <label style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;cursor:pointer;font-size:11px;">
                     <input type="checkbox" id="ck-item-${it.id}" style="width:16px;height:16px;accent-color:var(--success);margin:0;cursor:pointer;">
                     <span>${it.label}</span>
@@ -7207,7 +7201,7 @@
             const sel = document.getElementById('ck-placa');
             if (!sel) return;
             sel.innerHTML = '<option value="">— Selecione o veículo —</option>' +
-                (veics || []).map(v => `<option value="${v.placa}">${v.placa}${v.modelo ? ' - ' + v.modelo : ''} (${v.tipo})</option>`).join('');
+                (veics || []).map(v =>`<option value="${v.placa}">${v.placa}${v.modelo ? ' - ' + v.modelo : ''} (${v.tipo})</option>`).join('');
         }
 
         async function ckAtualizarSetor() {
@@ -7241,7 +7235,7 @@
         function ckRenderFotos() {
             const cont = document.getElementById('ck-preview-fotos');
             if (!cont) return;
-            cont.innerHTML = ckFotos.map((f, idx) => `
+            cont.innerHTML = ckFotos.map((f, idx) =>`
                 <div class="photo-card">
                     <img src="${f.data}" class="thumb" onclick="verFotoGrande('${f.data}')">
                     <div class="timestamp-overlay">📅 ${f.ts}</div>
@@ -7482,7 +7476,7 @@
             if (sel && sel.options.length <= 1) {
                 const { data: colabs } = await _filtrarBase(db.from(TBL.colaboradores).select('id,nome').order('nome'));
                 sel.innerHTML = '<option value="">— Selecione o motorista —</option>' +
-                    (colabs || []).filter(c => c.nome).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+                    (colabs || []).filter(c => c.nome).map(c =>`<option value="${c.id}">${c.nome}</option>`).join('');
             }
             try {
                 const { data: cnhs } = await db.from('cnh_motoristas').select('*').order('validade');
@@ -7817,8 +7811,7 @@
             document.getElementById('tour-titulo').textContent = passo.titulo;
             document.getElementById('tour-texto').textContent = passo.texto;
             const dots = document.getElementById('tour-dots');
-            if (dots) dots.innerHTML = _tourPassos.map((_, i) =>
-                `<div style="width:8px;height:8px;border-radius:50%;background:${i === _tourIdx ? 'var(--blue-light)' : 'rgba(255,255,255,.2)'};transition:.3s;"></div>`
+            if (dots) dots.innerHTML = _tourPassos.map((_, i) =>`<div style="width:8px;height:8px;border-radius:50%;background:${i === _tourIdx ? 'var(--blue-light)' : 'rgba(255,255,255,.2)'};transition:.3s;"></div>`
             ).join('');
             const prev = document.getElementById('tour-prev');
             const next = document.getElementById('tour-next');
@@ -8133,12 +8126,12 @@
                     </div>
                     <!-- Serviços para avaliar -->
                     <h4 style="color:var(--info);margin-bottom:10px;">✍️ Avaliar Serviços Concluídos</h4>
-                    ${paraAvaliar.length ? paraAvaliar.map(s => `
+                    ${paraAvaliar.length ? paraAvaliar.map(s =>`
                         <div class="prog-item" style="margin-bottom:8px;" id="aval-${s.id}">
                             <div style="font-size:12px;font-weight:600;margin-bottom:8px;">🏢 ${s.fornecedor} · ${s.placa} · ${s.data_servico}</div>
                             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
                                 <span style="font-size:11px;color:var(--gray);">Nota:</span>
-                                ${[1, 2, 3, 4, 5].map(n => `<button onclick="avaliarServico(${s.id},'${s.fornecedor}',${n})" 
+                                ${[1, 2, 3, 4, 5].map(n =>`<button onclick="avaliarServico(${s.id},'${s.fornecedor}',${n})" 
                                     style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.3);color:#fbbf24;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:'Montserrat',sans-serif;">
                                     ${'⭐'.repeat(n)}
                                 </button>`).join('')}
@@ -8186,7 +8179,7 @@
                 const ws = XLSX.utils.json_to_sheet(limpo);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, tabela);
-                XLSX.writeFile(wb, `Lokamig_${tabela}_${new Date().toISOString().split('T')[0]}.xlsx`);
+                XLSX.writeFile(wb, `OGAIT_${tabela}_${new Date().toISOString().split('T')[0]}.xlsx`);
                 loading(false);
                 await registrarAuditoria(`Excel exportado: ${tabela}`);
                 showSuccess('EXCEL GERADO!');
@@ -8216,7 +8209,7 @@
                 const ws = XLSX.utils.json_to_sheet(limpo);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, tabela);
-                XLSX.writeFile(wb, `Lokamig_${tabela}_${de}_${ate}.xlsx`);
+                XLSX.writeFile(wb, `OGAIT_${tabela}_${de}_${ate}.xlsx`);
                 loading(false);
                 showSuccess('EXCEL DO PERÍODO GERADO!');
             } catch (e) { loading(false); alert('Erro: ' + e.message); }
@@ -8242,7 +8235,7 @@
                     const concluidos = servs?.filter(s => s.status_flow === 'CONCLUIDO').length || 0;
                     return { ...b, total, concluidos };
                 }));
-                cont.innerHTML = resultados.map(b => `
+                cont.innerHTML = resultados.map(b =>`
                     <div class="metric-card" style="cursor:pointer;">
                         <div class="metric-icon">🏭</div>
                         <b style="font-size:13px;">${b.nome}</b>
@@ -8272,7 +8265,7 @@ ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';</cod
         }
 
         // ═══════════════════════════════════════════════════
-        // CHAT FLUTUANTE — WhatsApp interno Lokamig
+        // CHAT FLUTUANTE — Interno O.G.A.I.T.
         // ═══════════════════════════════════════════════════
         let _chatAberto = false;
         let _chatChannelFlutuante = null;
@@ -8819,7 +8812,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                     ['📊', 'Total Gasto', 'R$ ' + totalGeral.toFixed(2), 'var(--primary)'],
                     ['🚗', 'Serviços', '' + (servicos || []).length, 'var(--info)'],
                     ['✅', 'Concluídos', '' + (servicos || []).filter(s => s.status_flow === 'CONCLUIDO').length, 'var(--success)'],
-                ].map(([icon, label, val, cor]) => `<div class="metric-card" style="border:1px solid ${cor}33;">
+                ].map(([icon, label, val, cor]) =>`<div class="metric-card" style="border:1px solid ${cor}33;">
                     <div class="metric-icon">${icon}</div>
                     <span class="metric-value" style="color:${cor};font-size:18px;">${val}</span>
                     <span class="metric-label">${label}</span>
@@ -8943,7 +8936,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
         async function gerarManualPDF() {
             loading(true, 'Gerando manual...');
             const perfil = currentUser?.perfil || currentUser?.role || 'admin';
-            const nomeBase = document.getElementById('base-badge-nome')?.textContent || 'LOKAMIG';
+            const nomeBase = document.getElementById('base-badge-nome')?.textContent || 'O.G.A.I.T.';
             montarCabecalhoPDF('MANUAL DO USUÁRIO — ' + nomeBase.toUpperCase());
             const secoes = _getSecoesManuais(perfil);
             document.getElementById('pdf-body').innerHTML = secoes;
@@ -8956,13 +8949,13 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             const comum = `
                 <div style="background:#f0f7ff;border-left:4px solid #0369a1;padding:12px;margin-bottom:16px;border-radius:4px;">
                     <b style="color:#0369a1;">O.G.A.I.T. Systems — Integrated Transport | Multi-Base Management</b>
-                    <p style="font-size:11px;margin-top:4px;">Versão 7.2 · Suporte: sistema.lokamig@gmail.com</p>
+                    <p style="font-size:11px;margin-top:4px;">Versão 7.2 · Suporte: suporte@ogait.com.br</p>
                 </div>`;
             const secoes = {
                 admin: `${comum}
                     <h3 style="color:#0369a1;border-bottom:2px solid #0369a1;padding-bottom:4px;">📊 PAINEL ADMINISTRADOR</h3>
                     <h4>1. Acesso ao Sistema</h4>
-                    <p>Acesse <b>lokamig-producao-lucaztgh14.vercel.app</b> e faça login com suas credenciais de admin da base.</p>
+                    <p>Acesse o sistema O.G.A.I.T. e faça login com suas credenciais de administrador da base.</p>
                     <h4>2. Dashboard</h4>
                     <p>Visualize gráficos financeiros: combustível por mês, serviços por status, manutenções e gastos por veículo. Use o filtro de período para ajustar o intervalo.</p>
                     <h4>3. Monitor de Serviços</h4>
@@ -9084,7 +9077,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 const sel = document.getElementById(id);
                 if (!sel) return;
                 sel.innerHTML = '<option value="">Todas as bases</option>' +
-                    (bases || []).map(b => `<option value="${b.id}">${b.nome}</option>`).join('');
+                    (bases || []).map(b =>`<option value="${b.id}">${b.nome}</option>`).join('');
             });
         }
 
@@ -9196,7 +9189,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 const { data: list } = await q;
                 if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum serviço encontrado.</p>'; return; }
                 const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)', 'CANCELADO': 'var(--cancelled)' };
-                cont.innerHTML = list.map(s => `
+                cont.innerHTML = list.map(s =>`
                     <div class="prog-item status-${s.status_flow?.replace(' ', '-')}">
                         <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
                             <span class="status-badge" style="background:${statusColor[s.status_flow] || 'var(--gray)'};">${s.status_flow}</span>
@@ -9222,7 +9215,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 if (baseId) q = q.eq('base_id', parseInt(baseId));
                 const { data: veics } = await q;
                 if (!veics?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum veículo encontrado.</p>'; return; }
-                cont.innerHTML = veics.map(v => `
+                cont.innerHTML = veics.map(v =>`
                     <div class="prog-item" style="text-align:left;">
                         <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
                             <b>${v.placa}</b>
@@ -9249,7 +9242,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 const { data: list } = await q;
                 if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum orçamento.</p>'; return; }
                 const corStatus = { 'PENDENTE': 'var(--warning)', 'APROVADO': 'var(--success)', 'REJEITADO': 'var(--danger)', 'CANCELADO': 'var(--cancelled)' };
-                cont.innerHTML = list.map(o => `
+                cont.innerHTML = list.map(o =>`
                     <div class="orc-card ${(o.status || '').toLowerCase()}">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                             <b>${o.placa}</b>
@@ -9275,7 +9268,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 if (busca) lista = lista.filter(u => (u.nome || '').toLowerCase().includes(busca) || (u.user_login || '').toLowerCase().includes(busca));
                 if (!lista.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum usuário encontrado.</p>'; return; }
                 const perfilCor = { admin: '#a78bfa', chefao: '#6366f1', programador: '#3b82f6', supervisor: '#f59e0b', motorista: '#10b981' };
-                cont.innerHTML = lista.map(u => `
+                cont.innerHTML = lista.map(u =>`
                     <div class="master-user-row">
                         <div>
                             <b>${u.nome}</b>
@@ -9307,7 +9300,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             try {
                 const { data: logs } = await db.from(TBL.auditoria).select('*').order('id', { ascending: false }).limit(100);
                 if (!logs?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum registro.</p>'; return; }
-                cont.innerHTML = logs.map(l => `
+                cont.innerHTML = logs.map(l =>`
                     <div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;">
                         <span style="color:var(--gray);font-size:10px;">${l.timestamp || ''}</span> —
                         <span>${l.acao || ''}</span>
@@ -9426,7 +9419,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             const { data: bases } = await db.from('bases').select('id,nome').order('nome');
             const sel = document.getElementById('venda-base');
             if (sel) sel.innerHTML = '<option value="">— Selecione a base —</option>' +
-                (bases || []).map(b => `<option value="${b.id}">${b.nome}</option>`).join('');
+                (bases || []).map(b =>`<option value="${b.id}">${b.nome}</option>`).join('');
             await masterCarregarContratos();
         }
 
@@ -9451,7 +9444,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                     ['📊', 'Total Implantações', `R$ ${implantacoes.toFixed(0)}`, 'var(--success)'],
                     ['✅', 'Contratos Ativos', '' + ativos, 'var(--info)'],
                     ['⚠️', 'Vencendo em 30d', '' + vencendo, 'var(--warning)'],
-                ].map(([i, l, v, c]) => `<div class="metric-card" style="border:1px solid ${c}33;">
+                ].map(([i, l, v, c]) =>`<div class="metric-card" style="border:1px solid ${c}33;">
                     <div class="metric-icon">${i}</div>
                     <span class="metric-value" style="color:${c};font-size:16px;">${v}</span>
                     <span class="metric-label">${l}</span>
@@ -9738,7 +9731,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                         </div>
                         <div>
                             <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Nome no sistema:</div>
-                            <input type="text" id="wl-edit-nome" value="${wlAtual.nome || ''}" placeholder="Ex: LOKAMIG" style="margin:0;font-size:11px;">
+                            <input type="text" id="wl-edit-nome" value="${wlAtual.nome || ''}" placeholder="Ex: O.G.A.I.T." style="margin:0;font-size:11px;">
                         </div>
                     </div>
                     <div style="font-size:11px;color:var(--gray);margin-bottom:4px;">Slogan:</div>
@@ -9934,7 +9927,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                         ['🚛 Frota', (veics || []).length, '#a78bfa'],
                         ['👥 Equipe', (users || []).length, '#a78bfa'],
                         ['⚠️ Alertas', (manut || []).length, 'var(--danger)'],
-                    ].map(([l, v, c]) => `<div style="background:rgba(255,255,255,.06);border-radius:10px;padding:10px;text-align:center;">
+                    ].map(([l, v, c]) =>`<div style="background:rgba(255,255,255,.06);border-radius:10px;padding:10px;text-align:center;">
                             <div style="font-size:20px;font-weight:bold;color:${c};">${v}</div>
                             <div style="font-size:10px;color:var(--gray);">${l}</div>
                         </div>`).join('')}
@@ -9945,7 +9938,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                         <h5 style="color:#a78bfa;margin-bottom:8px;">📡 Serviços de Hoje</h5>
                         ${(servicos || []).length === 0
                         ? '<p style="color:var(--gray);font-size:11px;">Nenhum serviço hoje.</p>'
-                        : (servicos || []).slice(0, 8).map(s => `
+                        : (servicos || []).slice(0, 8).map(s =>`
                             <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;">
                                 <span style="background:${statusCor[s.status_flow] || 'var(--gray)'};color:#000;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:bold;white-space:nowrap;">${s.status_flow}</span>
                                 <b>${s.placa}</b>
@@ -9960,7 +9953,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                         <div style="display:flex;flex-wrap:wrap;gap:6px;">
                             ${(users || []).length === 0
                         ? '<p style="color:var(--gray);font-size:11px;">Nenhum usuário cadastrado.</p>'
-                        : (users || []).map(u => `<span style="background:${perfilCor[u.perfil] || '#6b7280'}22;border:1px solid ${perfilCor[u.perfil] || '#6b7280'}44;border-radius:20px;padding:4px 10px;font-size:10px;color:${perfilCor[u.perfil] || '#fff'};">
+                        : (users || []).map(u =>`<span style="background:${perfilCor[u.perfil] || '#6b7280'}22;border:1px solid ${perfilCor[u.perfil] || '#6b7280'}44;border-radius:20px;padding:4px 10px;font-size:10px;color:${perfilCor[u.perfil] || '#fff'};">
                                     ${u.nome} <span style="opacity:.7;">(${u.perfil})</span>
                                 </span>`).join('')
                     }
@@ -9972,7 +9965,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                     <div style="margin-bottom:14px;">
                         <h5 style="color:#a78bfa;margin-bottom:8px;">✅ Checklists Hoje</h5>
                         <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                            ${(checklists || []).map(c => `<span style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:20px;padding:4px 10px;font-size:10px;color:var(--success);">
+                            ${(checklists || []).map(c =>`<span style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:20px;padding:4px 10px;font-size:10px;color:var(--success);">
                                 ${c.placa} · ${c.motorista || '—'}
                             </span>`).join('')}
                         </div>
@@ -9982,7 +9975,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                     ${(manut || []).length > 0 ? `
                     <div>
                         <h5 style="color:var(--warning);margin-bottom:8px;">⚠️ Manutenções Pendentes</h5>
-                        ${(manut || []).slice(0, 5).map(m => `
+                        ${(manut || []).slice(0, 5).map(m =>`
                         <div style="padding:6px 10px;background:rgba(245,158,11,.1);border-radius:8px;margin-bottom:4px;font-size:11px;">
                             🚛 <b>${m.placa}</b> — ${m.tipo || m.descricao || 'Manutenção pendente'}
                         </div>`).join('')}
@@ -10036,7 +10029,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 const sel = document.getElementById(id);
                 if (!sel) return;
                 sel.innerHTML = '<option value="">— Selecione a base —</option>' +
-                    (bases || []).map(b => `<option value="${b.id}">${b.nome}</option>`).join('');
+                    (bases || []).map(b =>`<option value="${b.id}">${b.nome}</option>`).join('');
             });
         }
 
@@ -10099,7 +10092,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 if (busca) todos = todos.filter(u => (u.nome || '').toLowerCase().includes(busca) || (u.user_login || '').toLowerCase().includes(busca));
                 if (!todos.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum usuário encontrado.</p>'; return; }
                 const perfilCor = { admin: '#a78bfa', programador: '#3b82f6', supervisor: '#f59e0b', motorista: '#10b981', fornecedor: '#f97316' };
-                cont.innerHTML = todos.map(u => `
+                cont.innerHTML = todos.map(u =>`
                     <div class="master-user-row">
                         <div>
                             <b>${u.nome || u.empresa}</b>
@@ -10197,7 +10190,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 let lista = logs || [];
                 if (busca) lista = lista.filter(l => (l.acao || '').toLowerCase().includes(busca));
                 if (!lista.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum registro.</p>'; return; }
-                cont.innerHTML = lista.map(l => `
+                cont.innerHTML = lista.map(l =>`
                     <div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;">
                         <span style="color:var(--gray);font-size:10px;">${l.timestamp || ''}</span> —
                         <span>${l.acao || ''}</span>
