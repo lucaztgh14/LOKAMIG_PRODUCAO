@@ -5276,7 +5276,7 @@
             if (contLogos && items.length) {
                 contLogos.innerHTML = '<p style="color:var(--gray);font-size:11px;">Carregando...</p>';
                 const wlPromises = items.map(f =>
-                    db.from('config_sistema').select('valor').eq('chave', `whitelabel_forn_${f.id}`).single().catch(() => ({ data: null }))
+                    (async () => { try { return await db.from('config_sistema').select('valor').eq('chave', `whitelabel_forn_${f.id}`).single(); } catch(_) { return { data: null }; } })()
                 );
                 const wlResults = await Promise.all(wlPromises);
                 contLogos.innerHTML = items.map((f, i) => {
@@ -5906,9 +5906,13 @@
                 const { data: orcs } = await db.from(TBL.orcamentos)
                     .select('*').eq('empresa', currentUser.empresa).order('id', { ascending: false });
                 if (!orcs?.length) { cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:12px;">Nenhum orçamento enviado ainda.</p>'; return; }
-                const { data: nfs } = await db.from('notas_fiscais')
-                    .select('orcamento_id').eq('fornecedor', currentUser.empresa).catch(() => ({ data: [] }));
-                const nfsEmitidas = new Set((nfs || []).map(n => n.orcamento_id));
+                let nfs = [];
+                try {
+                    const { data: _nfs } = await db.from('notas_fiscais')
+                        .select('orcamento_id').eq('fornecedor', currentUser.empresa);
+                    nfs = _nfs || [];
+                } catch(_) {}
+                const nfsEmitidas = new Set(nfs.map(n => n.orcamento_id));
                 cont.innerHTML = orcs.map(o => {
                     const statusColor = { 'APROVADO': 'var(--success)', 'PENDENTE': 'var(--warning)', 'REPROVADO': 'var(--danger)' }[o.status] || 'var(--gray)';
                     const podeNF = o.status === 'APROVADO' && !nfsEmitidas.has(o.id);
@@ -6042,7 +6046,7 @@
         async function reimprimirNF(nfId) {
             const { data: nf } = await db.from('notas_fiscais').select('*').eq('id', nfId).single();
             if (!nf) return;
-            const { data: orc } = await db.from(TBL.orcamentos).select('*').eq('id', nf.orcamento_id).single().catch(() => ({ data: null }));
+            let orc = null; try { const { data: _orc } = await db.from(TBL.orcamentos).select('*').eq('id', nf.orcamento_id).single(); orc = _orc; } catch(_) {}
             await gerarPDFNF(nf, orc);
         }
 
@@ -8159,7 +8163,7 @@
                     { data: avals }
                 ] = await Promise.all([
                     _filtrarBase(db.from(TBL.prog).select('id,placa,fornecedor,data_servico').eq('status_flow', 'CONCLUIDO').order('id', { ascending: false }).limit(20)),
-                    db.from('avaliacoes').select('*').eq('base_id', currentUser?.base_id || 4).order('id', { ascending: false }).limit(50).catch(() => ({ data: [] }))
+                    (async () => { try { return await db.from('avaliacoes').select('*').eq('base_id', currentUser?.base_id || 4).order('id', { ascending: false }).limit(50); } catch(_) { return { data: [] }; } })()
                 ]);
                 // Médias por fornecedor
                 const mediaForn = {};
