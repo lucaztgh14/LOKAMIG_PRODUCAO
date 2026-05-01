@@ -2713,6 +2713,25 @@
                     <option value="Posto">Posto de Combustível</option>
                     <option value="Outros">Outros</option>
                 </select>
+
+                <!-- Upload de logo no cadastro -->
+                <div style="margin-bottom:10px;">
+                    <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:6px;">🖼️ Logo do Fornecedor (opcional — aparece nos PDFs)</label>
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                        <label for="f-logo-input" style="
+                            cursor:pointer;padding:8px 16px;border-radius:8px;font-size:11px;font-weight:700;
+                            background:rgba(56,189,248,.15);border:1px dashed rgba(56,189,248,.5);
+                            color:#38bdf8;font-family:Montserrat,sans-serif;white-space:nowrap;">
+                            📁 Selecionar Imagem
+                        </label>
+                        <input type="file" id="f-logo-input" accept="image/*" style="display:none;" onchange="previewNovaLogoForn(this)">
+                        <img id="f-logo-preview-new" src="" alt=""
+                            style="display:none;width:56px;height:56px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);">
+                        <span id="f-logo-nome" style="font-size:10px;color:var(--gray);"></span>
+                        <button id="f-logo-clear" onclick="limparNovaLogoForn()" style="display:none;background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;" title="Remover logo">✕</button>
+                    </div>
+                </div>
+
                 <button onclick="salvarNovoFornecedor()" class="btn-success">✅ Cadastrar Fornecedor</button>
             </div>
             <div class="form-section" style="margin-top:10px;">
@@ -5311,19 +5330,55 @@
             if (!nome) { alert('Informe o nome da empresa!'); return; }
 
             loading(true, 'Salvando...');
-            const { error } = await db.from(TBL.fornecedores).insert({ nome, tipo });
+            const { data: newForn, error } = await db.from(TBL.fornecedores)
+                .insert({ nome, tipo }).select('id').single();
             if (error) { loading(false); alert('Erro: ' + error.message); return; }
 
             if (user && pass) {
                 await db.from(TBL.fornUsers).insert({ user_login: user, senha: pass, empresa: nome, tipo });
             }
 
+            // Salvar logo se foi selecionada
+            const logoData = document.getElementById('f-logo-preview-new')?.src;
+            if (newForn?.id && logoData && logoData.startsWith('data:')) {
+                await salvarWhiteLabelFornecedor(newForn.id, logoData);
+            }
+
+            // Limpar form
             ['f-nome', 'f-user', 'f-pass'].forEach(id => document.getElementById(id).value = '');
+            limparNovaLogoForn();
             await popularSeletorFornecedores();
             await renderListaForn();
             await registrarAuditoria('Fornecedor cadastrado: ' + nome);
             loading(false);
-            alert('✅ Fornecedor cadastrado!');
+            alert('✅ Fornecedor cadastrado' + (logoData && logoData.startsWith('data:') ? ' com logo!' : '!'));
+        }
+
+        function previewNovaLogoForn(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const prev = document.getElementById('f-logo-preview-new');
+                const nome = document.getElementById('f-logo-nome');
+                const btn = document.getElementById('f-logo-clear');
+                prev.src = e.target.result;
+                prev.style.display = 'block';
+                if (nome) nome.textContent = file.name;
+                if (btn) btn.style.display = 'inline';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function limparNovaLogoForn() {
+            const input = document.getElementById('f-logo-input');
+            const prev = document.getElementById('f-logo-preview-new');
+            const nome = document.getElementById('f-logo-nome');
+            const btn = document.getElementById('f-logo-clear');
+            if (input) input.value = '';
+            if (prev) { prev.src = ''; prev.style.display = 'none'; }
+            if (nome) nome.textContent = '';
+            if (btn) btn.style.display = 'none';
         }
 
         // ─────────────────────────────────────────────
