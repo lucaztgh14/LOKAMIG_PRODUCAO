@@ -5111,7 +5111,7 @@
                                 <div style="font-size:20px;font-weight:900;color:var(--success);">R$ ${parseFloat(o.total || 0).toFixed(2)}</div>
                                 <div style="display:flex;gap:6px;margin-top:8px;justify-content:flex-end;flex-wrap:wrap;">
                                     <button class="btn-info btn-sm" onclick="gerarPDFOrcamento(${o.id})">📄 PDF</button>
-                                    ${podeNF ? `<button class="btn-success btn-sm" onclick="emitirNF(${o.id},'${o.placa}',${o.total},'${(o.empresa || '').replace(/'/g, '\\'')}')">🧾 Emitir NF</button>` : ''}
+                                    ${podeNF ? `<button class="btn-success btn-sm" onclick="emitirNF(${o.id},'${o.placa}',${o.total},this.dataset.emp)" data-emp="${(o.empresa || '').replace(/"/g, '&quot;')}">🧾 Emitir NF</button>` : ''}
                                     ${ nfEmitida ? `<span style="font-size:10px;color:var(--success);">✅ NF Emitida</span>` : '' }
                                 </div >
                             </div >
@@ -5128,7 +5128,8 @@
         // ═══════════════════════════════════════════════════
         // NF — EMISSÃO E LISTAGEM
         // ═══════════════════════════════════════════════════
-        async function emitirNF(orcId, placa, total, empresa) {
+        async function emitirNF(orcId, placa, total, empresaOrEl) {
+            const empresa = (typeof empresaOrEl === 'string') ? empresaOrEl : (empresaOrEl?.dataset?.emp || '');
             if (!confirm(`Emitir Nota Fiscal para o orçamento ?\n\nPlaca: ${ placa } \nValor: R$ ${ parseFloat(total).toFixed(2) } `)) return;
             loading(true, 'Emitindo Nota Fiscal...');
             try {
