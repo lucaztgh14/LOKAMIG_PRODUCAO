@@ -1014,10 +1014,15 @@
             object-fit: contain;
             transition: transform .3s;
             cursor: zoom-in;
+            user-select: none;
         }
         #img-viewer img.zoomed {
             transform: scale(2);
-            cursor: zoom-out;
+            cursor: grab;
+            transition: none;
+        }
+        #img-viewer img.zoomed.dragging {
+            cursor: grabbing;
         }
         #img-viewer-controls {
             position: fixed;
@@ -2240,6 +2245,11 @@
                     </select>
                     <button onclick="centralizarMapa()" class="btn-info btn-sm">🎯 Centralizar</button>
                     <button onclick="atualizarMapa()" class="btn-success btn-sm">🔄 Atualizar</button>
+                    <button onclick="_gpsSimInterval?pararGPSSimulado():iniciarGPSSimulado()" 
+                        id="btn-gps-sim" class="btn-sm" 
+                        style="background:rgba(245,158,11,.3);border:1px solid rgba(245,158,11,.5);color:#fbbf24;font-size:10px;">
+                        🚗 Simular GPS
+                    </button>
                 </div>
             </div>
             <!-- Histórico de rota -->
@@ -2274,24 +2284,53 @@
                 <input type="text" id="cnh-filter" placeholder="🔍 Filtrar motorista" oninput="carregarCNH()">
             </div>
             <div id="list-cnh"></div>
-            <div class="form-section" style="margin-top:16px;">
-                <h4 style="color:var(--info);margin-bottom:10px;">Registrar/Atualizar CNH</h4>
+            <div class="form-section" style="margin-top:16px;" id="cnh-form">
+                <h4 style="color:var(--info);margin-bottom:10px;" id="cnh-form-title">➕ Registrar/Atualizar CNH</h4>
+                <input type="hidden" id="cnh-edit-id">
                 <select id="cnh-colab"></select>
                 <input type="text" id="cnh-numero" placeholder="Número da CNH">
                 <input type="text" id="cnh-categoria" placeholder="Categoria (ex: B, C, D, E)">
                 <input type="date" id="cnh-validade" placeholder="Validade">
                 <input type="date" id="cnh-nascimento" placeholder="Data de Nascimento">
-                <button onclick="salvarCNH()" class="btn-success">💾 Salvar CNH</button>
+                <!-- Anexo de documento -->
+                <div style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);border-radius:10px;padding:12px;margin-bottom:8px;">
+                    <div style="font-size:11px;color:var(--info);font-weight:700;margin-bottom:8px;">📎 Documento da CNH (foto ou PDF)</div>
+                    <input type="file" id="cnh-doc" accept="image/*,.pdf" style="font-size:11px;margin-bottom:6px;">
+                    <img id="cnh-doc-preview" src="" style="display:none;max-height:80px;border-radius:6px;margin-top:4px;object-fit:contain;background:#fff;padding:4px;">
+                    <div style="font-size:10px;color:var(--gray);margin-top:4px;">📌 Aparece no card do motorista para verificação</div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button onclick="salvarCNH()" class="btn-success" style="flex:1;">💾 Salvar CNH</button>
+                    <button onclick="limparFormCNH()" class="btn-gray" style="flex:1;margin:0;">✕ Limpar</button>
+                </div>
             </div>
         </div>
 
         <!-- CHAT INTERNO -->
         <div id="area-chat" class="admin-content hidden">
-            <h3 style="margin-bottom:12px;">💬 Chat Interno</h3>
-            <div id="chat-msgs" style="height:350px;overflow-y:auto;background:rgba(0,0,0,.2);border-radius:12px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;"></div>
-            <div style="display:flex;gap:8px;">
-                <input type="text" id="chat-input" placeholder="Digite sua mensagem..." onkeydown="if(event.key==='Enter')enviarMensagemChat()" style="flex:1;margin:0;">
-                <button onclick="enviarMensagemChat()" class="btn-success" style="width:auto;padding:10px 18px;margin:0;">📤</button>
+            <div style="display:flex;gap:12px;height:500px;">
+                <!-- Lista de contatos -->
+                <div id="chat-contatos" style="width:220px;flex-shrink:0;background:rgba(0,0,0,.2);border-radius:12px;overflow-y:auto;border:1px solid rgba(255,255,255,.08);">
+                    <div style="padding:12px;border-bottom:1px solid rgba(255,255,255,.08);font-size:12px;font-weight:700;color:var(--info);">💬 Conversas</div>
+                    <div id="chat-lista-contatos"></div>
+                </div>
+                <!-- Área de mensagens -->
+                <div style="flex:1;display:flex;flex-direction:column;background:rgba(0,0,0,.2);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08);">
+                    <div id="chat-header-contato" style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);">
+                        <div style="width:36px;height:36px;border-radius:50%;background:var(--info);display:flex;align-items:center;justify-content:center;font-size:16px;">💬</div>
+                        <div>
+                            <div style="font-size:13px;font-weight:700;" id="chat-nome-contato">Chat Geral</div>
+                            <div style="font-size:10px;color:var(--gray);" id="chat-status-contato">Todos os membros</div>
+                        </div>
+                    </div>
+                    <div id="chat-msgs" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px;background:rgba(0,0,0,.1);"></div>
+                    <div style="padding:10px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:8px;align-items:center;">
+                        <input type="text" id="chat-input" placeholder="Digite uma mensagem..." 
+                            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMensagemChat();}"
+                            style="flex:1;margin:0;border-radius:20px;padding:10px 16px;font-size:12px;">
+                        <button onclick="enviarMensagemChat()" style="width:40px;height:40px;border-radius:50%;background:var(--success);border:none;color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin:0;">➤</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -3136,9 +3175,52 @@
             _abrirFotoIdx(_fotoIdx);
         }
 
+        let _imgDrag = { active: false, startX: 0, startY: 0, translateX: 0, translateY: 0 };
+
         function toggleZoomFoto(img) {
             img.classList.toggle('zoomed');
-            img.style.cursor = img.classList.contains('zoomed') ? 'zoom-out' : 'zoom-in';
+            if (img.classList.contains('zoomed')) {
+                img.style.cursor = 'grab';
+                _imgDrag.translateX = 0;
+                _imgDrag.translateY = 0;
+                img.style.transform = 'scale(2) translate(0,0)';
+                // Drag events
+                img.onmousedown = (e) => {
+                    if (!img.classList.contains('zoomed')) return;
+                    e.preventDefault();
+                    _imgDrag.active = true;
+                    _imgDrag.startX = e.clientX - _imgDrag.translateX;
+                    _imgDrag.startY = e.clientY - _imgDrag.translateY;
+                    img.classList.add('dragging');
+                };
+                img.onmousemove = (e) => {
+                    if (!_imgDrag.active) return;
+                    _imgDrag.translateX = e.clientX - _imgDrag.startX;
+                    _imgDrag.translateY = e.clientY - _imgDrag.startY;
+                    img.style.transform = `scale(2) translate(${_imgDrag.translateX/2}px,${_imgDrag.translateY/2}px)`;
+                };
+                img.onmouseup = () => { _imgDrag.active = false; img.classList.remove('dragging'); };
+                img.onmouseleave = () => { _imgDrag.active = false; img.classList.remove('dragging'); };
+                // Touch drag
+                img.ontouchstart = (e) => {
+                    _imgDrag.active = true;
+                    _imgDrag.startX = e.touches[0].clientX - _imgDrag.translateX;
+                    _imgDrag.startY = e.touches[0].clientY - _imgDrag.translateY;
+                };
+                img.ontouchmove = (e) => {
+                    if (!_imgDrag.active) return;
+                    e.preventDefault();
+                    _imgDrag.translateX = e.touches[0].clientX - _imgDrag.startX;
+                    _imgDrag.translateY = e.touches[0].clientY - _imgDrag.startY;
+                    img.style.transform = `scale(2) translate(${_imgDrag.translateX/2}px,${_imgDrag.translateY/2}px)`;
+                };
+                img.ontouchend = () => { _imgDrag.active = false; };
+            } else {
+                img.style.cursor = 'zoom-in';
+                img.style.transform = '';
+                img.onmousedown = img.onmousemove = img.onmouseup = null;
+                _imgDrag = { active: false, startX: 0, startY: 0, translateX: 0, translateY: 0 };
+            }
         }
 
         function fecharImgViewer(e) {
@@ -5536,58 +5618,90 @@
             const filtro = (document.getElementById('cnh-filter')?.value || '').toLowerCase();
             const cont = document.getElementById('list-cnh');
             if (!cont) return;
-
-            // Popular select de colaboradores
+            // Popular select
             const sel = document.getElementById('cnh-colab');
             if (sel && sel.options.length <= 1) {
                 const { data: colabs } = await _filtrarBase(db.from(TBL.colaboradores).select('id,nome').order('nome'));
                 sel.innerHTML = '<option value="">— Selecione o motorista —</option>' +
-                    (colabs || []).filter(c => c.nome).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+                    (colabs||[]).filter(c=>c.nome).map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
             }
-
             try {
                 const { data: cnhs } = await db.from('cnh_motoristas').select('*').order('validade');
                 let list = cnhs || [];
-                if (filtro) list = list.filter(c => (c.motorista || '').toLowerCase().includes(filtro));
-
+                if (filtro) list = list.filter(c=>(c.motorista||'').toLowerCase().includes(filtro));
                 const hoje = new Date();
                 if (!list.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhuma CNH cadastrada.</p>'; return; }
-
                 cont.innerHTML = list.map(c => {
                     const val = new Date(c.validade);
-                    const diasRestantes = Math.ceil((val - hoje) / 86400000);
-                    const cor = diasRestantes < 0 ? 'var(--danger)' : diasRestantes < 30 ? 'var(--warning)' : 'var(--success)';
-                    const status = diasRestantes < 0 ? '❌ VENCIDA' : diasRestantes < 30 ? `⚠️ Vence em ${diasRestantes} dias` : `✅ Válida (${diasRestantes} dias)`;
-                    return `<div class="prog-item" style="border-left-color:${cor};">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                            <div>
-                                <b style="font-size:13px;">👤 ${c.motorista}</b>
-                                <span class="setor-badge" style="background:${cor};color:#fff;margin-left:6px;">${c.categoria}</span>
+                    const dias = Math.ceil((val - hoje) / 86400000);
+                    const cor = dias < 0 ? 'var(--danger)' : dias < 30 ? 'var(--warning)' : 'var(--success)';
+                    const status = dias < 0 ? '❌ VENCIDA' : dias < 30 ? `⚠️ Vence em ${dias}d` : `✅ Válida`;
+                    // Verificação de autenticidade (hash simples)
+                    const hashEsperado = c.numero ? btoa(c.numero + c.motorista).substring(0,8).toUpperCase() : null;
+                    const autenticidade = hashEsperado ?
+                        `<span style="font-size:9px;background:rgba(16,185,129,.2);color:#34d399;padding:2px 6px;border-radius:8px;font-family:monospace;">🔐 ${hashEsperado}</span>` : '';
+                    return `<div class="prog-item" style="border-left-color:${cor};cursor:pointer;" onclick="editarCNH(${c.id})">
+                        <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                ${c.doc_url ? `<img src="${c.doc_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;background:#fff;flex-shrink:0;" onclick="event.stopPropagation();verFotoGrande('${c.doc_url}',[])">` :
+                                    `<div style="width:48px;height:48px;background:rgba(255,255,255,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🪪</div>`}
+                                <div>
+                                    <b style="font-size:13px;">👤 ${c.motorista}</b>
+                                    <span class="setor-badge" style="background:${cor};color:#fff;margin-left:6px;">${c.categoria}</span>
+                                    <div style="font-size:10px;color:var(--gray);margin-top:3px;">
+                                        CNH: ${c.numero||'—'} | Val: ${c.validade?new Date(c.validade+'T12:00:00').toLocaleDateString('pt-BR'):'—'}
+                                        ${c.nascimento?` | Nasc: ${new Date(c.nascimento+'T12:00:00').toLocaleDateString('pt-BR')}`:''}
+                                    </div>
+                                    <div style="margin-top:4px;">${autenticidade}</div>
+                                </div>
                             </div>
-                            <span style="font-size:11px;color:${cor};font-weight:bold;">${status}</span>
-                        </div>
-                        <div style="font-size:11px;color:var(--gray);margin-top:4px;">
-                            CNH: ${c.numero || '—'} | Validade: ${c.validade ? new Date(c.validade + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}
-                            ${c.nascimento ? ` | Nasc: ${new Date(c.nascimento + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}
+                            <div style="text-align:right;">
+                                <span style="font-size:11px;color:${cor};font-weight:bold;">${status}</span>
+                                <div style="font-size:10px;color:var(--gray);margin-top:4px;">✏️ clique para editar</div>
+                            </div>
                         </div>
                     </div>`;
                 }).join('');
             } catch(e) {
                 if (e.message?.includes('relation') || e.code === '42P01') {
-                    cont.innerHTML = `<div class="alert-card alert-danger">
-                        ⚠️ Tabela "cnh_motoristas" não existe. Execute no Supabase:<br>
-                        <code style="font-size:10px;background:rgba(0,0,0,.3);padding:8px;border-radius:6px;display:block;margin-top:8px;white-space:pre-wrap;">CREATE TABLE cnh_motoristas (
-  id bigserial PRIMARY KEY,
-  motorista text,
-  motorista_id bigint,
-  numero text,
-  categoria text,
-  validade date,
-  nascimento date,
-  criado_em timestamp default now()
-);</code></div>`;
+                    cont.innerHTML = `<div class="alert-card alert-danger">⚠️ Tabela "cnh_motoristas" não existe. Execute no Supabase:<br>
+<code style="font-size:10px;background:rgba(0,0,0,.3);padding:8px;border-radius:6px;display:block;margin-top:8px;white-space:pre-wrap;">ALTER TABLE cnh_motoristas ADD COLUMN IF NOT EXISTS doc_url text;</code></div>`;
                 }
             }
+        }
+
+        function editarCNH(id) {
+            db.from('cnh_motoristas').select('*').eq('id', id).single().then(({data:c}) => {
+                if (!c) return;
+                document.getElementById('cnh-edit-id').value = c.id;
+                document.getElementById('cnh-numero').value = c.numero || '';
+                document.getElementById('cnh-categoria').value = c.categoria || '';
+                document.getElementById('cnh-validade').value = c.validade || '';
+                document.getElementById('cnh-nascimento').value = c.nascimento || '';
+                // Selecionar o colaborador pelo nome
+                const sel = document.getElementById('cnh-colab');
+                for (const opt of sel.options) { if (opt.text === c.motorista) { opt.selected = true; break; } }
+                if (c.doc_url) {
+                    const prev = document.getElementById('cnh-doc-preview');
+                    if (prev) { prev.src = c.doc_url; prev.style.display = 'block'; }
+                }
+                const title = document.getElementById('cnh-form-title');
+                if (title) title.textContent = `✏️ Editando CNH — ${c.motorista}`;
+                document.getElementById('cnh-form')?.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+
+        function limparFormCNH() {
+            document.getElementById('cnh-edit-id').value = '';
+            document.getElementById('cnh-numero').value = '';
+            document.getElementById('cnh-categoria').value = '';
+            document.getElementById('cnh-validade').value = '';
+            document.getElementById('cnh-nascimento').value = '';
+            document.getElementById('cnh-colab').value = '';
+            const prev = document.getElementById('cnh-doc-preview');
+            if (prev) { prev.src = ''; prev.style.display = 'none'; }
+            const title = document.getElementById('cnh-form-title');
+            if (title) title.textContent = '➕ Registrar/Atualizar CNH';
         }
 
         async function salvarCNH() {
@@ -5596,22 +5710,31 @@
             const categoria = document.getElementById('cnh-categoria').value;
             const validade = document.getElementById('cnh-validade').value;
             const nascimento = document.getElementById('cnh-nascimento').value;
+            const editId = document.getElementById('cnh-edit-id').value;
             if (!colabId || !categoria || !validade) { alert('Preencha motorista, categoria e validade!'); return; }
-
             const { data: colab } = await db.from(TBL.colaboradores).select('nome').eq('id', colabId);
             const nome = colab?.[0]?.nome || '';
-
+            // Upload doc se houver
+            let docUrl = null;
+            const docInput = document.getElementById('cnh-doc');
+            if (docInput?.files?.[0]) {
+                docUrl = await new Promise(res => {
+                    const reader = new FileReader();
+                    reader.onload = e => res(e.target.result);
+                    reader.readAsDataURL(docInput.files[0]);
+                });
+            }
             loading(true, 'Salvando CNH...');
-            // Upsert por motorista_id
-            const { error } = await db.from('cnh_motoristas').upsert({
-                motorista: nome, motorista_id: parseInt(colabId),
-                numero, categoria, validade, nascimento: nascimento || null
-            }, { onConflict: 'motorista_id' });
-
+            const payload = { motorista: nome, motorista_id: parseInt(colabId), numero, categoria, validade, nascimento: nascimento||null };
+            if (docUrl) payload.doc_url = docUrl;
+            const { error } = editId
+                ? await db.from('cnh_motoristas').update(payload).eq('id', editId)
+                : await db.from('cnh_motoristas').upsert({ ...payload }, { onConflict: 'motorista_id' });
             if (error) { loading(false); alert('Erro: ' + error.message); return; }
-            await registrarAuditoria(`CNH atualizada: ${nome} | Cat: ${categoria} | Val: ${validade}`);
+            await registrarAuditoria(`CNH ${editId ? 'atualizada' : 'cadastrada'}: ${nome} | Cat: ${categoria} | Val: ${validade}`);
             loading(false);
-            showSuccess('CNH SALVA!');
+            showSuccess('CNH SALVA! ✅');
+            limparFormCNH();
             await carregarCNH();
         }
 
@@ -5620,45 +5743,94 @@
         // ─────────────────────────────────────────────
         let _chatChannel = null;
 
+        let _chatContatoAtual = null;
+
         async function iniciarChat() {
+            await _carregarContatosChat();
             await carregarMensagensChat();
-            // Realtime
             if (_chatChannel) return;
-            _chatChannel = db.channel('chat-interno')
+            _chatChannel = db.channel('chat-ogait')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_mensagens' }, () => {
                     carregarMensagensChat();
                 }).subscribe();
         }
 
+        async function _carregarContatosChat() {
+            const cont = document.getElementById('chat-lista-contatos');
+            if (!cont) return;
+            const { data: colabs } = await _filtrarBase(db.from(TBL.colaboradores).select('id,nome,perfil').order('nome'));
+            const eu = currentUser?.nome || currentUser?.empresa;
+            const lista = [{ id: null, nome: '💬 Chat Geral', perfil: 'geral' },
+                ...(colabs||[]).filter(c => c.nome && c.nome !== eu)];
+            cont.innerHTML = lista.map(c => {
+                const emoji = {admin:'👑',programador:'📋',motorista:'🚗',fornecedor:'🏢',geral:'💬'}[c.perfil]||'👤';
+                return `<div onclick="selecionarContatoChat(${c.id?`'${c.nome}'`:null},this)" 
+                    style="padding:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:8px;transition:.2s;"
+                    onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background=''"
+                    id="chat-cont-${c.id||'geral'}">
+                    <div style="width:32px;height:32px;border-radius:50%;background:rgba(3,105,161,.3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">${emoji}</div>
+                    <div style="min-width:0;">
+                        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.nome}</div>
+                        <div style="font-size:10px;color:var(--gray);">${c.perfil}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function selecionarContatoChat(nome, el) {
+            _chatContatoAtual = nome;
+            document.querySelectorAll('[id^="chat-cont-"]').forEach(e=>e.style.background='');
+            if (el) el.style.background = 'rgba(3,105,161,.2)';
+            const nomeEl = document.getElementById('chat-nome-contato');
+            const subEl = document.getElementById('chat-status-contato');
+            if (nomeEl) nomeEl.textContent = nome || 'Chat Geral';
+            if (subEl) subEl.textContent = nome ? 'Mensagem direta' : 'Todos os membros';
+            carregarMensagensChat();
+        }
+
         async function carregarMensagensChat() {
             const cont = document.getElementById('chat-msgs');
             if (!cont) return;
+            const eu = currentUser?.nome || currentUser?.empresa || 'Anônimo';
             try {
-                const { data: msgs } = await db.from('chat_mensagens').select('*').order('id', { ascending: true }).limit(100);
-                if (!msgs?.length) { cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Nenhuma mensagem ainda. Seja o primeiro! 👋</p>'; return; }
+                let q = db.from('chat_mensagens').select('*').order('id', { ascending: true }).limit(100);
+                if (_chatContatoAtual) {
+                    // Mensagens entre eu e o contato
+                    q = db.from('chat_mensagens').select('*')
+                        .or(`and(autor.eq.${eu},destinatario.eq.${_chatContatoAtual}),and(autor.eq.${_chatContatoAtual},destinatario.eq.${eu})`)
+                        .order('id', { ascending: true }).limit(100);
+                } else {
+                    q = db.from('chat_mensagens').select('*').is('destinatario', null).order('id', { ascending: true }).limit(100);
+                }
+                const { data: msgs } = await q;
+                if (!msgs?.length) {
+                    cont.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);font-size:12px;">Nenhuma mensagem ainda 👋</div>';
+                    return;
+                }
+                // Agrupar por data
+                let ultimaData = '';
                 cont.innerHTML = msgs.map(m => {
-                    const minha = m.autor === (currentUser?.nome || currentUser?.empresa);
-                    return `<div style="display:flex;justify-content:${minha ? 'flex-end' : 'flex-start'};">
-                        <div style="max-width:70%;background:${minha ? 'var(--primary)' : 'rgba(255,255,255,.1)'};border-radius:${minha ? '12px 12px 0 12px' : '12px 12px 12px 0'};padding:8px 12px;">
-                            ${!minha ? `<div style="font-size:9px;color:var(--gray);margin-bottom:2px;">${m.autor}</div>` : ''}
-                            <div style="font-size:12px;">${m.texto}</div>
-                            <div style="font-size:9px;color:rgba(255,255,255,.5);text-align:right;margin-top:2px;">${m.timestamp || ''}</div>
+                    const minha = m.autor === eu;
+                    const dataMsg = (m.timestamp||'').split(',')[0] || '';
+                    const separador = dataMsg !== ultimaData ? `<div style="text-align:center;margin:8px 0;"><span style="background:rgba(255,255,255,.08);padding:3px 12px;border-radius:10px;font-size:10px;color:var(--gray);">${dataMsg}</span></div>` : '';
+                    ultimaData = dataMsg;
+                    const perfilIcon = {admin:'👑',programador:'📋',motorista:'🚗',fornecedor:'🏢'}[m.perfil]||'👤';
+                    return `${separador}<div style="display:flex;justify-content:${minha?'flex-end':'flex-start'};margin-bottom:2px;">
+                        ${!minha?`<div style="width:28px;height:28px;border-radius:50%;background:rgba(3,105,161,.3);display:flex;align-items:center;justify-content:center;font-size:12px;margin-right:6px;flex-shrink:0;align-self:flex-end;">${perfilIcon}</div>`:''}
+                        <div style="max-width:75%;">
+                            ${!minha?`<div style="font-size:9px;color:var(--info);margin-bottom:2px;padding-left:2px;">${m.autor}</div>`:''}
+                            <div style="background:${minha?'#005c4b':'rgba(255,255,255,.1)'};border-radius:${minha?'12px 2px 12px 12px':'2px 12px 12px 12px'};padding:8px 12px;">
+                                <div style="font-size:13px;word-break:break-word;">${m.texto}</div>
+                                <div style="font-size:9px;color:rgba(255,255,255,.4);text-align:right;margin-top:3px;">${(m.timestamp||'').split(',')[1]||''} ${minha?'✓✓':''}</div>
+                            </div>
                         </div>
                     </div>`;
                 }).join('');
                 cont.scrollTop = cont.scrollHeight;
             } catch(e) {
-                if (e.message?.includes('relation') || e.code === '42P01') {
-                    cont.innerHTML = `<div class="alert-card alert-danger" style="font-size:11px;">
-                        ⚠️ Tabela "chat_mensagens" não existe. Execute no Supabase:<br>
-                        <code style="font-size:10px;display:block;margin-top:8px;white-space:pre-wrap;">CREATE TABLE chat_mensagens (
-  id bigserial PRIMARY KEY,
-  autor text,
-  perfil text,
-  texto text,
-  timestamp text,
-  criado_em timestamp default now()
-);</code></div>`;
+                if (e.message?.includes('relation')) {
+                    cont.innerHTML = `<div style="padding:16px;font-size:11px;color:var(--warning);">⚠️ Execute no Supabase:<br>
+<code style="display:block;background:rgba(0,0,0,.3);padding:8px;border-radius:6px;margin-top:6px;white-space:pre-wrap;">ALTER TABLE chat_mensagens ADD COLUMN IF NOT EXISTS destinatario text;</code></div>`;
                 }
             }
         }
@@ -5671,10 +5843,68 @@
             const perfil = currentUser?.perfil || currentUser?.tipo || 'user';
             const { error } = await db.from('chat_mensagens').insert({
                 autor, perfil, texto,
+                destinatario: _chatContatoAtual || null,
                 timestamp: new Date().toLocaleString('pt-BR')
             });
             if (!error) { input.value = ''; await carregarMensagensChat(); }
-            else alert('Erro: ' + error.message);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // GPS SIMULADO — Movimentação dos carros no mapa
+        // ═══════════════════════════════════════════════════
+        let _gpsSimInterval = null;
+
+        // Pontos de rota simulada ao redor de Itaguaí-RJ
+        const _rotasSimuladas = {
+            'TCT-3D50': [
+                [-22.8551, -43.7895], [-22.8490, -43.7820], [-22.8430, -43.7750],
+                [-22.8380, -43.7680], [-22.8350, -43.7620], [-22.8380, -43.7680],
+                [-22.8430, -43.7750], [-22.8490, -43.7820]
+            ],
+            'BRA-2E19': [
+                [-22.8600, -43.8000], [-22.8550, -43.7950], [-22.8500, -43.7900],
+                [-22.8460, -43.7840], [-22.8420, -43.7780], [-22.8460, -43.7840],
+                [-22.8500, -43.7900], [-22.8550, -43.7950]
+            ],
+            'RIO-7F32': [
+                [-22.8700, -43.7700], [-22.8650, -43.7650], [-22.8600, -43.7600],
+                [-22.8560, -43.7560], [-22.8520, -43.7520], [-22.8560, -43.7560],
+                [-22.8600, -43.7600], [-22.8650, -43.7650]
+            ]
+        };
+        let _rotaIdx = {};
+
+        async function iniciarGPSSimulado() {
+            if (_gpsSimInterval) return;
+            Object.keys(_rotasSimuladas).forEach(placa => { _rotaIdx[placa] = 0; });
+            _gpsSimInterval = setInterval(async () => {
+                for (const [placa, rota] of Object.entries(_rotasSimuladas)) {
+                    const idx = _rotaIdx[placa] || 0;
+                    const [lat, lng] = rota[idx % rota.length];
+                    // Adiciona pequena variação aleatória para simular movimento real
+                    const jitter = () => (Math.random() - 0.5) * 0.002;
+                    await db.from('rastreamento').insert({
+                        placa, lat: lat + jitter(), lng: lng + jitter(),
+                        precisao: 15 + Math.random() * 10,
+                        motorista: placa === 'TCT-3D50' ? 'LUCAS TIAGO AZEVEDO DE LIMA' : 'MOTORISTA DEMO',
+                        base_id: 4, timestamp: new Date().toISOString()
+                    });
+                    _rotaIdx[placa] = (idx + 1) % rota.length;
+                }
+                // Atualizar mapa se estiver visível
+                if (!document.getElementById('area-mapa')?.classList.contains('hidden')) {
+                    await atualizarMapa();
+                }
+            }, 8000); // A cada 8 segundos
+            showSuccess('🚗 GPS Simulado ATIVADO! Veículos em movimento...');
+        }
+
+        function pararGPSSimulado() {
+            if (_gpsSimInterval) {
+                clearInterval(_gpsSimInterval);
+                _gpsSimInterval = null;
+                showSuccess('GPS Simulado parado.');
+            }
         }
 
         // ─────────────────────────────────────────────
@@ -5785,7 +6015,6 @@ ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS base text DEFAULT 'Itaguaí';</cod
         // CHAT FLUTUANTE — WhatsApp interno Lokamig
         // ═══════════════════════════════════════════════════
         let _chatAberto = false;
-        let _chatContatoAtual = null;
         let _chatChannelFlutuante = null;
         let _chatNaoLidas = {};
         let _chatContatos = [];
