@@ -5330,18 +5330,21 @@
             if (!nome) { alert('Informe o nome da empresa!'); return; }
 
             loading(true, 'Salvando...');
-            const { data: newForn, error } = await db.from(TBL.fornecedores)
-                .insert({ nome, tipo }).select('id').single();
+            const { error } = await db.from(TBL.fornecedores).insert({ nome, tipo });
             if (error) { loading(false); alert('Erro: ' + error.message); return; }
 
             if (user && pass) {
                 await db.from(TBL.fornUsers).insert({ user_login: user, senha: pass, empresa: nome, tipo });
             }
 
-            // Salvar logo se foi selecionada
+            // Salvar logo: buscar o id pelo nome recem inserido
             const logoData = document.getElementById('f-logo-preview-new')?.src;
-            if (newForn?.id && logoData && logoData.startsWith('data:')) {
-                await salvarWhiteLabelFornecedor(newForn.id, logoData);
+            if (logoData && logoData.startsWith('data:')) {
+                try {
+                    const { data: fornRow } = await db.from(TBL.fornecedores)
+                        .select('id').eq('nome', nome).single();
+                    if (fornRow?.id) await salvarWhiteLabelFornecedor(fornRow.id, logoData);
+                } catch(_) {}
             }
 
             // Limpar form
