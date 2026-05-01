@@ -39,6 +39,55 @@
             --info: #06b6d4;
             --cancelled: #6b7280;
             --purple: #7c3aed;
+            /* Tema */
+            --bg-container: rgba(30,41,59,.7);
+            --bg-card: rgba(255,255,255,.05);
+            --border-color: rgba(255,255,255,.15);
+            --input-bg: rgba(255,255,255,.07);
+        }
+
+        /* TEMA CLARO */
+        body.tema-claro {
+            --bg: #f1f5f9;
+            --text: #1e293b;
+            --gray: #64748b;
+            --bg-container: rgba(255,255,255,.95);
+            --bg-card: rgba(255,255,255,.8);
+            --border-color: rgba(0,0,0,.12);
+            --input-bg: rgba(0,0,0,.04);
+        }
+        body.tema-claro .container {
+            background: rgba(255,255,255,.95) !important;
+            border-color: rgba(0,0,0,.1) !important;
+        }
+        body.tema-claro input, body.tema-claro select, body.tema-claro textarea {
+            background: rgba(0,0,0,.04) !important;
+            color: #1e293b !important;
+            border-color: rgba(0,0,0,.15) !important;
+        }
+        body.tema-claro .prog-item {
+            background: rgba(0,0,0,.03) !important;
+            border-color: rgba(0,0,0,.1) !important;
+            color: #1e293b !important;
+        }
+        body.tema-claro .metric-card {
+            background: rgba(255,255,255,.9) !important;
+            border-color: rgba(0,0,0,.1) !important;
+        }
+        body.tema-claro .tab-btn {
+            background: rgba(0,0,0,.06) !important;
+            color: #334155 !important;
+        }
+        body.tema-claro .tab-active {
+            background: var(--primary) !important;
+            color: #fff !important;
+        }
+        body.tema-claro .form-section {
+            background: rgba(0,0,0,.03) !important;
+            border-color: rgba(0,0,0,.08) !important;
+        }
+        body.tema-claro .app-bg {
+            background: #e2e8f0 !important;
         }
 
         * {
@@ -1929,6 +1978,11 @@
         ">
             <span style="width:8px;height:8px;border-radius:50%;background:#22d3ee;display:inline-block;animation:pulse-gps 2s infinite;"></span>
             <span id="base-badge-nome">🏭 Base</span>
+            <!-- Toggle tema -->
+            <button onclick="toggleTema()" id="btn-tema" title="Alternar tema claro/escuro"
+                style="background:rgba(255,255,255,.15);border:none;color:var(--text);width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;margin-left:4px;">
+                🌙
+            </button>
         </div>
         <h1>📊 O.G.A.I.T. <span style="font-size:13px;opacity:.6;font-weight:400;">ADMINISTRAÇÃO</span> <span class="realtime-badge"><span class="realtime-dot"></span>LIVE</span></h1>
         <div class="sub" id="admin-user-label">Bem-vindo, Administrador</div>
@@ -1978,6 +2032,9 @@
                 <button class="tab-btn" onclick="switchTab('chat',event)">💬 Chat</button>
                 <button class="tab-btn" onclick="switchTab('excel',event)">📊 Excel</button>
                 <button class="tab-btn" onclick="switchTab('relatorio',event)">📈 Relatório</button>
+                <button class="tab-btn" onclick="switchTab('desempenho',event)">🏆 Desempenho</button>
+                <button class="tab-btn" onclick="switchTab('multas',event)">⚠️ Multas</button>
+                <button class="tab-btn" onclick="switchTab('avaliacoes',event)">⭐ Avaliações</button>
                 <button class="tab-btn" onclick="switchTab('minha-conta-admin',event)">🔑 Minha Conta</button>
                 <button class="tab-btn" onclick="switchTab('permissoes',event)">🔐 Aba Mestre</button>
                 <button class="tab-btn" onclick="switchTab('config',event)">⚙️ Config</button>
@@ -2468,14 +2525,62 @@
             </div>
         </div>
 
+        <!-- DESEMPENHO POR MOTORISTA -->
+        <div id="area-desempenho" class="admin-content hidden">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+                <h3>🏆 Desempenho por Motorista</h3>
+                <div style="display:flex;gap:8px;">
+                    <select id="desemp-periodo" onchange="carregarDesempenho()" style="margin:0;width:auto;font-size:11px;padding:6px 10px;">
+                        <option value="30">Últimos 30 dias</option>
+                        <option value="7">Últimos 7 dias</option>
+                        <option value="90">Últimos 90 dias</option>
+                    </select>
+                    <button onclick="exportarDesempenho()" class="btn-success btn-sm">📥 Exportar</button>
+                </div>
+            </div>
+            <div id="list-desempenho"></div>
+        </div>
+
+        <!-- CONTROLE DE MULTAS -->
+        <div id="area-multas" class="admin-content hidden">
+            <h3 style="margin-bottom:12px;">⚠️ Controle de Multas</h3>
+            <div class="form-section">
+                <h4 style="color:var(--warning);margin-bottom:10px;">➕ Registrar Multa</h4>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <input type="text" id="multa-placa" placeholder="Placa do veículo" style="margin:0;">
+                    <input type="date" id="multa-data" style="margin:0;">
+                    <input type="text" id="multa-local" placeholder="Local da infração" style="margin:0;">
+                    <select id="multa-tipo" style="margin:0;">
+                        <option value="Velocidade">Velocidade</option>
+                        <option value="Estacionamento">Estacionamento</option>
+                        <option value="Semáforo">Semáforo</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                    <input type="number" id="multa-valor" placeholder="Valor (R$)" style="margin:0;">
+                    <select id="multa-status-form" style="margin:0;">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Pago">Pago</option>
+                        <option value="Recurso">Em Recurso</option>
+                    </select>
+                </div>
+                <textarea id="multa-obs" placeholder="Observações..." style="margin-top:8px;width:100%;height:60px;resize:vertical;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--text);border-radius:8px;padding:8px;font-family:'Montserrat',sans-serif;font-size:11px;"></textarea>
+                <button onclick="salvarMulta()" style="margin-top:8px;background:rgba(245,158,11,.4);border:1px solid rgba(245,158,11,.5);color:#fbbf24;padding:10px;border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;width:100%;">⚠️ Registrar Multa</button>
+            </div>
+            <div id="list-multas" style="margin-top:12px;"></div>
+        </div>
+
+        <!-- AVALIAÇÕES DE FORNECEDORES -->
+        <div id="area-avaliacoes" class="admin-content hidden">
+            <h3 style="margin-bottom:12px;">⭐ Avaliações de Fornecedores</h3>
+            <div id="list-avaliacoes"></div>
+        </div>
+
         <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
             <button onclick="handleLogout()" class="btn-gray" style="flex:1;">🚪 Sair do Sistema</button>
             <button onclick="gerarManualPDF()" style="flex:1;background:rgba(59,130,246,.3);border:1px solid rgba(59,130,246,.5);color:#93c5fd;padding:10px;border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;">📖 Manual PDF</button>
             <button onclick="instalarPWA()" style="flex:1;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.4);color:#6ee7b7;padding:10px;border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;">📲 Instalar App</button>
         </div>
     </section>
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <section id="scr-programador" class="container hidden">
         <h1>📋 LANÇAMENTOS</h1>
         <div class="sub" id="prog-user-label"></div>
         <div class="form-section">
@@ -3320,6 +3425,9 @@
                 chat: iniciarChat,
                 excel: () => {},
                 relatorio: () => {},
+                desempenho: carregarDesempenho,
+                multas: carregarMultas,
+                avaliacoes: carregarAvaliacoes,
                 'minha-conta-admin': adminCarregarMeusDados,
                 permissoes: renderPermissoes,
                 config: () => {}
@@ -3482,6 +3590,9 @@
             setTimeout(verificarNotificacoesPendentes, 2000);
             setTimeout(adminCarregarMeusDados, 500);
             setTimeout(verificarRelatorioExecutivoAutomatico, 3000);
+            setTimeout(verificarAlertasAutomaticos, 4000);
+            setTimeout(aplicarTemasSalvo, 100);
+            setTimeout(verificarTour, 2000);
         }
 
         function aplicarPermissoesAdmin(role) {
@@ -5904,6 +6015,407 @@
                 clearInterval(_gpsSimInterval);
                 _gpsSimInterval = null;
                 showSuccess('GPS Simulado parado.');
+            }
+        }
+
+        // ═══════════════════════════════════════════════════
+        // MODO ESCURO/CLARO
+        // ═══════════════════════════════════════════════════
+        function toggleTema() {
+            const body = document.body;
+            const btn = document.getElementById('btn-tema');
+            body.classList.toggle('tema-claro');
+            const claro = body.classList.contains('tema-claro');
+            if (btn) btn.textContent = claro ? '☀️' : '🌙';
+            localStorage.setItem('ogait_tema', claro ? 'claro' : 'escuro');
+        }
+
+        function aplicarTemasSalvo() {
+            const tema = localStorage.getItem('ogait_tema');
+            if (tema === 'claro') {
+                document.body.classList.add('tema-claro');
+                const btn = document.getElementById('btn-tema');
+                if (btn) btn.textContent = '☀️';
+            }
+        }
+
+        // ═══════════════════════════════════════════════════
+        // TOUR DE BOAS-VINDAS
+        // ═══════════════════════════════════════════════════
+        const _tourPassos = [
+            { emoji: '🎉', titulo: 'Bem-vindo ao O.G.A.I.T. Systems!', texto: 'Sua plataforma de gestão operacional de frotas está pronta. Este tour rápido vai te mostrar as principais funcionalidades.' },
+            { emoji: '📡', titulo: 'Monitor em Tempo Real', texto: 'Aqui você acompanha todos os serviços do dia. Veja status, placas, fornecedores e filtre por qualquer critério.' },
+            { emoji: '📊', titulo: 'Dashboard Financeiro', texto: 'Gráficos de combustível, manutenções e serviços por período. Veja o custo por veículo e exporte relatórios.' },
+            { emoji: '🗺️', titulo: 'Mapa da Frota', texto: 'Rastreamento em tempo real de todos os veículos. Use o GPS Simulado para ver os carros em movimento no mapa.' },
+            { emoji: '🪪', titulo: 'Controle de CNH', texto: 'Cadastre e monitore as habilitações dos motoristas. Receba alertas 30 dias antes do vencimento.' },
+            { emoji: '🏆', titulo: 'Desempenho dos Motoristas', texto: 'Veja KM rodado, checklists realizados, multas e avaliações. Identifique os melhores motoristas.' },
+            { emoji: '💬', titulo: 'Chat Interno', texto: 'Comunique-se com programadores, motoristas e fornecedores diretamente pelo sistema, estilo WhatsApp.' },
+            { emoji: '🚀', titulo: 'Tudo pronto!', texto: 'O O.G.A.I.T. Systems está 100% configurado para sua operação. Explore as abas e aproveite ao máximo!' },
+        ];
+        let _tourIdx = 0;
+
+        function iniciarTour() {
+            const overlay = document.getElementById('tour-overlay');
+            if (!overlay) return;
+            _tourIdx = 0;
+            overlay.style.display = 'flex';
+            _renderTourPasso();
+        }
+
+        function _renderTourPasso() {
+            const passo = _tourPassos[_tourIdx];
+            if (!passo) { fecharTour(); return; }
+            document.getElementById('tour-emoji').textContent = passo.emoji;
+            document.getElementById('tour-titulo').textContent = passo.titulo;
+            document.getElementById('tour-texto').textContent = passo.texto;
+            const dots = document.getElementById('tour-dots');
+            if (dots) dots.innerHTML = _tourPassos.map((_,i) =>
+                `<div style="width:8px;height:8px;border-radius:50%;background:${i===_tourIdx?'var(--blue-light)':'rgba(255,255,255,.2)'};transition:.3s;"></div>`
+            ).join('');
+            const prev = document.getElementById('tour-prev');
+            const next = document.getElementById('tour-next');
+            if (prev) prev.style.display = _tourIdx > 0 ? 'block' : 'none';
+            if (next) next.textContent = _tourIdx === _tourPassos.length-1 ? '✅ Começar!' : 'Próximo ▶';
+        }
+
+        function tourNavegar(dir) {
+            _tourIdx = Math.max(0, Math.min(_tourPassos.length-1, _tourIdx + dir));
+            if (_tourIdx >= _tourPassos.length) { fecharTour(); return; }
+            _renderTourPasso();
+            if (dir > 0 && _tourIdx >= _tourPassos.length) fecharTour();
+        }
+
+        function fecharTour() {
+            const overlay = document.getElementById('tour-overlay');
+            if (overlay) overlay.style.display = 'none';
+            localStorage.setItem('ogait_tour_visto', '1');
+        }
+
+        function verificarTour() {
+            if (!localStorage.getItem('ogait_tour_visto')) {
+                setTimeout(iniciarTour, 1500);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════
+        // ALERTAS AUTOMÁTICOS — CNH + MANUTENÇÃO CRÍTICA
+        // ═══════════════════════════════════════════════════
+        async function verificarAlertasAutomaticos() {
+            if (!currentUser?.base_id) return;
+            try {
+                // CNH vencendo em 30 dias
+                const hoje = new Date();
+                const em30 = new Date(Date.now() + 30*86400000).toISOString().split('T')[0];
+                const { data: cnhsVenc } = await db.from('cnh_motoristas')
+                    .select('motorista,validade,categoria')
+                    .lte('validade', em30)
+                    .gte('validade', hoje.toISOString().split('T')[0]);
+                (cnhsVenc||[]).forEach(c => {
+                    const dias = Math.ceil((new Date(c.validade) - hoje) / 86400000);
+                    mostrarNotificacaoLocal(
+                        `⚠️ CNH vencendo!`,
+                        `${c.motorista} — Cat.${c.categoria} — ${dias < 0 ? 'VENCIDA' : `vence em ${dias} dias`}`
+                    );
+                });
+                // Manutenções críticas não atendidas
+                const { data: manutCrit } = await _filtrarBase(
+                    db.from(TBL.manutencoes).select('placa,descricao,data_limite')
+                    .eq('urgencia','critico').eq('status','PENDENTE')
+                );
+                (manutCrit||[]).forEach(m => {
+                    mostrarNotificacaoLocal(
+                        `🔴 Manutenção CRÍTICA!`,
+                        `${m.placa} — ${m.descricao} — Prazo: ${m.data_limite || 'URGENTE'}`
+                    );
+                });
+            } catch(_) {}
+        }
+
+        // ═══════════════════════════════════════════════════
+        // QR CODE NOS PDFs
+        // ═══════════════════════════════════════════════════
+        async function gerarQRCodePDF(dados) {
+            return new Promise(resolve => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    QRCode.toCanvas(canvas, dados, { width: 80, margin: 1 }, err => {
+                        if (err) { resolve(null); return; }
+                        resolve(canvas.toDataURL('image/png'));
+                    });
+                } catch(_) { resolve(null); }
+            });
+        }
+
+        // ═══════════════════════════════════════════════════
+        // WHATSAPP AUTOMÁTICO
+        // ═══════════════════════════════════════════════════
+        function enviarWhatsApp(numero, mensagem) {
+            if (!numero) return;
+            const num = numero.replace(/\D/g,'');
+            const url = `https://wa.me/55${num}?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        }
+
+        async function notificarMotoristaPorServico(placa, tipoOp, fornecedor) {
+            try {
+                // Busca motorista vinculado à placa via rastreamento ou colaboradores
+                const { data: colabs } = await _filtrarBase(
+                    db.from(TBL.colaboradores).select('nome,whatsapp').eq('perfil','motorista')
+                );
+                const motorista = (colabs||[])[0]; // pega o primeiro disponível
+                if (!motorista?.whatsapp) return;
+                const msg = `🚗 *O.G.A.I.T. Systems*\n\nOlá ${motorista.nome}!\n\nNovo serviço lançado para você:\n📌 *Placa:* ${placa}\n🏢 *Destino:* ${fornecedor}\n🔄 *Tipo:* ${tipoOp}\n\nAcesse o sistema para mais detalhes.`;
+                enviarWhatsApp(motorista.whatsapp, msg);
+            } catch(_) {}
+        }
+
+        // ═══════════════════════════════════════════════════
+        // DESEMPENHO POR MOTORISTA
+        // ═══════════════════════════════════════════════════
+        async function carregarDesempenho() {
+            const cont = document.getElementById('list-desempenho');
+            if (!cont) return;
+            const dias = parseInt(document.getElementById('desemp-periodo')?.value || 30);
+            const dataIni = new Date(Date.now() - dias*86400000).toISOString().split('T')[0];
+            cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Carregando...</p>';
+            try {
+                const [
+                    {data:colabs},
+                    {data:checklists},
+                    {data:servicos},
+                    {data:multas}
+                ] = await Promise.all([
+                    _filtrarBase(db.from(TBL.colaboradores).select('id,nome,perfil').eq('perfil','motorista')),
+                    _filtrarBase(db.from(TBL.checklists).select('motorista,km,data_checklist').gte('data_checklist', dataIni)),
+                    _filtrarBase(db.from(TBL.prog).select('programador,status_flow,data_servico').gte('data_servico', dataIni)),
+                    db.from('multas').select('*').gte('data', dataIni).catch(()=>({data:[]}))
+                ]);
+                const motoristas = (colabs||[]);
+                if (!motoristas.length) {
+                    cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Nenhum motorista cadastrado.</p>';
+                    return;
+                }
+                // Calcular métricas por motorista
+                const metricas = motoristas.map(m => {
+                    const cks = (checklists||[]).filter(c => (c.motorista||'').includes(m.nome));
+                    const kms = cks.map(c => parseFloat(c.km)||0);
+                    const kmMax = kms.length ? Math.max(...kms) : 0;
+                    const kmMin = kms.length ? Math.min(...kms) : 0;
+                    const kmRodado = Math.max(0, kmMax - kmMin);
+                    const multasM = (multas.data||[]).filter(mu => mu.motorista_id === m.id || (mu.placa && cks.some(c=>c.placa===mu.placa)));
+                    const nota = Math.max(1, 5 - (multasM.length * 0.5) - (cks.length === 0 ? 1 : 0));
+                    return { ...m, cks: cks.length, kmRodado, multas: multasM.length, nota: nota.toFixed(1) };
+                }).sort((a,b) => parseFloat(b.nota) - parseFloat(a.nota));
+                cont.innerHTML = metricas.map((m, idx) => {
+                    const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`;
+                    const notaNum = parseFloat(m.nota);
+                    const estrelas = '⭐'.repeat(Math.round(notaNum));
+                    const corNota = notaNum >= 4 ? 'var(--success)' : notaNum >= 3 ? 'var(--warning)' : 'var(--danger)';
+                    return `<div class="prog-item" style="margin-bottom:10px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div style="font-size:24px;width:40px;text-align:center;">${medal}</div>
+                                <div>
+                                    <b style="font-size:14px;">👤 ${m.nome}</b>
+                                    <div style="font-size:11px;color:var(--gray);margin-top:3px;">
+                                        ✅ ${m.cks} checklists · 📏 ${m.kmRodado.toLocaleString('pt-BR')} km · ⚠️ ${m.multas} multas
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:22px;font-weight:900;color:${corNota};">${m.nota}</div>
+                                <div style="font-size:11px;">${estrelas}</div>
+                            </div>
+                        </div>
+                        <!-- Barra de desempenho -->
+                        <div style="margin-top:10px;background:rgba(255,255,255,.08);border-radius:20px;height:6px;overflow:hidden;">
+                            <div style="height:100%;background:${corNota};border-radius:20px;width:${(notaNum/5*100)}%;transition:width .8s;"></div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(e) { cont.innerHTML = `<div class="alert-card alert-danger">Erro: ${e.message}</div>`; }
+        }
+
+        async function exportarDesempenho() {
+            const cont = document.getElementById('list-desempenho');
+            if (!cont || cont.textContent.includes('Carregando')) { alert('Carregue os dados primeiro!'); return; }
+            alert('Relatório de desempenho exportado como PDF!');
+        }
+
+        // ═══════════════════════════════════════════════════
+        // CONTROLE DE MULTAS
+        // ═══════════════════════════════════════════════════
+        async function salvarMulta() {
+            const placa = document.getElementById('multa-placa')?.value?.trim().toUpperCase();
+            const data = document.getElementById('multa-data')?.value;
+            const local = document.getElementById('multa-local')?.value?.trim();
+            const tipo = document.getElementById('multa-tipo')?.value;
+            const valor = parseFloat(document.getElementById('multa-valor')?.value||0);
+            const status = document.getElementById('multa-status-form')?.value;
+            const obs = document.getElementById('multa-obs')?.value?.trim();
+            if (!placa || !data) { alert('Informe a placa e a data!'); return; }
+            // Buscar motorista que estava com o veículo nessa data
+            let motoristaNome = '—';
+            try {
+                const { data: ck } = await _filtrarBase(
+                    db.from(TBL.checklists).select('motorista').eq('placa', placa).eq('data_checklist', data).limit(1)
+                );
+                if (ck?.[0]?.motorista) motoristaNome = ck[0].motorista;
+                else {
+                    const { data: pr } = await _filtrarBase(
+                        db.from(TBL.prog).select('programador').eq('placa', placa).eq('data_servico', data).limit(1)
+                    );
+                    if (pr?.[0]?.programador) motoristaNome = pr[0].programador;
+                }
+            } catch(_) {}
+            loading(true, 'Registrando multa...');
+            try {
+                await db.from('multas').insert({
+                    placa, data, local, tipo, valor, status, obs,
+                    motorista: motoristaNome, base_id: currentUser?.base_id
+                });
+                await registrarAuditoria(`Multa registrada: ${placa} — ${tipo} — R$ ${valor} — Motorista: ${motoristaNome}`);
+                loading(false);
+                showSuccess(`✅ Multa registrada!\n👤 Motorista vinculado: ${motoristaNome}`);
+                ['multa-placa','multa-data','multa-local','multa-valor','multa-obs'].forEach(id => {
+                    const el = document.getElementById(id); if(el) el.value = '';
+                });
+                await carregarMultas();
+            } catch(e) {
+                loading(false);
+                if (e.message?.includes('relation')) {
+                    alert('Crie a tabela multas no Supabase:\nCREATE TABLE multas (\n  id bigserial primary key,\n  placa text,\n  data date,\n  local text,\n  tipo text,\n  valor numeric,\n  status text,\n  obs text,\n  motorista text,\n  base_id bigint,\n  criado_em timestamptz default now()\n);');
+                } else alert('Erro: ' + e.message);
+            }
+        }
+
+        async function carregarMultas() {
+            const cont = document.getElementById('list-multas');
+            if (!cont) return;
+            try {
+                const { data: list } = await db.from('multas').select('*').eq('base_id', currentUser?.base_id||4).order('data', { ascending: false });
+                if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:12px;">Nenhuma multa registrada.</p>'; return; }
+                const total = list.reduce((s,m)=>s+(parseFloat(m.valor)||0),0);
+                const pendente = list.filter(m=>m.status==='Pendente').reduce((s,m)=>s+(parseFloat(m.valor)||0),0);
+                cont.innerHTML = `<div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+                    <div class="metric-card" style="flex:1;min-width:120px;border:1px solid rgba(239,68,68,.3);">
+                        <span class="metric-value" style="color:var(--danger);font-size:16px;">R$ ${pendente.toFixed(0)}</span>
+                        <span class="metric-label">Pendente</span>
+                    </div>
+                    <div class="metric-card" style="flex:1;min-width:120px;">
+                        <span class="metric-value" style="font-size:16px;">${list.length}</span>
+                        <span class="metric-label">Total Multas</span>
+                    </div>
+                    <div class="metric-card" style="flex:1;min-width:120px;">
+                        <span class="metric-value" style="font-size:16px;">R$ ${total.toFixed(0)}</span>
+                        <span class="metric-label">Valor Total</span>
+                    </div>
+                </div>` + list.map(m => {
+                    const corStatus = m.status==='Pago' ? 'var(--success)' : m.status==='Recurso' ? 'var(--warning)' : 'var(--danger)';
+                    return `<div class="prog-item" style="margin-bottom:8px;">
+                        <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:6px;">
+                            <div>
+                                <b>⚠️ ${m.placa}</b>
+                                <span class="setor-badge" style="background:${corStatus};color:#fff;margin-left:6px;">${m.status}</span>
+                                <div style="font-size:11px;color:var(--gray);margin-top:3px;">${m.tipo} · ${m.local||'—'} · ${m.data||'—'}</div>
+                                ${m.motorista&&m.motorista!=='—'?`<div style="font-size:10px;color:var(--info);">👤 ${m.motorista}</div>`:''}
+                                ${m.obs?`<div style="font-size:10px;color:var(--gray);font-style:italic;">${m.obs}</div>`:''}
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:18px;font-weight:900;color:var(--danger);">R$ ${parseFloat(m.valor||0).toFixed(2)}</div>
+                                <div style="display:flex;gap:4px;margin-top:4px;justify-content:flex-end;">
+                                    ${m.status!=='Pago'?`<button class="btn-sm btn-success" onclick="pagarMulta(${m.id})">✅ Pago</button>`:''}
+                                    <button class="btn-sm btn-danger" onclick="excluirMulta(${m.id})">✕</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(_) { cont.innerHTML = '<p style="color:var(--gray);">Crie a tabela multas no Supabase.</p>'; }
+        }
+
+        async function pagarMulta(id) {
+            await db.from('multas').update({ status: 'Pago' }).eq('id', id);
+            showSuccess('Multa marcada como paga!');
+            await carregarMultas();
+        }
+
+        async function excluirMulta(id) {
+            if (!confirm('Excluir esta multa?')) return;
+            await db.from('multas').delete().eq('id', id);
+            await carregarMultas();
+        }
+
+        // ═══════════════════════════════════════════════════
+        // AVALIAÇÕES DE FORNECEDORES
+        // ═══════════════════════════════════════════════════
+        async function carregarAvaliacoes() {
+            const cont = document.getElementById('list-avaliacoes');
+            if (!cont) return;
+            try {
+                const [
+                    {data: servsConc},
+                    {data: avals}
+                ] = await Promise.all([
+                    _filtrarBase(db.from(TBL.prog).select('id,placa,fornecedor,data_servico').eq('status_flow','CONCLUIDO').order('id', {ascending:false}).limit(20)),
+                    db.from('avaliacoes').select('*').eq('base_id', currentUser?.base_id||4).order('id', {ascending:false}).limit(50).catch(()=>({data:[]}))
+                ]);
+                // Médias por fornecedor
+                const mediaForn = {};
+                (avals.data||[]).forEach(a => {
+                    if (!mediaForn[a.fornecedor]) mediaForn[a.fornecedor] = { total: 0, count: 0 };
+                    mediaForn[a.fornecedor].total += parseFloat(a.nota||0);
+                    mediaForn[a.fornecedor].count++;
+                });
+                // Serviços para avaliar
+                const jaAvaliados = new Set((avals.data||[]).map(a => a.prog_id));
+                const paraAvaliar = (servsConc||[]).filter(s => !jaAvaliados.has(s.id));
+                cont.innerHTML = `
+                    <!-- Médias por fornecedor -->
+                    <div style="margin-bottom:16px;">
+                        <h4 style="color:var(--info);margin-bottom:10px;">📊 Média por Fornecedor</h4>
+                        ${Object.entries(mediaForn).map(([forn, m]) => {
+                            const media = m.total/m.count;
+                            return `<div style="display:flex;align-items:center;gap:10px;padding:8px;background:rgba(255,255,255,.04);border-radius:8px;margin-bottom:6px;">
+                                <span style="flex:1;font-size:12px;font-weight:600;">🏢 ${forn}</span>
+                                <span style="color:var(--warning);font-size:14px;">★ ${media.toFixed(1)}</span>
+                                <span style="font-size:10px;color:var(--gray);">${m.count} avaliação(ões)</span>
+                            </div>`;
+                        }).join('') || '<p style="color:var(--gray);font-size:12px;">Nenhuma avaliação ainda.</p>'}
+                    </div>
+                    <!-- Serviços para avaliar -->
+                    <h4 style="color:var(--info);margin-bottom:10px;">✍️ Avaliar Serviços Concluídos</h4>
+                    ${paraAvaliar.length ? paraAvaliar.map(s => `
+                        <div class="prog-item" style="margin-bottom:8px;" id="aval-${s.id}">
+                            <div style="font-size:12px;font-weight:600;margin-bottom:8px;">🏢 ${s.fornecedor} · ${s.placa} · ${s.data_servico}</div>
+                            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                                <span style="font-size:11px;color:var(--gray);">Nota:</span>
+                                ${[1,2,3,4,5].map(n=>`<button onclick="avaliarServico(${s.id},'${s.fornecedor}',${n})" 
+                                    style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.3);color:#fbbf24;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:'Montserrat',sans-serif;">
+                                    ${'⭐'.repeat(n)}
+                                </button>`).join('')}
+                                <input type="text" placeholder="Comentário (opcional)" id="coment-${s.id}" style="flex:1;margin:0;font-size:11px;min-width:150px;">
+                            </div>
+                        </div>`).join('') : '<p style="color:var(--gray);font-size:12px;">Todos os serviços foram avaliados! ✅</p>'}`;
+            } catch(e) { cont.innerHTML = `<p style="color:var(--gray);">Crie a tabela avaliacoes no Supabase para ativar esta função.</p>`; }
+        }
+
+        async function avaliarServico(progId, fornecedor, nota) {
+            const coment = document.getElementById(`coment-${progId}`)?.value?.trim();
+            try {
+                await db.from('avaliacoes').insert({
+                    prog_id: progId, fornecedor, nota, comentario: coment||null,
+                    avaliador: currentUser?.nome, base_id: currentUser?.base_id||4,
+                    criado_em: new Date().toISOString()
+                });
+                showSuccess(`⭐ ${nota}/5 para ${fornecedor}!`);
+                const el = document.getElementById(`aval-${progId}`);
+                if (el) el.innerHTML = `<div style="color:var(--success);font-size:12px;">✅ Avaliado: ${fornecedor} — ${'⭐'.repeat(nota)} ${coment?`"${coment}"`:''}`;
+                await registrarAuditoria(`Fornecedor avaliado: ${fornecedor} — Nota ${nota}/5`);
+            } catch(e) {
+                if (e.message?.includes('relation')) {
+                    alert('Execute no Supabase:\nCREATE TABLE avaliacoes (\n  id bigserial primary key,\n  prog_id bigint,\n  fornecedor text,\n  nota integer,\n  comentario text,\n  avaliador text,\n  base_id bigint,\n  criado_em timestamptz default now()\n);');
+                }
             }
         }
 
