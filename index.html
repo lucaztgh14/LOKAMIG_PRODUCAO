@@ -5330,7 +5330,7 @@
             if (!nome) { alert('Informe o nome da empresa!'); return; }
 
             loading(true, 'Salvando...');
-            const { error } = await db.from(TBL.fornecedores).insert({ nome, tipo });
+            const { error } = await db.from(TBL.fornecedores).insert({ nome, tipo, base_id: _baseId() });
             if (error) { loading(false); alert('Erro: ' + error.message); return; }
 
             if (user && pass) {
@@ -5341,8 +5341,10 @@
             const logoData = document.getElementById('f-logo-preview-new')?.src;
             if (logoData && logoData.startsWith('data:')) {
                 try {
-                    const { data: fornRow } = await db.from(TBL.fornecedores)
-                        .select('id').eq('nome', nome).single();
+                    const bid = _baseId();
+                    let q2 = db.from(TBL.fornecedores).select('id').eq('nome', nome);
+                    if (bid) q2 = q2.eq('base_id', bid);
+                    const { data: fornRow } = await q2.single();
                     if (fornRow?.id) await salvarWhiteLabelFornecedor(fornRow.id, logoData);
                 } catch(_) {}
             }
