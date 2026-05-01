@@ -3476,6 +3476,7 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                     <input type="number" id="almo-sai-qtd" placeholder="Quantidade" min="1" style="margin:0;">
                     <select id="almo-sai-veiculo" style="margin:0;"><option value="">— Veículo (opc.) —</option></select>
+                    <select id="almo-sai-manutencao" style="margin:0;"><option value="">— Manutenção vinculada (opc.) —</option></select>
                     <input type="text" id="almo-sai-responsavel" placeholder="Responsável" style="margin:0;">
                     <input type="text" id="almo-sai-motivo" placeholder="Motivo" style="margin:0;">
                 </div>
@@ -4535,12 +4536,21 @@
                 pecas.forEach(p => { const o = new Option(`${p.nome} (${p.quantidade} ${p.unidade||'un'})`, p.id); sel.add(o); });
                 sel.value = val;
             });
-            // Veículos no saída
+            // Veículos na saída
             const { data: vs } = await _filtrarBase(db.from(TBL.veiculos).select('placa').order('placa'));
             const selV = document.getElementById('est-sai-veiculo');
             if (selV && vs) {
                 selV.innerHTML = '<option value="">— Veículo (opcional) —</option>';
                 vs.forEach(v => selV.add(new Option(v.placa, v.placa)));
+            }
+            // Manutenções pendentes na saída
+            const selM = document.getElementById('est-sai-manutencao');
+            if (selM) {
+                const { data: manut } = await _filtrarBase(
+                    db.from(TBL.manutencoes).select('id,placa,descricao').eq('status','PENDENTE').order('id', { ascending: false })
+                );
+                selM.innerHTML = '<option value="">— Manutenção vinculada (opcional) —</option>';
+                (manut || []).forEach(m => selM.add(new Option(`🔧 ${m.placa} — ${m.descricao}`, m.id)));
             }
         }
 
@@ -4558,6 +4568,15 @@
             if (selV && vs) {
                 selV.innerHTML = '<option value="">— Veículo (opc.) —</option>';
                 vs.forEach(v => selV.add(new Option(v.placa, v.placa)));
+            }
+            // Manutenções pendentes para o almoxarife
+            const selM = document.getElementById('almo-sai-manutencao');
+            if (selM) {
+                const { data: manut } = await _filtrarBase(
+                    db.from(TBL.manutencoes).select('id,placa,descricao').eq('status','PENDENTE').order('id', { ascending: false })
+                );
+                selM.innerHTML = '<option value="">— Manutenção vinculada (opcional) —</option>';
+                (manut || []).forEach(m => selM.add(new Option(`🔧 ${m.placa} — ${m.descricao}`, m.id)));
             }
         }
 
@@ -4580,10 +4599,11 @@
             const pecaId = document.getElementById('est-sai-peca').value;
             const qtd = parseInt(document.getElementById('est-sai-qtd').value) || 0;
             const veiculo = document.getElementById('est-sai-veiculo').value;
+            const manutencaoId = document.getElementById('est-sai-manutencao')?.value || null;
             const resp = document.getElementById('est-sai-responsavel').value.trim();
             const obs = document.getElementById('est-sai-obs').value.trim();
             if (!pecaId || qtd <= 0) { alert('Selecione a peça e informe quantidade!'); return; }
-            await _processarMovimentacao(pecaId, qtd, 'saida', { veiculo, responsavel: resp, obs });
+            await _processarMovimentacao(pecaId, qtd, 'saida', { veiculo, responsavel: resp, obs, manutencao_id: manutencaoId ? parseInt(manutencaoId) : null });
             ['est-sai-qtd','est-sai-responsavel','est-sai-obs'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
             alert('✅ Saída registrada!');
         }
@@ -4609,10 +4629,11 @@
             const pecaId = document.getElementById('almo-sai-peca').value;
             const qtd = parseInt(document.getElementById('almo-sai-qtd').value) || 0;
             const veiculo = document.getElementById('almo-sai-veiculo').value;
+            const manutencaoId = document.getElementById('almo-sai-manutencao')?.value || null;
             const resp = document.getElementById('almo-sai-responsavel').value.trim();
             const obs = document.getElementById('almo-sai-obs').value.trim();
             if (!pecaId || qtd <= 0) { alert('Selecione a peça e informe quantidade!'); return; }
-            await _processarMovimentacao(pecaId, qtd, 'saida', { veiculo, responsavel: resp, obs });
+            await _processarMovimentacao(pecaId, qtd, 'saida', { veiculo, responsavel: resp, obs, manutencao_id: manutencaoId ? parseInt(manutencaoId) : null });
             ['almo-sai-qtd','almo-sai-responsavel','almo-sai-obs'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
             await almoPopularSelects();
             await almoRenderPecas();
