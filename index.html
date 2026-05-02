@@ -4293,56 +4293,66 @@
                 const el = document.getElementById(id);
                 if (el) el.value = hoje;
             });
-
-            // Carrega config EmailJS do Supabase
-            try {
-                const { data } = await db.from(TBL.config).select('valor').eq('chave', 'emailjs').single();
-                if (data?.valor) {
-                    emailjsCfg = data.valor;
-                    if (emailjsCfg.userId) emailjs.init(emailjsCfg.userId);
-                    const ids = ['cfg-ejs-userid', 'cfg-ejs-serviceid', 'cfg-ejs-templateid'];
-                    const keys = ['userId', 'serviceId', 'templateId'];
-                    ids.forEach((id, i) => { const el = document.getElementById(id); if (el && emailjsCfg[keys[i]]) el.value = emailjsCfg[keys[i]]; });
-                }
-            } catch (_) { }
-
-            // Carrega permissões em cache
-            await carregarPermissoesCache();
-
             toggleFornDiv();
 
-            // ── RESTAURAR SESSÃO (F5) ──────────────────────────────
+            // ── RESTAURAR SESSÃO (F5) — PRIMEIRO, antes de qualquer outra coisa ──
             try {
                 const raw = sessionStorage.getItem('ogait_sessao_v1');
                 if (raw) {
                     const { user } = JSON.parse(raw);
                     if (user?.nome) {
-                        loading(true, 'Restaurando sessão...');
+                        // Esconde login imediatamente para evitar flash
+                        document.getElementById('scr-login').classList.add('hidden');
+                        loading(true, 'Carregando...');
                         currentUser = user;
-                        // Verificar se usuário ainda existe no banco
-                        let valido = false;
-                        if (user.role === 'master') {
-                            valido = true;
-                        } else if (user.role === 'fornecedor') {
-                            const { data: fu } = await db.from(TBL.fornUsers).select('id').eq('user_login', user.user_login).single();
-                            valido = !!fu;
-                        } else {
-                            const { data: cu } = await db.from(TBL.colaboradores).select('id').eq('user_login', user.user_login).single();
-                            valido = !!cu;
-                        }
-                        if (!valido) {
+                        // Validar sessão em paralelo com outras cargas
+                        const [validado] = await Promise.all([
+                            (async () => {
+                                try {
+                                    if (user.role === 'master') return true;
+                                    if (user.role === 'fornecedor') {
+                                        const { data: fu } = await db.from(TBL.fornUsers).select('id').eq('user_login', user.user_login).single();
+                                        return !!fu;
+                                    }
+                                    const { data: cu } = await db.from(TBL.colaboradores).select('id').eq('user_login', user.user_login).single();
+                                    return !!cu;
+                                } catch(_) { return false; }
+                            })(),
+                            carregarPermissoesCache().catch(() => {}),
+                        ]);
+                        loading(false);
+                        if (!validado) {
                             sessionStorage.removeItem('ogait_sessao_v1');
                             currentUser = null;
-                            loading(false);
+                            document.getElementById('scr-login').classList.remove('hidden');
                             return;
                         }
-                        loading(false);
-                        // Re-executar fluxo pós-login baseado no perfil
                         await _restaurarPosLogin(user);
+                        // Config EmailJS em background
+                        db.from(TBL.config).select('valor').eq('chave', 'emailjs').single().then(({ data }) => {
+                            if (data?.valor) {
+                                emailjsCfg = data.valor;
+                                if (emailjsCfg.userId) emailjs.init(emailjsCfg.userId);
+                            }
+                        }).catch(() => {});
                         return;
                     }
                 }
             } catch(_) { sessionStorage.removeItem('ogait_sessao_v1'); }
+
+            // Sem sessão — carrega normalmente em background
+            Promise.all([
+                carregarPermissoesCache().catch(() => {}),
+                db.from(TBL.config).select('valor').eq('chave', 'emailjs').single().then(({ data }) => {
+                    if (data?.valor) {
+                        emailjsCfg = data.valor;
+                        if (emailjsCfg.userId) emailjs.init(emailjsCfg.userId);
+                        const ids = ['cfg-ejs-userid', 'cfg-ejs-serviceid', 'cfg-ejs-templateid'];
+                        const keys = ['userId', 'serviceId', 'templateId'];
+                        ids.forEach((id, i) => { const el = document.getElementById(id); if (el && emailjsCfg[keys[i]]) el.value = emailjsCfg[keys[i]]; });
+                    }
+                }).catch(() => {}),
+            ]);
         };
 
         async function _restaurarPosLogin(user) {
@@ -4353,11 +4363,9 @@
             }
             if (perfil === 'fornecedor') {
                 show('scr-fornecedor');
-                document.getElementById('forn-nome-empresa').textContent = user.empresa || user.nome;
-                document.getElementById('forn-tipo-empresa').textContent = user.tipo || '';
-                document.getElementById('forn-status-badge').textContent = '● ONLINE';
-                await carregarLogoFornecedor();
-                await carregarOrcForn();
+                const fnEl = document.getElementById('forn-name-screen') || document.getElementById('forn-nome-empresa');
+                if (fnEl) fnEl.textContent = '🏢 ' + (user.empresa || user.nome);
+                Promise.all([carregarLogoFornecedor(), carregarServicosForn(), carregarOrcForn()]).catch(() => {});
                 iniciarRealtime();
                 return;
             }
@@ -4397,7 +4405,13 @@
             if (document.getElementById('base-badge-nome'))
                 document.getElementById('base-badge-nome').textContent = '🏭 ' + (user.base_nome || 'Base');
             show('scr-admin');
-            await Promise.all([atualizarDashboard(), carregarProgAdmin(), popularSeletorVeiculos(), popularSeletorFornecedores()]);
+            // Carregar tudo em paralelo para máxima velocidade
+            Promise.all([
+                atualizarDashboard(),
+                carregarProgAdmin(),
+                popularSeletorVeiculos(),
+                popularSeletorFornecedores()
+            ]).catch(() => {});
             iniciarRealtime();
             setTimeout(inicializarChat, 1000);
         }
@@ -6662,13 +6676,23 @@
             const total = itens.reduce((s, i) => s + i.valor, 0);
 
             loading(true, 'Enviando orçamento...');
+            // Buscar base_id do fornecedor para garantir separação por base
+            let fornBaseId = currentUser?.base_id || null;
+            if (!fornBaseId && currentUser?.empresa) {
+                try {
+                    const { data: fb } = await db.from(TBL.fornecedores)
+                        .select('base_id').eq('nome', currentUser.empresa).single();
+                    if (fb?.base_id) fornBaseId = fb.base_id;
+                } catch(_) {}
+            }
             const { error } = await db.from(TBL.orcamentos).insert({
                 timestamp: new Date().toLocaleString('pt-BR'),
                 data_orc: new Date().toISOString().split('T')[0],
                 empresa: currentUser?.empresa || '—',
                 placa, descricao: desc, itens, total,
                 evidencias: [...tempEvidencias],
-                status: 'PENDENTE'
+                status: 'PENDENTE',
+                base_id: fornBaseId
             });
             if (error) { loading(false); alert('Erro: ' + error.message); return; }
 
