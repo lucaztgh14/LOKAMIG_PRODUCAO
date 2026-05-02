@@ -2333,7 +2333,7 @@
     </section>
 
     <section id="scr-login"
-        style="display:flex;justify-content:center;align-items:center;width:100%;min-height:100vh;position:relative;overflow:hidden;">
+        style="display:flex;justify-content:center;align-items:center;width:100%;min-height:100vh;position:relative;overflow:;">
         <span id="wl-login-nome" style="display:none;"></span>
         <span id="wl-login-sub" style="display:none;"></span>
         <!-- Canvas 3D animado -->
@@ -4027,6 +4027,22 @@
             );
         }
 
+        async function carregarLogoFornecedor() {
+            try {
+                const empresa = currentUser?.empresa;
+                if (!empresa) return;
+                const { data: forn } = await db.from('fornecedores').select('id').eq('nome', empresa).single();
+                if (!forn?.id) return;
+                const { data: wl } = await db.from('config_sistema').select('valor').eq('chave', `whitelabel_forn_${forn.id}`).single();
+                const logo = wl?.valor?.logo;
+                const prev = document.getElementById('forn-logo-preview');
+                if (prev) {
+                    if (logo) { prev.src = logo; prev.style.display = 'block'; }
+                    else { prev.style.display = 'none'; }
+                }
+            } catch(_) {}
+        }
+
         // ─────────────────────────────────────────────
         // PERMISSÕES PADRÃO
         // ─────────────────────────────────────────────
@@ -4338,7 +4354,10 @@
                         return;
                     }
                 }
-            } catch(_) { sessionStorage.removeItem('ogait_sessao_v1'); }
+            } catch(_) {
+                sessionStorage.removeItem('ogait_sessao_v1');
+                document.getElementById('scr-login').classList.remove('hidden');
+            }
 
             // Sem sessão — carrega normalmente em background
             Promise.all([
@@ -4364,14 +4383,8 @@
             if (perfil === 'fornecedor') {
                 show('scr-fornecedor');
                 const fnEl = document.getElementById('forn-name-screen') || document.getElementById('forn-nome-empresa');
-                if (fnEl) fnEl.innerText = '🏢 ' + (user.empresa || user.nome);
-                try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
-                Promise.all([
-                    carregarLogoFornecedor().catch(()=>{}),
-                    carregarServicosForn().catch(()=>{}),
-                    carregarOrcForn().catch(()=>{}),
-                    carregarAlertasRevisaoFornecedor().catch(()=>{})
-                ]);
+                if (fnEl) fnEl.textContent = '🏢 ' + (user.empresa || user.nome);
+                Promise.all([carregarLogoFornecedor(), carregarServicosForn(), carregarOrcForn()]).catch(() => {});
                 iniciarRealtime();
                 return;
             }
@@ -4395,9 +4408,6 @@
             if (perfil === 'programador') {
                 document.getElementById('prog-user-label').textContent = 'Usuário: ' + user.nome;
                 show('scr-programador');
-                try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
-                const pfd = document.getElementById('p-filter-date');
-                if (pfd && !pfd.value) pfd.value = new Date().toISOString().split('T')[0];
                 await Promise.all([popularSeletorVeiculos(), popularSeletorFornecedores()]);
                 toggleFornDiv();
                 await carregarProgGeral();
@@ -4405,35 +4415,22 @@
                 return;
             }
             if (perfil === 'chefao') {
-                show('scr-chefao');
-                try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
-                await carregarChefao(); iniciarRealtime(); return;
-            }
-            if (perfil === 'supervisor') {
-                const baseLabel = user.base_nome || user.base_id || '';
-                document.getElementById('admin-user-label').textContent = `Bem-vindo, ${user.nome} · ${baseLabel}`;
-                if (document.getElementById('base-badge-nome'))
-                    document.getElementById('base-badge-nome').textContent = '🏭 ' + (user.base_nome || 'Base');
-                show('scr-admin');
-                Promise.all([atualizarDashboard(), carregarProgAdmin()]).catch(()=>{});
-                iniciarRealtime();
-                return;
+                await _entrarChefao(); return;
             }
             // admin / supervisor
             const baseLabel = user.base_nome || user.base_id || '';
             document.getElementById('admin-user-label').textContent =
-                `Bem-vindo, ${user.nome} · ${baseLabel}`;
+                `Bem-vindo, ${user.nome} · ${baseLabel} — ${baseLabel}`;
             if (document.getElementById('base-badge-nome'))
                 document.getElementById('base-badge-nome').textContent = '🏭 ' + (user.base_nome || 'Base');
             show('scr-admin');
-            try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
-            // Carregar tudo em paralelo
+            // Carregar tudo em paralelo para máxima velocidade
             Promise.all([
-                atualizarDashboard().catch(()=>{}),
-                carregarProgAdmin().catch(()=>{}),
-                popularSeletorVeiculos().catch(()=>{}),
-                popularSeletorFornecedores().catch(()=>{})
-            ]);
+                atualizarDashboard(),
+                carregarProgAdmin(),
+                popularSeletorVeiculos(),
+                popularSeletorFornecedores()
+            ]).catch(() => {});
             iniciarRealtime();
             setTimeout(inicializarChat, 1000);
         }
@@ -4501,12 +4498,17 @@
                 desempenho: carregarDesempenho,
                 multas: carregarMultas,
                 avaliacoes: carregarAvaliacoes,
+                estoque: () => { renderPecas(); popularSelectsPecas(); carregarAlertasEstoque('list-est-alertas'); },
                 'minha-conta-admin': adminCarregarMeusDados,
                 permissoes: renderPermissoes,
-                config: () => { },
-                estoque: () => { estoqueSwitchTab('pecas', document.getElementById('est-tab-pecas')); renderPecas(); }
+                config: () => { }
             };
             if (loaders[id]) loaders[id]();
+            // Atualizar tela na sessão
+            try {
+                const raw = sessionStorage.getItem('ogait_sessao_v1');
+                if (raw) { const s = JSON.parse(raw); s.tela = 'scr-admin'; sessionStorage.setItem('ogait_sessao_v1', JSON.stringify(s)); }
+            } catch(_) {}
         }
 
         // ─────────────────────────────────────────────
@@ -4959,8 +4961,8 @@
                     if (colab.perfil === 'programador') {
                         document.getElementById('prog-user-label').textContent = 'Usuário: ' + colab.nome;
                         loading(false);
-                        show('scr-programador');
                         try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
+                        show('scr-programador');
                         await Promise.all([popularSeletorVeiculos(), popularSeletorFornecedores()]);
                         toggleFornDiv();
                         await carregarProgGeral();
@@ -4972,8 +4974,8 @@
                     if (colab.perfil === 'motorista') {
                         document.getElementById('motorista-user-label').textContent = 'Motorista: ' + colab.nome;
                         loading(false);
-                        show('scr-motorista');
                         try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
+                        show('scr-motorista');
                         await ckPopularVeiculos();
                         ckRenderItens();
                         const hoje = new Date().toISOString().split('T')[0];
@@ -4987,10 +4989,11 @@
                     if (colab.perfil === 'almoxarife') {
                         document.getElementById('almo-user-label').textContent = '🗃️ ' + colab.nome + ' — Almoxarife';
                         loading(false);
-                        show('scr-almoxarife');
                         try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
-                        await Promise.all([almoPopularSelects(), almoRenderPecas()]);
-                        almoCarregarAlertas();
+                        show('scr-almoxarife');
+                        await almoPopularSelects();
+                        await almoRenderPecas();
+                        await almoCarregarAlertas();
                         iniciarRealtime();
                         return;
                     }
@@ -5016,9 +5019,12 @@
                     document.getElementById('forn-name-screen').innerText = '🏢 ' + forn.empresa;
                     await registrarAuditoria('Login Fornecedor: ' + forn.empresa);
                     loading(false);
-                    show('scr-fornecedor');
+                    // Salvar sessão
                     try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
-                    Promise.all([carregarServicosForn(), carregarAlertasRevisaoFornecedor(), carregarOrcForn()]).catch(()=>{});
+                    show('scr-fornecedor');
+                    await carregarLogoFornecedor();
+                    await carregarServicosForn();
+                    await carregarAlertasRevisaoFornecedor();
                     iniciarRealtime();
                     setTimeout(inicializarChat, 1000);
                     return;
@@ -5478,7 +5484,7 @@
             if (error) { loading(false); alert('Erro: ' + error.message); return; }
 
             if (user && pass) {
-                await db.from(TBL.fornUsers).insert({ user_login: user, senha: pass, empresa: nome, tipo });
+                await db.from(TBL.fornUsers).insert({ user_login: user, senha: pass, empresa: nome, tipo, base_id: _baseId() });
             }
 
             // Salvar logo: buscar o id pelo nome recem inserido
@@ -5547,7 +5553,7 @@
             const { data: exists } = await db.from(TBL.colaboradores).select('id').ilike('user_login', user);
             if (exists?.length) { loading(false); alert('Login já em uso!'); return; }
 
-            const { error } = await db.from(TBL.colaboradores).insert({ nome, matricula: mat, user_login: user, senha: pass, nfc_id: nfc, perfil });
+            const { error } = await db.from(TBL.colaboradores).insert({ nome, matricula: mat, user_login: user, senha: pass, nfc_id: nfc, perfil, base_id: _baseId() });
             if (error) { loading(false); alert('Erro: ' + error.message); return; }
 
             ['c-nome', 'c-mat', 'c-user', 'c-pass', 'c-nfc'].forEach(id => document.getElementById(id).value = '');
@@ -5592,7 +5598,7 @@
             if (!placa) { alert('Informe a placa do veículo!'); return; }
 
             loading(true, 'Salvando...');
-            const { error } = await db.from(TBL.veiculos).insert({ placa, modelo, ano, km_atual: kmAtual, km_proxima_revisao: kmRev, tipo });
+            const { error } = await db.from(TBL.veiculos).insert({ placa, modelo, ano, km_atual: kmAtual, km_proxima_revisao: kmRev, tipo, base_id: _baseId() });
             if (error) { loading(false); alert('Erro: ' + error.message + (error.code === '23505' ? ' (Placa já cadastrada)' : '')); return; }
 
             ['v-placa', 'v-modelo', 'v-ano', 'v-km-atual', 'v-km-revisao'].forEach(id => document.getElementById(id).value = '');
@@ -6042,20 +6048,7 @@
         // ═══════════════════════════════════════════════════
         // FORNECEDOR — ORÇAMENTOS
         // ═══════════════════════════════════════════════════
-        async function carregarLogoFornecedor() {
-            try {
-                const { data: wl } = await db.from(TBL.config).select('valor')
-                    .eq('chave', `whitelabel_forn_${currentUser?.id || 0}`).single();
-                const logo = wl?.valor?.logo;
-                const logoEls = document.querySelectorAll('.forn-logo-img');
-                logoEls.forEach(el => {
-                    if (logo) { el.src = logo; el.style.display = 'block'; }
-                    else el.style.display = 'none';
-                });
-            } catch(_) {}
-        }
-
-                async function carregarOrcForn() {
+        async function carregarOrcForn() {
             const cont = document.getElementById('list-orc-forn');
             if (!cont || !currentUser) return;
             cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:12px;">Carregando...</p>';
@@ -6119,7 +6112,7 @@
                 if (!orc) throw new Error('Orçamento não encontrado');
                 // Criar NF no banco
                 const { data: nfCriada, error } = await db.from('notas_fiscais').insert({
-                    orcamento_id: orcId, fornecedor: currentUser.empresa, base_id: currentUser?.base_id || fornBaseId || null,
+                    orcamento_id: orcId, fornecedor: currentUser.empresa,
                     placa: orc.placa, valor: orc.total,
                     descricao: `Serviços conforme orçamento #${orcId} — ${orc.placa} `,
                     base_id: orc.base_id, status: 'emitida',
@@ -6489,7 +6482,8 @@
                 await db.from(TBL.avaliacoes).insert({
                     id_prog: statusPendente.id,
                     rating: statusPendente.rating,
-                    data_aval: new Date().toISOString().split('T')[0]
+                    data_aval: new Date().toISOString().split('T')[0],
+                    base_id: _baseId()
                 });
             }
 
@@ -6534,6 +6528,7 @@
                 placa,
                 litros: parseFloat(litros),
                 valor: parseFloat(valor),
+                base_id: _baseId(),
                 km: parseInt(km),
                 comprovante: abastecimentoFoto
             });
@@ -6597,7 +6592,7 @@
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('E-mail inválido!'); return; }
 
             loading(true, 'Salvando...');
-            const { error } = await db.from(TBL.emails).insert({ email, nome });
+            const { error } = await db.from(TBL.emails).insert({ email, nome, base_id: _baseId() });
             if (error) { loading(false); alert(error.code === '23505' ? 'E-mail já cadastrado!' : 'Erro: ' + error.message); return; }
 
             document.getElementById('email-destinatario').value = '';
@@ -6633,7 +6628,8 @@
                 await db.from(TBL.auditoria).insert({
                     data_hora: new Date().toLocaleString('pt-BR'),
                     acao,
-                    usuario: currentUser?.nome || '—'
+                    usuario: currentUser?.nome || '—',
+                    base_id: _baseId()
                 });
             } catch (_) { }
         }
@@ -9275,19 +9271,14 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
         // SISTEMA CHEFÃO — VISÃO MULTI-BASE
         // ═══════════════════════════════════════════════════
 
-        async function carregarChefao() {
-            await _entrarChefaoConteudo();
-        }
-
         async function _entrarChefao() {
             document.getElementById('chefao-user-label').textContent = `Bem-vindo, ${currentUser.nome} — Visão Multi-Base`;
-            // Inicializa data do monitor com hoje
             const hoje = new Date().toISOString().split('T')[0];
             const monDate = document.getElementById('chf-mon-date');
             if (monDate) monDate.value = hoje;
             loading(false);
+            try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
             show('scr-chefao');
-                try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
             await chefaoCarregarMetricas();
             await chefaoCarregarVisaoGeral();
             await chefaoPopularSelects();
@@ -9310,6 +9301,11 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 'minha-conta': () => { }
             };
             if (loaders[id]) loaders[id]();
+            // Atualizar tela na sessão
+            try {
+                const raw = sessionStorage.getItem('ogait_sessao_v1');
+                if (raw) { const s = JSON.parse(raw); s.tela = 'scr-admin'; sessionStorage.setItem('ogait_sessao_v1', JSON.stringify(s)); }
+            } catch(_) {}
         }
 
         async function chefaoPopularSelects() {
@@ -9896,6 +9892,11 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 'auditoria-global': masterCarregarAuditoria
             };
             if (loaders[id]) loaders[id]();
+            // Atualizar tela na sessão
+            try {
+                const raw = sessionStorage.getItem('ogait_sessao_v1');
+                if (raw) { const s = JSON.parse(raw); s.tela = 'scr-admin'; sessionStorage.setItem('ogait_sessao_v1', JSON.stringify(s)); }
+            } catch(_) {}
         }
 
 
@@ -10017,6 +10018,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             show('scr-master');
             await masterCarregarMetricas();
             await masterCarregarVisaoGeral();
+            try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch(_) {}
             await registrarAuditoria('Login MASTER');
             iniciarRealtime();
         }
