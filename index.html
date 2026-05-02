@@ -4310,7 +4310,97 @@
             await carregarPermissoesCache();
 
             toggleFornDiv();
+
+            // ── RESTAURAR SESSÃO (F5) ──────────────────────────────
+            try {
+                const raw = sessionStorage.getItem('ogait_sessao_v1');
+                if (raw) {
+                    const { user } = JSON.parse(raw);
+                    if (user?.nome) {
+                        loading(true, 'Restaurando sessão...');
+                        currentUser = user;
+                        // Verificar se usuário ainda existe no banco
+                        let valido = false;
+                        if (user.role === 'master') {
+                            valido = true;
+                        } else if (user.role === 'fornecedor') {
+                            const { data: fu } = await db.from(TBL.fornUsers).select('id').eq('user_login', user.user_login).single();
+                            valido = !!fu;
+                        } else {
+                            const { data: cu } = await db.from(TBL.colaboradores).select('id').eq('user_login', user.user_login).single();
+                            valido = !!cu;
+                        }
+                        if (!valido) {
+                            sessionStorage.removeItem('ogait_sessao_v1');
+                            currentUser = null;
+                            loading(false);
+                            return;
+                        }
+                        loading(false);
+                        // Re-executar fluxo pós-login baseado no perfil
+                        await _restaurarPosLogin(user);
+                        return;
+                    }
+                }
+            } catch(_) { sessionStorage.removeItem('ogait_sessao_v1'); }
         };
+
+        async function _restaurarPosLogin(user) {
+            const perfil = user.role || user.perfil;
+            const hoje = new Date().toISOString().split('T')[0];
+            if (perfil === 'master') {
+                show('scr-master'); return;
+            }
+            if (perfil === 'fornecedor') {
+                show('scr-fornecedor');
+                document.getElementById('forn-nome-empresa').textContent = user.empresa || user.nome;
+                document.getElementById('forn-tipo-empresa').textContent = user.tipo || '';
+                document.getElementById('forn-status-badge').textContent = '● ONLINE';
+                await carregarLogoFornecedor();
+                await carregarOrcForn();
+                iniciarRealtime();
+                return;
+            }
+            if (perfil === 'motorista') {
+                document.getElementById('motorista-user-label').textContent = 'Motorista: ' + user.nome;
+                show('scr-motorista');
+                await ckPopularVeiculos(); ckRenderItens();
+                document.getElementById('ck-hist-date').value = hoje;
+                await carregarHistoricoMotorista();
+                iniciarRealtime();
+                atualizarUIGPS('inativo','GPS: Clique em "Ativar GPS" para iniciar',null);
+                return;
+            }
+            if (perfil === 'almoxarife') {
+                document.getElementById('almo-user-label').textContent = '🗃️ ' + user.nome + ' — Almoxarife';
+                show('scr-almoxarife');
+                await almoPopularSelects(); await almoRenderPecas(); await almoCarregarAlertas();
+                iniciarRealtime();
+                return;
+            }
+            if (perfil === 'programador') {
+                document.getElementById('prog-user-label').textContent = 'Usuário: ' + user.nome;
+                show('scr-programador');
+                await Promise.all([popularSeletorVeiculos(), popularSeletorFornecedores()]);
+                toggleFornDiv();
+                await carregarProgGeral();
+                iniciarRealtime();
+                return;
+            }
+            if (perfil === 'chefao') {
+                show('scr-chefao'); await carregarChefao(); iniciarRealtime(); return;
+            }
+            // admin / supervisor
+            const baseLabel = user.base_nome || user.base_id || '';
+            document.getElementById('admin-user-label').textContent =
+                `Bem-vindo, ${user.nome} · ${baseLabel} — ${baseLabel}`;
+            if (document.getElementById('base-badge-nome'))
+                document.getElementById('base-badge-nome').textContent = '🏭 ' + (user.base_nome || 'Base');
+            show('scr-admin');
+            await Promise.all([atualizarDashboard(), carregarProgAdmin(), popularSeletorVeiculos(), popularSeletorFornecedores()]);
+            iniciarRealtime();
+            setTimeout(inicializarChat, 1000);
+        }
 
         // ─────────────────────────────────────────────
         // REALTIME — inscrição após login
@@ -4380,6 +4470,11 @@
                 config: () => { }
             };
             if (loaders[id]) loaders[id]();
+            // Atualizar tela na sessão
+            try {
+                const raw = sessionStorage.getItem('ogait_sessao_v1');
+                if (raw) { const s = JSON.parse(raw); s.tela = 'scr-admin'; sessionStorage.setItem('ogait_sessao_v1', JSON.stringify(s)); }
+            } catch(_) {}
         }
 
         // ─────────────────────────────────────────────
@@ -4767,6 +4862,16 @@
             await carregarAlertasEstoque('almo-list-alertas');
         }
         // ── Fim módulo estoque ───────────────────────────────────
+        function _telaAtual() {
+            const screens = ['scr-admin','scr-programador','scr-almoxarife','scr-fornecedor',
+                             'scr-motorista','scr-chefao','scr-master','scr-supervisor'];
+            for (const s of screens) {
+                const el = document.getElementById(s);
+                if (el && !el.classList.contains('hidden')) return s;
+            }
+            return 'scr-login';
+        }
+
         async function handleLogin() {
             const uRaw = DOMPurify.sanitize(document.getElementById('user').value.trim());
             const u = uRaw.toUpperCase(); // só usado para checar MASTER e ADMIN
@@ -4924,6 +5029,8 @@
                 renderPermissoes()
             ]);
             await registrarAuditoria('Login: ' + (currentUser?.nome || 'ADMIN') + ' | Base: ' + baseLabel);
+            // Persistir sessão para F5
+            try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser, tela: _telaAtual() })); } catch(_) {}
             iniciarRealtime();
             setTimeout(inicializarChat, 1000);
             setTimeout(verificarNotificacoesPendentes, 2000);
@@ -4961,6 +5068,7 @@
         async function handleLogout() {
             pararRealtime();
             currentUser = null;
+            try { sessionStorage.removeItem('ogait_sessao_v1'); } catch(_) {}
             tempFotos = []; tempEvidencias = []; abastecimentoFoto = null;
             show('scr-login');
             document.getElementById('user').value = '';
@@ -9140,6 +9248,11 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 'minha-conta': () => { }
             };
             if (loaders[id]) loaders[id]();
+            // Atualizar tela na sessão
+            try {
+                const raw = sessionStorage.getItem('ogait_sessao_v1');
+                if (raw) { const s = JSON.parse(raw); s.tela = 'scr-admin'; sessionStorage.setItem('ogait_sessao_v1', JSON.stringify(s)); }
+            } catch(_) {}
         }
 
         async function chefaoPopularSelects() {
@@ -9726,6 +9839,11 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 'auditoria-global': masterCarregarAuditoria
             };
             if (loaders[id]) loaders[id]();
+            // Atualizar tela na sessão
+            try {
+                const raw = sessionStorage.getItem('ogait_sessao_v1');
+                if (raw) { const s = JSON.parse(raw); s.tela = 'scr-admin'; sessionStorage.setItem('ogait_sessao_v1', JSON.stringify(s)); }
+            } catch(_) {}
         }
 
 
