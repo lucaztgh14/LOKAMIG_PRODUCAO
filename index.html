@@ -2535,6 +2535,8 @@
             <div class="form-section">
                 <h4 style="margin-bottom:10px;color:var(--info);">➕ Novo Fornecedor</h4>
                 <input type="text" id="f-nome" placeholder="Nome da empresa">
+                <input type="text" id="f-cnpj" placeholder="CNPJ (opcional — 14 dígitos)" maxlength="18"
+                    oninput="this.value=this.value.replace(/[^\d.\-\/]/g,'')">
                 <input type="text" id="f-user" placeholder="Login de acesso">
                 <input type="password" id="f-pass" placeholder="Senha">
                 <select id="f-tipo">
@@ -5431,6 +5433,16 @@
         // ─────────────────────────────────────────────
         // FORNECEDORES (ADMIN)
         // ─────────────────────────────────────────────
+        function _somenteDigitosCNPJ(s) {
+            return String(s || '').replace(/\D/g, '');
+        }
+
+        function _formatarCNPJExibicao(s) {
+            const d = _somenteDigitosCNPJ(s);
+            if (d.length !== 14) return d || '';
+            return d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        }
+
         async function renderListaForn() {
             const [{ data: items }, { data: users }] = await Promise.all([
                 _filtrarBase(db.from(TBL.fornecedores).select('*')),
@@ -5461,6 +5473,7 @@
                             <span style="font-size:10px;color:var(--gray);margin-left:6px;">${it.tipo || ''}</span>
                             <div style="font-size:11px;margin-top:2px;">
                                 ${user ? `<span style="color:var(--gray);">Login: <b>${user.user_login}</b></span>` : '<span style="color:var(--warning);">⚠️ Sem login</span>'}
+                                ${it.cnpj ? `<div style="font-size:10px;color:var(--gray);margin-top:2px;">CNPJ: ${_formatarCNPJExibicao(it.cnpj)}</div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -5518,11 +5531,19 @@
             const user = document.getElementById('f-user').value.trim();
             const pass = document.getElementById('f-pass').value.trim();
             const tipo = document.getElementById('f-tipo').value;
+            const cnpjDig = _somenteDigitosCNPJ(document.getElementById('f-cnpj')?.value || '');
             if (!nome) { alert('Informe o nome da empresa!'); return; }
+            if (cnpjDig && cnpjDig.length !== 14) { alert('CNPJ deve ter exatamente 14 dígitos ou deixe o campo em branco.'); return; }
 
             loading(true, 'Salvando...');
-            const { error } = await db.from(TBL.fornecedores).insert({ nome, tipo, base_id: _baseId() });
-            if (error) { loading(false); alert('Erro: ' + error.message); return; }
+            const { error } = await db.from(TBL.fornecedores).insert({ nome, tipo, cnpj: cnpjDig || null, base_id: _baseId() });
+            if (error) {
+                loading(false);
+                if (String(error.message || '').includes('cnpj') || error.code === '42703') {
+                    alert('Erro: a coluna CNPJ ainda não existe na tabela fornecedores.\n\nExecute no Supabase (SQL Editor):\nALTER TABLE fornecedores ADD COLUMN IF NOT EXISTS cnpj text;');
+                } else { alert('Erro: ' + error.message); }
+                return;
+            }
 
             if (user && pass) {
                 await db.from(TBL.fornUsers).insert({ user_login: user, senha: pass, empresa: nome, tipo, base_id: _baseId() });
@@ -5541,7 +5562,7 @@
             }
 
             // Limpar form
-            ['f-nome', 'f-user', 'f-pass'].forEach(id => document.getElementById(id).value = '');
+            ['f-nome', 'f-cnpj', 'f-user', 'f-pass'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             limparNovaLogoForn();
             await popularSeletorFornecedores();
             await renderListaForn();
@@ -6338,15 +6359,19 @@
             const W = 210, M = 15;
             const num = String(nf.id || 0).padStart(6, '0');
             const dataEmissao = nf.emitida_em ? new Date(nf.emitida_em).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+            const nomeEmit = nf.fornecedor || currentUser?.empresa || '—';
+            const dadosForn = await buscarDadosFornecedorPdf(nomeEmit, nf.base_id || orc?.base_id || currentUser?.base_id);
 
             // Fundo header
             doc.setFillColor(2, 12, 27);
             doc.rect(0, 0, W, 45, 'F');
 
-            // Logo (se disponível)
-            const logoUrl = typeof LOGO_URL !== 'undefined' ? LOGO_URL : null;
+            // Logo do fornecedor (se cadastrada em config_sistema); senão fica sem imagem no canto
+            const logoUrl = dadosForn.logo;
             if (logoUrl && logoUrl.startsWith('data:')) {
-                try { doc.addImage(logoUrl, 'PNG', M, 5, 28, 28); } catch (_) { }
+                try { doc.addImage(logoUrl, 'PNG', M, 5, 28, 28); } catch (_) {
+                    try { doc.addImage(logoUrl, 'JPEG', M, 5, 28, 28); } catch (__) { }
+                }
             }
 
             // Nome empresa
@@ -6381,7 +6406,7 @@
 
             // Box EMITENTE
             doc.setFillColor(12, 25, 41);
-            doc.roundedRect(M, y, (W - M * 2) / 2 - 3, 32, 3, 3, 'F');
+            doc.roundedRect(M, y, (W - M * 2) / 2 - 3, 36, 3, 3, 'F');
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(8);
             doc.setTextColor(56, 189, 248);
@@ -6389,15 +6414,20 @@
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(226, 232, 240);
             doc.setFontSize(10);
-            doc.text(nf.fornecedor || currentUser?.empresa || '—', M + 4, y + 15);
+            doc.text(nomeEmit, M + 4, y + 15);
             doc.setFontSize(8);
             doc.setTextColor(148, 163, 184);
-            doc.text('Prestador de Serviços Automotivos', M + 4, y + 21);
+            let yLin = y + 21;
+            if (dadosForn.cnpj) {
+                doc.text('CNPJ: ' + dadosForn.cnpj, M + 4, yLin);
+                yLin += 5;
+            }
+            doc.text('Prestador de Serviços Automotivos', M + 4, yLin);
 
             // Box TOMADOR
             const x2 = M + (W - M * 2) / 2 + 3;
             doc.setFillColor(12, 25, 41);
-            doc.roundedRect(x2, y, (W - M * 2) / 2 - 3, 32, 3, 3, 'F');
+            doc.roundedRect(x2, y, (W - M * 2) / 2 - 3, 36, 3, 3, 'F');
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(8);
             doc.setTextColor(56, 189, 248);
@@ -6410,7 +6440,7 @@
             doc.setTextColor(148, 163, 184);
             doc.text(`Base: ${currentUser?.base_id || 4} `, x2 + 4, y + 21);
 
-            y += 40;
+            y += 44;
 
             // Dados do veículo
             doc.setFillColor(3, 105, 161);
@@ -7101,7 +7131,7 @@
             ]);
             const totalComb = (comb || []).reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
             const totalOrcs = (orcs || []).reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
-            montarCabecalhoPDF('RELATÓRIO FINANCEIRO GERAL');
+            await montarCabecalhoPDF('RELATÓRIO FINANCEIRO GERAL');
             document.getElementById('pdf-body').innerHTML = `
                 <h3 style="color:#0369a1;margin-bottom:10px;"> Resumo Financeiro</h3>
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
@@ -7254,7 +7284,7 @@
                 }
 
                 if (formato === 'pdf') {
-                    montarCabecalhoPDF(`RELATÓRIO MENSAL — ${nomBase.toUpperCase()} — ${nomeMes.toUpperCase()}/${ano}`);
+                    await montarCabecalhoPDF(`RELATÓRIO MENSAL — ${nomBase.toUpperCase()} — ${nomeMes.toUpperCase()}/${ano}`);
                     document.getElementById('pdf-body').innerHTML = `
                     <div style="margin-bottom:16px;">
                         <h3 style="color:#0369a1;margin-bottom:10px;">📊 Resumo do Período</h3>
@@ -7327,21 +7357,55 @@
             return _logoBase64;
         }
 
-        async function montarCabecalhoPDF(titulo, subtitulo) {
+        async function buscarDadosFornecedorPdf(nomeEmpresa, baseIdPreferido) {
+            const out = { logo: null, cnpj: '' };
+            if (!nomeEmpresa || !String(nomeEmpresa).trim()) return out;
+            try {
+                const nome = String(nomeEmpresa).trim();
+                const bid = baseIdPreferido != null && baseIdPreferido !== '' ? Number(baseIdPreferido) : null;
+                let q = db.from(TBL.fornecedores).select('id,cnpj').eq('nome', nome);
+                if (bid != null && !Number.isNaN(bid)) q = q.eq('base_id', bid);
+                let { data: forn } = await q.maybeSingle();
+                if (!forn?.id) {
+                    const { data: lista } = await db.from(TBL.fornecedores).select('id,cnpj').eq('nome', nome).limit(1);
+                    forn = lista?.[0] || null;
+                }
+                if (!forn?.id) return out;
+                if (forn.cnpj) out.cnpj = _formatarCNPJExibicao(forn.cnpj);
+                const { data: wl } = await db.from('config_sistema').select('valor').eq('chave', `whitelabel_forn_${forn.id}`).maybeSingle();
+                const logo = wl?.valor?.logo;
+                if (logo && String(logo).startsWith('data:')) out.logo = logo;
+            } catch (_) { }
+            return out;
+        }
+
+        async function montarCabecalhoPDF(titulo, subtitulo, opcoes) {
+            const opt = opcoes || {};
             document.getElementById('pdf-titulo').innerText = titulo;
             document.getElementById('pdf-data-geracao').innerText = subtitulo || `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.1`;
             const logo = document.getElementById('pdf-logo');
-            if (logo) {
-                const b64 = await _carregarLogoBase64();
-                if (b64) {
-                    logo.src = b64;
+            const fallback = document.getElementById('pdf-logo-fallback');
+            if (!logo) return;
+            if (Object.prototype.hasOwnProperty.call(opt, 'logoFornecedor')) {
+                if (fallback) fallback.style.display = 'none';
+                const u = opt.logoFornecedor;
+                if (u && String(u).startsWith('data:')) {
+                    logo.src = u;
                     logo.style.display = 'block';
                 } else {
-                    // Fallback: esconde a tag img e exibe o nome do sistema
+                    logo.removeAttribute('src');
                     logo.style.display = 'none';
-                    const fallback = document.getElementById('pdf-logo-fallback');
-                    if (fallback) fallback.style.display = 'block';
                 }
+                return;
+            }
+            const b64 = await _carregarLogoBase64();
+            if (b64) {
+                logo.src = b64;
+                logo.style.display = 'block';
+                if (fallback) fallback.style.display = 'none';
+            } else {
+                logo.style.display = 'none';
+                if (fallback) fallback.style.display = 'block';
             }
         }
 
@@ -7392,7 +7456,7 @@
             const { data: rows } = await db.from(TBL.prog).select('*').eq('id', id);
             const item = rows?.[0]; if (!item) return;
 
-            montarCabecalhoPDF(`RELATÓRIO DE SERVIÇO — ${item.tipo_op}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.1`);
+            await montarCabecalhoPDF(`RELATÓRIO DE SERVIÇO — ${item.tipo_op}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | v6.1`);
             document.getElementById('pdf-body').innerHTML = `
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;">Campo</th><th style="padding:8px;text-align:left;">Valor</th></tr>
@@ -7425,11 +7489,13 @@
                 try { o.itens = typeof o.itens === 'string' ? JSON.parse(o.itens) : (o.itens || []); } catch (_) { o.itens = []; }
             }
             if (!o) return;
-            montarCabecalhoPDF(`ORÇAMENTO — ${o.placa}`, `Gerado em: ${new Date().toLocaleString('pt-BR')}`);
+            const dadosForn = await buscarDadosFornecedorPdf(o.empresa, o.base_id);
+            await montarCabecalhoPDF(`ORÇAMENTO — ${o.placa}`, `Gerado em: ${new Date().toLocaleString('pt-BR')}`, { logoFornecedor: dadosForn.logo });
             document.getElementById('pdf-body').innerHTML = `
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <tr style="background:#f5f5f5;"><th style="padding:8px;text-align:left;" colspan="2">Informações do Orçamento</th></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Empresa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.empresa}</td></tr>
+        ${dadosForn.cnpj ? `<tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>CNPJ</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${dadosForn.cnpj}</td></tr>` : ''}
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Placa</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.placa}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Data</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.timestamp}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;"><b>Status</b></td><td style="padding:8px;border-bottom:1px solid #eee;">${o.status}</td></tr>
@@ -7462,7 +7528,7 @@
                 porPlaca[a.placa].count++;
             });
 
-            montarCabecalhoPDF(`RELATÓRIO DE COMBUSTÍVEL — ${nomeMes.toUpperCase()}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | O.G.A.I.T. v7.2`);
+            await montarCabecalhoPDF(`RELATÓRIO DE COMBUSTÍVEL — ${nomeMes.toUpperCase()}`, `Gerado em: ${new Date().toLocaleString('pt-BR')} | O.G.A.I.T. v7.2`);
             document.getElementById('pdf-body').innerHTML = `
     <div style="background:#fef9e7;border:1px solid #f39c12;border-radius:8px;padding:12px;margin-bottom:16px;">
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
@@ -9401,7 +9467,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             loading(true, 'Gerando manual...');
             const perfil = currentUser?.perfil || currentUser?.role || 'admin';
             const nomeBase = document.getElementById('base-badge-nome')?.textContent || 'O.G.A.I.T.';
-            montarCabecalhoPDF('MANUAL DO USUÁRIO — ' + nomeBase.toUpperCase());
+            await montarCabecalhoPDF('MANUAL DO USUÁRIO — ' + nomeBase.toUpperCase());
             const secoes = _getSecoesManuais(perfil);
             document.getElementById('pdf-body').innerHTML = secoes;
             document.getElementById('pdf-photos').innerHTML = '';
@@ -10091,7 +10157,7 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 // Veículo mais usado
                 const vCont = {}; (servicos || []).forEach(s => { if (s.placa) vCont[s.placa] = (vCont[s.placa] || 0) + 1; });
                 const topVeic = Object.entries(vCont).sort((a, b) => b[1] - a[1])[0];
-                montarCabecalhoPDF(`RELATÓRIO EXECUTIVO — ${nomBase.toUpperCase()} — ${mesesNomes[mes].toUpperCase()}/${ano}`);
+                await montarCabecalhoPDF(`RELATÓRIO EXECUTIVO — ${nomBase.toUpperCase()} — ${mesesNomes[mes].toUpperCase()}/${ano}`);
                 document.getElementById('pdf-body').innerHTML = `
                     <div style="background:#e8f4fd;border-left:5px solid #0369a1;padding:12px 16px;border-radius:4px;margin-bottom:20px;">
                         <b style="color:#0369a1;font-size:14px;">O.G.A.I.T. Systems — Relatório Executivo Mensal</b>
