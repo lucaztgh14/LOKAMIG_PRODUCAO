@@ -2049,13 +2049,22 @@
                 <input type="text" id="mst-user-nome" placeholder="Nome completo">
                 <input type="text" id="mst-user-login" placeholder="Login de acesso">
                 <input type="password" id="mst-user-pass" placeholder="Senha">
-                <select id="mst-user-perfil">
+                <select id="mst-user-perfil" onchange="masterToggleNfcMotorista()">
                     <option value="chefao">🏆 Chefão (visão multi-base)</option>
                     <option value="admin">Admin de Base</option>
                     <option value="programador">Programador</option>
                     <option value="supervisor">Supervisor</option>
                     <option value="motorista">Motorista</option>
                 </select>
+                <div id="mst-user-nfc-wrap" style="display:none;margin-bottom:8px;">
+                    <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:6px;">📳 NFC do
+                        motorista</label>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+                        <button type="button" onclick="masterLerNfcTag()" class="btn-info"
+                            style="margin:0;padding:8px 14px;font-size:11px;">Ler crachá NFC</button>
+                    </div>
+                    <input type="text" id="mst-user-nfc" placeholder="ID do crachá (opcional — login por NFC)">
+                </div>
                 <button onclick="masterCriarUsuario()" class="btn-purple">👤 Criar Usuário</button>
             </div>
             <div style="margin-bottom:10px;">
@@ -2196,6 +2205,19 @@
                     style="width:100%;padding:14px 16px 14px 44px;background:rgba(255,255,255,0.04);border:1px solid rgba(56,189,248,0.18);border-radius:12px;color:#e2e8f0;font-size:14px;outline:none;font-family:'Montserrat',sans-serif;transition:all .25s;"
                     onfocus="this.style.borderColor='rgba(56,189,248,0.6)';this.style.background='rgba(56,189,248,0.06)';this.style.boxShadow='0 0 0 3px rgba(56,189,248,0.12)'"
                     onblur="this.style.borderColor='rgba(56,189,248,0.18)';this.style.background='rgba(255,255,255,0.04)';this.style.boxShadow='none'">
+            </div>
+            <div style="margin:18px 0 14px;text-align:center;">
+                <div
+                    style="height:1px;background:linear-gradient(90deg,transparent,rgba(56,189,248,0.35),transparent);margin-bottom:12px;">
+                </div>
+                <div style="font-size:10px;letter-spacing:2px;color:rgba(148,163,184,0.95);margin-bottom:8px;">MOTORISTA
+                </div>
+                <button type="button" onclick="handleLoginNFCMotorista()"
+                    style="width:100%;padding:12px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.45);border-radius:12px;color:#6ee7b7;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">
+                    📳 Entrar com crachá NFC
+                </button>
+                <p style="font-size:9px;color:rgba(148,163,184,0.8);margin-top:8px;line-height:1.35;">Somente motoristas
+                    cadastrados com NFC. Use Chrome no Android, site em HTTPS e permissão de NFC.</p>
             </div>
             <button onclick="handleLogin()"
                 style="width:100%;padding:15px;background:linear-gradient(135deg,#0369a1,#0ea5e9 50%,#38bdf8);background-size:200% auto;border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .35s;box-shadow:0 4px 24px rgba(3,105,161,0.55);position:relative;overflow:hidden;"
@@ -2557,7 +2579,19 @@
                 <input type="text" id="c-nome" placeholder="Nome completo">
                 <input type="text" id="c-user" placeholder="Login de acesso">
                 <input type="password" id="c-pass" placeholder="Senha">
-                <input type="text" id="c-nfc" placeholder="NFC ID (opcional)">
+                <div id="c-nfc-wrap" style="display:none;margin-bottom:8px;">
+                    <label style="font-size:11px;color:var(--gray);display:block;margin-bottom:6px;">📳 NFC do motorista
+                        (login por crachá)</label>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+                        <button type="button" onclick="adminColabLerNfcTag()" class="btn-info"
+                            style="margin:0;padding:8px 14px;font-size:11px;">Ler crachá NFC</button>
+                        <span style="font-size:10px;color:var(--gray);">Chrome · Android · HTTPS</span>
+                    </div>
+                    <input type="text" id="c-nfc" placeholder="ID do crachá (lido automaticamente ou manual)"
+                        style="margin-bottom:6px;">
+                    <p style="font-size:10px;color:var(--gray);margin:0;">Sem este ID, o motorista não entra só com o
+                        crachá na tela de login.</p>
+                </div>
                 <select id="c-perfil" onchange="hintSenhaPadrao(this)">
                     <option value="programador">Programador (acessa tela de lançamentos)</option>
                     <option value="supervisor">Supervisor (admin limitado)</option>
@@ -4380,9 +4414,36 @@
         // ║  Todas as operações filtradas por base_id            ║
         // ╚══════════════════════════════════════════════════════╝
 
+        function colabToggleNfcMotorista() {
+            const perfil = document.getElementById('c-perfil')?.value;
+            const w = document.getElementById('c-nfc-wrap');
+            const nfcIn = document.getElementById('c-nfc');
+            if (!w) return;
+            if (perfil === 'motorista') {
+                w.style.display = '';
+            } else {
+                w.style.display = 'none';
+                if (nfcIn) nfcIn.value = '';
+            }
+        }
+
+        function masterToggleNfcMotorista() {
+            const perfil = document.getElementById('mst-user-perfil')?.value;
+            const w = document.getElementById('mst-user-nfc-wrap');
+            const nfcIn = document.getElementById('mst-user-nfc');
+            if (!w) return;
+            if (perfil === 'motorista') {
+                w.style.display = '';
+            } else {
+                w.style.display = 'none';
+                if (nfcIn) nfcIn.value = '';
+            }
+        }
+
         function hintSenhaPadrao(sel) {
             const hint = document.getElementById('hint-senha-padrao');
             if (hint) hint.style.display = sel.value === 'almoxarife' ? 'block' : 'none';
+            colabToggleNfcMotorista();
         }
 
         // ── ADMIN: Switch sub-tabs do estoque ───────────────────
@@ -4766,6 +4827,136 @@
             return 'scr-login';
         }
 
+        function normalizarIdNFC(v) {
+            if (v == null || v === '') return '';
+            return String(v).trim().replace(/:/g, '').toUpperCase();
+        }
+
+        function nfcWebDisponivel() {
+            return typeof window !== 'undefined' && window.isSecureContext === true && 'NDEFReader' in window;
+        }
+
+        async function lerTagNFC(opts) {
+            const timeoutMs = (opts && opts.timeoutMs) || 65000;
+            if (!nfcWebDisponivel()) {
+                throw new Error('Leitura NFC não disponível neste aparelho/navegador. Use Google Chrome no Android com HTTPS, ou preencha o ID do crachá manualmente no cadastro.');
+            }
+            const ndef = new NDEFReader();
+            return new Promise((resolve, reject) => {
+                let settled = false;
+                const finish = (err, val) => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    try { ndef.removeEventListener('reading', onReading); } catch (_) { }
+                    if (err) reject(err);
+                    else resolve(val);
+                };
+                const timer = setTimeout(() => finish(new Error('Tempo esgotado. Aproxime o crachá na parte traseira do celular e tente de novo.')), timeoutMs);
+                const onReading = (ev) => {
+                    let id = normalizarIdNFC(ev.serialNumber || '');
+                    if (!id && ev.message && ev.message.records && ev.message.records.length) {
+                        for (const rec of ev.message.records) {
+                            try {
+                                if (rec.recordType === 'text') {
+                                    const t = new TextDecoder(rec.encoding || 'utf-8').decode(rec.data);
+                                    id = normalizarIdNFC(t);
+                                    if (id) break;
+                                }
+                                if (rec.recordType === 'url') {
+                                    const t = new TextDecoder().decode(rec.data);
+                                    id = normalizarIdNFC(t.replace(/^https?:\/\//i, ''));
+                                    if (id) break;
+                                }
+                            } catch (_) { }
+                        }
+                    }
+                    if (!id) {
+                        finish(new Error('Não foi possível ler um ID desta tag. Tente outra tag ou cadastre o ID manualmente.'));
+                        return;
+                    }
+                    finish(null, id);
+                };
+                ndef.addEventListener('reading', onReading);
+                ndef.scan().catch(err => finish(err));
+            });
+        }
+
+        async function _entrarMotoristaPosLogin() {
+            document.getElementById('motorista-user-label').textContent = 'Motorista: ' + currentUser.nome;
+            loading(false);
+            try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch (_) { }
+            show('scr-motorista');
+            await ckPopularVeiculos();
+            ckRenderItens();
+            const hoje = new Date().toISOString().split('T')[0];
+            const hist = document.getElementById('ck-hist-date');
+            if (hist) hist.value = hoje;
+            await carregarHistoricoMotorista();
+            iniciarRealtime();
+            atualizarUIGPS('inativo', 'GPS: Clique em "Ativar GPS" para iniciar o rastreamento', null);
+        }
+
+        async function handleLoginNFCMotorista() {
+            loading(true, 'Aproxime o crachá ao celular…');
+            try {
+                const tagId = await lerTagNFC({ timeoutMs: 65000 });
+                if (!tagId) { loading(false); alert('Tag sem ID legível.'); return; }
+                const { data: lista, error } = await db.from(TBL.colaboradores).select('*').eq('perfil', 'motorista');
+                if (error) throw error;
+                const colab = (lista || []).find(c => normalizarIdNFC(c.nfc_id || '') === tagId);
+                if (!colab) {
+                    loading(false);
+                    alert('Crachá não cadastrado ou não é motorista. O administrador precisa vincular este NFC no cadastro do motorista (Equipe).');
+                    return;
+                }
+                currentUser = { ...colab, nome: colab.nome, role: colab.perfil };
+                await registrarAuditoria('Login NFC motorista: ' + colab.nome);
+                await _entrarMotoristaPosLogin();
+            } catch (e) {
+                loading(false);
+                alert(e && e.message ? e.message : String(e));
+            }
+        }
+
+        async function adminColabLerNfcTag() {
+            const perfil = document.getElementById('c-perfil')?.value;
+            if (perfil !== 'motorista') { alert('NFC é usado apenas para o perfil Motorista.'); return; }
+            if (!nfcWebDisponivel()) {
+                alert('Leitura NFC não disponível neste dispositivo. Digite o ID do crachá no campo abaixo.');
+                return;
+            }
+            loading(true, 'Aproxime o crachá…');
+            try {
+                const id = await lerTagNFC({ timeoutMs: 65000 });
+                const el = document.getElementById('c-nfc');
+                if (el) el.value = id;
+                loading(false);
+            } catch (e) {
+                loading(false);
+                alert(e && e.message ? e.message : String(e));
+            }
+        }
+
+        async function masterLerNfcTag() {
+            const perfil = document.getElementById('mst-user-perfil')?.value;
+            if (perfil !== 'motorista') { alert('NFC é usado apenas para o perfil Motorista.'); return; }
+            if (!nfcWebDisponivel()) {
+                alert('Leitura NFC não disponível neste dispositivo. Digite o ID do crachá no campo abaixo.');
+                return;
+            }
+            loading(true, 'Aproxime o crachá…');
+            try {
+                const id = await lerTagNFC({ timeoutMs: 65000 });
+                const el = document.getElementById('mst-user-nfc');
+                if (el) el.value = id;
+                loading(false);
+            } catch (e) {
+                loading(false);
+                alert(e && e.message ? e.message : String(e));
+            }
+        }
+
         async function handleLogin() {
             const uRaw = DOMPurify.sanitize(document.getElementById('user').value.trim());
             const u = uRaw.toUpperCase(); // só usado para checar MASTER e ADMIN
@@ -4832,17 +5023,7 @@
                     }
 
                     if (colab.perfil === 'motorista') {
-                        document.getElementById('motorista-user-label').textContent = 'Motorista: ' + colab.nome;
-                        loading(false);
-                        try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch (_) { }
-                        show('scr-motorista');
-                        await ckPopularVeiculos();
-                        ckRenderItens();
-                        const hoje = new Date().toISOString().split('T')[0];
-                        document.getElementById('ck-hist-date').value = hoje;
-                        await carregarHistoricoMotorista();
-                        iniciarRealtime();
-                        atualizarUIGPS('inativo', 'GPS: Clique em "Ativar GPS" para iniciar o rastreamento', null);
+                        await _entrarMotoristaPosLogin();
                         return;
                     }
 
@@ -5399,13 +5580,20 @@
         // ─────────────────────────────────────────────
         // COLABORADORES
         // ─────────────────────────────────────────────
+        async function nfcJaUsadoPorOutro(nfcNorm, excetoId) {
+            if (!nfcNorm) return false;
+            const { data: rows } = await db.from(TBL.colaboradores).select('id,nfc_id').not('nfc_id', 'is', null);
+            return (rows || []).some(r => normalizarIdNFC(r.nfc_id) === nfcNorm && String(r.id) !== String(excetoId || ''));
+        }
+
         async function salvarColab() {
             const nome = document.getElementById('c-nome').value.trim();
             const mat = document.getElementById('c-mat').value.trim();
             const user = document.getElementById('c-user').value.trim();
             let pass = document.getElementById('c-pass').value.trim();
-            const nfc = document.getElementById('c-nfc').value.trim();
             const perfil = document.getElementById('c-perfil').value;
+            const nfcBruto = perfil === 'motorista' ? (document.getElementById('c-nfc')?.value || '').trim() : '';
+            const nfcNorm = perfil === 'motorista' ? normalizarIdNFC(nfcBruto) : '';
             if (perfil === 'almoxarife' && !pass) pass = '1234'; // senha padrão almoxarife
             if (!nome || !mat || !user || !pass) { alert('Preencha Nome, Matrícula, Login e Senha!'); return; }
 
@@ -5413,10 +5601,20 @@
             const { data: exists } = await db.from(TBL.colaboradores).select('id').ilike('user_login', user);
             if (exists?.length) { loading(false); alert('Login já em uso!'); return; }
 
-            const { error } = await db.from(TBL.colaboradores).insert({ nome, matricula: mat, user_login: user, senha: pass, nfc_id: nfc, perfil, base_id: _baseId() });
+            if (nfcNorm && await nfcJaUsadoPorOutro(nfcNorm, null)) {
+                loading(false);
+                alert('Este ID de NFC já está vinculado a outro colaborador. Use outro crachá ou remova o vínculo antigo.');
+                return;
+            }
+
+            const { error } = await db.from(TBL.colaboradores).insert({
+                nome, matricula: mat, user_login: user, senha: pass,
+                nfc_id: nfcNorm || null,
+                perfil, base_id: _baseId()
+            });
             if (error) { loading(false); alert('Erro: ' + error.message); return; }
 
-            ['c-nome', 'c-mat', 'c-user', 'c-pass', 'c-nfc'].forEach(id => document.getElementById(id).value = '');
+            ['c-nome', 'c-mat', 'c-user', 'c-pass', 'c-nfc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             await renderListaColab();
             await registrarAuditoria('Colaborador cadastrado: ' + nome + ' (' + perfil + ')');
             loading(false);
@@ -5429,13 +5627,18 @@
             if (!cont) return;
             if (!items?.length) { cont.innerHTML = '<p style="color:var(--gray);">Nenhum colaborador cadastrado.</p>'; return; }
             cont.innerHTML = items.map(it => `
-        <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="prog-item" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
             <div>
                 <b>${it.nome}</b> <small style="color:var(--gray);">#${it.matricula}</small>
                 <span class="setor-badge" style="background:rgba(139,92,246,.3);color:#c4b5fd;">${it.perfil}</span>
                 <br><small style="color:var(--gray);">Login: ${it.user_login}${it.nfc_id ? ' | NFC: ' + it.nfc_id : ''}</small>
             </div>
-            <button class="btn-danger btn-sm" onclick="excluirColab(${it.id})">✕</button>
+            <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+                ${it.perfil === 'motorista' ? `
+                <button type="button" class="btn-info btn-sm" onclick="adminColabGravarNfcPorLeitura(${it.id})" title="Ler crachá">📳 NFC</button>
+                <button type="button" class="btn-gray btn-sm" onclick="adminColabGravarNfcManual(${it.id})" title="Digitar ou limpar ID">✏️ ID</button>` : ''}
+                <button class="btn-danger btn-sm" onclick="excluirColab(${it.id})">✕</button>
+            </div>
         </div>`).join('');
         }
 
@@ -5443,6 +5646,75 @@
             if (!confirm('Remover este colaborador?')) return;
             await db.from(TBL.colaboradores).delete().eq('id', id);
             await renderListaColab();
+        }
+
+        async function _colabBuscarMotoristaPorId(id) {
+            const { data, error } = await db.from(TBL.colaboradores).select('id,perfil,nome').eq('id', id).maybeSingle();
+            if (error || !data) { alert('Colaborador não encontrado.'); return null; }
+            if (data.perfil !== 'motorista') { alert('NFC só pode ser vinculado a usuários com perfil Motorista.'); return null; }
+            return data;
+        }
+
+        async function colaboradorMotoristaDefinirNfc(id, valorBrutoOuVazio) {
+            const m = await _colabBuscarMotoristaPorId(id);
+            if (!m) return false;
+            const tagId = (valorBrutoOuVazio == null || String(valorBrutoOuVazio).trim() === '')
+                ? null
+                : normalizarIdNFC(String(valorBrutoOuVazio));
+            if (tagId && await nfcJaUsadoPorOutro(tagId, id)) {
+                alert('Este ID de NFC já está vinculado a outro colaborador.');
+                return false;
+            }
+            const { error } = await db.from(TBL.colaboradores).update({ nfc_id: tagId }).eq('id', id);
+            if (error) { alert('Erro: ' + error.message); return false; }
+            await registrarAuditoria('NFC motorista atualizado: ' + m.nome);
+            return true;
+        }
+
+        async function adminColabGravarNfcPorLeitura(id) {
+            if (!nfcWebDisponivel()) { alert('Leitura NFC não disponível neste aparelho. Use o botão ✏️ ID.'); return; }
+            loading(true, 'Aproxime o crachá…');
+            try {
+                const tagId = await lerTagNFC({ timeoutMs: 65000 });
+                const ok = await colaboradorMotoristaDefinirNfc(id, tagId);
+                loading(false);
+                if (ok) { await renderListaColab(); showSuccess('NFC atualizado!'); }
+            } catch (e) {
+                loading(false);
+                alert(e && e.message ? e.message : String(e));
+            }
+        }
+
+        async function adminColabGravarNfcManual(id) {
+            const manual = prompt('ID do crachá NFC para este motorista (deixe em branco para remover o NFC):', '');
+            if (manual === null) return;
+            loading(true, 'Salvando…');
+            const ok = await colaboradorMotoristaDefinirNfc(id, manual);
+            loading(false);
+            if (ok) { await renderListaColab(); showSuccess('NFC atualizado!'); }
+        }
+
+        async function masterColabAtualizarNfcLeitura(id) {
+            if (!nfcWebDisponivel()) { alert('Leitura NFC não disponível neste aparelho. Use ✏️ ID.'); return; }
+            loading(true, 'Aproxime o crachá…');
+            try {
+                const tagId = await lerTagNFC({ timeoutMs: 65000 });
+                const ok = await colaboradorMotoristaDefinirNfc(id, tagId);
+                loading(false);
+                if (ok) { await masterCarregarUsuarios(); showSuccess('NFC atualizado!'); }
+            } catch (e) {
+                loading(false);
+                alert(e && e.message ? e.message : String(e));
+            }
+        }
+
+        async function masterColabAtualizarNfcManual(id) {
+            const manual = prompt('ID do crachá NFC para este motorista (deixe em branco para remover o NFC):', '');
+            if (manual === null) return;
+            loading(true, 'Salvando…');
+            const ok = await colaboradorMotoristaDefinirNfc(id, manual);
+            loading(false);
+            if (ok) { await masterCarregarUsuarios(); showSuccess('NFC atualizado!'); }
         }
 
         // ─────────────────────────────────────────────
@@ -10314,9 +10586,12 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                         <div>
                             <b>${u.nome || u.empresa}</b>
                             <span style="background:${perfilCor[u.tipo] || '#6b7280'};color:#000;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px;font-weight:bold;">${u.tipo}</span>
-                            <div style="font-size:10px;color:var(--gray);">Login: ${u.user_login || '—'} | Base: ${u.baseNome}</div>
+                            <div style="font-size:10px;color:var(--gray);">Login: ${u.user_login || '—'} | Base: ${u.baseNome}${u.origem === 'colaborador' && u.tipo === 'motorista' && u.nfc_id ? ' | NFC: ' + u.nfc_id : ''}</div>
                         </div>
-                        <div style="display:flex;gap:4px;">
+                        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                            ${u.origem === 'colaborador' && u.tipo === 'motorista' ? `
+                            <button type="button" class="btn-info btn-sm" onclick="masterColabAtualizarNfcLeitura(${u.id})" title="Ler crachá">📳</button>
+                            <button type="button" class="btn-gray btn-sm" onclick="masterColabAtualizarNfcManual(${u.id})" title="Digitar ID NFC">✏️</button>` : ''}
                             <button class="btn-warning btn-sm" onclick="masterEditarSenhaUser(${u.id},'${u.origem}','${u.nome || u.empresa}')">🔑</button>
                             <button class="btn-danger btn-sm" onclick="masterExcluirUser(${u.id},'${u.origem}','${u.nome || u.empresa}')">✕</button>
                         </div>
@@ -10330,17 +10605,24 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             const login = document.getElementById('mst-user-login')?.value?.trim();
             const pass = document.getElementById('mst-user-pass')?.value?.trim();
             const perfil = document.getElementById('mst-user-perfil')?.value;
+            const nfcNorm = perfil === 'motorista' ? normalizarIdNFC(document.getElementById('mst-user-nfc')?.value || '') : '';
             if (!nome || !login || !pass) { alert('Preencha nome, login e senha!'); return; }
             loading(true, 'Criando usuário...');
             try {
+                if (nfcNorm && await nfcJaUsadoPorOutro(nfcNorm, null)) {
+                    loading(false);
+                    alert('Este ID de NFC já está vinculado a outro colaborador.');
+                    return;
+                }
                 const { error } = await db.from(TBL.colaboradores).insert({
                     nome, matricula: 'MST-' + Date.now(),
                     user_login: login, senha: pass, perfil,
+                    nfc_id: nfcNorm || null,
                     base_id: baseId ? parseInt(baseId) : null
                 });
                 if (error) throw error;
                 await registrarAuditoria(`Usuário criado pelo Master: ${nome} (${perfil})`);
-                ['mst-user-nome', 'mst-user-login', 'mst-user-pass'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+                ['mst-user-nome', 'mst-user-login', 'mst-user-pass', 'mst-user-nfc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
                 loading(false);
                 showSuccess('USUÁRIO CRIADO!');
                 await masterCarregarUsuarios();
