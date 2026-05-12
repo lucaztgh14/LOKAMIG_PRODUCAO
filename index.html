@@ -2472,7 +2472,6 @@
                 <button class="tab-btn" onclick="switchTab('forn',event)">🏢 Fornecedores</button>
                 <button class="tab-btn" onclick="switchTab('colab',event)">👥 Equipe</button>
                 <button class="tab-btn" onclick="switchTab('veic',event)">🚛 Frota</button>
-                <button class="tab-btn" onclick="switchTab('manutencao',event)">🔧 Manutenções</button>
                 <button class="tab-btn" onclick="switchTab('orcamentos',event)">💰 Orçamentos</button>
                 <button class="tab-btn" onclick="switchTab('combustivel',event)">⛽ Combustível</button>
                 <button class="tab-btn" onclick="switchTab('emails',event)">📧 E-mails</button>
@@ -3239,13 +3238,11 @@
         <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;">
             <button onclick="progSwitchTab('lancamentos',this)" class="tab-btn tab-active" id="prog-tab-lancamentos">📋
                 Lançamentos</button>
-            <button onclick="progSwitchTab('manutencao',this)" class="tab-btn" id="prog-tab-manutencao">🔧
-                Manutenções</button>
             <button onclick="progSwitchTab('historico',this)" class="tab-btn" id="prog-tab-historico">📜
                 Histórico</button>
         </div>
 
-        <!-- Aba Lançamentos -->
+        <!-- Aba Lançamentos (+ revisões na mesma tela) -->
         <div id="prog-area-lancamentos">
             <div class="form-section">
                 <h4 style="color:var(--info);margin-bottom:10px;">Novo Lançamento</h4>
@@ -3284,12 +3281,10 @@
             </div>
             <input type="date" id="p-filter-date" onchange="carregarProgGeral()" style="margin-bottom:10px;">
             <div id="list-prog-geral"></div>
-        </div>
 
-        <!-- Aba Manutenções -->
-        <div id="prog-area-manutencao" style="display:none;">
-            <div class="form-section">
-                <h4 style="margin-bottom:10px;color:var(--info);">🔧 Programar Revisão</h4>
+            <div class="form-section" style="margin-top:16px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px;">
+                <h4 style="margin-bottom:10px;color:var(--info);">🔧 Revisões / manutenções programadas</h4>
+                <p style="font-size:11px;color:var(--gray);margin:0 0 10px 0;">Programação de revisão fica nesta mesma tela, vinculada à frota da base.</p>
                 <select id="pm-veiculo">
                     <option value="">— Selecione o veículo —</option>
                 </select>
@@ -3943,15 +3938,15 @@
         // PERMISSÕES PADRÃO
         // ─────────────────────────────────────────────
         const PERMISSOES_PADRAO = {
-            admin: { monitor: true, history: true, forn: true, colab: true, veic: true, manutencao: true, orcamentos: true, combustivel: true, emails: true, auditoria: true, mapa: true, checklist: true, cnh: true, chat: true, excel: true, bases: true, permissoes: true, config: true },
+            admin: { monitor: true, history: true, forn: true, colab: true, veic: true, manutencao: false, orcamentos: true, combustivel: true, emails: true, auditoria: true, mapa: true, checklist: true, cnh: true, chat: true, excel: true, bases: true, permissoes: true, config: true },
             programador: { monitor: false, history: false, forn: false, colab: false, veic: false, manutencao: false, orcamentos: false, combustivel: false, emails: false, auditoria: false, mapa: false, checklist: false, cnh: false, chat: true, excel: false, bases: false, permissoes: false, config: false },
-            supervisor: { monitor: true, history: true, forn: false, colab: false, veic: true, manutencao: true, orcamentos: true, combustivel: false, emails: true, auditoria: false, mapa: true, checklist: true, cnh: true, chat: true, excel: true, bases: false, permissoes: false, config: false },
+            supervisor: { monitor: true, history: true, forn: false, colab: false, veic: true, manutencao: false, orcamentos: true, combustivel: false, emails: true, auditoria: false, mapa: true, checklist: true, cnh: true, chat: true, excel: true, bases: false, permissoes: false, config: false },
             motorista: { monitor: false, history: false, forn: false, colab: false, veic: false, manutencao: false, orcamentos: false, combustivel: false, emails: false, auditoria: false, mapa: false, checklist: false, cnh: false, chat: false, excel: false, bases: false, permissoes: false, config: false }
         };
 
         const NOMES_TABS = {
             monitor: '📡 Monitor', history: '📋 Histórico', forn: '🏢 Fornecedores',
-            colab: '👥 Equipe', veic: '🚛 Frota', manutencao: '🔧 Manutenções',
+            colab: '👥 Equipe', veic: '🚛 Frota',
             orcamentos: '💰 Orçamentos', combustivel: '⛽ Combustível',
             emails: '📧 E-mails', auditoria: '📝 Auditoria',
             mapa: '🗺️ Mapa', checklist: '✅ Checklists', cnh: '🪪 CNH', chat: '💬 Chat',
@@ -4050,8 +4045,8 @@
             localStorage.setItem(OFFLINE_KEY, JSON.stringify(novaFila));
             if (sincronizados > 0) {
                 showSuccess(`${sincronizados} LANÇAMENTO(S) SINCRONIZADO(S)!`);
-                if (currentUser?.perfil === 'programador') {
-                    try { await carregarProgGeral(); } catch (_) { }
+                if (currentUser?.perfil === 'programador' || currentUser?.role === 'programador') {
+                    try { await Promise.all([carregarProgGeral(), carregarManutencoesProg()]); } catch (_) { }
                 } else if (currentUser?.perfil === 'motorista') {
                     try { await carregarHistoricoMotorista(); } catch (_) { }
                 } else {
@@ -4306,7 +4301,7 @@
                 show('scr-programador');
                 await Promise.all([popularSeletorVeiculos(), popularSeletorFornecedores()]);
                 toggleFornDiv();
-                await carregarProgGeral();
+                await Promise.all([carregarProgGeral(), carregarManutencoesProg()]);
                 iniciarRealtime();
                 return;
             }
@@ -4341,13 +4336,25 @@
                 .on('postgres_changes', { event: '*', schema: 'public', table: TBL.prog }, () => {
                     carregarProgAdmin();
                     atualizarDashboard();
+                    try {
+                        const scrP = document.getElementById('scr-programador');
+                        if (scrP && !scrP.classList.contains('hidden') && (currentUser?.role === 'programador' || currentUser?.perfil === 'programador'))
+                            carregarProgGeral().catch(() => { });
+                        const scrF = document.getElementById('scr-fornecedor');
+                        if (scrF && !scrF.classList.contains('hidden') && currentUser?.role === 'fornecedor')
+                            carregarServicosForn().catch(() => { });
+                    } catch (_) { }
                 })
                 .on('postgres_changes', { event: '*', schema: 'public', table: TBL.orcamentos }, () => {
                     if (!document.getElementById('area-orcamentos').classList.contains('hidden')) renderOrcamentosAdmin();
                 })
                 .on('postgres_changes', { event: '*', schema: 'public', table: TBL.manutencoes }, () => {
-                    if (!document.getElementById('area-manutencao').classList.contains('hidden')) carregarManutencoes();
                     atualizarDashboard();
+                    try {
+                        const scrP = document.getElementById('scr-programador');
+                        if (scrP && !scrP.classList.contains('hidden') && (currentUser?.role === 'programador' || currentUser?.perfil === 'programador'))
+                            carregarManutencoesProg().catch(() => { });
+                    } catch (_) { }
                 })
                 .on('postgres_changes', { event: '*', schema: 'public', table: TBL.combustivel }, () => {
                     if (!document.getElementById('area-combustivel').classList.contains('hidden')) carregarAbastecimentos();
@@ -4377,7 +4384,6 @@
                 forn: renderListaForn,
                 colab: renderListaColab,
                 veic: renderListaVeic,
-                manutencao: carregarManutencoes,
                 orcamentos: renderOrcamentosAdmin,
                 combustivel: carregarAbastecimentos,
                 emails: carregarEmails,
@@ -5018,7 +5024,7 @@
                         show('scr-programador');
                         await Promise.all([popularSeletorVeiculos(), popularSeletorFornecedores()]);
                         toggleFornDiv();
-                        await carregarProgGeral();
+                        await Promise.all([carregarProgGeral(), carregarManutencoesProg()]);
                         iniciarRealtime();
                         setTimeout(inicializarChat, 1000);
                         return;
@@ -5962,7 +5968,12 @@
         }
 
         async function carregarProgGeral() {
-            const dt = document.getElementById('p-filter-date')?.value || '';
+            const elDt = document.getElementById('p-filter-date');
+            let dt = (elDt?.value || '').trim();
+            if (!dt) {
+                dt = new Date().toISOString().split('T')[0];
+                if (elDt) elDt.value = dt;
+            }
             const { data: list } = await _filtrarBase(db.from(TBL.prog).select('*').eq('data_servico', dt).order('id'));
             const cont = document.getElementById('list-prog-geral');
             if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento nesta data.</p>'; return; }
@@ -6068,7 +6079,7 @@
         }
 
         async function cancelarServicoProg(id) {
-            if (!confirm('Cancelar este serviço? O fornecedor será notificado.')) return;
+            if (!confirm('Cancelar este serviço?\n\nO mesmo registro some do painel do fornecedor (evita uso indevido após cancelamento).')) return;
             const ts = new Date().toLocaleString('pt-BR');
             const { error } = await db.from(TBL.prog).update({ status_flow: 'CANCELADO', cancelado_em: ts, cancelado_por: currentUser?.nome }).eq('id', id);
             if (!error) {
@@ -6126,13 +6137,13 @@
         // PROGRAMADOR — TABS
         // ═══════════════════════════════════════════════════
         function progSwitchTab(aba, btn) {
-            ['lancamentos', 'manutencao', 'historico'].forEach(a => {
+            ['lancamentos', 'historico'].forEach(a => {
                 const el = document.getElementById(`prog-area-${a}`);
                 const tb = document.getElementById(`prog-tab-${a}`);
                 if (el) el.style.display = a === aba ? '' : 'none';
                 if (tb) tb.classList.toggle('tab-active', a === aba);
             });
-            if (aba === 'manutencao') carregarManutencoesProg();
+            if (aba === 'lancamentos') carregarManutencoesProg();
             if (aba === 'historico') carregarHistoricoProgReal();
         }
 
