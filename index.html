@@ -1190,6 +1190,24 @@
             opacity: .85;
         }
 
+        /* Modal evidências — sobrepõe a tela atual (não troca de section) */
+        #scr-modal-status {
+            position: fixed;
+            inset: 0;
+            z-index: 8500;
+            display: none !important;
+            pointer-events: none;
+        }
+
+        #scr-modal-status.modal-aberto {
+            display: block !important;
+            pointer-events: auto;
+        }
+
+        #scr-modal-status .modal-overlay {
+            z-index: 8501;
+        }
+
         .mon-resumo-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -3777,7 +3795,7 @@
     </section>
 
     <!-- MODAL: EVIDÊNCIAS DO SERVIÇO (fornecedor / admin / programador) -->
-    <section id="scr-modal-status" class="hidden">
+    <section id="scr-modal-status">
         <div class="modal-overlay" onclick="fecharModalStatus()">
             <div class="modal-content" onclick="event.stopPropagation()" style="max-height:92vh;overflow-y:auto;">
                 <div class="modal-header" id="modal-status-titulo">📸 Evidências do serviço</div>
@@ -4026,6 +4044,30 @@
                 if (f && f.data) return { url: f.data, tipo: f.tipo || 'foto', ts: f.ts || '', endereco: f.endereco || '' };
                 return null;
             }).filter(Boolean);
+        }
+
+        /** Fotos antigas (só URL) viram "antes" se o serviço ainda está pendente */
+        function _evidenciasClassificadas(fotos, statusFlow) {
+            const ev = _parseFotosProg(fotos);
+            if (statusFlow === 'PENDENTE') {
+                return ev.map(e => {
+                    if (!e.tipo || e.tipo === 'foto') return { ...e, tipo: 'antes' };
+                    return e;
+                });
+            }
+            return ev;
+        }
+
+        function abrirOverlayEvidencias() {
+            const el = document.getElementById('scr-modal-status');
+            if (el) el.classList.add('modal-aberto');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharOverlayEvidencias() {
+            const el = document.getElementById('scr-modal-status');
+            if (el) el.classList.remove('modal-aberto');
+            document.body.style.overflow = '';
         }
 
         function _urlEvidencia(ev) {
@@ -6556,8 +6598,12 @@
             _renderListaServicosForn(fornListaDiaCache);
         }
 
-        function fornClicarServico(id) {
-            abrirPainelEvidenciasServico(id, false);
+        async function fornClicarServico(id) {
+            try {
+                await abrirPainelEvidenciasServico(id, false);
+            } catch (e) {
+                alert('Não foi possível abrir o serviço: ' + (e.message || e));
+            }
         }
 
         function _hintCardForn(st) {
@@ -6578,8 +6624,17 @@
             cont.innerHTML = filtrada.map(s => {
                 const stClass = (s.status_flow || '').replace(/ /g, '-');
                 const statusColor = _corStatusFlow(s.status_flow);
-                const temFotos = (s.fotos || []).length > 0;
-                return `<div class="prog-item forn-serv-card status-${stClass}" role="button" tabindex="0"
+                const ev = _evidenciasClassificadas(s.fotos, s.status_flow);
+                const nFotos = ev.length;
+                const btnAcao = s.status_flow === 'PENDENTE'
+                    ? `<button type="button" class="btn-warning btn-sm" style="width:100%;margin-top:10px;padding:12px;font-size:12px;font-weight:700;"
+                        onclick="event.stopPropagation();fornClicarServico(${s.id})">▶ ABRIR — FOTOS ANTES E INICIAR</button>`
+                    : s.status_flow === 'EM EXECUÇÃO'
+                        ? `<button type="button" class="btn-success btn-sm" style="width:100%;margin-top:10px;padding:12px;font-size:12px;font-weight:700;"
+                        onclick="event.stopPropagation();fornClicarServico(${s.id})">✅ ABRIR — FOTOS DEPOIS E CONCLUIR</button>`
+                        : `<button type="button" class="btn-info btn-sm" style="width:100%;margin-top:10px;"
+                        onclick="event.stopPropagation();fornClicarServico(${s.id})">📷 VER EVIDÊNCIAS</button>`;
+                return `<div class="prog-item forn-serv-card status-${stClass}" role="button" tabindex="0" data-servico-id="${s.id}"
                     onclick="fornClicarServico(${s.id})"
                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fornClicarServico(${s.id})}">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;">
@@ -6592,8 +6647,8 @@
                 </div>
                 <div style="font-size:11px;color:#cbd5e1;">KM: ${s.km || '—'} · ${s.timestamp || s.data_servico || ''}</div>
                 ${s.obs ? `<div style="font-size:10px;color:var(--gray);margin-top:6px;line-height:1.4;">📝 ${s.obs}</div>` : ''}
-                ${temFotos ? `<div style="font-size:10px;color:var(--info);margin-top:4px;">📷 ${(s.fotos || []).length} foto(s)</div>` : ''}
-                <div class="forn-card-hint">${_hintCardForn(s.status_flow)}</div>
+                ${nFotos ? `<div style="font-size:10px;color:var(--info);margin-top:4px;">📷 ${nFotos} evidência(s)</div>` : ''}
+                ${btnAcao}
             </div>`;
             }).join('');
         }
@@ -7190,11 +7245,11 @@
             const files = Array.from(input.files || []);
             if (!files.length) return;
             const geoEl = document.getElementById('evid-geo-status');
-            if (geoEl) geoEl.textContent = '📍 Obtendo localização e endereço...';
-            const geo = await _capturarGeoEndereco();
-            if (geoEl) geoEl.textContent = `📍 ${geo.endereco}`;
+            if (geoEl) geoEl.textContent = '📍 Obtendo localização...';
 
             for (const file of files) {
+                const geo = await _capturarGeoEndereco();
+                if (geoEl) geoEl.textContent = `📍 ${geo.endereco}`;
                 if (categoria === 'video') {
                     const reader = new FileReader();
                     await new Promise(res => {
@@ -7224,7 +7279,8 @@
         }
 
         function renderPainelEvidenciasUI() {
-            const ev = _parseFotosProg(statusPendente.servico?.fotos);
+            const st = statusPendente.servico?.status_flow;
+            const ev = _evidenciasClassificadas(statusPendente.servico?.fotos, st);
             const salvasAntes = ev.filter(e => e.tipo === 'antes');
             const salvasDepois = ev.filter(e => e.tipo === 'depois');
             const salvasVideo = ev.filter(e => e.tipo === 'video');
@@ -7239,8 +7295,15 @@
 
             const btnIni = document.getElementById('btn-iniciar-servico');
             const btnConc = document.getElementById('btn-concluir-servico');
-            if (btnIni) btnIni.classList.toggle('hidden', ro || statusPendente.modo !== 'iniciar' || !statusPendente.novasAntes.length);
-            if (btnConc) btnConc.classList.toggle('hidden', ro || statusPendente.modo !== 'concluir' || !statusPendente.novasDepois.length);
+            const podeIniciar = statusPendente.modo === 'iniciar' && (statusPendente.novasAntes.length > 0 || salvasAntes.length > 0);
+            const podeConcluir = statusPendente.modo === 'concluir' && (statusPendente.novasDepois.length > 0 || salvasDepois.length > 0);
+            if (btnIni) {
+                btnIni.classList.toggle('hidden', ro || !podeIniciar);
+                btnIni.textContent = statusPendente.novasAntes.length ? '▶ INICIAR SERVIÇO' : '▶ INICIAR (usar fotos já enviadas)';
+            }
+            if (btnConc) {
+                btnConc.classList.toggle('hidden', ro || !podeConcluir);
+            }
         }
 
         async function abrirPainelEvidenciasServico(id, somenteLeitura) {
@@ -7285,7 +7348,7 @@
             document.getElementById('btn-iniciar-servico').classList.add('hidden');
             document.getElementById('btn-concluir-servico').classList.add('hidden');
             renderPainelEvidenciasUI();
-            show('scr-modal-status');
+            abrirOverlayEvidencias();
         }
 
         function abrirModalStatus(id, novoStatus) {
@@ -7301,7 +7364,7 @@
         }
 
         async function _salvarEvidenciasServico(novoStatus) {
-            const { data: rows } = await db.from(TBL.prog).select('fotos,obs_status').eq('id', statusPendente.id);
+            const { data: rows } = await db.from(TBL.prog).select('fotos,obs_status,status_flow').eq('id', statusPendente.id);
             const item = rows?.[0];
             if (!item) return false;
 
@@ -7310,21 +7373,28 @@
                 ...statusPendente.novasDepois,
                 ...statusPendente.novosVideos
             ];
-            if (!paraUpload.length && novoStatus !== 'EM EXECUÇÃO') {
-                alert('📸 Adicione pelo menos uma evidência.');
-                return false;
-            }
 
             loading(true, 'Enviando evidências...');
             let enviadas = [];
-            try {
-                enviadas = await uploadEvidenciasProg(paraUpload, (a, t) => loading(true, `Enviando ${a}/${t}...`));
-            } catch (e) {
-                console.warn('Cloudinary:', e);
-                enviadas = paraUpload.map(ev => ({ ...ev, url: ev.data }));
+            if (paraUpload.length) {
+                try {
+                    enviadas = await uploadEvidenciasProg(paraUpload, (a, t) => loading(true, `Enviando ${a}/${t}...`));
+                } catch (e) {
+                    console.warn('Cloudinary:', e);
+                    enviadas = paraUpload.map(ev => {
+                        const { data, ...rest } = ev;
+                        return { ...rest, url: data };
+                    });
+                }
             }
 
-            const anteriores = _parseFotosProg(item.fotos);
+            let anteriores = _evidenciasClassificadas(item.fotos, item.status_flow || statusPendente.servico?.status_flow);
+            if (novoStatus === 'EM EXECUÇÃO') {
+                anteriores = anteriores.map(e => {
+                    if (!e.tipo || e.tipo === 'foto') return { ...e, tipo: 'antes' };
+                    return e;
+                });
+            }
             const fotosMerged = [...anteriores, ...enviadas];
             const obsNova = DOMPurify.sanitize(document.getElementById('status-obs').value.trim());
             const obsAntiga = item.obs_status || '';
@@ -7339,7 +7409,12 @@
             };
             if (novoStatus === 'CONCLUIDO') payload.rating = statusPendente.rating;
 
-            await db.from(TBL.prog).update(payload).eq('id', statusPendente.id);
+            const { error: errUp } = await db.from(TBL.prog).update(payload).eq('id', statusPendente.id);
+            if (errUp) {
+                loading(false);
+                alert('Erro ao salvar no sistema:\n' + errUp.message + '\n\nSe mencionar "fotos", no Supabase use tipo JSONB na coluna fotos da tabela prog.');
+                return false;
+            }
 
             if (novoStatus === 'CONCLUIDO' && statusPendente.rating > 0) {
                 await db.from(TBL.avaliacoes).insert({
@@ -7354,8 +7429,10 @@
         }
 
         async function confirmarIniciarServico() {
-            if (!statusPendente.novasAntes.length) {
-                alert('📸 Tire pelo menos uma foto ANTES para iniciar o serviço.');
+            const ev = _evidenciasClassificadas(statusPendente.servico?.fotos, 'PENDENTE');
+            const temAntes = statusPendente.novasAntes.length > 0 || ev.some(e => e.tipo === 'antes');
+            if (!temAntes) {
+                alert('📸 Tire pelo menos uma foto ANTES e depois toque em INICIAR SERVIÇO.');
                 return;
             }
             const ok = await _salvarEvidenciasServico('EM EXECUÇÃO');
@@ -7366,8 +7443,10 @@
         }
 
         async function confirmarConcluirServico() {
-            if (!statusPendente.novasDepois.length) {
-                alert('📸 Tire pelo menos uma foto DEPOIS para concluir o serviço.');
+            const ev = _evidenciasClassificadas(statusPendente.servico?.fotos, 'EM EXECUÇÃO');
+            const temDepois = statusPendente.novasDepois.length > 0 || ev.some(e => e.tipo === 'depois');
+            if (!temDepois) {
+                alert('📸 Tire pelo menos uma foto DEPOIS e depois toque em CONCLUIR SERVIÇO.');
                 return;
             }
             const ok = await _salvarEvidenciasServico('CONCLUIDO');
@@ -7378,15 +7457,13 @@
         }
 
         async function fecharModalStatus() {
+            fecharOverlayEvidencias();
             const role = currentUser?.role || currentUser?.perfil;
             if (role === 'fornecedor') {
-                show('scr-fornecedor');
                 await Promise.all([carregarServicosForn(), carregarResumoServicosFornMes()]);
             } else if (role === 'programador') {
-                show('scr-programador');
                 await carregarProgGeral();
-            } else {
-                show('scr-admin');
+            } else if (role === 'admin' || role === 'supervisor') {
                 await carregarProgAdmin();
             }
             statusPendente = { id: null, modo: 'ver', servico: null, somenteLeitura: false, novasAntes: [], novasDepois: [], novosVideos: [], rating: 0 };
