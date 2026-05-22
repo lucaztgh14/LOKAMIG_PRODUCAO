@@ -3965,39 +3965,65 @@
         const CLOUDINARY = {
             cloudName: 'dlaregq2k',
             uploadPreset: 'lokamig',
-            uploadUrl: 'https://api.cloudinary.com/v1_1/dlaregq2k/image/upload',
-            videoUploadUrl: 'https://api.cloudinary.com/v1_1/dlaregq2k/video/upload'
+            uploadUrl: 'https://api.cloudinary.com/v1_1/dlaregq2k/auto/upload'
         };
 
-        async function uploadFotoCloudinary(base64Data) {
-            // Converte base64 para blob
-            const res = await fetch(base64Data);
-            const blob = await res.blob();
+        function _dataURLtoBlob(dataUrl) {
+            const parts = String(dataUrl).split(',');
+            const mime = (parts[0].match(/:(.*?);/) || [])[1] || 'image/jpeg';
+            const bin = atob(parts[1] || '');
+            const buf = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+            return new Blob([buf], { type: mime });
+        }
+
+        async function _cloudinaryUploadBlob(blob, pasta) {
             const formData = new FormData();
             formData.append('file', blob);
             formData.append('upload_preset', CLOUDINARY.uploadPreset);
-            formData.append('folder', 'lokamig');
+            formData.append('folder', pasta || 'lokamig');
+            let lastErr = null;
+            for (let tent = 0; tent < 2; tent++) {
+                try {
+                    const response = await fetch(CLOUDINARY.uploadUrl, { method: 'POST', body: formData });
+                    const data = await response.json();
+                    if (data.secure_url) return data.secure_url;
+                    lastErr = new Error(data.error?.message || 'Resposta inválida do Cloudinary');
+                } catch (e) {
+                    lastErr = e;
+                }
+                if (tent === 0) await new Promise(r => setTimeout(r, 800));
+            }
+            throw lastErr || new Error('Falha no upload');
+        }
 
-            const response = await fetch(CLOUDINARY.uploadUrl, {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-            if (data.secure_url) return data.secure_url;
-            throw new Error('Falha no upload: ' + (data.error?.message || 'Erro desconhecido'));
+        async function uploadFotoCloudinary(base64Data) {
+            const blob = _dataURLtoBlob(base64Data);
+            return _cloudinaryUploadBlob(blob, 'lokamig');
         }
 
         async function uploadVideoCloudinary(base64Data) {
-            const res = await fetch(base64Data);
-            const blob = await res.blob();
-            const formData = new FormData();
-            formData.append('file', blob);
-            formData.append('upload_preset', CLOUDINARY.uploadPreset);
-            formData.append('folder', 'lokamig/videos');
-            const response = await fetch(CLOUDINARY.videoUploadUrl, { method: 'POST', body: formData });
-            const data = await response.json();
-            if (data.secure_url) return data.secure_url;
-            throw new Error('Falha no vídeo: ' + (data.error?.message || 'Erro'));
+            const blob = _dataURLtoBlob(base64Data);
+            return _cloudinaryUploadBlob(blob, 'lokamig/videos');
+        }
+
+        /** Nunca envia base64 ao Supabase — só URLs https e metadados */
+        function _sanitizarEvidenciasBanco(lista) {
+            return (lista || []).map(ev => {
+                const u = _urlEvidencia(ev);
+                if (!u || String(u).startsWith('data:')) return null;
+                return {
+                    url: u,
+                    tipo: ev.tipo || 'foto',
+                    ts: ev.ts || '',
+                    lat: ev.lat ?? null,
+                    lng: ev.lng ?? null,
+                    endereco: ev.endereco || '',
+                    rua: ev.rua || '',
+                    bairro: ev.bairro || '',
+                    cidade: ev.cidade || ''
+                };
+            }).filter(Boolean);
         }
 
         async function uploadFotosCloudinary(fotosArray, onProgress) {
@@ -4016,6 +4042,7 @@
 
         async function uploadEvidenciasProg(evidencias, onProgress) {
             const out = [];
+            const falhas = [];
             for (let i = 0; i < evidencias.length; i++) {
                 const ev = evidencias[i];
                 if (ev.url && String(ev.url).startsWith('http')) {
@@ -4023,14 +4050,25 @@
                     out.push(rest);
                     continue;
                 }
-                if (onProgress) onProgress(i + 1, evidencias.length);
                 const base64 = ev.data;
-                if (!base64) continue;
-                const url = ev.tipo === 'video'
-                    ? await uploadVideoCloudinary(base64)
-                    : await uploadFotoCloudinary(base64);
-                const { data, ...rest } = ev;
-                out.push({ ...rest, url });
+                if (!base64 || String(base64).startsWith('http')) continue;
+                if (onProgress) onProgress(i + 1, evidencias.length);
+                try {
+                    const url = ev.tipo === 'video'
+                        ? await uploadVideoCloudinary(base64)
+                        : await uploadFotoCloudinary(base64);
+                    const { data, ...rest } = ev;
+                    out.push({ ...rest, url });
+                } catch (e) {
+                    console.warn('Upload evidência', e);
+                    falhas.push((i + 1) + ': ' + (e.message || 'rede'));
+                }
+            }
+            if (falhas.length) {
+                const err = new Error('Falha ao enviar foto(s) para a nuvem (Cloudinary/rede):\n' + falhas.join('\n'));
+                err.falhasUpload = falhas;
+                err.parcial = out;
+                throw err;
             }
             return out;
         }
@@ -7264,7 +7302,7 @@
                         reader.readAsDataURL(file);
                     });
                 } else {
-                    const compressed = await compressarFoto(file);
+                    const compressed = await compressarFoto(file, 0.5, 1024);
                     const item = {
                         tipo: categoria, data: compressed, ts: geo.ts,
                         lat: geo.lat, lng: geo.lng, endereco: geo.endereco,
@@ -7380,11 +7418,22 @@
                 try {
                     enviadas = await uploadEvidenciasProg(paraUpload, (a, t) => loading(true, `Enviando ${a}/${t}...`));
                 } catch (e) {
-                    console.warn('Cloudinary:', e);
-                    enviadas = paraUpload.map(ev => {
-                        const { data, ...rest } = ev;
-                        return { ...rest, url: data };
-                    });
+                    loading(false);
+                    const parcial = e.parcial || [];
+                    if (parcial.length) {
+                        const cont = confirm(
+                            e.message + '\n\nAlgumas fotos subiram. Deseja salvar o status mesmo assim com as que foram enviadas?'
+                        );
+                        if (!cont) return false;
+                        enviadas = parcial;
+                        loading(true, 'Salvando...');
+                    } else {
+                        alert(
+                            e.message + '\n\nVerifique sua internet (Wi‑Fi/dados) e tente de novo. ' +
+                            'As fotos precisam subir para a nuvem antes de mudar o status — não feche esta tela.'
+                        );
+                        return false;
+                    }
                 }
             }
 
@@ -7395,7 +7444,19 @@
                     return e;
                 });
             }
-            const fotosMerged = [...anteriores, ...enviadas];
+            const fotosMerged = _sanitizarEvidenciasBanco([...anteriores, ...enviadas]);
+
+            if (novoStatus === 'EM EXECUÇÃO' && !fotosMerged.some(f => f.tipo === 'antes')) {
+                loading(false);
+                alert('É necessário ter pelo menos uma foto ANTES enviada com sucesso.');
+                return false;
+            }
+            if (novoStatus === 'CONCLUIDO' && !fotosMerged.some(f => f.tipo === 'depois')) {
+                loading(false);
+                alert('É necessário ter pelo menos uma foto DEPOIS enviada com sucesso.');
+                return false;
+            }
+
             const obsNova = DOMPurify.sanitize(document.getElementById('status-obs').value.trim());
             const obsAntiga = item.obs_status || '';
             const obs_status = obsNova
@@ -7409,10 +7470,21 @@
             };
             if (novoStatus === 'CONCLUIDO') payload.rating = statusPendente.rating;
 
-            const { error: errUp } = await db.from(TBL.prog).update(payload).eq('id', statusPendente.id);
-            if (errUp) {
+            try {
+                const { error: errUp } = await db.from(TBL.prog).update(payload).eq('id', statusPendente.id);
+                if (errUp) {
+                    loading(false);
+                    let msg = 'Erro ao salvar no Supabase:\n' + errUp.message;
+                    if (/fotos|json|invalid/i.test(errUp.message)) {
+                        msg += '\n\nNo SQL Editor do Supabase execute:\nALTER TABLE prog ALTER COLUMN fotos TYPE jsonb USING to_jsonb(fotos);';
+                    }
+                    alert(msg);
+                    return false;
+                }
+            } catch (e) {
                 loading(false);
-                alert('Erro ao salvar no sistema:\n' + errUp.message + '\n\nSe mencionar "fotos", no Supabase use tipo JSONB na coluna fotos da tabela prog.');
+                alert('Erro de conexão ao salvar (rede/Supabase):\n' + (e.message || e) +
+                    '\n\nSe o erro persistir, confira se a coluna fotos da tabela prog é JSONB.');
                 return false;
             }
 
