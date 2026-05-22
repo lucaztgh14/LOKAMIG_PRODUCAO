@@ -3965,8 +3965,9 @@
         const CLOUDINARY = {
             cloudName: 'dlaregq2k',
             uploadPreset: 'lokamig',
-            uploadUrl: 'https://api.cloudinary.com/v1_1/dlaregq2k/auto/upload'
+            uploadUrl: 'https://api.cloudinary.com/v1_1/dlaregq2k/image/upload'
         };
+        const SUPABASE_STORAGE_BUCKET = 'evidencias-prog';
 
         function _dataURLtoBlob(dataUrl) {
             const parts = String(dataUrl).split(',');
@@ -3977,24 +3978,59 @@
             return new Blob([buf], { type: mime });
         }
 
+        async function _carregarConfigCloudinary() {
+            try {
+                const { data: cfg } = await db.from('config_sistema').select('valor').eq('chave', 'cloudinary_upload').maybeSingle();
+                const v = cfg?.valor;
+                if (v?.cloudName) CLOUDINARY.cloudName = v.cloudName;
+                if (v?.uploadPreset) CLOUDINARY.uploadPreset = v.uploadPreset;
+                CLOUDINARY.uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/image/upload`;
+            } catch (_) { }
+        }
+
+        async function _uploadSupabaseStorage(blob, subpasta) {
+            const ext = (blob.type || 'image/jpeg').includes('video') ? 'mp4' : 'jpg';
+            const path = `${subpasta || 'prog'}/${statusPendente?.id || 'tmp'}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { data, error } = await db.storage.from(SUPABASE_STORAGE_BUCKET).upload(path, blob, {
+                contentType: blob.type || 'image/jpeg',
+                cacheControl: '3600',
+                upsert: false
+            });
+            if (error) throw error;
+            const { data: pub } = db.storage.from(SUPABASE_STORAGE_BUCKET).getPublicUrl(data.path);
+            return pub.publicUrl;
+        }
+
         async function _cloudinaryUploadBlob(blob, pasta) {
+            await _carregarConfigCloudinary();
             const formData = new FormData();
             formData.append('file', blob);
             formData.append('upload_preset', CLOUDINARY.uploadPreset);
-            formData.append('folder', pasta || 'lokamig');
+            if (pasta) formData.append('folder', pasta);
             let lastErr = null;
             for (let tent = 0; tent < 2; tent++) {
                 try {
                     const response = await fetch(CLOUDINARY.uploadUrl, { method: 'POST', body: formData });
                     const data = await response.json();
                     if (data.secure_url) return data.secure_url;
-                    lastErr = new Error(data.error?.message || 'Resposta inválida do Cloudinary');
+                    const msg = data.error?.message || 'Resposta inválida do Cloudinary';
+                    lastErr = new Error(msg);
+                    if (/api key|unknown|preset|unsigned/i.test(msg)) break;
                 } catch (e) {
                     lastErr = e;
                 }
                 if (tent === 0) await new Promise(r => setTimeout(r, 800));
             }
-            throw lastErr || new Error('Falha no upload');
+            try {
+                return await _uploadSupabaseStorage(blob, pasta || 'lokamig');
+            } catch (supErr) {
+                const cMsg = lastErr?.message || 'Cloudinary indisponível';
+                const sMsg = supErr?.message || 'Storage indisponível';
+                throw new Error(
+                    `Cloudinary: ${cMsg}\nSupabase Storage: ${sMsg}\n\n` +
+                    'Corrija o preset "lokamig" no Cloudinary (modo Unsigned) ou crie o bucket "' + SUPABASE_STORAGE_BUCKET + '" no Supabase Storage.'
+                );
+            }
         }
 
         async function uploadFotoCloudinary(base64Data) {
