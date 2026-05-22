@@ -1104,6 +1104,146 @@
             border-left-color: var(--success);
         }
 
+        /* Painel fornecedor reorganizado */
+        .forn-subnav {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            background: rgba(0, 0, 0, .2);
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .forn-subnav-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--gray);
+            padding: 10px 8px;
+            border-radius: 9px;
+            font-family: Montserrat, sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .forn-subnav-btn.active {
+            background: linear-gradient(135deg, rgba(14, 165, 233, .35), rgba(14, 165, 233, .15));
+            color: #7dd3fc;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, .2);
+        }
+
+        .forn-dia-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .forn-chip {
+            flex: 1;
+            min-width: 72px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            background: rgba(255, 255, 255, .04);
+            border-radius: 10px;
+            padding: 8px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: .2s;
+            font-family: Montserrat, sans-serif;
+        }
+
+        .forn-chip.active {
+            border-color: rgba(56, 189, 248, .5);
+            background: rgba(56, 189, 248, .12);
+        }
+
+        .forn-chip-val {
+            display: block;
+            font-size: 18px;
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .forn-chip-lbl {
+            font-size: 9px;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        .forn-serv-card {
+            cursor: pointer;
+            border-left-width: 5px;
+            transition: transform .15s, box-shadow .15s;
+        }
+
+        .forn-serv-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .25);
+        }
+
+        .forn-serv-card .forn-card-hint {
+            font-size: 10px;
+            color: var(--info);
+            margin-top: 8px;
+            opacity: .85;
+        }
+
+        .mon-resumo-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mon-chip {
+            text-align: center;
+            padding: 10px 6px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .mon-chip b {
+            display: block;
+            font-size: 20px;
+            line-height: 1.1;
+        }
+
+        .mon-chip span {
+            font-size: 9px;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        .mon-grupo-placa {
+            margin-bottom: 14px;
+        }
+
+        .mon-grupo-titulo {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--gray);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .mon-par-cards {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .mon-mini-card {
+            flex: 1;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 10px;
+            min-height: 72px;
+        }
+
         .status-badge {
             padding: 3px 8px;
             border-radius: 6px;
@@ -2495,6 +2635,12 @@
 
         <!-- MONITOR -->
         <div id="area-monitor" class="admin-content">
+            <div id="mon-resumo-status" class="mon-resumo-bar">
+                <div class="mon-chip"><b id="mon-cnt-total" style="color:var(--info);">0</b><span>Veículos hoje</span></div>
+                <div class="mon-chip"><b id="mon-cnt-pend" style="color:var(--warning);">0</b><span>Pendentes</span></div>
+                <div class="mon-chip"><b id="mon-cnt-exec" style="color:#f87171;">0</b><span>Em execução</span></div>
+                <div class="mon-chip"><b id="mon-cnt-ok" style="color:var(--success);">0</b><span>Concluídos</span></div>
+            </div>
             <div class="search-bar">
                 <input type="date" id="mon-filter-date" onchange="carregarProgAdmin()">
                 <input type="text" id="mon-filter-placa" placeholder="🔍 Placa" oninput="carregarProgAdmin()">
@@ -3412,90 +3558,98 @@
     <section id="scr-fornecedor" class="container hidden">
         <div
             style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px;">
-            <h1 id="forn-name-screen" style="margin:0;"></h1>
+            <h1 id="forn-name-screen" style="margin:0;font-size:15px;"></h1>
             <div class="badge"
                 style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;font-size:10px;padding:4px 12px;border-radius:20px;">
                 🟢 ONLINE</div>
         </div>
-        <div class="sub" style="margin-bottom:12px;">Painel do Fornecedor</div>
-
-        <!-- Cards de resumo — orçamentos / NF -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
-            <div class="metric-card" style="border:1px solid rgba(245,158,11,.2);">
-                <div class="metric-icon">💰</div>
-                <span class="metric-value" id="forn-total-orc" style="color:var(--warning);font-size:18px;">0</span>
-                <span class="metric-label">Orçamentos</span>
-            </div>
-            <div class="metric-card" style="border:1px solid rgba(16,185,129,.2);">
-                <div class="metric-icon">✅</div>
-                <span class="metric-value" id="forn-aprovados" style="color:var(--success);font-size:18px;">0</span>
-                <span class="metric-label">Aprovados</span>
-            </div>
-            <div class="metric-card" style="border:1px solid rgba(56,189,248,.2);">
-                <div class="metric-icon">🧾</div>
-                <span class="metric-value" id="forn-total-nf" style="color:var(--info);font-size:18px;">0</span>
-                <span class="metric-label">NFs Emitidas</span>
-            </div>
-        </div>
-
-        <!-- Resumo serviços do mês (veículos atendidos) -->
-        <div class="form-section" style="margin-bottom:14px;padding:12px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-                <h4 style="margin:0;font-size:13px;color:var(--info);">🚗 Serviços do mês</h4>
-                <input type="month" id="forn-mes-resumo" onchange="carregarResumoServicosFornMes()"
-                    style="width:auto;min-width:150px;margin:0;font-size:11px;padding:6px 10px;">
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">
-                <div class="metric-card" style="border:1px solid rgba(56,189,248,.25);padding:10px;">
-                    <div class="metric-icon" style="font-size:18px;">🚗</div>
-                    <span class="metric-value" id="forn-mes-veiculos" style="color:var(--info);font-size:20px;">0</span>
-                    <span class="metric-label">Veículos</span>
-                    <span id="forn-mes-servicos-sub" style="font-size:9px;color:var(--gray);display:block;margin-top:2px;">0 serviços</span>
-                </div>
-                <div class="metric-card" style="border:1px solid rgba(245,158,11,.25);padding:10px;">
-                    <div class="metric-icon" style="font-size:18px;">⏳</div>
-                    <span class="metric-value" id="forn-mes-pendentes" style="color:var(--warning);font-size:20px;">0</span>
-                    <span class="metric-label">Pendentes</span>
-                </div>
-                <div class="metric-card" style="border:1px solid rgba(239,68,68,.25);padding:10px;">
-                    <div class="metric-icon" style="font-size:18px;">▶</div>
-                    <span class="metric-value" id="forn-mes-execucao" style="color:#f87171;font-size:20px;">0</span>
-                    <span class="metric-label">Em execução</span>
-                </div>
-                <div class="metric-card" style="border:1px solid rgba(16,185,129,.25);padding:10px;">
-                    <div class="metric-icon" style="font-size:18px;">✅</div>
-                    <span class="metric-value" id="forn-mes-concluidos" style="color:var(--success);font-size:20px;">0</span>
-                    <span class="metric-label">Concluídos</span>
-                </div>
-            </div>
-            <div id="forn-mes-placas" style="max-height:160px;overflow-y:auto;">
-                <p style="color:var(--gray);font-size:11px;text-align:center;margin:0;">Carregando resumo...</p>
-            </div>
-        </div>
+        <div class="sub" style="margin-bottom:10px;">Painel do Fornecedor</div>
 
         <div id="forn-alertas-revisao"></div>
         <input type="file" id="forn-logo-upload" accept="image/*" style="display:none;"
             onchange="previewLogoForn(event)">
-        <img id="forn-logo-preview" src=""
-            style="display:none;width:60px;height:60px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,.1);">
 
-        <!-- Abas do fornecedor -->
+        <!-- Abas principais -->
         <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;">
             <button onclick="fornSwitchTab('servicos',this)" class="tab-btn tab-active" id="forn-tab-servicos">🚗
-                Serviços</button>
+                Operação</button>
             <button onclick="fornSwitchTab('orcamentos',this)" class="tab-btn" id="forn-tab-orcamentos">💰
                 Orçamentos</button>
             <button onclick="fornSwitchTab('nf',this)" class="tab-btn" id="forn-tab-nf">🧾 Notas Fiscais</button>
         </div>
 
-        <!-- Aba Serviços -->
+        <!-- Aba Operação -->
         <div id="forn-area-servicos">
-            <input type="date" id="forn-filter-date" onchange="carregarServicosForn()" style="margin-bottom:10px;">
-            <div id="list-forn-servicos"></div>
+            <div class="forn-subnav">
+                <button type="button" class="forn-subnav-btn active" id="forn-sub-dia"
+                    onclick="fornSwitchSubView('dia',this)">📅 Programação do dia</button>
+                <button type="button" class="forn-subnav-btn" id="forn-sub-mes"
+                    onclick="fornSwitchSubView('mes',this)">📊 Resumo do mês</button>
+            </div>
+
+            <div id="forn-panel-dia">
+                <input type="date" id="forn-filter-date" onchange="carregarServicosForn()"
+                    style="margin-bottom:10px;width:100%;">
+                <div class="forn-dia-chips">
+                    <div class="forn-chip active" data-filtro="" onclick="fornFiltrarDia('',this)">
+                        <span class="forn-chip-val" id="forn-dia-todos" style="color:var(--info);">0</span>
+                        <span class="forn-chip-lbl">Todos</span>
+                    </div>
+                    <div class="forn-chip" data-filtro="PENDENTE" onclick="fornFiltrarDia('PENDENTE',this)">
+                        <span class="forn-chip-val" id="forn-dia-pend" style="color:var(--warning);">0</span>
+                        <span class="forn-chip-lbl">Pendentes</span>
+                    </div>
+                    <div class="forn-chip" data-filtro="EM EXECUÇÃO" onclick="fornFiltrarDia('EM EXECUÇÃO',this)">
+                        <span class="forn-chip-val" id="forn-dia-exec" style="color:#f87171;">0</span>
+                        <span class="forn-chip-lbl">Em execução</span>
+                    </div>
+                    <div class="forn-chip" data-filtro="CONCLUIDO" onclick="fornFiltrarDia('CONCLUIDO',this)">
+                        <span class="forn-chip-val" id="forn-dia-ok" style="color:var(--success);">0</span>
+                        <span class="forn-chip-lbl">Concluídos</span>
+                    </div>
+                </div>
+                <p style="font-size:10px;color:var(--gray);margin:0 0 10px 0;">Toque no card do veículo para iniciar, concluir ou ver fotos.</p>
+                <div id="list-forn-servicos"></div>
+            </div>
+
+            <div id="forn-panel-mes" style="display:none;">
+                <input type="month" id="forn-mes-resumo" onchange="carregarResumoServicosFornMes()"
+                    style="width:100%;margin-bottom:10px;">
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">
+                    <div class="metric-card" style="padding:10px;">
+                        <span class="metric-value" id="forn-mes-veiculos" style="color:var(--info);font-size:18px;">0</span>
+                        <span class="metric-label">Veículos no mês</span>
+                        <span id="forn-mes-servicos-sub" style="font-size:9px;color:var(--gray);">0 serviços</span>
+                    </div>
+                    <div class="metric-card" style="padding:10px;">
+                        <span class="metric-value" id="forn-mes-pendentes" style="color:var(--warning);font-size:18px;">0</span>
+                        <span class="metric-label">Pendentes</span>
+                    </div>
+                    <div class="metric-card" style="padding:10px;">
+                        <span class="metric-value" id="forn-mes-execucao" style="color:#f87171;font-size:18px;">0</span>
+                        <span class="metric-label">Em execução</span>
+                    </div>
+                    <div class="metric-card" style="padding:10px;">
+                        <span class="metric-value" id="forn-mes-concluidos" style="color:var(--success);font-size:18px;">0</span>
+                        <span class="metric-label">Concluídos</span>
+                    </div>
+                </div>
+                <div id="forn-mes-placas" style="max-height:220px;overflow-y:auto;"></div>
+            </div>
         </div>
 
         <!-- Aba Orçamentos -->
         <div id="forn-area-orcamentos" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                <div class="metric-card" style="padding:10px;">
+                    <span class="metric-value" id="forn-total-orc" style="color:var(--warning);font-size:18px;">0</span>
+                    <span class="metric-label">Orçamentos</span>
+                </div>
+                <div class="metric-card" style="padding:10px;">
+                    <span class="metric-value" id="forn-aprovados" style="color:var(--success);font-size:18px;">0</span>
+                    <span class="metric-label">Aprovados</span>
+                </div>
+            </div>
             <div id="list-orc-forn"></div>
             <button onclick="show('scr-orcamento')"
                 style="margin-top:10px;background:rgba(245,158,11,.3);border:1px solid rgba(245,158,11,.4);color:#fbbf24;padding:12px;border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;width:100%;">
@@ -3505,6 +3659,10 @@
 
         <!-- Aba Notas Fiscais -->
         <div id="forn-area-nf" style="display:none;">
+            <div class="metric-card" style="padding:10px;margin-bottom:12px;">
+                <span class="metric-value" id="forn-total-nf" style="color:var(--info);font-size:18px;">0</span>
+                <span class="metric-label">NFs emitidas</span>
+            </div>
             <div id="list-nf-forn"></div>
         </div>
 
@@ -4310,6 +4468,8 @@
                 show('scr-fornecedor');
                 const fnEl = document.getElementById('forn-name-screen') || document.getElementById('forn-nome-empresa');
                 if (fnEl) fnEl.textContent = '🏢 ' + (user.empresa || user.nome);
+                _inicializarDataForn();
+                _inicializarMesResumoForn();
                 Promise.all([
                     carregarLogoFornecedor(),
                     carregarServicosForn(),
@@ -4375,9 +4535,12 @@
             realtimeChannel = db
                 .channel('ogait-realtime-v2')
                 .on('postgres_changes', { event: '*', schema: 'public', table: TBL.prog }, () => {
-                    carregarProgAdmin();
-                    atualizarDashboard();
                     try {
+                        const scrA = document.getElementById('scr-admin');
+                        if (scrA && !scrA.classList.contains('hidden')) {
+                            carregarProgAdmin().catch(() => { });
+                            atualizarDashboard();
+                        }
                         const scrP = document.getElementById('scr-programador');
                         if (scrP && !scrP.classList.contains('hidden') && (currentUser?.role === 'programador' || currentUser?.perfil === 'programador'))
                             carregarProgGeral().catch(() => { });
@@ -5115,7 +5278,9 @@
                     try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch (_) { }
                     show('scr-fornecedor');
                     await carregarLogoFornecedor();
+                    _inicializarDataForn();
                     _inicializarMesResumoForn();
+                    fornFiltroDiaAtivo = '';
                     await Promise.all([
                         carregarServicosForn(),
                         carregarResumoServicosFornMes(),
@@ -5312,51 +5477,97 @@
             cont.innerHTML = html;
         }
 
+        function _corStatusFlow(st) {
+            return { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)', 'CANCELADO': 'var(--cancelled)' }[st] || 'var(--gray)';
+        }
+
+        function _atualizarResumoMonitor(list) {
+            const rows = (list || []).filter(s => s.status_flow !== 'CANCELADO');
+            const placas = new Set(rows.map(s => s.placa).filter(Boolean));
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            set('mon-cnt-total', placas.size);
+            set('mon-cnt-pend', rows.filter(s => s.status_flow === 'PENDENTE').length);
+            set('mon-cnt-exec', rows.filter(s => s.status_flow === 'EM EXECUÇÃO').length);
+            set('mon-cnt-ok', rows.filter(s => s.status_flow === 'CONCLUIDO').length);
+        }
+
+        function _renderMonitorOperacional(list, opts) {
+            const o = opts || {};
+            const placas = [...new Set((list || []).map(s => s.placa))];
+            let html = '';
+            const mkMini = (s, cor, label, arrow) => {
+                if (!s) return `<div class="mon-mini-card" style="flex:1;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:var(--gray);min-height:72px;">Sem ${label.toLowerCase()}</div>`;
+                const statusColor = _corStatusFlow(s.status_flow);
+                const cancelClass = s.status_flow === 'CANCELADO' ? 'cancelado' : '';
+                const temFotos = (s.fotos || []).length > 0;
+                const acoes = o.modo === 'admin' ? `
+                    <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;" onclick="event.stopPropagation()">
+                        <button class="btn-info btn-sm" onclick="abrirDetalheServico(${s.id})">🔍</button>
+                        ${temFotos ? `<button class="btn-info btn-sm" onclick="verFotosProgCard(${s.id})">📷</button>` : ''}
+                        <button class="btn-pdf btn-sm" onclick="gerarPDF(${s.id})">📄</button>
+                        ${s.status_flow !== 'CANCELADO' && s.status_flow !== 'CONCLUIDO' ? `<button class="btn-cancel btn-sm" onclick="cancelarServico(${s.id})">🚫</button>` : ''}
+                    </div>` : (temFotos ? `<div style="margin-top:4px;"><button class="btn-info btn-sm" onclick="event.stopPropagation();verFotosProgCard(${s.id})">📷 Fotos</button></div>` : '');
+                return `<div class="mon-mini-card ${cancelClass}" style="flex:1;background:rgba(${cor},.08);border:1px solid rgba(${cor},.35);cursor:${o.modo === 'admin' ? 'default' : 'default'};">
+                    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;">
+                        <span class="status-badge" style="background:${statusColor};color:#fff;font-size:9px;">${s.status_flow}</span>
+                        <b style="font-size:11px;color:rgba(${cor},1);">${arrow} ${label}</b>
+                    </div>
+                    <div style="font-size:10px;color:var(--gray);">${arrow === '↗' ? '→' : '←'} ${s.fornecedor || 'PÁTIO'}</div>
+                    <div style="font-size:10px;color:var(--gray);">KM: ${s.km || '—'} | ${s.timestamp || s.data_servico || ''}</div>
+                    ${s.obs ? `<div style="font-size:9px;color:var(--gray);margin-top:3px;">📝 ${String(s.obs).slice(0, 80)}${String(s.obs).length > 80 ? '…' : ''}</div>` : ''}
+                    ${acoes}
+                </div>`;
+            };
+
+            placas.forEach(placa => {
+                const doPlaca = list.filter(s => s.placa === placa);
+                const saidas = doPlaca.filter(s => s.tipo_op === 'SAÍDA');
+                const retornos = doPlaca.filter(s => s.tipo_op === 'RETORNO');
+                const outros = doPlaca.filter(s => s.tipo_op !== 'SAÍDA' && s.tipo_op !== 'RETORNO');
+                const setor = doPlaca[0]?.setor || '';
+                const max = Math.max(saidas.length, retornos.length, outros.length, 1);
+                html += `<div class="mon-grupo-placa">
+                    <div class="mon-grupo-titulo">🚗 ${placa} ${setor ? `<span class="setor-badge setor-${setor}">${setor}</span>` : ''}</div>`;
+                for (let i = 0; i < max; i++) {
+                    const saida = saidas[i];
+                    const retorno = retornos[i];
+                    const outro = outros[i];
+                    if (saida || retorno) {
+                        html += `<div class="mon-par-cards">${mkMini(saida, '245,158,11', 'SAÍDA', '↗')}${mkMini(retorno, '16,185,129', 'RETORNO', '↙')}</div>`;
+                    } else if (outro) {
+                        html += `<div class="mon-par-cards">${mkMini(outro, '56,189,248', outro.tipo_op || 'SERVIÇO', '•')}</div>`;
+                    }
+                }
+                html += `</div>`;
+            });
+            return html;
+        }
+
         async function carregarProgAdmin() {
-            const dt = document.getElementById('mon-filter-date')?.value || '';
+            const elDt = document.getElementById('mon-filter-date');
+            let dt = (elDt?.value || '').trim();
+            if (!dt) {
+                dt = new Date().toISOString().split('T')[0];
+                if (elDt) elDt.value = dt;
+            }
             const placa = (document.getElementById('mon-filter-placa')?.value || '').toUpperCase().trim();
             const status = document.getElementById('mon-filter-status')?.value || '';
             const setor = document.getElementById('mon-filter-setor')?.value || '';
-            let query = _filtrarBase(db.from(TBL.prog).select('*').order('id', { ascending: false }));
-            if (dt) query = query.eq('data_servico', dt);
+            let query = _filtrarBase(db.from(TBL.prog).select('*').eq('data_servico', dt).order('id'));
             if (placa) query = query.ilike('placa', `%${placa}%`);
             if (status) query = query.eq('status_flow', status);
             if (setor) query = query.eq('setor', setor);
 
             const { data: list, error } = await query;
             const cont = document.getElementById('list-prog-admin');
+            _atualizarResumoMonitor(list || []);
             if (error || !list?.length) {
-                cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento encontrado.</p>';
+                cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento nesta data.</p>';
+                await atualizarDashboard();
                 return;
             }
 
-            cont.innerHTML = list.map(s => {
-                const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)', 'CANCELADO': 'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
-                const cancelClass = s.status_flow === 'CANCELADO' ? 'cancelado' : '';
-                const setorClass = s.setor ? `setor-${s.setor}` : '';
-                const ts = s.timestamp || s.data_servico;
-                return `
-        <div class="prog-item ${cancelClass} status-${(s.status_flow || '').replace(' ', '-')}">
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-                <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
-                <b style="font-size:14px;">${s.placa}</b>
-                ${s.setor ? `<span class="setor-badge ${setorClass}">${s.setor}</span>` : ''}
-                <span style="color:var(--gray);font-size:10px;margin-left:auto;">${ts}</span>
-            </div>
-            <div style="font-size:11px;color:#cbd5e1;">
-                ${s.tipo_op || ''} → <b>${s.fornecedor || '—'}</b>
-                ${s.km ? ` | KM: ${s.km}` : ''}
-                ${s.programador ? ` | Por: ${s.programador}` : ''}
-            </div>
-            ${s.obs ? `<div style="font-size:10px;color:var(--gray);margin-top:4px;">📝 ${s.obs}</div>` : ''}
-            <div class="card-acoes">
-                <button class="btn-info btn-sm" onclick="abrirDetalheServico(${s.id})">🔍 Detalhes</button>
-                <button class="btn-pdf btn-sm" onclick="gerarPDF(${s.id})">📄 PDF</button>
-                ${s.status_flow !== 'CANCELADO' ? `<button class="btn-cancel btn-sm" onclick="cancelarServico(${s.id})">🚫 Cancelar</button>` : ''}
-            </div>
-        </div>`;
-            }).join('');
-
+            cont.innerHTML = _renderMonitorOperacional(list, { modo: 'admin' });
             await atualizarDashboard();
         }
 
@@ -6139,6 +6350,84 @@
         }
 
         // ─────────────────────────────────────────────
+        // FORNECEDOR: UI OPERAÇÃO
+        // ─────────────────────────────────────────────
+        let fornListaDiaCache = [];
+        let fornFiltroDiaAtivo = '';
+
+        function _inicializarDataForn() {
+            const el = document.getElementById('forn-filter-date');
+            if (el && !el.value) el.value = new Date().toISOString().split('T')[0];
+        }
+
+        function fornSwitchSubView(view, btn) {
+            const dia = document.getElementById('forn-panel-dia');
+            const mes = document.getElementById('forn-panel-mes');
+            if (dia) dia.style.display = view === 'dia' ? 'block' : 'none';
+            if (mes) mes.style.display = view === 'mes' ? 'block' : 'none';
+            document.querySelectorAll('.forn-subnav-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            if (view === 'dia') carregarServicosForn();
+            else carregarResumoServicosFornMes();
+        }
+
+        function fornFiltrarDia(filtro, chipEl) {
+            fornFiltroDiaAtivo = filtro || '';
+            document.querySelectorAll('.forn-chip').forEach(c => c.classList.toggle('active', c === chipEl));
+            _renderListaServicosForn(fornListaDiaCache);
+        }
+
+        function fornClicarServico(id, statusFlow) {
+            const s = fornListaDiaCache.find(x => x.id === id);
+            if (!s) return;
+            if (statusFlow === 'PENDENTE') abrirModalStatus(id, 'EM EXECUÇÃO');
+            else if (statusFlow === 'EM EXECUÇÃO') abrirModalStatus(id, 'CONCLUIDO');
+            else if (statusFlow === 'CONCLUIDO') {
+                const fotos = s.fotos || [];
+                if (fotos.length) verFotoGrande(fotos[0], fotos, `📸 ${s.placa} — concluído`);
+                else alert(`✅ ${s.placa} já concluído.\n${s.tipo_op || ''} | KM: ${s.km || '—'}`);
+            }
+        }
+
+        function _hintCardForn(st) {
+            if (st === 'PENDENTE') return '👆 Toque para iniciar o serviço';
+            if (st === 'EM EXECUÇÃO') return '👆 Toque para concluir (foto obrigatória)';
+            if (st === 'CONCLUIDO') return '👆 Toque para ver fotos / detalhes';
+            return '';
+        }
+
+        function _renderListaServicosForn(list) {
+            const cont = document.getElementById('list-forn-servicos');
+            if (!cont) return;
+            const filtrada = fornFiltroDiaAtivo ? (list || []).filter(s => s.status_flow === fornFiltroDiaAtivo) : (list || []);
+            if (!filtrada.length) {
+                cont.innerHTML = `<p style="color:var(--gray);padding:15px;text-align:center;">${list?.length ? 'Nenhum serviço com este filtro.' : 'Nenhum veículo programado para esta data.<br><span style="font-size:10px;">Aguarde o programador enviar a programação.</span>'}</p>`;
+                return;
+            }
+            cont.innerHTML = filtrada.map(s => {
+                const stClass = (s.status_flow || '').replace(/ /g, '-');
+                const statusColor = _corStatusFlow(s.status_flow);
+                const temFotos = (s.fotos || []).length > 0;
+                return `<div class="prog-item forn-serv-card status-${stClass}" role="button" tabindex="0"
+                    onclick="fornClicarServico(${s.id},${JSON.stringify(s.status_flow)})"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fornClicarServico(${s.id},${JSON.stringify(s.status_flow)})}">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;">
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                        <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
+                        <b style="font-size:15px;">${s.placa}</b>
+                        ${s.setor ? `<span class="setor-badge setor-${s.setor}">${s.setor}</span>` : ''}
+                    </div>
+                    <span style="font-size:10px;color:var(--gray);">${s.tipo_op || ''}</span>
+                </div>
+                <div style="font-size:11px;color:#cbd5e1;">KM: ${s.km || '—'} · ${s.timestamp || s.data_servico || ''}</div>
+                ${s.obs ? `<div style="font-size:10px;color:var(--gray);margin-top:6px;line-height:1.4;">📝 ${s.obs}</div>` : ''}
+                ${temFotos ? `<div style="font-size:10px;color:var(--info);margin-top:4px;">📷 ${(s.fotos || []).length} foto(s)</div>` : ''}
+                <div class="forn-card-hint">${_hintCardForn(s.status_flow)}</div>
+            </div>`;
+            }).join('');
+        }
+
+        // ─────────────────────────────────────────────
         // FORNECEDOR: RESUMO SERVIÇOS DO MÊS
         // ─────────────────────────────────────────────
         function _inicializarMesResumoForn() {
@@ -6236,29 +6525,18 @@
         // ─────────────────────────────────────────────
         async function carregarServicosForn() {
             if (!currentUser) return;
+            _inicializarDataForn();
             const dt = document.getElementById('forn-filter-date')?.value || new Date().toISOString().split('T')[0];
             const { data: list } = await db.from(TBL.prog)
-                .select('*').eq('data_servico', dt).eq('fornecedor', currentUser.empresa).neq('status_flow', 'CANCELADO');
-            const cont = document.getElementById('list-forn-servicos');
-            if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum serviço para esta data.</p>'; return; }
-            cont.innerHTML = list.map(s => {
-                const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)' }[s.status_flow] || 'var(--gray)';
-                const podeIniciar = s.status_flow === 'PENDENTE';
-                const podeConcluir = s.status_flow === 'EM EXECUÇÃO';
-                return `<div class="prog-item">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-                <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
-                <b>${s.placa}</b>
-                ${s.setor ? `<span class="setor-badge setor-${s.setor}">${s.setor}</span>` : ''}
-            </div>
-            <small style="color:#cbd5e1;">${s.tipo_op || ''} | KM: ${s.km || '—'} | ${s.timestamp}</small>
-            ${s.obs ? `<br><small style="color:var(--gray);">📝 ${s.obs}</small>` : ''}
-            <div class="card-acoes">
-                ${podeIniciar ? `<button class="btn-warning btn-sm" onclick="abrirModalStatus(${s.id},'EM EXECUÇÃO')">▶ INICIAR</button>` : ''}
-                ${podeConcluir ? `<button class="btn-success btn-sm" onclick="abrirModalStatus(${s.id},'CONCLUIDO')">✅ CONCLUIR</button>` : ''}
-            </div>
-        </div>`;
-            }).join('');
+                .select('*').eq('data_servico', dt).eq('fornecedor', currentUser.empresa).neq('status_flow', 'CANCELADO')
+                .order('id', { ascending: true });
+            fornListaDiaCache = list || [];
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            set('forn-dia-todos', fornListaDiaCache.length);
+            set('forn-dia-pend', fornListaDiaCache.filter(s => s.status_flow === 'PENDENTE').length);
+            set('forn-dia-exec', fornListaDiaCache.filter(s => s.status_flow === 'EM EXECUÇÃO').length);
+            set('forn-dia-ok', fornListaDiaCache.filter(s => s.status_flow === 'CONCLUIDO').length);
+            _renderListaServicosForn(fornListaDiaCache);
         }
 
         // ═══════════════════════════════════════════════════
@@ -6272,8 +6550,9 @@
                 if (tb) { tb.classList.toggle('tab-active', a === aba); }
             });
             if (aba === 'servicos') {
-                carregarServicosForn();
-                carregarResumoServicosFornMes();
+                const mesVis = document.getElementById('forn-panel-mes')?.style.display !== 'none';
+                if (mesVis) carregarResumoServicosFornMes();
+                else carregarServicosForn();
             }
             if (aba === 'orcamentos') carregarOrcForn();
             if (aba === 'nf') carregarNFForn();
