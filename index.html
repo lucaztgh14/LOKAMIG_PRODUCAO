@@ -3419,8 +3419,8 @@
         </div>
         <div class="sub" style="margin-bottom:12px;">Painel do Fornecedor</div>
 
-        <!-- Cards de resumo -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
+        <!-- Cards de resumo — orçamentos / NF -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
             <div class="metric-card" style="border:1px solid rgba(245,158,11,.2);">
                 <div class="metric-icon">💰</div>
                 <span class="metric-value" id="forn-total-orc" style="color:var(--warning);font-size:18px;">0</span>
@@ -3435,6 +3435,41 @@
                 <div class="metric-icon">🧾</div>
                 <span class="metric-value" id="forn-total-nf" style="color:var(--info);font-size:18px;">0</span>
                 <span class="metric-label">NFs Emitidas</span>
+            </div>
+        </div>
+
+        <!-- Resumo serviços do mês (veículos atendidos) -->
+        <div class="form-section" style="margin-bottom:14px;padding:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+                <h4 style="margin:0;font-size:13px;color:var(--info);">🚗 Serviços do mês</h4>
+                <input type="month" id="forn-mes-resumo" onchange="carregarResumoServicosFornMes()"
+                    style="width:auto;min-width:150px;margin:0;font-size:11px;padding:6px 10px;">
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">
+                <div class="metric-card" style="border:1px solid rgba(56,189,248,.25);padding:10px;">
+                    <div class="metric-icon" style="font-size:18px;">🚗</div>
+                    <span class="metric-value" id="forn-mes-veiculos" style="color:var(--info);font-size:20px;">0</span>
+                    <span class="metric-label">Veículos</span>
+                    <span id="forn-mes-servicos-sub" style="font-size:9px;color:var(--gray);display:block;margin-top:2px;">0 serviços</span>
+                </div>
+                <div class="metric-card" style="border:1px solid rgba(245,158,11,.25);padding:10px;">
+                    <div class="metric-icon" style="font-size:18px;">⏳</div>
+                    <span class="metric-value" id="forn-mes-pendentes" style="color:var(--warning);font-size:20px;">0</span>
+                    <span class="metric-label">Pendentes</span>
+                </div>
+                <div class="metric-card" style="border:1px solid rgba(239,68,68,.25);padding:10px;">
+                    <div class="metric-icon" style="font-size:18px;">▶</div>
+                    <span class="metric-value" id="forn-mes-execucao" style="color:#f87171;font-size:20px;">0</span>
+                    <span class="metric-label">Em execução</span>
+                </div>
+                <div class="metric-card" style="border:1px solid rgba(16,185,129,.25);padding:10px;">
+                    <div class="metric-icon" style="font-size:18px;">✅</div>
+                    <span class="metric-value" id="forn-mes-concluidos" style="color:var(--success);font-size:20px;">0</span>
+                    <span class="metric-label">Concluídos</span>
+                </div>
+            </div>
+            <div id="forn-mes-placas" style="max-height:160px;overflow-y:auto;">
+                <p style="color:var(--gray);font-size:11px;text-align:center;margin:0;">Carregando resumo...</p>
             </div>
         </div>
 
@@ -4275,7 +4310,13 @@
                 show('scr-fornecedor');
                 const fnEl = document.getElementById('forn-name-screen') || document.getElementById('forn-nome-empresa');
                 if (fnEl) fnEl.textContent = '🏢 ' + (user.empresa || user.nome);
-                Promise.all([carregarLogoFornecedor(), carregarServicosForn(), carregarOrcForn()]).catch(() => { });
+                Promise.all([
+                    carregarLogoFornecedor(),
+                    carregarServicosForn(),
+                    carregarResumoServicosFornMes(),
+                    carregarOrcForn(),
+                    carregarNFForn()
+                ]).catch(() => { });
                 iniciarRealtime();
                 return;
             }
@@ -4341,8 +4382,10 @@
                         if (scrP && !scrP.classList.contains('hidden') && (currentUser?.role === 'programador' || currentUser?.perfil === 'programador'))
                             carregarProgGeral().catch(() => { });
                         const scrF = document.getElementById('scr-fornecedor');
-                        if (scrF && !scrF.classList.contains('hidden') && currentUser?.role === 'fornecedor')
+                        if (scrF && !scrF.classList.contains('hidden') && currentUser?.role === 'fornecedor') {
                             carregarServicosForn().catch(() => { });
+                            carregarResumoServicosFornMes().catch(() => { });
+                        }
                     } catch (_) { }
                 })
                 .on('postgres_changes', { event: '*', schema: 'public', table: TBL.orcamentos }, () => {
@@ -5072,7 +5115,13 @@
                     try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch (_) { }
                     show('scr-fornecedor');
                     await carregarLogoFornecedor();
-                    await carregarServicosForn();
+                    _inicializarMesResumoForn();
+                    await Promise.all([
+                        carregarServicosForn(),
+                        carregarResumoServicosFornMes(),
+                        carregarOrcForn(),
+                        carregarNFForn()
+                    ]);
                     await carregarAlertasRevisaoFornecedor();
                     iniciarRealtime();
                     setTimeout(inicializarChat, 1000);
@@ -6090,6 +6139,99 @@
         }
 
         // ─────────────────────────────────────────────
+        // FORNECEDOR: RESUMO SERVIÇOS DO MÊS
+        // ─────────────────────────────────────────────
+        function _inicializarMesResumoForn() {
+            const el = document.getElementById('forn-mes-resumo');
+            if (!el || el.value) return;
+            const hoje = new Date();
+            el.value = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function _fornIntervaloMes(ym) {
+            const [ano, mes] = (ym || '').split('-').map(Number);
+            if (!ano || !mes) return null;
+            const dataIni = `${ano}-${String(mes).padStart(2, '0')}-01`;
+            const ultimo = new Date(ano, mes, 0).getDate();
+            const dataFim = `${ano}-${String(mes).padStart(2, '0')}-${String(ultimo).padStart(2, '0')}`;
+            return { dataIni, dataFim };
+        }
+
+        async function carregarResumoServicosFornMes() {
+            if (!currentUser?.empresa) return;
+            _inicializarMesResumoForn();
+            const ym = document.getElementById('forn-mes-resumo')?.value;
+            const intervalo = _fornIntervaloMes(ym);
+            const contPlacas = document.getElementById('forn-mes-placas');
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            if (!intervalo) {
+                set('forn-mes-veiculos', '0'); set('forn-mes-pendentes', '0');
+                set('forn-mes-execucao', '0'); set('forn-mes-concluidos', '0');
+                const sub = document.getElementById('forn-mes-servicos-sub');
+                if (sub) sub.textContent = '0 serviços';
+                if (contPlacas) contPlacas.innerHTML = '<p style="color:var(--gray);font-size:11px;text-align:center;margin:0;">Selecione o mês.</p>';
+                return;
+            }
+            try {
+                const { data: list, error } = await db.from(TBL.prog)
+                    .select('id,placa,status_flow,tipo_op,data_servico')
+                    .eq('fornecedor', currentUser.empresa)
+                    .gte('data_servico', intervalo.dataIni)
+                    .lte('data_servico', intervalo.dataFim)
+                    .neq('status_flow', 'CANCELADO')
+                    .order('data_servico', { ascending: false });
+                if (error) throw error;
+                const rows = list || [];
+                const placasUnicas = new Set(rows.map(s => s.placa).filter(Boolean));
+                const pendentes = rows.filter(s => s.status_flow === 'PENDENTE').length;
+                const execucao = rows.filter(s => s.status_flow === 'EM EXECUÇÃO').length;
+                const concluidos = rows.filter(s => s.status_flow === 'CONCLUIDO').length;
+
+                set('forn-mes-veiculos', placasUnicas.size);
+                set('forn-mes-pendentes', pendentes);
+                set('forn-mes-execucao', execucao);
+                set('forn-mes-concluidos', concluidos);
+                const sub = document.getElementById('forn-mes-servicos-sub');
+                if (sub) sub.textContent = rows.length + (rows.length === 1 ? ' serviço' : ' serviços');
+
+                if (!contPlacas) return;
+                if (!rows.length) {
+                    contPlacas.innerHTML = '<p style="color:var(--gray);font-size:11px;text-align:center;margin:0;">Nenhum veículo atendido neste mês.</p>';
+                    return;
+                }
+
+                const porPlaca = {};
+                rows.forEach(s => {
+                    const p = s.placa || '—';
+                    if (!porPlaca[p]) porPlaca[p] = { total: 0, pendente: 0, exec: 0, concluido: 0 };
+                    porPlaca[p].total++;
+                    if (s.status_flow === 'PENDENTE') porPlaca[p].pendente++;
+                    else if (s.status_flow === 'EM EXECUÇÃO') porPlaca[p].exec++;
+                    else if (s.status_flow === 'CONCLUIDO') porPlaca[p].concluido++;
+                });
+
+                const ordenadas = Object.keys(porPlaca).sort();
+                contPlacas.innerHTML = ordenadas.map(placa => {
+                    const st = porPlaca[placa];
+                    const chips = [
+                        st.pendente ? `<span class="status-badge" style="background:var(--warning);font-size:9px;">${st.pendente} pend.</span>` : '',
+                        st.exec ? `<span class="status-badge" style="background:#ef4444;font-size:9px;">${st.exec} exec.</span>` : '',
+                        st.concluido ? `<span class="status-badge" style="background:var(--success);font-size:9px;">${st.concluido} ok</span>` : ''
+                    ].filter(Boolean).join(' ');
+                    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;margin-bottom:6px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid rgba(255,255,255,.06);">
+                        <div>
+                            <b style="font-size:12px;">${placa}</b>
+                            <span style="font-size:10px;color:var(--gray);margin-left:6px;">${st.total} serv.</span>
+                        </div>
+                        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;">${chips || '<span style="font-size:9px;color:var(--gray);">—</span>'}</div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                if (contPlacas) contPlacas.innerHTML = `<p style="color:var(--danger);font-size:11px;margin:0;">Erro: ${e.message}</p>`;
+            }
+        }
+
+        // ─────────────────────────────────────────────
         // FORNECEDOR: SERVIÇOS DO DIA
         // ─────────────────────────────────────────────
         async function carregarServicosForn() {
@@ -6129,6 +6271,10 @@
                 if (el) el.style.display = a === aba ? 'block' : 'none';
                 if (tb) { tb.classList.toggle('tab-active', a === aba); }
             });
+            if (aba === 'servicos') {
+                carregarServicosForn();
+                carregarResumoServicosFornMes();
+            }
             if (aba === 'orcamentos') carregarOrcForn();
             if (aba === 'nf') carregarNFForn();
         }
@@ -6668,7 +6814,7 @@
 
         async function fecharModalStatus() {
             show('scr-fornecedor');
-            await carregarServicosForn();
+            await Promise.all([carregarServicosForn(), carregarResumoServicosFornMes()]);
             statusPendente = { id: null, novoStatus: null, fotos: [], rating: 0 };
         }
 
