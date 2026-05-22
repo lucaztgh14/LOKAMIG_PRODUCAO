@@ -1244,6 +1244,42 @@
             min-height: 72px;
         }
 
+        .evid-secao {
+            margin-bottom: 14px;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, .2);
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .evid-secao h5 {
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            color: var(--info);
+        }
+
+        .evid-meta {
+            font-size: 9px;
+            color: var(--gray);
+            line-height: 1.35;
+            margin-top: 4px;
+        }
+
+        .evid-geo-status {
+            font-size: 10px;
+            color: var(--warning);
+            margin-bottom: 8px;
+            min-height: 14px;
+        }
+
+        .evid-ant {
+            border-color: rgba(245, 158, 11, .35);
+        }
+
+        .evid-dep {
+            border-color: rgba(16, 185, 129, .35);
+        }
+
         .status-badge {
             padding: 3px 8px;
             border-radius: 6px;
@@ -3740,25 +3776,62 @@
         <button onclick="handleLogout()" class="btn-gray" style="margin-top:10px;">🚪 Sair</button>
     </section>
 
-    <!-- MODAL: ALTERAR STATUS -->
+    <!-- MODAL: EVIDÊNCIAS DO SERVIÇO (fornecedor / admin / programador) -->
     <section id="scr-modal-status" class="hidden">
-        <div class="modal-overlay">
-            <div class="modal-content" onclick="event.stopPropagation()">
-                <div class="modal-header" id="modal-status-titulo">📸 Registrar Status</div>
-                <p style="font-size:11px;color:var(--gray);margin-bottom:10px;">Registre pelo menos uma foto para
-                    confirmar:</p>
-                <div class="btn-row">
-                    <button onclick="document.getElementById('status-foto-cam').click()"
-                        style="background:var(--joint);" class="btn-flex">📸 CÂMERA</button>
-                    <button onclick="document.getElementById('status-foto-gal').click()"
-                        style="background:var(--return);" class="btn-flex">🖼️ GALERIA</button>
+        <div class="modal-overlay" onclick="fecharModalStatus()">
+            <div class="modal-content" onclick="event.stopPropagation()" style="max-height:92vh;overflow-y:auto;">
+                <div class="modal-header" id="modal-status-titulo">📸 Evidências do serviço</div>
+                <p id="modal-status-sub" style="font-size:11px;color:var(--gray);margin:0 0 10px 0;"></p>
+                <div id="evid-geo-status" class="evid-geo-status"></div>
+
+                <div id="evid-secao-antes" class="evid-secao evid-ant">
+                    <h5>📷 Antes do serviço</h5>
+                    <p style="font-size:10px;color:var(--gray);margin:0 0 8px 0;">Obrigatório para iniciar. Data, hora e local são gravados automaticamente.</p>
+                    <div id="evid-btns-antes" class="btn-row">
+                        <button type="button" onclick="document.getElementById('status-foto-antes-cam').click()"
+                            style="background:var(--joint);" class="btn-flex">📸 Câmera</button>
+                        <button type="button" onclick="document.getElementById('status-foto-antes-gal').click()"
+                            style="background:var(--return);" class="btn-flex">🖼️ Galeria</button>
+                    </div>
+                    <input type="file" id="status-foto-antes-cam" capture="environment" accept="image/*" class="hidden"
+                        onchange="handleEvidenciaServico(this,'antes')">
+                    <input type="file" id="status-foto-antes-gal" multiple accept="image/*" class="hidden"
+                        onchange="handleEvidenciaServico(this,'antes')">
+                    <div id="status-preview-antes" class="preview-area"></div>
                 </div>
-                <input type="file" id="status-foto-cam" capture="environment" accept="image/*" class="hidden"
-                    onchange="handleStatusFotos(this)">
-                <input type="file" id="status-foto-gal" multiple accept="image/*" class="hidden"
-                    onchange="handleStatusFotos(this)">
-                <div id="status-foto-preview" class="preview-area"></div>
-                <div id="rating-area" class="hidden">
+
+                <div id="evid-secao-depois" class="evid-secao evid-dep" style="display:none;">
+                    <h5>📷 Depois do serviço</h5>
+                    <p style="font-size:10px;color:var(--gray);margin:0 0 8px 0;">Obrigatório para concluir. Tire a foto do resultado final.</p>
+                    <div id="evid-btns-depois" class="btn-row">
+                        <button type="button" onclick="document.getElementById('status-foto-depois-cam').click()"
+                            style="background:var(--joint);" class="btn-flex">📸 Câmera</button>
+                        <button type="button" onclick="document.getElementById('status-foto-depois-gal').click()"
+                            style="background:var(--return);" class="btn-flex">🖼️ Galeria</button>
+                    </div>
+                    <input type="file" id="status-foto-depois-cam" capture="environment" accept="image/*" class="hidden"
+                        onchange="handleEvidenciaServico(this,'depois')">
+                    <input type="file" id="status-foto-depois-gal" multiple accept="image/*" class="hidden"
+                        onchange="handleEvidenciaServico(this,'depois')">
+                    <div id="status-preview-depois" class="preview-area"></div>
+                </div>
+
+                <div id="evid-secao-video" class="evid-secao" style="display:none;">
+                    <h5>🎥 Vídeo (opcional)</h5>
+                    <button type="button" onclick="document.getElementById('status-video-cam').click()"
+                        class="btn-info btn-sm" style="width:100%;">Gravar / selecionar vídeo</button>
+                    <input type="file" id="status-video-cam" accept="video/*" capture="camcorder" class="hidden"
+                        onchange="handleEvidenciaServico(this,'video')">
+                    <div id="status-preview-video" class="evidencia-grid" style="margin-top:8px;"></div>
+                </div>
+
+                <div id="evid-secao-obs">
+                    <h5 style="font-size:12px;color:var(--info);margin:0 0 6px 0;">📝 Observações</h5>
+                    <textarea id="status-obs" placeholder="Descreva o que foi feito, peças trocadas, defeitos encontrados..." rows="3"
+                        style="margin:0;"></textarea>
+                </div>
+
+                <div id="rating-area" class="hidden" style="margin-top:10px;">
                     <p style="font-size:11px;color:var(--gray);margin-bottom:5px;">Avalie o serviço:</p>
                     <div class="stars" id="rating-stars">
                         <span onclick="setRating(1)">☆</span><span onclick="setRating(2)">☆</span>
@@ -3766,11 +3839,12 @@
                         <span onclick="setRating(5)">☆</span>
                     </div>
                 </div>
-                <textarea id="status-obs" placeholder="Observações sobre o serviço..." rows="2"
-                    style="margin-top:8px;"></textarea>
-                <button id="btn-confirmar-status" class="btn-success hidden" onclick="confirmarAlteracaoStatus()">✅
-                    CONFIRMAR</button>
-                <button onclick="fecharModalStatus()" class="btn-gray btn-sm" style="margin-top:5px;">Cancelar</button>
+
+                <button id="btn-iniciar-servico" class="btn-warning hidden" style="width:100%;margin-top:12px;"
+                    onclick="confirmarIniciarServico()">▶ INICIAR SERVIÇO</button>
+                <button id="btn-concluir-servico" class="btn-success hidden" style="width:100%;margin-top:12px;"
+                    onclick="confirmarConcluirServico()">✅ CONCLUIR SERVIÇO</button>
+                <button onclick="fecharModalStatus()" class="btn-gray btn-sm" style="margin-top:8px;width:100%;">← Voltar</button>
             </div>
         </div>
     </section>
@@ -3873,7 +3947,8 @@
         const CLOUDINARY = {
             cloudName: 'dlaregq2k',
             uploadPreset: 'lokamig',
-            uploadUrl: 'https://api.cloudinary.com/v1_1/dlaregq2k/image/upload'
+            uploadUrl: 'https://api.cloudinary.com/v1_1/dlaregq2k/image/upload',
+            videoUploadUrl: 'https://api.cloudinary.com/v1_1/dlaregq2k/video/upload'
         };
 
         async function uploadFotoCloudinary(base64Data) {
@@ -3894,18 +3969,101 @@
             throw new Error('Falha no upload: ' + (data.error?.message || 'Erro desconhecido'));
         }
 
+        async function uploadVideoCloudinary(base64Data) {
+            const res = await fetch(base64Data);
+            const blob = await res.blob();
+            const formData = new FormData();
+            formData.append('file', blob);
+            formData.append('upload_preset', CLOUDINARY.uploadPreset);
+            formData.append('folder', 'lokamig/videos');
+            const response = await fetch(CLOUDINARY.videoUploadUrl, { method: 'POST', body: formData });
+            const data = await response.json();
+            if (data.secure_url) return data.secure_url;
+            throw new Error('Falha no vídeo: ' + (data.error?.message || 'Erro'));
+        }
+
         async function uploadFotosCloudinary(fotosArray, onProgress) {
             const urls = [];
             for (let i = 0; i < fotosArray.length; i++) {
                 const foto = fotosArray[i];
-                const base64 = typeof foto === 'object' ? foto.data : foto;
-                // Se já é uma URL (já foi enviada), mantém
-                if (base64.startsWith('http')) { urls.push(base64); continue; }
+                const base64 = typeof foto === 'object' ? (foto.data || foto.url) : foto;
+                if (!base64) continue;
+                if (String(base64).startsWith('http')) { urls.push(base64); continue; }
                 if (onProgress) onProgress(i + 1, fotosArray.length);
                 const url = await uploadFotoCloudinary(base64);
                 urls.push(url);
             }
             return urls;
+        }
+
+        async function uploadEvidenciasProg(evidencias, onProgress) {
+            const out = [];
+            for (let i = 0; i < evidencias.length; i++) {
+                const ev = evidencias[i];
+                if (ev.url && String(ev.url).startsWith('http')) {
+                    const { data, ...rest } = ev;
+                    out.push(rest);
+                    continue;
+                }
+                if (onProgress) onProgress(i + 1, evidencias.length);
+                const base64 = ev.data;
+                if (!base64) continue;
+                const url = ev.tipo === 'video'
+                    ? await uploadVideoCloudinary(base64)
+                    : await uploadFotoCloudinary(base64);
+                const { data, ...rest } = ev;
+                out.push({ ...rest, url });
+            }
+            return out;
+        }
+
+        function _parseFotosProg(raw) {
+            if (!raw) return [];
+            const arr = Array.isArray(raw) ? raw : (typeof raw === 'string' ? (() => { try { return JSON.parse(raw); } catch (_) { return [raw]; } })() : []);
+            return arr.map(f => {
+                if (typeof f === 'string') return { url: f, tipo: 'foto', ts: '' };
+                if (f && f.url) return f;
+                if (f && f.data) return { url: f.data, tipo: f.tipo || 'foto', ts: f.ts || '', endereco: f.endereco || '' };
+                return null;
+            }).filter(Boolean);
+        }
+
+        function _urlEvidencia(ev) {
+            return (typeof ev === 'string') ? ev : (ev?.url || ev?.data || '');
+        }
+
+        function _metaEvidenciaHtml(ev) {
+            const ts = ev.ts || '—';
+            const loc = ev.endereco || (ev.lat != null ? `${ev.lat.toFixed(5)}, ${ev.lng.toFixed(5)}` : 'Sem localização');
+            const tipo = ev.tipo === 'antes' ? '📷 ANTES' : ev.tipo === 'depois' ? '✅ DEPOIS' : ev.tipo === 'video' ? '🎥 VÍDEO' : '📎';
+            return `<div class="evid-meta">${tipo}<br>📅 ${ts}<br>📍 ${loc}</div>`;
+        }
+
+        async function _capturarGeoEndereco() {
+            const ts = new Date().toLocaleString('pt-BR');
+            const fallback = { lat: null, lng: null, endereco: 'Localização não disponível', rua: '', bairro: '', cidade: '', ts };
+            if (!navigator.geolocation) return fallback;
+            return new Promise(resolve => {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    let endereco = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                    let rua = '', bairro = '', cidade = '';
+                    try {
+                        const r = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=pt-BR`,
+                            { headers: { 'Accept-Language': 'pt-BR' } }
+                        );
+                        const j = await r.json();
+                        const a = j.address || {};
+                        rua = [a.road || a.pedestrian, a.house_number].filter(Boolean).join(', ');
+                        bairro = a.suburb || a.neighbourhood || a.quarter || a.city_district || '';
+                        cidade = a.city || a.town || a.municipality || a.village || '';
+                        endereco = [rua, bairro, cidade].filter(Boolean).join(' — ') || j.display_name || endereco;
+                    } catch (_) { }
+                    resolve({ lat, lng, endereco, rua, bairro, cidade, ts });
+                }, () => resolve(fallback), { enableHighAccuracy: true, timeout: 14000, maximumAge: 45000 });
+            });
         }
 
         // ─────────────────────────────────────────────
@@ -4153,7 +4311,10 @@
         let tempEvidencias = [];
         let currentUser = null;
         let abastecimentoFoto = null;
-        let statusPendente = { id: null, novoStatus: null, fotos: [], rating: 0 };
+        let statusPendente = {
+            id: null, modo: 'ver', servico: null, somenteLeitura: false,
+            novasAntes: [], novasDepois: [], novosVideos: [], rating: 0
+        };
         let orcDetalheOrigem = 'admin';
         let orcAtual = null;
         let servicoDetalheId = null;
@@ -5502,11 +5663,14 @@
                 const temFotos = (s.fotos || []).length > 0;
                 const acoes = o.modo === 'admin' ? `
                     <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;" onclick="event.stopPropagation()">
+                        <button class="btn-info btn-sm" onclick="abrirPainelEvidenciasServico(${s.id},true)">📷</button>
                         <button class="btn-info btn-sm" onclick="abrirDetalheServico(${s.id})">🔍</button>
-                        ${temFotos ? `<button class="btn-info btn-sm" onclick="verFotosProgCard(${s.id})">📷</button>` : ''}
                         <button class="btn-pdf btn-sm" onclick="gerarPDF(${s.id})">📄</button>
                         ${s.status_flow !== 'CANCELADO' && s.status_flow !== 'CONCLUIDO' ? `<button class="btn-cancel btn-sm" onclick="cancelarServico(${s.id})">🚫</button>` : ''}
-                    </div>` : (temFotos ? `<div style="margin-top:4px;"><button class="btn-info btn-sm" onclick="event.stopPropagation();verFotosProgCard(${s.id})">📷 Fotos</button></div>` : '');
+                    </div>` : `<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;" onclick="event.stopPropagation()">
+                        <button class="btn-info btn-sm" onclick="abrirPainelEvidenciasServico(${s.id},true)">📷 Evidências</button>
+                        ${temFotos ? `<button class="btn-info btn-sm" onclick="verFotosProgCard(${s.id})">🖼️</button>` : ''}
+                    </div>`;
                 return `<div class="mon-mini-card ${cancelClass}" style="flex:1;background:rgba(${cor},.08);border:1px solid rgba(${cor},.35);cursor:${o.modo === 'admin' ? 'default' : 'default'};">
                     <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;">
                         <span class="status-badge" style="background:${statusColor};color:#fff;font-size:9px;">${s.status_flow}</span>
@@ -5584,7 +5748,10 @@
             const { data: revs } = await _filtrarBase(db.from(TBL.manutencoes).select('*').eq('placa', s.placa).eq('status', 'PENDENTE'));
             const revisao = revs?.[0];
 
-            const fotos = s.fotos || [];
+            const evids = _parseFotosProg(s.fotos);
+            const nAntes = evids.filter(e => e.tipo === 'antes').length;
+            const nDepois = evids.filter(e => e.tipo === 'depois').length;
+            const nVideo = evids.filter(e => e.tipo === 'video').length;
             document.getElementById('srv-det-body').innerHTML = `
     <table>
         <tr><th>Placa</th><td><b>${s.placa}</b></td></tr>
@@ -5595,14 +5762,24 @@
         <tr><th>Status</th><td>${s.status_flow}</td></tr>
         <tr><th>Programador</th><td>${s.programador || '—'}</td></tr>
         <tr><th>Data/Hora</th><td>${s.timestamp || s.data_servico}</td></tr>
-        ${s.obs ? `<tr><th>Obs.</th><td>${s.obs}</td></tr>` : ''}
+        <tr><th>Evidências</th><td>📷 Antes: ${nAntes} · Depois: ${nDepois} · 🎥 ${nVideo}</td></tr>
+        ${s.obs ? `<tr><th>Obs. programação</th><td>${s.obs}</td></tr>` : ''}
         ${s.rating ? `<tr><th>Avaliação</th><td>${'★'.repeat(s.rating)}${'☆'.repeat(5 - s.rating)}</td></tr>` : ''}
-        ${s.obs_status ? `<tr><th>Obs. Serviço</th><td>${s.obs_status}</td></tr>` : ''}
-    </table>`;
+        ${s.obs_status ? `<tr><th>Obs. fornecedor</th><td style="white-space:pre-wrap;">${s.obs_status}</td></tr>` : ''}
+    </table>
+    <button class="btn-info btn-sm" style="margin-top:10px;width:100%;" onclick="abrirPainelEvidenciasServico(${id},true)">📷 Ver todas as evidências</button>`;
 
-            document.getElementById('srv-det-fotos').innerHTML = fotos.map(f => `<div class="photo-card"><img src="${f}" class="thumb" onclick="verFotoGrande('${f}')">
-         <div class="timestamp-overlay">${s.timestamp || s.data_servico}</div></div>`
-            ).join('');
+            document.getElementById('srv-det-fotos').innerHTML = evids.length
+                ? evids.map(ev => {
+                    const u = _urlEvidencia(ev);
+                    if (ev.tipo === 'video') {
+                        return `<div class="ev-card"><video src="${u}" controls style="width:100%;max-height:140px;"></video>${_metaEvidenciaHtml(ev)}</div>`;
+                    }
+                    return `<div class="photo-card"><img src="${u}" class="thumb" onclick="verFotoGrande('${u}')">
+                        <div class="timestamp-overlay">${ev.tipo === 'antes' ? 'ANTES' : ev.tipo === 'depois' ? 'DEPOIS' : ''} ${ev.ts || ''}</div>
+                        ${_metaEvidenciaHtml(ev)}</div>`;
+                }).join('')
+                : '<p style="color:var(--gray);font-size:11px;">Sem fotos registradas pelo fornecedor.</p>';
 
             const revCont = document.getElementById('srv-det-revisao');
             if (revisao) {
@@ -6272,7 +6449,8 @@
                             <div style="font-size:10px;color:var(--gray);">KM: ${s.km || '—'} | ${s.timestamp || s.data_servico}</div>
                             ${s.rating ? `<div style="color:#fbbf24;font-size:10px;">${'★'.repeat(s.rating)}${'☆'.repeat(5 - s.rating)}</div>` : ''}
                             <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
-                                ${temFotos ? `<button class="btn-info btn-sm" onclick="verFotosProgCard(${s.id})">📷 Fotos</button>` : ''}
+                                <button class="btn-info btn-sm" onclick="abrirPainelEvidenciasServico(${s.id},true)">📷 Evidências</button>
+                                ${temFotos ? `<button class="btn-info btn-sm" onclick="verFotosProgCard(${s.id})">🖼️</button>` : ''}
                                 ${podeCancelar ? `<button class="btn-cancel btn-sm" onclick="cancelarServicoProg(${s.id})">🚫</button>` : ''}
                             </div>
                         </div>`;
@@ -6297,12 +6475,13 @@
         }
 
         async function verFotosProgCard(id) {
-            const { data: rows } = await db.from(TBL.prog).select('fotos,placa,timestamp,tipo_op').eq('id', id);
+            const { data: rows } = await db.from(TBL.prog).select('fotos,placa,timestamp,tipo_op,status_flow').eq('id', id);
             const s = rows?.[0]; if (!s) return;
-            const fotos = s.fotos || [];
-            if (!fotos.length) { alert('Nenhuma foto neste lançamento.'); return; }
-            // Abre direto no lightbox com todas as fotos navegáveis
-            verFotoGrande(fotos[0], fotos, `📸 ${s.placa} — ${s.tipo_op || ''} | ${s.timestamp || ''}`);
+            const evids = _parseFotosProg(s.fotos);
+            if (!evids.length) { alert('Nenhuma evidência neste lançamento.'); return; }
+            const imgs = evids.filter(e => e.tipo !== 'video').map(e => _urlEvidencia(e)).filter(Boolean);
+            if (imgs.length) verFotoGrande(imgs[0], imgs, `📸 ${s.placa} — ${s.tipo_op || ''}`);
+            else abrirPainelEvidenciasServico(id, true);
         }
 
         async function lancarRetornoRapido(placa) {
@@ -6377,22 +6556,14 @@
             _renderListaServicosForn(fornListaDiaCache);
         }
 
-        function fornClicarServico(id, statusFlow) {
-            const s = fornListaDiaCache.find(x => x.id === id);
-            if (!s) return;
-            if (statusFlow === 'PENDENTE') abrirModalStatus(id, 'EM EXECUÇÃO');
-            else if (statusFlow === 'EM EXECUÇÃO') abrirModalStatus(id, 'CONCLUIDO');
-            else if (statusFlow === 'CONCLUIDO') {
-                const fotos = s.fotos || [];
-                if (fotos.length) verFotoGrande(fotos[0], fotos, `📸 ${s.placa} — concluído`);
-                else alert(`✅ ${s.placa} já concluído.\n${s.tipo_op || ''} | KM: ${s.km || '—'}`);
-            }
+        function fornClicarServico(id) {
+            abrirPainelEvidenciasServico(id, false);
         }
 
         function _hintCardForn(st) {
-            if (st === 'PENDENTE') return '👆 Toque para iniciar o serviço';
-            if (st === 'EM EXECUÇÃO') return '👆 Toque para concluir (foto obrigatória)';
-            if (st === 'CONCLUIDO') return '👆 Toque para ver fotos / detalhes';
+            if (st === 'PENDENTE') return '👆 Toque para fotos ANTES e iniciar';
+            if (st === 'EM EXECUÇÃO') return '👆 Toque para fotos DEPOIS e concluir';
+            if (st === 'CONCLUIDO') return '👆 Toque para ver evidências completas';
             return '';
         }
 
@@ -6409,8 +6580,8 @@
                 const statusColor = _corStatusFlow(s.status_flow);
                 const temFotos = (s.fotos || []).length > 0;
                 return `<div class="prog-item forn-serv-card status-${stClass}" role="button" tabindex="0"
-                    onclick="fornClicarServico(${s.id},${JSON.stringify(s.status_flow)})"
-                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fornClicarServico(${s.id},${JSON.stringify(s.status_flow)})}">
+                    onclick="fornClicarServico(${s.id})"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fornClicarServico(${s.id})}">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;">
                     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                         <span class="status-badge" style="background:${statusColor}">${s.status_flow}</span>
@@ -6989,49 +7160,136 @@
         }
 
         // ─────────────────────────────────────────────
-        // MODAL STATUS (FORNECEDOR)
+        // EVIDÊNCIAS DO SERVIÇO (fornecedor / admin / programador)
         // ─────────────────────────────────────────────
-        function abrirModalStatus(id, novoStatus) {
-            statusPendente = { id, novoStatus, fotos: [], rating: 0 };
-            document.getElementById('modal-status-titulo').innerText = novoStatus === 'EM EXECUÇÃO' ? '▶ INICIAR SERVIÇO' : '✅ FINALIZAR SERVIÇO';
-            document.getElementById('status-foto-preview').innerHTML = '';
-            document.getElementById('status-obs').value = '';
-            document.getElementById('rating-area').classList.toggle('hidden', novoStatus !== 'CONCLUIDO');
-            document.querySelectorAll('#rating-stars span').forEach(s => { s.classList.remove('active'); s.textContent = '☆'; });
-            // Para INICIAR: botão aparece imediatamente (foto opcional)
-            // Para CONCLUIR: botão aparece só após foto
-            if (novoStatus === 'EM EXECUÇÃO') {
-                document.getElementById('btn-confirmar-status').classList.remove('hidden');
-            } else {
-                document.getElementById('btn-confirmar-status').classList.add('hidden');
+        function _renderPreviewEvidencias(contId, lista, tipoArr, somenteLeitura) {
+            const cont = document.getElementById(contId);
+            if (!cont) return;
+            cont.innerHTML = (lista || []).map((ev, i) => {
+                const src = ev.data || ev.url;
+                const del = somenteLeitura ? '' : `<button class="del-btn" onclick="removerEvidenciaServico('${tipoArr}',${i})">✕</button>`;
+                if (ev.tipo === 'video') {
+                    return `<div class="ev-card">${del}<video src="${src}" controls style="width:100%;max-height:120px;"></video>${_metaEvidenciaHtml(ev)}</div>`;
+                }
+                return `<div class="photo-card">${del}
+                    <img src="${src}" class="thumb" onclick="verFotoGrande(${JSON.stringify(src)})">
+                    <div class="timestamp-overlay">📅 ${ev.ts || ''}</div>
+                    ${_metaEvidenciaHtml(ev)}
+                </div>`;
+            }).join('');
+        }
+
+        function removerEvidenciaServico(tipoArr, idx) {
+            if (tipoArr === 'antes') statusPendente.novasAntes.splice(idx, 1);
+            else if (tipoArr === 'depois') statusPendente.novasDepois.splice(idx, 1);
+            else statusPendente.novosVideos.splice(idx, 1);
+            renderPainelEvidenciasUI();
+        }
+
+        async function handleEvidenciaServico(input, categoria) {
+            const files = Array.from(input.files || []);
+            if (!files.length) return;
+            const geoEl = document.getElementById('evid-geo-status');
+            if (geoEl) geoEl.textContent = '📍 Obtendo localização e endereço...';
+            const geo = await _capturarGeoEndereco();
+            if (geoEl) geoEl.textContent = `📍 ${geo.endereco}`;
+
+            for (const file of files) {
+                if (categoria === 'video') {
+                    const reader = new FileReader();
+                    await new Promise(res => {
+                        reader.onload = e => {
+                            statusPendente.novosVideos.push({
+                                tipo: 'video', data: e.target.result, ts: geo.ts,
+                                lat: geo.lat, lng: geo.lng, endereco: geo.endereco,
+                                rua: geo.rua, bairro: geo.bairro, cidade: geo.cidade
+                            });
+                            res();
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                } else {
+                    const compressed = await compressarFoto(file);
+                    const item = {
+                        tipo: categoria, data: compressed, ts: geo.ts,
+                        lat: geo.lat, lng: geo.lng, endereco: geo.endereco,
+                        rua: geo.rua, bairro: geo.bairro, cidade: geo.cidade
+                    };
+                    if (categoria === 'antes') statusPendente.novasAntes.push(item);
+                    else statusPendente.novasDepois.push(item);
+                }
             }
+            input.value = '';
+            renderPainelEvidenciasUI();
+        }
+
+        function renderPainelEvidenciasUI() {
+            const ev = _parseFotosProg(statusPendente.servico?.fotos);
+            const salvasAntes = ev.filter(e => e.tipo === 'antes');
+            const salvasDepois = ev.filter(e => e.tipo === 'depois');
+            const salvasVideo = ev.filter(e => e.tipo === 'video');
+            const todasAntes = [...salvasAntes, ...statusPendente.novasAntes];
+            const todasDepois = [...salvasDepois, ...statusPendente.novasDepois];
+            const todosVideos = [...salvasVideo, ...statusPendente.novosVideos];
+            const ro = statusPendente.somenteLeitura;
+
+            _renderPreviewEvidencias('status-preview-antes', todasAntes, 'antes', ro);
+            _renderPreviewEvidencias('status-preview-depois', todasDepois, 'depois', ro);
+            _renderPreviewEvidencias('status-preview-video', todosVideos, 'video', ro);
+
+            const btnIni = document.getElementById('btn-iniciar-servico');
+            const btnConc = document.getElementById('btn-concluir-servico');
+            if (btnIni) btnIni.classList.toggle('hidden', ro || statusPendente.modo !== 'iniciar' || !statusPendente.novasAntes.length);
+            if (btnConc) btnConc.classList.toggle('hidden', ro || statusPendente.modo !== 'concluir' || !statusPendente.novasDepois.length);
+        }
+
+        async function abrirPainelEvidenciasServico(id, somenteLeitura) {
+            const { data: rows } = await db.from(TBL.prog).select('*').eq('id', id);
+            const s = rows?.[0];
+            if (!s) return;
+
+            const st = s.status_flow;
+            let modo = 'ver';
+            if (!somenteLeitura && st === 'PENDENTE') modo = 'iniciar';
+            else if (!somenteLeitura && st === 'EM EXECUÇÃO') modo = 'concluir';
+
+            statusPendente = {
+                id, modo, servico: s, somenteLeitura: somenteLeitura || modo === 'ver',
+                novasAntes: [], novasDepois: [], novosVideos: [], rating: s.rating || 0
+            };
+
+            const titulo = document.getElementById('modal-status-titulo');
+            const sub = document.getElementById('modal-status-sub');
+            if (titulo) titulo.textContent = `🚗 ${s.placa} — ${s.tipo_op || 'Serviço'}`;
+            if (sub) sub.textContent = `${s.fornecedor || ''} · ${st} · KM ${s.km || '—'}`;
+
+            document.getElementById('evid-secao-antes').style.display = '';
+            document.getElementById('evid-secao-depois').style.display = (modo === 'concluir' || st === 'CONCLUIDO') ? '' : 'none';
+            const temVideo = _parseFotosProg(s.fotos).some(e => e.tipo === 'video');
+            document.getElementById('evid-secao-video').style.display = (statusPendente.somenteLeitura && !temVideo) ? 'none' : '';
+            document.getElementById('evid-btns-antes').style.display = (statusPendente.somenteLeitura || modo !== 'iniciar') ? 'none' : '';
+            document.getElementById('evid-btns-depois').style.display = (statusPendente.somenteLeitura || modo !== 'concluir') ? 'none' : '';
+            const vidBtns = document.querySelector('#evid-secao-video button');
+            if (vidBtns) vidBtns.style.display = statusPendente.somenteLeitura ? 'none' : '';
+            document.getElementById('status-obs').value = s.obs_status || '';
+            document.getElementById('status-obs').readOnly = statusPendente.somenteLeitura;
+            document.getElementById('rating-area').classList.toggle('hidden', modo !== 'concluir');
+            document.querySelectorAll('#rating-stars span').forEach((sp, i) => {
+                sp.classList.toggle('active', i < statusPendente.rating);
+                sp.textContent = i < statusPendente.rating ? '★' : '☆';
+            });
+            document.getElementById('evid-geo-status').textContent = modo === 'iniciar' || modo === 'concluir'
+                ? '📍 Ao tirar foto, data/hora e endereço serão registrados automaticamente.'
+                : '';
+
+            document.getElementById('btn-iniciar-servico').classList.add('hidden');
+            document.getElementById('btn-concluir-servico').classList.add('hidden');
+            renderPainelEvidenciasUI();
             show('scr-modal-status');
         }
 
-        async function handleStatusFotos(input) {
-            const now = new Date().toLocaleString('pt-BR');
-            const files = Array.from(input.files);
-            for (const file of files) {
-                const compressed = await compressarFoto(file);
-                statusPendente.fotos.push({ data: compressed, ts: now });
-            }
-            renderStatusPreviews();
-            input.value = '';
-        }
-
-        function renderStatusPreviews() {
-            const cont = document.getElementById('status-foto-preview');
-            if (!cont) return;
-            cont.innerHTML = statusPendente.fotos.map((f, i) => {
-                const src = typeof f === 'object' ? f.data : f;
-                const ts = typeof f === 'object' ? f.ts : '';
-                return `<div class="photo-card">
-                        <img src="${src}" class="thumb" onclick="verFotoGrande('${src}')">
-                            <div class="timestamp-overlay">📅 ${ts}</div>
-                            <button class="del-btn" onclick="statusPendente.fotos.splice(${i},1);renderStatusPreviews()">✕</button>
-                        </div>`;
-            }).join('');
-            document.getElementById('btn-confirmar-status').classList.toggle('hidden', statusPendente.fotos.length === 0);
+        function abrirModalStatus(id, novoStatus) {
+            abrirPainelEvidenciasServico(id, false);
         }
 
         function setRating(val) {
@@ -7042,41 +7300,48 @@
             });
         }
 
-        async function confirmarAlteracaoStatus() {
-            // Foto obrigatória apenas para CONCLUIR, não para INICIAR
-            if (statusPendente.novoStatus === 'CONCLUIDO' && !statusPendente.fotos.length) {
-                alert('📸 Tire pelo menos uma foto para concluir o serviço!'); return;
-            }
-            loading(true, 'Enviando fotos...');
-
-            const { data: rows } = await db.from(TBL.prog).select('fotos').eq('id', statusPendente.id);
+        async function _salvarEvidenciasServico(novoStatus) {
+            const { data: rows } = await db.from(TBL.prog).select('fotos,obs_status').eq('id', statusPendente.id);
             const item = rows?.[0];
-            if (!item) { loading(false); fecharModalStatus(); return; }
+            if (!item) return false;
 
-            const fotosAnteriores = item.fotos || [];
-            const obs_status = DOMPurify.sanitize(document.getElementById('status-obs').value);
-
-            // Upload para Cloudinary
-            let novasFotos = [];
-            try {
-                novasFotos = await uploadFotosCloudinary(statusPendente.fotos, (atual, total) => {
-                    loading(true, `Enviando foto ${atual} de ${total}...`);
-                });
-            } catch (e) {
-                // Fallback: salva base64 se Cloudinary falhar
-                console.warn('Cloudinary falhou, salvando base64:', e);
-                novasFotos = statusPendente.fotos.map(f => typeof f === 'object' ? f.data : f);
+            const paraUpload = [
+                ...statusPendente.novasAntes,
+                ...statusPendente.novasDepois,
+                ...statusPendente.novosVideos
+            ];
+            if (!paraUpload.length && novoStatus !== 'EM EXECUÇÃO') {
+                alert('📸 Adicione pelo menos uma evidência.');
+                return false;
             }
 
-            loading(true, 'Salvando...');
-            await db.from(TBL.prog).update({
-                status_flow: statusPendente.novoStatus,
-                rating: statusPendente.rating,
-                obs_status,
-                fotos: [...fotosAnteriores, ...novasFotos]
-            }).eq('id', statusPendente.id);
+            loading(true, 'Enviando evidências...');
+            let enviadas = [];
+            try {
+                enviadas = await uploadEvidenciasProg(paraUpload, (a, t) => loading(true, `Enviando ${a}/${t}...`));
+            } catch (e) {
+                console.warn('Cloudinary:', e);
+                enviadas = paraUpload.map(ev => ({ ...ev, url: ev.data }));
+            }
 
-            if (statusPendente.rating > 0) {
+            const anteriores = _parseFotosProg(item.fotos);
+            const fotosMerged = [...anteriores, ...enviadas];
+            const obsNova = DOMPurify.sanitize(document.getElementById('status-obs').value.trim());
+            const obsAntiga = item.obs_status || '';
+            const obs_status = obsNova
+                ? (obsAntiga ? obsAntiga + '\n---\n' + obsNova : obsNova)
+                : obsAntiga;
+
+            const payload = {
+                status_flow: novoStatus,
+                obs_status,
+                fotos: fotosMerged
+            };
+            if (novoStatus === 'CONCLUIDO') payload.rating = statusPendente.rating;
+
+            await db.from(TBL.prog).update(payload).eq('id', statusPendente.id);
+
+            if (novoStatus === 'CONCLUIDO' && statusPendente.rating > 0) {
                 await db.from(TBL.avaliacoes).insert({
                     id_prog: statusPendente.id,
                     rating: statusPendente.rating,
@@ -7084,17 +7349,47 @@
                     base_id: _baseId()
                 });
             }
+            await registrarAuditoria(`Serviço ${novoStatus}: ID ${statusPendente.id} | ${currentUser?.empresa || currentUser?.nome}`);
+            return true;
+        }
 
-            await registrarAuditoria(`Status: ID ${statusPendente.id} → ${statusPendente.novoStatus} | ${currentUser?.empresa}`);
+        async function confirmarIniciarServico() {
+            if (!statusPendente.novasAntes.length) {
+                alert('📸 Tire pelo menos uma foto ANTES para iniciar o serviço.');
+                return;
+            }
+            const ok = await _salvarEvidenciasServico('EM EXECUÇÃO');
+            if (!ok) { loading(false); return; }
             loading(false);
-            showSuccess(statusPendente.novoStatus === 'CONCLUIDO' ? 'SERVIÇO CONCLUÍDO!' : 'SERVIÇO INICIADO!');
-            fecharModalStatus();
+            showSuccess('SERVIÇO INICIADO!');
+            await fecharModalStatus();
+        }
+
+        async function confirmarConcluirServico() {
+            if (!statusPendente.novasDepois.length) {
+                alert('📸 Tire pelo menos uma foto DEPOIS para concluir o serviço.');
+                return;
+            }
+            const ok = await _salvarEvidenciasServico('CONCLUIDO');
+            if (!ok) { loading(false); return; }
+            loading(false);
+            showSuccess('SERVIÇO CONCLUÍDO!');
+            await fecharModalStatus();
         }
 
         async function fecharModalStatus() {
-            show('scr-fornecedor');
-            await Promise.all([carregarServicosForn(), carregarResumoServicosFornMes()]);
-            statusPendente = { id: null, novoStatus: null, fotos: [], rating: 0 };
+            const role = currentUser?.role || currentUser?.perfil;
+            if (role === 'fornecedor') {
+                show('scr-fornecedor');
+                await Promise.all([carregarServicosForn(), carregarResumoServicosFornMes()]);
+            } else if (role === 'programador') {
+                show('scr-programador');
+                await carregarProgGeral();
+            } else {
+                show('scr-admin');
+                await carregarProgAdmin();
+            }
+            statusPendente = { id: null, modo: 'ver', servico: null, somenteLeitura: false, novasAntes: [], novasDepois: [], novosVideos: [], rating: 0 };
         }
 
         // ─────────────────────────────────────────────
