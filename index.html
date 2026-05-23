@@ -1208,6 +1208,29 @@
             z-index: 8501;
         }
 
+        #scr-prog-detalhe {
+            position: fixed;
+            inset: 0;
+            z-index: 8400;
+            display: none !important;
+            pointer-events: none;
+        }
+
+        #scr-prog-detalhe.modal-aberto {
+            display: block !important;
+            pointer-events: auto;
+        }
+
+        .prog-card-click {
+            cursor: pointer;
+            transition: transform .15s, box-shadow .15s;
+        }
+
+        .prog-card-click:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+        }
+
         .mon-resumo-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -3431,21 +3454,33 @@
     <!-- TELA 3: PROGRAMADOR -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-programador" class="container hidden">
-        <h1>📋 LANÇAMENTOS</h1>
+        <h1>📋 PROGRAMADOR</h1>
         <div class="sub" id="prog-user-label"></div>
 
-        <!-- Tabs do Programador -->
-        <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;">
-            <button onclick="progSwitchTab('lancamentos',this)" class="tab-btn tab-active" id="prog-tab-lancamentos">📋
-                Lançamentos</button>
-            <button onclick="progSwitchTab('historico',this)" class="tab-btn" id="prog-tab-historico">📜
-                Histórico</button>
+        <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;flex-wrap:wrap;">
+            <button onclick="progSwitchTab('dia',this)" class="tab-btn tab-active" id="prog-tab-dia">📅 Programação do dia</button>
+            <button onclick="progSwitchTab('novo',this)" class="tab-btn" id="prog-tab-novo">➕ Novo lançamento</button>
+            <button onclick="progSwitchTab('historico',this)" class="tab-btn" id="prog-tab-historico">📜 Histórico</button>
+            <button onclick="progSwitchTab('manut',this)" class="tab-btn" id="prog-tab-manut">🔧 Revisões</button>
         </div>
 
-        <!-- Aba Lançamentos (+ revisões na mesma tela) -->
-        <div id="prog-area-lancamentos">
+        <!-- Programação do dia -->
+        <div id="prog-area-dia">
+            <input type="date" id="p-filter-date" onchange="carregarProgGeral()" style="margin-bottom:10px;width:100%;">
+            <div class="mon-resumo-bar" style="margin-bottom:12px;">
+                <div class="mon-chip"><b id="prog-cnt-total" style="color:var(--info);">0</b><span>Veículos</span></div>
+                <div class="mon-chip"><b id="prog-cnt-pend" style="color:var(--warning);">0</b><span>Pendentes</span></div>
+                <div class="mon-chip"><b id="prog-cnt-exec" style="color:#f87171;">0</b><span>Em execução</span></div>
+                <div class="mon-chip"><b id="prog-cnt-ok" style="color:var(--success);">0</b><span>Concluídos</span></div>
+            </div>
+            <p style="font-size:10px;color:var(--gray);margin:0 0 10px 0;">Toque no card para ver detalhes, evidências do fornecedor ou cancelar a programação.</p>
+            <div id="list-prog-geral"></div>
+        </div>
+
+        <!-- Novo lançamento -->
+        <div id="prog-area-novo" style="display:none;">
             <div class="form-section">
-                <h4 style="color:var(--info);margin-bottom:10px;">Novo Lançamento</h4>
+                <h4 style="color:var(--info);margin-bottom:10px;">Enviar veículo ao fornecedor</h4>
                 <select id="p-placa" onchange="atualizarSetor()">
                     <option value="">— Selecione o veículo —</option>
                 </select>
@@ -3455,39 +3490,41 @@
                     <span id="p-revisao-alerta" style="color:var(--warning);font-weight:bold;"></span>
                 </div>
                 <select id="p-tipo-op" onchange="toggleFornDiv()">
-                    <option value="SAÍDA">SAÍDA</option>
-                    <option value="RETORNO">RETORNO</option>
+                    <option value="SAÍDA">SAÍDA → fornecedor</option>
+                    <option value="RETORNO">RETORNO → pátio</option>
                 </select>
                 <input type="number" id="p-km" placeholder="KM atual do veículo">
                 <div id="p-forn-div">
                     <select id="p-fornecedor-select">
-                        <option value="">— Selecione o destino —</option>
+                        <option value="">— Selecione o fornecedor —</option>
                     </select>
                 </div>
-                <textarea id="p-obs" placeholder="Observações adicionais..." rows="2" maxlength="500"></textarea>
+                <textarea id="p-obs" placeholder="Observações para o fornecedor (defeitos, serviços solicitados)..." rows="3" maxlength="500"></textarea>
                 <div class="btn-row">
-                    <button onclick="document.getElementById('p-fotos-cam').click()" style="background:var(--joint);"
-                        class="btn-flex">📸 CÂMERA</button>
-                    <button onclick="document.getElementById('p-fotos-gal').click()" style="background:var(--return);"
-                        class="btn-flex">🖼️ GALERIA</button>
+                    <button type="button" onclick="document.getElementById('p-fotos-cam').click()" style="background:var(--joint);" class="btn-flex">📸 Câmera</button>
+                    <button type="button" onclick="document.getElementById('p-fotos-gal').click()" style="background:var(--return);" class="btn-flex">🖼️ Galeria</button>
                 </div>
-                <input type="file" id="p-fotos-cam" capture="environment" accept="image/*" class="hidden"
-                    onchange="handleNewUpload(this)">
-                <input type="file" id="p-fotos-gal" multiple accept="image/*" class="hidden"
-                    onchange="handleNewUpload(this)">
+                <input type="file" id="p-fotos-cam" capture="environment" accept="image/*" class="hidden" onchange="handleNewUpload(this)">
+                <input type="file" id="p-fotos-gal" multiple accept="image/*" class="hidden" onchange="handleNewUpload(this)">
                 <div id="p-preview-fotos" class="preview-area"></div>
-                <button onclick="lancarProgramacao()" class="btn-success" style="margin-top:5px;">✅ Finalizar e
-                    Enviar</button>
+                <button type="button" onclick="lancarProgramacao()" class="btn-success" style="margin-top:8px;width:100%;">✅ Finalizar e enviar ao fornecedor</button>
             </div>
-            <input type="date" id="p-filter-date" onchange="carregarProgGeral()" style="margin-bottom:10px;">
-            <div id="list-prog-geral"></div>
+        </div>
 
-            <div class="form-section" style="margin-top:16px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px;">
-                <h4 style="margin-bottom:10px;color:var(--info);">🔧 Revisões / manutenções programadas</h4>
-                <p style="font-size:11px;color:var(--gray);margin:0 0 10px 0;">Programação de revisão fica nesta mesma tela, vinculada à frota da base.</p>
-                <select id="pm-veiculo">
-                    <option value="">— Selecione o veículo —</option>
-                </select>
+        <!-- Histórico -->
+        <div id="prog-area-historico" style="display:none;">
+            <input type="date" id="p-hist-date" onchange="carregarHistoricoProgReal()" style="margin-bottom:10px;width:100%;">
+            <p style="font-size:10px;color:var(--gray);margin:0 0 10px 0;">Lançamentos enviados em outras datas — clique para ver, editar observação ou cancelar.</p>
+            <div id="prog-list-historico">
+                <p style="color:var(--gray);text-align:center;padding:20px;">Carregando...</p>
+            </div>
+        </div>
+
+        <!-- Revisões -->
+        <div id="prog-area-manut" style="display:none;">
+            <div class="form-section">
+                <h4 style="margin-bottom:10px;color:var(--info);">🔧 Programar revisão</h4>
+                <select id="pm-veiculo"><option value="">— Selecione o veículo —</option></select>
                 <input type="text" id="pm-descricao" placeholder="Descrição da revisão / serviço">
                 <input type="number" id="pm-km-programada" placeholder="KM programada">
                 <input type="date" id="pm-data-limite">
@@ -3496,21 +3533,27 @@
                     <option value="urgente">Urgente</option>
                     <option value="critico">Crítico</option>
                 </select>
-                <button onclick="salvarManutencaoProg()" class="btn-success">✅ Programar Revisão</button>
+                <button type="button" onclick="salvarManutencaoProg()" class="btn-success">✅ Programar revisão</button>
             </div>
-            <div id="prog-list-manutencoes"></div>
-        </div>
-
-        <!-- Aba Histórico -->
-        <div id="prog-area-historico" style="display:none;">
-            <input type="date" id="p-hist-date" onchange="carregarHistoricoProgReal()" style="margin-bottom:10px;">
-            <div id="prog-list-historico">
-                <p style="color:var(--gray);text-align:center;padding:20px;">Selecione uma data para ver o histórico.
-                </p>
-            </div>
+            <div id="prog-list-manutencoes" style="margin-top:12px;"></div>
         </div>
 
         <button onclick="handleLogout()" class="btn-gray" style="margin-top:16px;">🚪 Sair</button>
+    </section>
+
+    <!-- Detalhe programação (programador) — overlay -->
+    <section id="scr-prog-detalhe">
+        <div class="modal-overlay" onclick="fecharDetalheProg()">
+            <div class="modal-content" onclick="event.stopPropagation()" style="max-height:92vh;overflow-y:auto;text-align:left;">
+                <div class="modal-header" id="prog-det-titulo">🚗 Detalhe</div>
+                <div id="prog-det-body"></div>
+                <div id="prog-det-fotos" class="preview-area" style="margin-top:10px;"></div>
+                <label style="font-size:11px;color:var(--gray);display:block;margin-top:10px;">📝 Observações (editável)</label>
+                <textarea id="prog-det-obs-edit" rows="3" style="margin:0 0 10px 0;"></textarea>
+                <div id="prog-det-acoes" style="display:flex;flex-direction:column;gap:8px;"></div>
+                <button type="button" onclick="fecharDetalheProg()" class="btn-gray btn-sm" style="margin-top:8px;width:100%;">← Voltar</button>
+            </div>
+        </div>
     </section>
 
     <!-- ═══════════════════════════════════════════════════════ -->
@@ -4777,8 +4820,10 @@
             if (perfil === 'programador') {
                 document.getElementById('prog-user-label').textContent = 'Usuário: ' + user.nome;
                 show('scr-programador');
+                _inicializarDatasProg();
                 await Promise.all([popularSeletorVeiculos(), popularSeletorFornecedores()]);
                 toggleFornDiv();
+                progSwitchTab('dia', document.getElementById('prog-tab-dia'));
                 await Promise.all([carregarProgGeral(), carregarManutencoesProg()]);
                 iniciarRealtime();
                 return;
@@ -4819,8 +4864,11 @@
                             atualizarDashboard();
                         }
                         const scrP = document.getElementById('scr-programador');
-                        if (scrP && !scrP.classList.contains('hidden') && (currentUser?.role === 'programador' || currentUser?.perfil === 'programador'))
+                        if (scrP && !scrP.classList.contains('hidden') && (currentUser?.role === 'programador' || currentUser?.perfil === 'programador')) {
                             carregarProgGeral().catch(() => { });
+                            if (document.getElementById('prog-area-historico')?.style.display !== 'none')
+                                carregarHistoricoProgReal().catch(() => { });
+                        }
                         const scrF = document.getElementById('scr-fornecedor');
                         if (scrF && !scrF.classList.contains('hidden') && currentUser?.role === 'fornecedor') {
                             carregarServicosForn().catch(() => { });
@@ -5768,6 +5816,24 @@
             set('mon-cnt-ok', rows.filter(s => s.status_flow === 'CONCLUIDO').length);
         }
 
+        function _atualizarResumoProg(list) {
+            const rows = (list || []).filter(s => s.status_flow !== 'CANCELADO');
+            const placas = new Set(rows.map(s => s.placa).filter(Boolean));
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            set('prog-cnt-total', placas.size);
+            set('prog-cnt-pend', rows.filter(s => s.status_flow === 'PENDENTE').length);
+            set('prog-cnt-exec', rows.filter(s => s.status_flow === 'EM EXECUÇÃO').length);
+            set('prog-cnt-ok', rows.filter(s => s.status_flow === 'CONCLUIDO').length);
+        }
+
+        function _inicializarDatasProg() {
+            const hoje = new Date().toISOString().split('T')[0];
+            const elD = document.getElementById('p-filter-date');
+            const elH = document.getElementById('p-hist-date');
+            if (elD && !elD.value) elD.value = hoje;
+            if (elH && !elH.value) elH.value = hoje;
+        }
+
         function _renderMonitorOperacional(list, opts) {
             const o = opts || {};
             const placas = [...new Set((list || []).map(s => s.placa))];
@@ -5776,18 +5842,24 @@
                 if (!s) return `<div class="mon-mini-card" style="flex:1;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:var(--gray);min-height:72px;">Sem ${label.toLowerCase()}</div>`;
                 const statusColor = _corStatusFlow(s.status_flow);
                 const cancelClass = s.status_flow === 'CANCELADO' ? 'cancelado' : '';
-                const temFotos = (s.fotos || []).length > 0;
+                const podeCancelar = s.status_flow !== 'CANCELADO' && s.status_flow !== 'CONCLUIDO';
+                const acoesProg = o.modo === 'programador' ? `
+                    <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-info btn-sm" onclick="abrirDetalheProg(${s.id})">🔍 Detalhes</button>
+                        <button type="button" class="btn-info btn-sm" onclick="abrirPainelEvidenciasServico(${s.id},true)">📷 Evidências</button>
+                        ${podeCancelar ? `<button type="button" class="btn-cancel btn-sm" onclick="cancelarServicoProg(${s.id})">🚫 Cancelar</button>` : ''}
+                    </div>
+                    <div style="font-size:9px;color:var(--info);margin-top:4px;">👆 Toque no card ou em Detalhes</div>` : '';
                 const acoes = o.modo === 'admin' ? `
                     <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;" onclick="event.stopPropagation()">
-                        <button class="btn-info btn-sm" onclick="abrirPainelEvidenciasServico(${s.id},true)">📷</button>
-                        <button class="btn-info btn-sm" onclick="abrirDetalheServico(${s.id})">🔍</button>
-                        <button class="btn-pdf btn-sm" onclick="gerarPDF(${s.id})">📄</button>
-                        ${s.status_flow !== 'CANCELADO' && s.status_flow !== 'CONCLUIDO' ? `<button class="btn-cancel btn-sm" onclick="cancelarServico(${s.id})">🚫</button>` : ''}
-                    </div>` : `<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;" onclick="event.stopPropagation()">
-                        <button class="btn-info btn-sm" onclick="abrirPainelEvidenciasServico(${s.id},true)">📷 Evidências</button>
-                        ${temFotos ? `<button class="btn-info btn-sm" onclick="verFotosProgCard(${s.id})">🖼️</button>` : ''}
-                    </div>`;
-                return `<div class="mon-mini-card ${cancelClass}" style="flex:1;background:rgba(${cor},.08);border:1px solid rgba(${cor},.35);cursor:${o.modo === 'admin' ? 'default' : 'default'};">
+                        <button type="button" class="btn-info btn-sm" onclick="abrirPainelEvidenciasServico(${s.id},true)">📷</button>
+                        <button type="button" class="btn-info btn-sm" onclick="abrirDetalheServico(${s.id})">🔍</button>
+                        <button type="button" class="btn-pdf btn-sm" onclick="gerarPDF(${s.id})">📄</button>
+                        ${podeCancelar ? `<button type="button" class="btn-cancel btn-sm" onclick="cancelarServico(${s.id})">🚫</button>` : ''}
+                    </div>` : acoesProg;
+                const clickProg = o.modo === 'programador' && s ? `onclick="abrirDetalheProg(${s.id})" role="button" tabindex="0"` : '';
+                const clsClick = o.modo === 'programador' ? ' prog-card-click' : '';
+                return `<div class="mon-mini-card ${cancelClass}${clsClick}" ${clickProg} style="flex:1;background:rgba(${cor},.08);border:1px solid rgba(${cor},.35);">
                     <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;">
                         <span class="status-badge" style="background:${statusColor};color:#fff;font-size:9px;">${s.status_flow}</span>
                         <b style="font-size:11px;color:rgba(${cor},1);">${arrow} ${label}</b>
@@ -6518,75 +6590,35 @@
             document.getElementById('p-setor-display').style.display = 'none';
             renderNewPreviews();
             await carregarProgGeral();
+            progSwitchTab('dia', document.getElementById('prog-tab-dia'));
         }
 
         async function carregarProgGeral() {
+            _inicializarDatasProg();
             const elDt = document.getElementById('p-filter-date');
-            let dt = (elDt?.value || '').trim();
-            if (!dt) {
-                dt = new Date().toISOString().split('T')[0];
-                if (elDt) elDt.value = dt;
-            }
-            const { data: list } = await _filtrarBase(db.from(TBL.prog).select('*').eq('data_servico', dt).order('id'));
+            let dt = (elDt?.value || '').trim() || new Date().toISOString().split('T')[0];
+            if (elDt) elDt.value = dt;
+            const { data: list, error } = await _filtrarBase(db.from(TBL.prog).select('*').eq('data_servico', dt).order('id'));
             const cont = document.getElementById('list-prog-geral');
-            if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento nesta data.</p>'; return; }
-
-            // Agrupa por placa
+            if (!cont) return;
+            _atualizarResumoProg(list || []);
+            if (error) {
+                cont.innerHTML = `<p style="color:var(--danger);padding:15px;text-align:center;">Erro: ${error.message}</p>`;
+                return;
+            }
+            if (!list?.length) {
+                cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum lançamento nesta data.<br><span style="font-size:10px;">Use <b>Novo lançamento</b> para enviar ao fornecedor.</span></p>';
+                return;
+            }
+            let html = _renderMonitorOperacional(list, { modo: 'programador' });
             const placas = [...new Set(list.map(s => s.placa))];
-            let html = '';
-
             placas.forEach(placa => {
-                const doPlaca = list.filter(s => s.placa === placa);
-                const saidas = doPlaca.filter(s => s.tipo_op === 'SAÍDA');
-                const retornos = doPlaca.filter(s => s.tipo_op === 'RETORNO');
-                const setor = doPlaca[0]?.setor || '';
-                const max = Math.max(saidas.length, retornos.length, 1);
-
-                html += `<div style="margin-bottom:14px;">
-                    <div style="font-size:11px;font-weight:bold;color:var(--gray);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">
-                        🚗 ${placa} ${setor ? `<span class="setor-badge setor-${setor}">${setor}</span>` : ''}
-                    </div>`;
-
-                for (let i = 0; i < max; i++) {
-                    const saida = saidas[i];
-                    const retorno = retornos[i];
-
-                    const mkCard = (s, cor, label, arrow) => {
-                        if (!s) return `<div style="flex:1;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:center;color:var(--gray);font-size:11px;min-height:70px;">Sem ${label.toLowerCase()}</div>`;
-                        const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)', 'CANCELADO': 'var(--cancelled)' }[s.status_flow] || 'var(--gray)';
-                        const podeCancelar = s.status_flow !== 'CANCELADO' && s.status_flow !== 'CONCLUIDO';
-                        const temFotos = (s.fotos || []).length > 0;
-                        return `<div style="flex:1;background:rgba(${cor},.08);border:1px solid rgba(${cor},.3);border-radius:10px;padding:10px;">
-                            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;flex-wrap:wrap;">
-                                <span class="status-badge" style="background:${statusColor};color:#fff;">${s.status_flow}</span>
-                                <b style="font-size:12px;color:rgba(${cor},1);">${arrow} ${label}</b>
-                            </div>
-                            <div style="font-size:10px;color:var(--gray);">${arrow === '↗' ? '→' : '←'} ${s.fornecedor || 'PÁTIO'}</div>
-                            <div style="font-size:10px;color:var(--gray);">KM: ${s.km || '—'} | ${s.timestamp || s.data_servico}</div>
-                            ${s.rating ? `<div style="color:#fbbf24;font-size:10px;">${'★'.repeat(s.rating)}${'☆'.repeat(5 - s.rating)}</div>` : ''}
-                            <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
-                                <button class="btn-info btn-sm" onclick="abrirPainelEvidenciasServico(${s.id},true)">📷 Evidências</button>
-                                ${temFotos ? `<button class="btn-info btn-sm" onclick="verFotosProgCard(${s.id})">🖼️</button>` : ''}
-                                ${podeCancelar ? `<button class="btn-cancel btn-sm" onclick="cancelarServicoProg(${s.id})">🚫</button>` : ''}
-                            </div>
-                        </div>`;
-                    };
-
-                    // Se saída está PENDENTE/EM EXECUÇÃO e não há retorno ainda, mostra botão de retorno rápido
-                    const saidaPendente = saida && saida.status_flow !== 'CANCELADO' && !retorno;
-                    html += `<div style="display:flex;gap:8px;margin-bottom:8px;">
-                        ${mkCard(saida, '245,158,11', 'SAÍDA', '↗')}
-                        ${mkCard(retorno, '16,185,129', 'RETORNO', '↙')}
-                    </div>`;
-                    if (saidaPendente) {
-                        html += `<div style="margin-bottom:8px;">
-                            <button class="btn-success btn-sm" style="width:100%;font-size:10px;" onclick="lancarRetornoRapido('${placa}')">↙ Lançar Retorno de ${placa}</button>
-                        </div>`;
-                    }
+                const saidas = list.filter(s => s.placa === placa && s.tipo_op === 'SAÍDA' && s.status_flow !== 'CANCELADO');
+                const temRetorno = list.some(s => s.placa === placa && s.tipo_op === 'RETORNO' && s.status_flow !== 'CANCELADO');
+                if (saidas.length && !temRetorno) {
+                    html += `<button type="button" class="btn-success btn-sm" style="width:100%;font-size:10px;margin-bottom:12px;" onclick="lancarRetornoRapido('${placa}')">↙ Lançar retorno de ${placa}</button>`;
                 }
-                html += `</div>`;
             });
-
             cont.innerHTML = html;
         }
 
@@ -6634,14 +6666,85 @@
         }
 
         async function cancelarServicoProg(id) {
-            if (!confirm('Cancelar este serviço?\n\nO mesmo registro some do painel do fornecedor (evita uso indevido após cancelamento).')) return;
+            if (!id) return;
+            if (!confirm('Cancelar esta programação?\n\nO veículo some da tela do fornecedor naquele dia (status CANCELADO).')) return;
+            loading(true, 'Cancelando...');
             const ts = new Date().toLocaleString('pt-BR');
-            const { error } = await db.from(TBL.prog).update({ status_flow: 'CANCELADO', cancelado_em: ts, cancelado_por: currentUser?.nome }).eq('id', id);
-            if (!error) {
-                await registrarAuditoria(`Cancelamento pelo programador ${currentUser?.nome}: ID ${id}`);
-                showSuccess('SERVIÇO CANCELADO!');
-                await carregarProgGeral();
-            } else { alert('Erro: ' + error.message); }
+            const { error } = await db.from(TBL.prog).update({
+                status_flow: 'CANCELADO',
+                cancelado_em: ts,
+                cancelado_por: currentUser?.nome || 'Programador'
+            }).eq('id', id);
+            loading(false);
+            if (error) {
+                alert('Erro ao cancelar: ' + error.message);
+                return;
+            }
+            await registrarAuditoria(`Cancelamento programador: ID ${id} | ${currentUser?.nome}`);
+            showSuccess('PROGRAMAÇÃO CANCELADA!');
+            fecharDetalheProg();
+            await Promise.all([carregarProgGeral(), carregarHistoricoProgReal()]);
+        }
+
+        let progDetalheId = null;
+
+        function abrirOverlayProgDetalhe() {
+            document.getElementById('scr-prog-detalhe')?.classList.add('modal-aberto');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharDetalheProg() {
+            document.getElementById('scr-prog-detalhe')?.classList.remove('modal-aberto');
+            document.body.style.overflow = '';
+            progDetalheId = null;
+        }
+
+        async function abrirDetalheProg(id) {
+            const { data: rows } = await db.from(TBL.prog).select('*').eq('id', id);
+            const s = rows?.[0];
+            if (!s) { alert('Registro não encontrado.'); return; }
+            progDetalheId = id;
+            const st = s.status_flow || '—';
+            const stColor = _corStatusFlow(st);
+            document.getElementById('prog-det-titulo').textContent = `🚗 ${s.placa} — ${s.tipo_op || 'Serviço'}`;
+            document.getElementById('prog-det-body').innerHTML = `
+                <table style="width:100%;font-size:12px;">
+                    <tr><th>Status</th><td><span class="status-badge" style="background:${stColor}">${st}</span></td></tr>
+                    <tr><th>Fornecedor</th><td>${s.fornecedor || '—'}</td></tr>
+                    <tr><th>KM</th><td>${s.km || '—'}</td></tr>
+                    <tr><th>Setor</th><td>${s.setor || '—'}</td></tr>
+                    <tr><th>Data</th><td>${s.data_servico || '—'}</td></tr>
+                    <tr><th>Hora</th><td>${s.timestamp || '—'}</td></tr>
+                    <tr><th>Programador</th><td>${s.programador || '—'}</td></tr>
+                    ${s.obs_status ? `<tr><th>Obs. fornecedor</th><td style="white-space:pre-wrap;">${s.obs_status}</td></tr>` : ''}
+                </table>`;
+            document.getElementById('prog-det-obs-edit').value = s.obs || '';
+            document.getElementById('prog-det-obs-edit').readOnly = st === 'CANCELADO';
+            const evids = _parseFotosProg(s.fotos);
+            const contF = document.getElementById('prog-det-fotos');
+            contF.innerHTML = evids.length ? evids.map(ev => {
+                const u = _urlEvidencia(ev);
+                if (ev.tipo === 'video') return `<div class="ev-card"><video src="${u}" controls style="max-height:100px;width:100%;"></video>${_metaEvidenciaHtml(ev)}</div>`;
+                return `<div class="photo-card"><img src="${u}" class="thumb" onclick="verFotoGrande(${JSON.stringify(u)})">${_metaEvidenciaHtml(ev)}</div>`;
+            }).join('') : '<p style="font-size:11px;color:var(--gray);">Sem evidências do fornecedor ainda.</p>';
+            const podeCancelar = st !== 'CANCELADO' && st !== 'CONCLUIDO';
+            document.getElementById('prog-det-acoes').innerHTML = `
+                <button type="button" class="btn-info" onclick="abrirPainelEvidenciasServico(${id},true)">📷 Ver evidências (antes/depois)</button>
+                ${podeCancelar ? `<button type="button" class="btn-success" onclick="progSalvarObservacao()">💾 Salvar observação</button>` : ''}
+                ${podeCancelar ? `<button type="button" class="btn-cancel" onclick="cancelarServicoProg(${id})">🚫 Cancelar programação</button>` : ''}`;
+            abrirOverlayProgDetalhe();
+        }
+
+        async function progSalvarObservacao() {
+            if (!progDetalheId) return;
+            const obs = DOMPurify.sanitize(document.getElementById('prog-det-obs-edit').value.trim());
+            loading(true, 'Salvando...');
+            const { error } = await db.from(TBL.prog).update({ obs }).eq('id', progDetalheId);
+            loading(false);
+            if (error) { alert('Erro: ' + error.message); return; }
+            showSuccess('Observação atualizada!');
+            await Promise.all([carregarProgGeral(), carregarHistoricoProgReal()]);
+            await abrirDetalheProg(progDetalheId);
         }
 
         // ─────────────────────────────────────────────
@@ -6862,14 +6965,15 @@
         // PROGRAMADOR — TABS
         // ═══════════════════════════════════════════════════
         function progSwitchTab(aba, btn) {
-            ['lancamentos', 'historico'].forEach(a => {
+            ['dia', 'novo', 'historico', 'manut'].forEach(a => {
                 const el = document.getElementById(`prog-area-${a}`);
                 const tb = document.getElementById(`prog-tab-${a}`);
-                if (el) el.style.display = a === aba ? '' : 'none';
+                if (el) el.style.display = a === aba ? 'block' : 'none';
                 if (tb) tb.classList.toggle('tab-active', a === aba);
             });
-            if (aba === 'lancamentos') carregarManutencoesProg();
+            if (aba === 'dia') carregarProgGeral();
             if (aba === 'historico') carregarHistoricoProgReal();
+            if (aba === 'manut') carregarManutencoesProg();
         }
 
         async function salvarManutencaoProg() {
@@ -6903,7 +7007,8 @@
             cont.innerHTML = list.map(m => {
                 const urgColor = { critico: 'var(--danger)', urgente: 'var(--warning)', normal: 'var(--info)' }[m.urgencia] || 'var(--gray)';
                 const concluido = m.status === 'CONCLUIDO';
-                return `<div class="prog-item" style="border-left-color:${urgColor};${concluido ? 'opacity:.5' : ''}">
+                return `<div class="prog-item prog-card-click" style="border-left-color:${urgColor};${concluido ? 'opacity:.6' : ''}" role="button" tabindex="0"
+                    onclick="abrirDetalheManutProg(${m.id})">
                     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
                         <div>
                             <b>${m.placa}</b> — ${m.descricao}
@@ -6913,25 +7018,41 @@
                         </div>
                         <span class="status-badge" style="background:${concluido ? 'var(--success)' : 'rgba(245,158,11,.3)'};color:${concluido ? '#fff' : 'var(--warning)'};">${m.status}</span>
                     </div>
+                    <div style="font-size:9px;color:var(--info);margin-top:6px;">👆 Toque para ver / concluir / excluir</div>
                 </div>`;
             }).join('');
+        }
+
+        async function abrirDetalheManutProg(id) {
+            const { data: rows } = await _filtrarBase(db.from(TBL.manutencoes).select('*').eq('id', id));
+            const m = rows?.[0];
+            if (!m) return;
+            const acoes = m.status !== 'CONCLUIDO'
+                ? `Deseja marcar como concluída?\n\nOK = Concluir\nCancelar = outra opção`;
+            if (m.status !== 'CONCLUIDO' && confirm(`🔧 ${m.placa}\n${m.descricao}\n\n${acoes}`)) {
+                await db.from(TBL.manutencoes).update({ status: 'CONCLUIDO', concluido_em: new Date().toLocaleString('pt-BR') }).eq('id', id);
+                showSuccess('Revisão concluída!');
+                await carregarManutencoesProg();
+                return;
+            }
+            if (m.status !== 'CONCLUIDO' && confirm('Excluir esta revisão programada?')) {
+                await db.from(TBL.manutencoes).delete().eq('id', id);
+                showSuccess('Revisão removida.');
+                await carregarManutencoesProg();
+            }
         }
 
         async function carregarHistoricoProgReal() {
             const cont = document.getElementById('prog-list-historico');
             if (!cont) return;
+            _inicializarDatasProg();
             const date = document.getElementById('p-hist-date')?.value;
             if (!date) { cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Selecione uma data.</p>'; return; }
             cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Carregando...</p>';
-            const { data: list } = await db.from(TBL.prog).select('*').eq('data_servico', date).order('id', { ascending: false });
+            const { data: list, error } = await _filtrarBase(db.from(TBL.prog).select('*').eq('data_servico', date).order('id', { ascending: false }));
+            if (error) { cont.innerHTML = `<p style="color:var(--danger);text-align:center;padding:20px;">${error.message}</p>`; return; }
             if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px;">Nenhum lançamento nesta data.</p>'; return; }
-            cont.innerHTML = list.map(s => `<div class="prog-item">
-                <b>${s.placa}</b> <span class="status-badge">${s.tipo_op || '—'}</span>
-                <div style="font-size:11px;color:var(--gray);margin-top:4px;">
-                    ${s.fornecedor ? '🏢 ' + s.fornecedor + ' · ' : ''}📏 ${s.km || '—'} km · Por: ${s.programador || '—'}
-                </div>
-                ${s.obs ? '<div style="font-size:11px;margin-top:4px;opacity:.7;">📝 ' + s.obs + '</div>' : ''}
-            </div>`).join('');
+            cont.innerHTML = _renderMonitorOperacional(list, { modo: 'programador' });
         }
 
         // ═══════════════════════════════════════════════════
@@ -7570,7 +7691,9 @@
             if (role === 'fornecedor') {
                 await Promise.all([carregarServicosForn(), carregarResumoServicosFornMes()]);
             } else if (role === 'programador') {
-                await carregarProgGeral();
+                if (!document.getElementById('scr-prog-detalhe')?.classList.contains('modal-aberto'))
+                    show('scr-programador');
+                await Promise.all([carregarProgGeral(), carregarHistoricoProgReal()]);
             } else if (role === 'admin' || role === 'supervisor') {
                 await carregarProgAdmin();
             }
