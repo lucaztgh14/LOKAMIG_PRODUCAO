@@ -2436,7 +2436,7 @@
                 <p style="font-size:9px;color:rgba(148,163,184,0.8);margin-top:8px;line-height:1.35;">Somente motoristas
                     cadastrados com NFC. Use Chrome no Android, site em HTTPS e permissão de NFC.</p>
             </div>
-            <button onclick="handleLogin()"
+            <button type="button" onclick="handleLogin()"
                 style="width:100%;padding:15px;background:linear-gradient(135deg,#0369a1,#0ea5e9 50%,#38bdf8);background-size:200% auto;border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .35s;box-shadow:0 4px 24px rgba(3,105,161,0.55);position:relative;overflow:hidden;"
                 onmouseover="this.style.backgroundPosition='right center';this.style.boxShadow='0 6px 32px rgba(14,165,233,0.7)';this.style.transform='translateY(-1px)'"
                 onmouseout="this.style.backgroundPosition='left center';this.style.boxShadow='0 4px 24px rgba(3,105,161,0.55)';this.style.transform='translateY(0)'"
@@ -4599,24 +4599,42 @@
             if (el) el.style.display = show ? 'flex' : 'none';
         }
 
+        function _normalizarLoginBusca(ident) {
+            return String(ident || '').trim().replace(/\s+/g, ' ');
+        }
+
+        function _senhaConfere(cadastrada, digitada) {
+            const a = String(cadastrada ?? '').trim();
+            const b = String(digitada ?? '').trim();
+            return a.length > 0 && a === b;
+        }
+
         /** Busca colaborador por user_login ou nome (login flexível). */
         async function _buscarColaboradoresPorIdent(ident) {
-            const t = String(ident || '').trim();
+            const t = _normalizarLoginBusca(ident);
             if (!t) return { data: [], error: null };
-            const r1 = await db.from(TBL.colaboradores).select('*').ilike('user_login', t);
+            const loginPat = '%' + t.replace(/[%_\\]/g, '\\$&') + '%';
+            const r1 = await db.from(TBL.colaboradores).select('*').ilike('user_login', loginPat);
             if (r1.error) return r1;
             if (r1.data?.length) return r1;
-            const r2 = await db.from(TBL.colaboradores).select('*').ilike('nome', '%' + t + '%');
+            const r1b = await db.from(TBL.colaboradores).select('*').eq('user_login', t);
+            if (r1b.error) return r1b;
+            if (r1b.data?.length) return r1b;
+            const r2 = await db.from(TBL.colaboradores).select('*').ilike('nome', '%' + t.replace(/[%_\\]/g, '\\$&') + '%');
             return r2;
         }
 
         async function _buscarFornecedorPorIdent(ident) {
-            const t = String(ident || '').trim();
+            const t = _normalizarLoginBusca(ident);
             if (!t) return { data: [], error: null };
-            const r1 = await db.from(TBL.fornUsers).select('*').ilike('user_login', t);
+            const loginPat = '%' + t.replace(/[%_\\]/g, '\\$&') + '%';
+            const r1 = await db.from(TBL.fornUsers).select('*').ilike('user_login', loginPat);
             if (r1.error) return r1;
             if (r1.data?.length) return r1;
-            return db.from(TBL.fornUsers).select('*').ilike('empresa', '%' + t + '%');
+            const r1b = await db.from(TBL.fornUsers).select('*').eq('user_login', t);
+            if (r1b.error) return r1b;
+            if (r1b.data?.length) return r1b;
+            return db.from(TBL.fornUsers).select('*').ilike('empresa', '%' + t.replace(/[%_\\]/g, '\\$&') + '%');
         }
 
         async function _entrarProgramadorPosLogin() {
@@ -5594,7 +5612,12 @@
                     return;
                 }
                 if (colabs?.length) {
-                    const colab = colabs.find(c => (c.senha || '').trim() === p.trim());
+                    const colab = colabs.find(c => _senhaConfere(c.senha, p));
+                    if (!colab && colabs.length && colabs.every(c => c.senha == null || c.senha === '')) {
+                        loading(false);
+                        alert('❌ Usuário encontrado, mas a senha não está disponível no banco.\n\nPeça ao Master para recadastrar a senha deste usuário.');
+                        return;
+                    }
                     if (!colab) {
                         const dica = colabs.length > 1
                             ? '\n\nVários usuários com esse nome. Digite o **login** exato (veja no painel Master: "Login: ...").'
@@ -5660,7 +5683,7 @@
                     return;
                 }
                 if (forns?.length) {
-                    const forn = forns.find(f => f.senha === p);
+                    const forn = forns.find(f => _senhaConfere(f.senha, p));
                     if (!forn) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.'); return; }
                     currentUser = { ...forn, role: 'fornecedor' };
                     document.getElementById('forn-name-screen').innerText = '🏢 ' + forn.empresa;
@@ -7096,9 +7119,7 @@
             const { data: rows } = await _filtrarBase(db.from(TBL.manutencoes).select('*').eq('id', id));
             const m = rows?.[0];
             if (!m) return;
-            const acoes = m.status !== 'CONCLUIDO'
-                ? `Deseja marcar como concluída?\n\nOK = Concluir\nCancelar = outra opção`;
-            if (m.status !== 'CONCLUIDO' && confirm(`🔧 ${m.placa}\n${m.descricao}\n\n${acoes}`)) {
+            if (m.status !== 'CONCLUIDO' && confirm(`🔧 ${m.placa}\n${m.descricao}\n\nDeseja marcar como concluída?\n\nOK = Concluir · Cancelar = voltar`)) {
                 await db.from(TBL.manutencoes).update({ status: 'CONCLUIDO', concluido_em: new Date().toLocaleString('pt-BR') }).eq('id', id);
                 showSuccess('Revisão concluída!');
                 await carregarManutencoesProg();
@@ -12056,6 +12077,12 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 });
             } catch (_) { }
         }
+
+        // Login no escopo global (botões onclick)
+        window.handleLogin = handleLogin;
+        window.handleLoginNFCMotorista = handleLoginNFCMotorista;
+        if (db) console.log('[O.G.A.I.T.] v7.2 — sistema carregado, login disponível');
+        else console.error('[O.G.A.I.T.] Supabase não iniciou — recarregue com Ctrl+F5');
 
     </script>
 
