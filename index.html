@@ -2409,7 +2409,7 @@
             <div style="position:relative;margin-bottom:13px;">
                 <span
                     style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.45;pointer-events:none;">👤</span>
-                <input type="text" id="user" placeholder="Usuário" autocomplete="off"
+                <input type="text" id="user" placeholder="Login ou nome (ex: lucas)" autocomplete="username"
                     onkeydown="if(event.key==='Enter') document.getElementById('pass').focus()"
                     style="width:100%;padding:14px 16px 14px 44px;background:rgba(255,255,255,0.04);border:1px solid rgba(56,189,248,0.18);border-radius:12px;color:#e2e8f0;font-size:14px;outline:none;font-family:'Montserrat',sans-serif;transition:all .25s;"
                     onfocus="this.style.borderColor='rgba(56,189,248,0.6)';this.style.background='rgba(56,189,248,0.06)';this.style.boxShadow='0 0 0 3px rgba(56,189,248,0.12)'"
@@ -4252,8 +4252,18 @@
         // ─────────────────────────────────────────────
         const SUPA_URL = 'https://rpsdrhapdtipvujixoxa.supabase.co';
         const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc2RyaGFwZHRpcHZ1aml4b3hhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NDEzMTIsImV4cCI6MjA5MjUxNzMxMn0.ny3a-wvnnYDtcsJYdljRLFmwmLAqzFp89mduepxSVY4';
-        const { createClient } = supabase;
-        const db = createClient(SUPA_URL, SUPA_KEY);
+        let db;
+        try {
+            if (typeof supabase === 'undefined' || !supabase?.createClient) {
+                throw new Error('Biblioteca Supabase não carregou. Verifique sua internet e recarregue (Ctrl+F5).');
+            }
+            db = supabase.createClient(SUPA_URL, SUPA_KEY);
+        } catch (e) {
+            console.error(e);
+            document.addEventListener('DOMContentLoaded', () => {
+                alert('Erro ao iniciar o sistema:\n' + (e.message || e) + '\n\nRecarregue a página com Ctrl+F5.');
+            });
+        }
 
         // Nomes das tabelas (igual ao banco criado)
         const TBL = {
@@ -4584,8 +4594,47 @@
         // ─────────────────────────────────────────────
         function loading(show, msg) {
             const el = document.getElementById('loading-overlay');
-            document.getElementById('loading-msg').textContent = msg || 'Carregando...';
-            el.style.display = show ? 'flex' : 'none';
+            const msgEl = document.getElementById('loading-msg');
+            if (msgEl) msgEl.textContent = msg || 'Carregando...';
+            if (el) el.style.display = show ? 'flex' : 'none';
+        }
+
+        /** Busca colaborador por user_login ou nome (login flexível). */
+        async function _buscarColaboradoresPorIdent(ident) {
+            const t = String(ident || '').trim();
+            if (!t) return { data: [], error: null };
+            const r1 = await db.from(TBL.colaboradores).select('*').ilike('user_login', t);
+            if (r1.error) return r1;
+            if (r1.data?.length) return r1;
+            const r2 = await db.from(TBL.colaboradores).select('*').ilike('nome', '%' + t + '%');
+            return r2;
+        }
+
+        async function _buscarFornecedorPorIdent(ident) {
+            const t = String(ident || '').trim();
+            if (!t) return { data: [], error: null };
+            const r1 = await db.from(TBL.fornUsers).select('*').ilike('user_login', t);
+            if (r1.error) return r1;
+            if (r1.data?.length) return r1;
+            return db.from(TBL.fornUsers).select('*').ilike('empresa', '%' + t + '%');
+        }
+
+        async function _entrarProgramadorPosLogin() {
+            document.getElementById('prog-user-label').textContent = 'Usuário: ' + (currentUser?.nome || '');
+            show('scr-programador');
+            _inicializarDatasProg();
+            try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch (_) { }
+            try {
+                await Promise.all([popularSeletorVeiculos(), popularSeletorFornecedores()]);
+                toggleFornDiv();
+                progSwitchTab('dia', document.getElementById('prog-tab-dia'));
+                await Promise.all([carregarProgGeral(), carregarManutencoesProg()]);
+                iniciarRealtime();
+                setTimeout(inicializarChat, 1000);
+            } catch (e) {
+                console.error('Pós-login programador:', e);
+                alert('Login OK, mas houve erro ao carregar a tela: ' + (e?.message || e) + '\n\nTente atualizar a página (F5).');
+            }
         }
 
         function show(id) {
@@ -4713,7 +4762,9 @@
                 const el = document.getElementById(id);
                 if (el) el.value = hoje;
             });
-            toggleFornDiv();
+            try { toggleFornDiv(); } catch (_) { }
+
+            if (!db) return;
 
             // ── RESTAURAR SESSÃO (F5) — PRIMEIRO, antes de qualquer outra coisa ──
             try {
@@ -4731,12 +4782,14 @@
                                 try {
                                     if (user.role === 'master') return true;
                                     if (user.role === 'fornecedor') {
-                                        const { data: fu } = await db.from(TBL.fornUsers).select('id').eq('user_login', user.user_login).single();
+                                        if (!user.user_login) return true;
+                                        const { data: fu } = await db.from(TBL.fornUsers).select('id').eq('user_login', user.user_login).maybeSingle();
                                         return !!fu;
                                     }
-                                    const { data: cu } = await db.from(TBL.colaboradores).select('id').eq('user_login', user.user_login).single();
+                                    if (!user.user_login) return true;
+                                    const { data: cu } = await db.from(TBL.colaboradores).select('id').eq('user_login', user.user_login).maybeSingle();
                                     return !!cu;
-                                } catch (_) { return false; }
+                                } catch (_) { return true; }
                             })(),
                             carregarPermissoesCache().catch(() => { }),
                         ]);
@@ -4747,7 +4800,16 @@
                             document.getElementById('scr-login').classList.remove('hidden');
                             return;
                         }
-                        await _restaurarPosLogin(user);
+                        try {
+                            await _restaurarPosLogin(user);
+                        } catch (e) {
+                            console.error('Restaurar sessão:', e);
+                            sessionStorage.removeItem('ogait_sessao_v1');
+                            currentUser = null;
+                            document.getElementById('scr-login').classList.remove('hidden');
+                            alert('Sessão expirada ou erro ao carregar. Faça login novamente.\n' + (e?.message || ''));
+                            return;
+                        }
                         // Config EmailJS em background
                         db.from(TBL.config).select('valor').eq('chave', 'emailjs').single().then(({ data }) => {
                             if (data?.valor) {
@@ -4764,6 +4826,7 @@
             }
 
             // Sem sessão — carrega normalmente em background
+            if (!db) return;
             Promise.all([
                 carregarPermissoesCache().catch(() => { }),
                 db.from(TBL.config).select('valor').eq('chave', 'emailjs').single().then(({ data }) => {
@@ -4818,14 +4881,7 @@
                 return;
             }
             if (perfil === 'programador') {
-                document.getElementById('prog-user-label').textContent = 'Usuário: ' + user.nome;
-                show('scr-programador');
-                _inicializarDatasProg();
-                await Promise.all([popularSeletorVeiculos(), popularSeletorFornecedores()]);
-                toggleFornDiv();
-                progSwitchTab('dia', document.getElementById('prog-tab-dia'));
-                await Promise.all([carregarProgGeral(), carregarManutencoesProg()]);
-                iniciarRealtime();
+                await _entrarProgramadorPosLogin();
                 return;
             }
             if (perfil === 'chefao') {
@@ -5497,11 +5553,15 @@
         }
 
         async function handleLogin() {
-            const uRaw = DOMPurify.sanitize(document.getElementById('user').value.trim());
+            if (!db) {
+                alert('Sistema ainda não carregou. Aguarde ou recarregue a página (Ctrl+F5).');
+                return;
+            }
+            const uRaw = (typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(document.getElementById('user').value) : document.getElementById('user').value).trim();
             const u = uRaw.toUpperCase(); // só usado para checar MASTER e ADMIN
             const uOriginal = uRaw; // preservado para buscar no banco
             const p = document.getElementById('pass').value.trim();
-            if (!uRaw || !p) { alert('Preencha todos os campos!'); return; }
+            if (!uRaw || !p) { alert('Preencha usuário e senha!'); return; }
 
             loading(true, 'Autenticando...');
 
@@ -5527,11 +5587,21 @@
                 // Use admin_ita, admin_pe, admin_xxx conforme a base
 
                 // Colaboradores (admin de base, programador, supervisor, motorista)
-                const { data: colabs, error: colabErr } = await db.from(TBL.colaboradores)
-                    .select('*').ilike('user_login', uOriginal.trim());
+                const { data: colabs, error: colabErr } = await _buscarColaboradoresPorIdent(uOriginal);
+                if (colabErr) {
+                    loading(false);
+                    alert('Erro ao consultar usuários: ' + colabErr.message);
+                    return;
+                }
                 if (colabs?.length) {
                     const colab = colabs.find(c => (c.senha || '').trim() === p.trim());
-                    if (!colab) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.\n\nDica: verifique se a senha foi cadastrada corretamente pelo Master.'); return; }
+                    if (!colab) {
+                        const dica = colabs.length > 1
+                            ? '\n\nVários usuários com esse nome. Digite o **login** exato (veja no painel Master: "Login: ...").'
+                            : '\n\nDica: verifique se a senha foi cadastrada corretamente pelo Master.';
+                        alert('❌ Senha incorreta.' + dica);
+                        return;
+                    }
                     currentUser = { ...colab, nome: colab.nome, role: colab.perfil };
                     await registrarAuditoria('Login: ' + colab.nome + ' (' + colab.perfil + ')');
 
@@ -5549,15 +5619,8 @@
                     }
 
                     if (colab.perfil === 'programador') {
-                        document.getElementById('prog-user-label').textContent = 'Usuário: ' + colab.nome;
                         loading(false);
-                        try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser })); } catch (_) { }
-                        show('scr-programador');
-                        await Promise.all([popularSeletorVeiculos(), popularSeletorFornecedores()]);
-                        toggleFornDiv();
-                        await Promise.all([carregarProgGeral(), carregarManutencoesProg()]);
-                        iniciarRealtime();
-                        setTimeout(inicializarChat, 1000);
+                        await _entrarProgramadorPosLogin();
                         return;
                     }
 
@@ -5590,8 +5653,12 @@
                 }
 
                 // Fornecedores
-                const { data: forns } = await db.from(TBL.fornUsers)
-                    .select('*').ilike('user_login', uOriginal);
+                const { data: forns, error: fornErr } = await _buscarFornecedorPorIdent(uOriginal);
+                if (fornErr) {
+                    loading(false);
+                    alert('Erro ao consultar fornecedor: ' + fornErr.message);
+                    return;
+                }
                 if (forns?.length) {
                     const forn = forns.find(f => f.senha === p);
                     if (!forn) { loading(false); alert('❌ Acesso Negado. Usuário ou senha incorretos.'); return; }
@@ -5619,11 +5686,13 @@
                 }
 
                 loading(false);
-                alert('❌ Acesso Negado. Usuário ou senha incorretos.');
+                alert('❌ Acesso negado.\n\nUse o **login** cadastrado (não só o nome) e a senha correta.\nEx.: se no Master aparece "Login: lucas", digite lucas.');
 
             } catch (err) {
+                console.error('handleLogin:', err);
+                alert('Erro ao conectar: ' + (err?.message || err));
+            } finally {
                 loading(false);
-                alert('Erro ao conectar: ' + err.message);
             }
         }
 
