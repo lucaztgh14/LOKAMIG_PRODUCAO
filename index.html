@@ -1258,6 +1258,65 @@
             text-transform: uppercase;
         }
 
+        /* Design system O.G.A.I.T. — telas operacionais */
+        .ogait-hint {
+            font-size: 10px;
+            color: var(--gray);
+            margin: 0 0 10px 0;
+            line-height: 1.45;
+        }
+
+        .ogait-tabs-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .mon-mini-thumbs {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .mon-mini-thumbs img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, .15);
+            cursor: pointer;
+        }
+
+        #area-manutencao {
+            display: none !important;
+        }
+
+        .ogait-screen-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .ogait-screen-header h1 {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        img.thumb {
+            cursor: pointer;
+        }
+
+        .modal-screen.hidden {
+            display: none !important;
+        }
+
         .mon-grupo-placa {
             margin-bottom: 14px;
         }
@@ -2041,7 +2100,7 @@
         </div>
 
         <!-- Tabs Chefão -->
-        <div class="chefao-tabs">
+        <div class="chefao-tabs ogait-tabs-row">
             <button class="chefao-tab-btn active" onclick="chefaoSwitchTab('visao-geral',this)">🌐 Visão Geral</button>
             <button class="chefao-tab-btn" onclick="chefaoSwitchTab('monitor',this)">📡 Monitor Global</button>
             <button class="chefao-tab-btn" onclick="chefaoSwitchTab('frota',this)">🚛 Frota Global</button>
@@ -2063,6 +2122,7 @@
         <!-- TAB: Monitor Global -->
         <div id="chefao-monitor" class="chefao-section">
             <h3 style="color:#a5b4fc;margin-bottom:12px;">📡 Monitor Global de Serviços</h3>
+            <p class="ogait-hint">Mesma lógica do admin/programador — cards por placa com status e fotos do fornecedor.</p>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
                 <input type="date" id="chf-mon-date" onchange="chefaoCarregarMonitor()"
                     style="flex:1;margin:0;min-width:140px;">
@@ -2218,7 +2278,7 @@
         </div>
 
         <!-- Tabs Master -->
-        <div class="master-tabs">
+        <div class="master-tabs ogait-tabs-row">
             <button class="master-tab-btn active" onclick="masterSwitchTab('visao-geral',this)">🌐 Visão Geral</button>
             <button class="master-tab-btn" onclick="masterSwitchTab('bases',this)">🏭 Bases</button>
             <button class="master-tab-btn" onclick="masterSwitchTab('usuarios',this)">👥 Usuários</button>
@@ -2444,8 +2504,12 @@
                 onmouseup="this.style.transform='translateY(-1px)'">
                 ⚡ ACESSAR SISTEMA
             </button>
+            <p class="ogait-hint" style="text-align:center;margin-top:12px;">
+                Use o <b>login</b> cadastrado (ex: <code style="font-size:10px;">lucas</code>), não só o nome completo.
+                Master: usuário <b>MASTER</b>
+            </p>
             <p
-                style="text-align:center;margin-top:20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(100,116,139,0.65);font-family:'Montserrat',sans-serif;">
+                style="text-align:center;margin-top:8px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(100,116,139,0.65);font-family:'Montserrat',sans-serif;">
                 O.G.A.I.T. Systems · v7.2 · Multi-Base Management
             </p>
             <button id="btn-instalar-pwa" onclick="instalarPWA()"
@@ -2718,6 +2782,7 @@
                 <div class="mon-chip"><b id="mon-cnt-exec" style="color:#f87171;">0</b><span>Em execução</span></div>
                 <div class="mon-chip"><b id="mon-cnt-ok" style="color:var(--success);">0</b><span>Concluídos</span></div>
             </div>
+            <p class="ogait-hint">Mesma visão do programador. Toque no card ou em 📷 para ver fotos antes/depois do fornecedor.</p>
             <div class="search-bar">
                 <input type="date" id="mon-filter-date" onchange="carregarProgAdmin()">
                 <input type="text" id="mon-filter-placa" placeholder="🔍 Placa" oninput="carregarProgAdmin()">
@@ -3270,6 +3335,13 @@
                 <input type="text" id="cfg-ejs-templateid" placeholder="EmailJS Template ID">
                 <button onclick="salvarConfigEmailJS()" class="btn-success">💾 Salvar Config EmailJS</button>
             </div>
+            <div id="config-cloudinary" class="form-section" style="margin-top:10px;">
+                <h4 style="color:var(--info);margin-bottom:10px;">☁️ Cloudinary (fotos)</h4>
+                <p class="ogait-hint">Preset deve estar em modo <b>Unsigned</b>. Se falhar, use bucket Supabase <code>evidencias-prog</code>.</p>
+                <input type="text" id="cfg-cld-cloud" placeholder="Cloud name (ex: dlaregq2k)">
+                <input type="text" id="cfg-cld-preset" placeholder="Upload preset (ex: lokamig)">
+                <button type="button" onclick="salvarConfigCloudinary()" class="btn-success">💾 Salvar Cloudinary</button>
+            </div>
         </div>
 
         <!-- DESEMPENHO POR MOTORISTA -->
@@ -3454,10 +3526,13 @@
     <!-- TELA 3: PROGRAMADOR -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-programador" class="container hidden">
-        <h1>📋 PROGRAMADOR</h1>
+        <div class="ogait-screen-header">
+            <h1>📋 PROGRAMADOR</h1>
+            <span class="realtime-badge"><span class="realtime-dot"></span>LIVE</span>
+        </div>
         <div class="sub" id="prog-user-label"></div>
 
-        <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;flex-wrap:wrap;">
+        <div class="ogait-tabs-row">
             <button onclick="progSwitchTab('dia',this)" class="tab-btn tab-active" id="prog-tab-dia">📅 Programação do dia</button>
             <button onclick="progSwitchTab('novo',this)" class="tab-btn" id="prog-tab-novo">➕ Novo lançamento</button>
             <button onclick="progSwitchTab('historico',this)" class="tab-btn" id="prog-tab-historico">📜 Histórico</button>
@@ -3473,7 +3548,7 @@
                 <div class="mon-chip"><b id="prog-cnt-exec" style="color:#f87171;">0</b><span>Em execução</span></div>
                 <div class="mon-chip"><b id="prog-cnt-ok" style="color:var(--success);">0</b><span>Concluídos</span></div>
             </div>
-            <p style="font-size:10px;color:var(--gray);margin:0 0 10px 0;">Toque no card para ver detalhes, evidências do fornecedor ou cancelar a programação.</p>
+            <p class="ogait-hint">Toque no card para ver detalhes, evidências do fornecedor ou cancelar a programação.</p>
             <div id="list-prog-geral"></div>
         </div>
 
@@ -3514,7 +3589,7 @@
         <!-- Histórico -->
         <div id="prog-area-historico" style="display:none;">
             <input type="date" id="p-hist-date" onchange="carregarHistoricoProgReal()" style="margin-bottom:10px;width:100%;">
-            <p style="font-size:10px;color:var(--gray);margin:0 0 10px 0;">Lançamentos enviados em outras datas — clique para ver, editar observação ou cancelar.</p>
+            <p class="ogait-hint">Lançamentos em outras datas — clique no card para ver, editar observação ou cancelar.</p>
             <div id="prog-list-historico">
                 <p style="color:var(--gray);text-align:center;padding:20px;">Carregando...</p>
             </div>
@@ -3560,10 +3635,13 @@
     <!-- TELA ALMOXARIFE -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-almoxarife" class="container hidden">
-        <h1>🗃️ ALMOXARIFADO</h1>
+        <div class="ogait-screen-header">
+            <h1>🗃️ ALMOXARIFADO</h1>
+            <span class="realtime-badge"><span class="realtime-dot"></span>LIVE</span>
+        </div>
         <div class="sub" id="almo-user-label"></div>
 
-        <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+        <div class="ogait-tabs-row">
             <button onclick="almoSwitchTab('pecas',this)" class="tab-btn tab-active" id="almo-tab-pecas">📦
                 Estoque</button>
             <button onclick="almoSwitchTab('entrada',this)" class="tab-btn" id="almo-tab-entrada">📥 Entrada</button>
@@ -3663,11 +3741,14 @@
         <div class="sub" style="margin-bottom:10px;">Painel do Fornecedor</div>
 
         <div id="forn-alertas-revisao"></div>
+        <div id="forn-logo-preview-wrap" style="display:none;margin-bottom:10px;text-align:center;">
+            <img id="forn-logo-preview" alt="Logo" style="max-height:56px;max-width:160px;border-radius:8px;">
+        </div>
         <input type="file" id="forn-logo-upload" accept="image/*" style="display:none;"
-            onchange="previewLogoForn(event)">
+            onchange="previewLogoForn(this)">
 
         <!-- Abas principais -->
-        <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;">
+        <div class="ogait-tabs-row">
             <button onclick="fornSwitchTab('servicos',this)" class="tab-btn tab-active" id="forn-tab-servicos">🚗
                 Operação</button>
             <button onclick="fornSwitchTab('orcamentos',this)" class="tab-btn" id="forn-tab-orcamentos">💰
@@ -3705,7 +3786,7 @@
                         <span class="forn-chip-lbl">Concluídos</span>
                     </div>
                 </div>
-                <p style="font-size:10px;color:var(--gray);margin:0 0 10px 0;">Toque no card do veículo para iniciar, concluir ou ver fotos.</p>
+                <p class="ogait-hint">Toque no card do veículo para iniciar, concluir ou ver fotos antes/depois.</p>
                 <div id="list-forn-servicos"></div>
             </div>
 
@@ -3770,7 +3851,10 @@
     <!-- TELA 5: MOTORISTA — CHECKLIST -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <section id="scr-motorista" class="container hidden">
-        <h1>🚗 CHECKLIST DO VEÍCULO</h1>
+        <div class="ogait-screen-header">
+            <h1>🚗 CHECKLIST DO VEÍCULO</h1>
+            <span class="realtime-badge"><span class="realtime-dot"></span>LIVE</span>
+        </div>
         <div class="sub" id="motorista-user-label"></div>
 
         <!-- Barra de status GPS -->
@@ -4652,7 +4736,30 @@
             } catch (e) {
                 console.error('Pós-login programador:', e);
                 alert('Login OK, mas houve erro ao carregar a tela: ' + (e?.message || e) + '\n\nTente atualizar a página (F5).');
+            } finally {
+                loading(false);
             }
+        }
+
+        function _ogaitFecharOverlays() {
+            try { fecharDetalheProg(); } catch (_) { }
+            try { fecharOverlayEvidencias(); } catch (_) { }
+            document.getElementById('scr-prog-detalhe')?.classList.remove('modal-aberto');
+            document.getElementById('scr-modal-status')?.classList.remove('modal-aberto');
+            ['scr-orcamento', 'scr-orc-enviados', 'scr-orc-detalhe', 'scr-servico-detalhe'].forEach(id => {
+                document.getElementById(id)?.classList.add('hidden');
+            });
+            document.body.style.overflow = '';
+        }
+
+        function _renderMiniThumbs(s) {
+            const evids = _parseFotosProg(s?.fotos).filter(e => e.tipo !== 'video').slice(0, 4);
+            if (!evids.length) return '';
+            return `<div class="mon-mini-thumbs" onclick="event.stopPropagation()">${evids.map(ev => {
+                const u = _urlEvidencia(ev);
+                if (!u) return '';
+                return `<img src="${u}" alt="" loading="lazy" class="thumb">`;
+            }).join('')}</div>`;
         }
 
         function show(id) {
@@ -4863,9 +4970,12 @@
             const perfil = user.role || user.perfil;
             const hoje = new Date().toISOString().split('T')[0];
             if (perfil === 'master') {
-                show('scr-master'); return;
+                currentUser = user;
+                await _entrarMaster();
+                return;
             }
             if (perfil === 'fornecedor') {
+                currentUser = { ...user, role: 'fornecedor' };
                 show('scr-fornecedor');
                 const fnEl = document.getElementById('forn-name-screen') || document.getElementById('forn-nome-empresa');
                 if (fnEl) fnEl.textContent = '🏢 ' + (user.empresa || user.nome);
@@ -4899,28 +5009,18 @@
                 return;
             }
             if (perfil === 'programador') {
+                currentUser = { ...user, role: 'programador', perfil: 'programador' };
                 await _entrarProgramadorPosLogin();
                 return;
             }
             if (perfil === 'chefao') {
-                await _entrarChefao(); return;
+                currentUser = user;
+                await _entrarChefao();
+                return;
             }
             // admin / supervisor
-            const baseLabel = user.base_nome || user.base_id || '';
-            document.getElementById('admin-user-label').textContent =
-                `Bem-vindo, ${user.nome} · ${baseLabel} — ${baseLabel}`;
-            if (document.getElementById('base-badge-nome'))
-                document.getElementById('base-badge-nome').textContent = '🏭 ' + (user.base_nome || 'Base');
-            show('scr-admin');
-            // Carregar tudo em paralelo para máxima velocidade
-            Promise.all([
-                atualizarDashboard(),
-                carregarProgAdmin(),
-                popularSeletorVeiculos(),
-                popularSeletorFornecedores()
-            ]).catch(() => { });
-            iniciarRealtime();
-            setTimeout(inicializarChat, 1000);
+            currentUser = { ...user, role: user.role || user.perfil };
+            await _entrarAdmin();
         }
 
         // ─────────────────────────────────────────────
@@ -4951,7 +5051,10 @@
                     } catch (_) { }
                 })
                 .on('postgres_changes', { event: '*', schema: 'public', table: TBL.orcamentos }, () => {
-                    if (!document.getElementById('area-orcamentos').classList.contains('hidden')) renderOrcamentosAdmin();
+                    const ar = document.getElementById('area-orcamentos');
+                    if (ar && !ar.classList.contains('hidden')) renderOrcamentosAdmin();
+                    const scrF = document.getElementById('scr-fornecedor');
+                    if (scrF && !scrF.classList.contains('hidden')) carregarOrcForn().catch(() => { });
                 })
                 .on('postgres_changes', { event: '*', schema: 'public', table: TBL.manutencoes }, () => {
                     atualizarDashboard();
@@ -4962,7 +5065,8 @@
                     } catch (_) { }
                 })
                 .on('postgres_changes', { event: '*', schema: 'public', table: TBL.combustivel }, () => {
-                    if (!document.getElementById('area-combustivel').classList.contains('hidden')) carregarAbastecimentos();
+                    const ar = document.getElementById('area-combustivel');
+                    if (ar && !ar.classList.contains('hidden')) carregarAbastecimentos();
                     atualizarDashboard();
                 })
                 .subscribe();
@@ -5008,7 +5112,7 @@
                 estoque: () => { renderPecas(); popularSelectsPecas(); carregarAlertasEstoque('list-est-alertas'); },
                 'minha-conta-admin': adminCarregarMeusDados,
                 permissoes: renderPermissoes,
-                config: () => { }
+                config: carregarConfigPainel
             };
             if (loaders[id]) loaders[id]();
             // Atualizar tela na sessão
@@ -5432,7 +5536,7 @@
         // ── Fim módulo estoque ───────────────────────────────────
         function _telaAtual() {
             const screens = ['scr-admin', 'scr-programador', 'scr-almoxarife', 'scr-fornecedor',
-                'scr-motorista', 'scr-chefao', 'scr-master', 'scr-supervisor'];
+                'scr-motorista', 'scr-chefao', 'scr-master'];
             for (const s of screens) {
                 const el = document.getElementById(s);
                 if (el && !el.classList.contains('hidden')) return s;
@@ -5571,6 +5675,7 @@
         }
 
         async function handleLogin() {
+            _ogaitFecharOverlays();
             if (!db) {
                 alert('Sistema ainda não carregou. Aguarde ou recarregue a página (Ctrl+F5).');
                 return;
@@ -5634,15 +5739,14 @@
                         return;
                     }
 
-                    if (colab.perfil === 'admin') {
+                    if (colab.perfil === 'admin' || colab.perfil === 'supervisor') {
                         const liberado = await verificarLicencaBase(colab.base_id);
-                        if (!liberado) { loading(false); return; }
+                        if (!liberado) return;
                         await _entrarAdmin();
                         return;
                     }
 
                     if (colab.perfil === 'programador') {
-                        loading(false);
                         await _entrarProgramadorPosLogin();
                         return;
                     }
@@ -5664,15 +5768,7 @@
                         return;
                     }
 
-                    document.getElementById('admin-user-label').textContent = 'Bem-vindo, ' + colab.nome + ' (' + colab.perfil + ')';
-                    loading(false);
-                    show('scr-admin');
-                    await carregarPermissoesCache();
-                    aplicarPermissoesAdmin(colab.perfil);
-                    await Promise.all([atualizarDashboard(), carregarProgAdmin()]);
-                    iniciarRealtime();
-                    setTimeout(inicializarChat, 1000);
-                    return;
+
                 }
 
                 // Fornecedores
@@ -5743,11 +5839,8 @@
             if (mesSel) mesSel.value = new Date().getMonth() + 1;
             loading(false);
             show('scr-admin');
-            await Promise.all([
-                atualizarDashboard(),
-                carregarProgAdmin(),
-                renderPermissoes()
-            ]);
+            await carregarPermissoesCache();
+            aplicarPermissoesAdmin(currentUser?.perfil || currentUser?.role || 'admin');
             await registrarAuditoria('Login: ' + (currentUser?.nome || 'ADMIN') + ' | Base: ' + baseLabel);
             // Persistir sessão para F5
             try { sessionStorage.setItem('ogait_sessao_v1', JSON.stringify({ user: currentUser, tela: _telaAtual() })); } catch (_) { }
@@ -5769,10 +5862,14 @@
             // Esconde todas as áreas primeiro
             document.querySelectorAll('.admin-content').forEach(a => a.classList.add('hidden'));
 
+            const areaManut = document.getElementById('area-manutencao');
+            if (areaManut) areaManut.classList.add('hidden');
+
             Array.from(tabs.children).forEach(btn => {
                 const match = btn.getAttribute('onclick')?.match(/'([^']+)'/);
                 if (match) {
-                    const visivel = perm[match[1]] === true;
+                    const abaId = match[1];
+                    const visivel = abaId === 'manutencao' ? false : (perm[abaId] === true);
                     btn.style.display = visivel ? '' : 'none';
                 }
             });
@@ -5787,12 +5884,15 @@
 
         async function handleLogout() {
             pararRealtime();
+            _ogaitFecharOverlays();
             currentUser = null;
             try { sessionStorage.removeItem('ogait_sessao_v1'); } catch (_) { }
             tempFotos = []; tempEvidencias = []; abastecimentoFoto = null;
             show('scr-login');
-            document.getElementById('user').value = '';
-            document.getElementById('pass').value = '';
+            const u = document.getElementById('user');
+            const pw = document.getElementById('pass');
+            if (u) u.value = '';
+            if (pw) pw.value = '';
         }
 
         // ─────────────────────────────────────────────
@@ -5803,7 +5903,10 @@
                 const { data } = await db.from(TBL.permissoes).select('*');
                 if (data?.length) {
                     permissoesCache = {};
-                    data.forEach(row => { permissoesCache[row.perfil] = row.permissoes; });
+                    data.forEach(row => {
+                        permissoesCache[row.perfil] = { ...(PERMISSOES_PADRAO[row.perfil] || {}), ...(row.permissoes || {}) };
+                        if (row.perfil === 'admin' || row.perfil === 'supervisor') permissoesCache[row.perfil].manutencao = false;
+                    });
                 } else {
                     permissoesCache = PERMISSOES_PADRAO;
                 }
@@ -5944,14 +6047,18 @@
                     <div style="font-size:9px;color:var(--info);margin-top:4px;">👆 Toque no card ou em Detalhes</div>` : '';
                 const acoes = o.modo === 'admin' ? `
                     <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;" onclick="event.stopPropagation()">
-                        <button type="button" class="btn-info btn-sm" onclick="abrirPainelEvidenciasServico(${s.id},true)">📷</button>
+                        <button type="button" class="btn-info btn-sm" onclick="abrirPainelEvidenciasServico(${s.id},true)">📷 Evidências</button>
                         <button type="button" class="btn-info btn-sm" onclick="abrirDetalheServico(${s.id})">🔍</button>
                         <button type="button" class="btn-pdf btn-sm" onclick="gerarPDF(${s.id})">📄</button>
                         ${podeCancelar ? `<button type="button" class="btn-cancel btn-sm" onclick="cancelarServico(${s.id})">🚫</button>` : ''}
-                    </div>` : acoesProg;
-                const clickProg = o.modo === 'programador' && s ? `onclick="abrirDetalheProg(${s.id})" role="button" tabindex="0"` : '';
-                const clsClick = o.modo === 'programador' ? ' prog-card-click' : '';
-                return `<div class="mon-mini-card ${cancelClass}${clsClick}" ${clickProg} style="flex:1;background:rgba(${cor},.08);border:1px solid rgba(${cor},.35);">
+                    </div>
+                    <div style="font-size:9px;color:var(--info);margin-top:4px;">👆 Toque no card para abrir fotos</div>` : acoesProg;
+                const thumbs = o.modo === 'admin' ? _renderMiniThumbs(s) : '';
+                const clickHandler = o.modo === 'programador' ? `abrirDetalheProg(${s.id})`
+                    : o.modo === 'admin' ? `abrirPainelEvidenciasServico(${s.id},true)` : '';
+                const clickAttr = clickHandler ? `onclick="${clickHandler}" role="button" tabindex="0"` : '';
+                const clsClick = (o.modo === 'programador' || o.modo === 'admin') ? ' prog-card-click' : '';
+                return `<div class="mon-mini-card ${cancelClass}${clsClick}" ${clickAttr} style="flex:1;background:rgba(${cor},.08);border:1px solid rgba(${cor},.35);">
                     <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;">
                         <span class="status-badge" style="background:${statusColor};color:#fff;font-size:9px;">${s.status_flow}</span>
                         <b style="font-size:11px;color:rgba(${cor},1);">${arrow} ${label}</b>
@@ -5959,6 +6066,7 @@
                     <div style="font-size:10px;color:var(--gray);">${arrow === '↗' ? '→' : '←'} ${s.fornecedor || 'PÁTIO'}</div>
                     <div style="font-size:10px;color:var(--gray);">KM: ${s.km || '—'} | ${s.timestamp || s.data_servico || ''}</div>
                     ${s.obs ? `<div style="font-size:9px;color:var(--gray);margin-top:3px;">📝 ${String(s.obs).slice(0, 80)}${String(s.obs).length > 80 ? '…' : ''}</div>` : ''}
+                    ${thumbs}
                     ${acoes}
                 </div>`;
             };
@@ -6079,13 +6187,17 @@
         function fecharDetalheServico() { show('scr-admin'); carregarProgAdmin(); }
 
         async function cancelarServico(id) {
-            if (!confirm('Confirmar cancelamento deste serviço?')) return;
+            if (!confirm('Cancelar este serviço?\n\nSome da tela do fornecedor (status CANCELADO).')) return;
             const ts = new Date().toLocaleString('pt-BR');
-            const { error } = await db.from(TBL.prog).update({ status_flow: 'CANCELADO', cancelado_em: ts }).eq('id', id);
-            if (!error) {
-                await registrarAuditoria('Cancelamento serviço ID ' + id);
-                await carregarProgAdmin();
-            }
+            const { error } = await db.from(TBL.prog).update({
+                status_flow: 'CANCELADO',
+                cancelado_em: ts,
+                cancelado_por: currentUser?.nome || 'Admin'
+            }).eq('id', id);
+            if (error) { alert('Erro: ' + error.message); return; }
+            await registrarAuditoria('Cancelamento admin: ID ' + id + ' | ' + (currentUser?.nome || ''));
+            showSuccess('Serviço cancelado!');
+            await carregarProgAdmin();
         }
 
         async function concluirManutencaoPorPlaca(placa) {
@@ -6629,9 +6741,9 @@
                 const src = typeof f === 'string' ? f : f.data;
                 const ts = typeof f === 'object' ? f.ts : '';
                 return `<div class="photo-card">
-            <img src="${src}" class="thumb" onclick="verFotoGrande('${src}')">
+            <img src="${src}" class="thumb" alt="">
             <div class="timestamp-overlay">📅 ${ts}</div>
-            <button class="del-btn" onclick="tempFotos.splice(${idx},1);renderNewPreviews()">✕</button>
+            <button type="button" class="del-btn" onclick="event.stopPropagation();tempFotos.splice(${idx},1);renderNewPreviews()">✕</button>
         </div>`;
             }).join('');
         }
@@ -6643,36 +6755,57 @@
             const km = document.getElementById('p-km').value || null;
             const obs = DOMPurify.sanitize(document.getElementById('p-obs').value);
             const fornecedor = tipo === 'RETORNO' ? 'PÁTIO' : (document.getElementById('p-fornecedor-select').value || '—');
+            if (tipo !== 'RETORNO' && (!fornecedor || fornecedor === '—')) {
+                alert('Selecione o fornecedor de destino!');
+                return;
+            }
             const setor = document.getElementById('p-setor-label')?.innerText || '';
-            const fotos = tempFotos.map(f => typeof f === 'string' ? f : f.data);
+            const fotosRaw = tempFotos.map(f => typeof f === 'string' ? f : f.data).filter(Boolean);
             const ts = new Date().toLocaleString('pt-BR');
+            let fotosPayload = [];
 
             const payload = {
                 data_servico: new Date().toISOString().split('T')[0],
                 timestamp: ts,
                 placa, setor, km: km ? parseInt(km) : null,
-                fornecedor, obs, fotos,
+                fornecedor, obs, fotos: fotosPayload,
                 programador: currentUser?.nome || 'Sistema',
                 status_flow: tipo === 'RETORNO' ? 'CONCLUIDO' : 'PENDENTE',
                 tipo_op: tipo,
-                rating: 0
+                rating: 0,
+                base_id: currentUser?.base_id || null
             };
 
             if (!isOnline) {
+                payload.fotos = fotosRaw;
                 enfileirarOffline(TBL.prog, payload);
-                // Salva localmente para exibição imediata
                 const local = JSON.parse(localStorage.getItem('ogait_prog_local') || '[]');
                 local.push({ ...payload, id: Date.now(), _offline: true });
                 localStorage.setItem('ogait_prog_local', JSON.stringify(local));
                 showSuccess('SALVO OFFLINE!');
             } else {
                 loading(true, 'Enviando...');
-                const { error } = await db.from(TBL.prog).insert(payload);
-                if (error) { loading(false); alert('Erro: ' + error.message); return; }
-                if (km) await db.from(TBL.veiculos).update({ km_atual: parseInt(km) }).eq('placa', placa);
-                await registrarAuditoria(`Lançamento: ${tipo} ${placa} → ${fornecedor} | Por: ${currentUser?.nome}`);
-                loading(false);
-                showSuccess('LANÇAMENTO ENVIADO!');
+                try {
+                    if (fotosRaw.length) {
+                        loading(true, 'Enviando fotos...');
+                        const urls = await uploadFotosCloudinary(fotosRaw);
+                        fotosPayload = _sanitizarEvidenciasBanco(urls.map(u => ({
+                            url: u, tipo: 'antes', ts, programador: currentUser?.nome
+                        })));
+                        payload.fotos = fotosPayload;
+                    }
+                    loading(true, 'Salvando programação...');
+                    const { error } = await db.from(TBL.prog).insert(payload);
+                    if (error) { loading(false); alert('Erro: ' + error.message); return; }
+                    if (km) await db.from(TBL.veiculos).update({ km_atual: parseInt(km) }).eq('placa', placa);
+                    await registrarAuditoria(`Lançamento: ${tipo} ${placa} → ${fornecedor} | Por: ${currentUser?.nome}`);
+                    showSuccess('LANÇAMENTO ENVIADO!');
+                } catch (e) {
+                    console.error(e);
+                    alert('Erro ao enviar: ' + (e?.message || e));
+                } finally {
+                    loading(false);
+                }
             }
 
             tempFotos = [];
@@ -8176,6 +8309,40 @@
             emailjs.init(cfg.userId);
             loading(false);
             alert('✅ Configuração EmailJS salva!');
+        }
+
+        async function carregarConfigPainel() {
+            try {
+                const { data: ejs } = await db.from(TBL.config).select('valor').eq('chave', 'emailjs').maybeSingle();
+                if (ejs?.valor) {
+                    emailjsCfg = ejs.valor;
+                    const ids = ['cfg-ejs-userid', 'cfg-ejs-serviceid', 'cfg-ejs-templateid'];
+                    const keys = ['userId', 'serviceId', 'templateId'];
+                    ids.forEach((id, i) => { const el = document.getElementById(id); if (el && emailjsCfg[keys[i]]) el.value = emailjsCfg[keys[i]]; });
+                }
+                const { data: cld } = await db.from(TBL.config).select('valor').eq('chave', 'cloudinary_upload').maybeSingle();
+                if (cld?.valor) {
+                    const elC = document.getElementById('cfg-cld-cloud');
+                    const elP = document.getElementById('cfg-cld-preset');
+                    if (elC) elC.value = cld.valor.cloudName || '';
+                    if (elP) elP.value = cld.valor.uploadPreset || '';
+                }
+            } catch (_) { }
+            await _carregarConfigCloudinary();
+        }
+
+        async function salvarConfigCloudinary() {
+            const cloudName = document.getElementById('cfg-cld-cloud')?.value?.trim();
+            const uploadPreset = document.getElementById('cfg-cld-preset')?.value?.trim();
+            if (!cloudName || !uploadPreset) { alert('Preencha cloud name e upload preset!'); return; }
+            loading(true, 'Salvando...');
+            await db.from(TBL.config).upsert({
+                chave: 'cloudinary_upload',
+                valor: { cloudName, uploadPreset }
+            }, { onConflict: 'chave' });
+            await _carregarConfigCloudinary();
+            loading(false);
+            showSuccess('Cloudinary atualizado!');
         }
 
         function enviarOrcamentoPorEmail() {
@@ -10843,7 +11010,9 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
         async function chefaoCarregarMonitor() {
             const cont = document.getElementById('chefao-lista-monitor');
             if (!cont) return;
-            const dt = document.getElementById('chf-mon-date')?.value || new Date().toISOString().split('T')[0];
+            const elDt = document.getElementById('chf-mon-date');
+            let dt = (elDt?.value || '').trim() || new Date().toISOString().split('T')[0];
+            if (elDt) elDt.value = dt;
             const baseId = document.getElementById('chf-mon-base')?.value || '';
             const status = document.getElementById('chf-mon-status')?.value || '';
             cont.innerHTML = '<p style="color:var(--gray);padding:10px;">Carregando...</p>';
@@ -10851,22 +11020,13 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 let q = db.from(TBL.prog).select('*').eq('data_servico', dt).order('id', { ascending: false });
                 if (baseId) q = q.eq('base_id', parseInt(baseId));
                 if (status) q = q.eq('status_flow', status);
-                const { data: list } = await q;
-                if (!list?.length) { cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum serviço encontrado.</p>'; return; }
-                const statusColor = { 'PENDENTE': 'var(--warning)', 'EM EXECUÇÃO': '#ef4444', 'CONCLUIDO': 'var(--success)', 'CANCELADO': 'var(--cancelled)' };
-                cont.innerHTML = list.map(s => `
-                    <div class="prog-item status-${s.status_flow?.replace(' ', '-')}">
-                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
-                            <span class="status-badge" style="background:${statusColor[s.status_flow] || 'var(--gray)'};">${s.status_flow}</span>
-                            <b>${s.placa}</b>
-                            ${s.setor ? `<span class="setor-badge setor-${s.setor}">${s.setor}</span>` : ''}
-                            <span style="font-size:10px;color:var(--gray);margin-left:auto;">${s.tipo_op || ''}</span>
-                        </div>
-                        <div style="font-size:11px;color:var(--gray);">
-                            → ${s.fornecedor || 'PÁTIO'} | KM: ${s.km || '—'} | ${s.timestamp || s.data_servico}
-                            ${s.programador ? `<br>👤 ${s.programador}` : ''}
-                        </div>
-                    </div>`).join('');
+                const { data: list, error } = await q;
+                if (error) throw error;
+                if (!list?.length) {
+                    cont.innerHTML = '<p style="color:var(--gray);padding:15px;text-align:center;">Nenhum serviço nesta data.</p>';
+                    return;
+                }
+                cont.innerHTML = _renderMonitorOperacional(list, { modo: 'admin' });
             } catch (e) { cont.innerHTML = `<div class="alert-card alert-danger">${e.message}</div>`; }
         }
 
@@ -11312,9 +11472,6 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             } catch (e) { loading(false); console.error(e); }
         }
 
-        // Atualizar masterSwitchTab para incluir vendas
-        const _origMasterSwitch = masterSwitchTab;
-
         let _masterSenhaAtual = null; // armazenada no Supabase na tabela config_sistema
 
         function masterSwitchTab(id, el) {
@@ -11332,10 +11489,9 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
                 'auditoria-global': masterCarregarAuditoria
             };
             if (loaders[id]) loaders[id]();
-            // Atualizar tela na sessão
             try {
                 const raw = sessionStorage.getItem('ogait_sessao_v1');
-                if (raw) { const s = JSON.parse(raw); s.tela = 'scr-admin'; sessionStorage.setItem('ogait_sessao_v1', JSON.stringify(s)); }
+                if (raw) { const s = JSON.parse(raw); s.tela = 'scr-master'; sessionStorage.setItem('ogait_sessao_v1', JSON.stringify(s)); }
             } catch (_) { }
         }
 
@@ -11357,7 +11513,9 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
             const reader = new FileReader();
             reader.onload = e => {
                 const prev = document.getElementById('forn-logo-preview');
-                if (prev) { prev.src = e.target.result; prev.style.display = 'block'; }
+                const wrap = document.getElementById('forn-logo-preview-wrap');
+                if (prev) prev.src = e.target.result;
+                if (wrap) wrap.style.display = 'block';
             };
             reader.readAsDataURL(file);
         }
@@ -12081,8 +12239,23 @@ CREATE POLICY "allow_all" ON rastreamento FOR ALL USING (true) WITH CHECK (true)
         // Login no escopo global (botões onclick)
         window.handleLogin = handleLogin;
         window.handleLoginNFCMotorista = handleLoginNFCMotorista;
-        if (db) console.log('[O.G.A.I.T.] v7.2 — sistema carregado, login disponível');
-        else console.error('[O.G.A.I.T.] Supabase não iniciou — recarregue com Ctrl+F5');
+
+        // Clique em miniaturas — evita onclick quebrado com URLs longas
+        document.body.addEventListener('click', function (e) {
+            if (e.target.closest('.del-btn')) return;
+            const img = e.target.closest('img.thumb');
+            if (!img || !img.src) return;
+            const area = img.closest('.preview-area, #prog-det-fotos, .mon-mini-thumbs, .evidencia-grid, .photo-card');
+            const galeria = area ? [...area.querySelectorAll('img.thumb')].map(i => i.src).filter(Boolean) : [img.src];
+            verFotoGrande(img.src, galeria.length > 1 ? galeria : null);
+        });
+
+        if (db) {
+            console.log('[O.G.A.I.T.] v7.2 — sistema carregado, login disponível');
+            _carregarConfigCloudinary().catch(() => { });
+        } else {
+            console.error('[O.G.A.I.T.] Supabase não iniciou — recarregue com Ctrl+F5');
+        }
 
     </script>
 
